@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 import ptBR from './locales/pt-br.json';
 import enUS from './locales/en-us.json';
@@ -21,26 +20,29 @@ export const languageFlags: Record<SupportedLanguage, string> = {
   'es-es': '🇪🇸',
 };
 
+// Create resources object with proper typing
 const resources = {
   'pt-br': { translation: ptBR },
   'en-us': { translation: enUS },
   'es-es': { translation: esES },
-};
+} as const;
 
-i18n
-  .use(LanguageDetector)
+// Export the init promise so we can wait for it
+export const i18nPromise = i18n
   .use(initReactI18next)
   .init({
     resources,
+    lng: 'pt-br',
     fallbackLng: 'pt-br',
-    supportedLngs: supportedLanguages,
-    detection: {
-      order: ['path', 'navigator', 'htmlTag'],
-      lookupFromPathIndex: 0,
-      caches: [],
-    },
+    supportedLngs: ['pt-br', 'en-us', 'es-es'],
+    ns: ['translation'],
+    defaultNS: 'translation',
+    keySeparator: '.',
     interpolation: {
       escapeValue: false,
+    },
+    react: {
+      useSuspense: false,
     },
   });
 
