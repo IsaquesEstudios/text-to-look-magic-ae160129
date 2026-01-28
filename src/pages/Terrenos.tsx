@@ -4,7 +4,7 @@ import { AdvantagesSection } from "@/components/sections/AdvantagesSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import heroLand from "@/assets/hero-land.jpg";
+import terrenosImage from "@/assets/terrenos.webp";
 
 const flowSteps = [
   {
@@ -35,7 +35,7 @@ const Terrenos = () => {
         title="Investimento em Terrenos nos EUA: Lucratividade Média de 90%."
         description="Inicie sua jornada de dolarização com o ativo de maior giro e margem do mercado imobiliário americano. A Discovery Investments identifica terrenos em leilões estratégicos, permitindo que você adquira propriedades por uma fração do valor de mercado e colha lucros excepcionais."
         ctaText="Quero Investir em Terrenos"
-        backgroundImage={heroLand}
+        backgroundImage={terrenosImage}
       />
 
       {/* How it Works - Dark section after hero */}
@@ -80,7 +80,7 @@ const Terrenos = () => {
       </section>
 
       {/* Advantages - Light section with image */}
-      <AdvantagesSection image={heroLand} />
+      <AdvantagesSection image={terrenosImage} />
 
       {/* Profitability - White section */}
       <section className="section-cream py-24">
