@@ -1,8 +1,9 @@
-// Initialize i18n first - must be imported before React components
-import "./i18n";
-
 import { createRoot } from "react-dom/client";
+import { i18nPromise } from "@/i18n";
 import App from "./App.tsx";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Wait for i18n to be initialized before rendering
+i18nPromise.then(() => {
+  createRoot(document.getElementById("root")!).render(<App />);
+});
