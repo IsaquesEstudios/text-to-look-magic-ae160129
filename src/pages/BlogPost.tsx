@@ -292,10 +292,10 @@ const BlogPost = () => {
       </section>
 
       {/* Related Posts */}
-      <section className="section-graphite py-16">
+      <section className="section-light py-16">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl font-bold text-discovery-dark mb-8">
               {lang === "pt" ? "Artigos Relacionados" : lang === "es" ? "Artículos Relacionados" : "Related Articles"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -309,24 +309,29 @@ const BlogPost = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-card rounded-xl overflow-hidden border border-border hover:border-discovery-green/30 transition-all group"
+                    className="bg-white rounded-2xl overflow-hidden border border-discovery-green/10 shadow-sm hover:shadow-lg transition-all duration-300 group"
                   >
-                    <Link to={`/${lang}/blog/${relatedPost.slug}`} className="flex gap-4 p-4">
-                      <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <Link to={`/${lang}/blog/${relatedPost.slug}`} className="block">
+                      <div className="relative h-48 overflow-hidden">
                         <img
                           src={cityscape}
                           alt={relatedPost.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                        <div className="absolute top-4 left-4">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-discovery-green text-primary-foreground text-xs font-semibold rounded-full">
+                            {relatedPost.category}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-xs text-discovery-green font-medium">
-                          {relatedPost.category}
-                        </span>
-                        <h3 className="text-sm font-semibold text-card-foreground mt-1 line-clamp-2 group-hover:text-discovery-green transition-colors">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-discovery-dark mb-2 group-hover:text-discovery-green transition-colors line-clamp-2">
                           {relatedPost.title}
                         </h3>
-                        <span className="text-xs text-muted-foreground mt-2 block">
+                        <p className="text-discovery-text text-sm mb-3 line-clamp-2">
+                          {relatedPost.excerpt}
+                        </p>
+                        <span className="text-xs text-discovery-text/60">
                           {relatedPost.date}
                         </span>
                       </div>
