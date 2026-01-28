@@ -1,9 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
-import { HeroSection } from "@/components/sections/HeroSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
 import { MessageCircle, Headphones, Globe, MapPin } from "lucide-react";
-import partnership from "@/assets/partnership.jpg";
 
 const channels = [
   { icon: MessageCircle, title: "WhatsApp de Triagem", description: "Onde realizamos sua qualificação técnica e de aptidão inicial." },
@@ -19,12 +17,24 @@ const locations = [
 const Contato = () => {
   return (
     <Layout>
-      <HeroSection
-        title="Conecte-se com sua Rentabilidade em Dólar."
-        description="Estamos prontos para orientar sua jornada no mercado imobiliário americano. Seja para tirar dúvidas sobre leilões, abertura de LLC ou para iniciar seu primeiro investimento, nossa equipe técnica está à disposição."
-        ctaText="Iniciar Conversa no WhatsApp"
-        backgroundImage={partnership}
-      />
+      {/* Compact Hero Section */}
+      <section className="section-graphite pt-32 pb-16">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4">
+              Conecte-se com sua Rentabilidade em Dólar.
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Estamos prontos para orientar sua jornada no mercado imobiliário americano.
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
       <section className="section-graphite py-24">
         <div className="container mx-auto px-6">
