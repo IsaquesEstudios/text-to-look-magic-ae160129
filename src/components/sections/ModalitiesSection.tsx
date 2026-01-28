@@ -9,7 +9,7 @@ const investments = [
     icon: MapPin,
     title: "Terrenos",
     subtitle: "Leilões de Terrenos nos EUA",
-    description: "Adquira terrenos em leilões americanos com retornos de até 90% e segurança jurídica.",
+    description: "Adquira terrenos em leilões americanos por preços a baixo do mercado, tenha retornos de até 90% e segurança jurídica.",
     image: heroLand,
     link: "/terrenos",
   },
