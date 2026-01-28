@@ -38,40 +38,6 @@ const Sobre = () => {
         backgroundImage={partnershipImg}
       />
 
-      {/* Structure - Dark section after hero */}
-      <section className="section-graphite py-24">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center"
-          >
-            <div className="flex items-center justify-center gap-6 mb-8">
-              <div className="w-20 h-20 bg-discovery-green rounded-xl flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-3xl">D</span>
-              </div>
-              <span className="text-muted-foreground text-3xl">+</span>
-              <div className="w-20 h-20 bg-card border border-border rounded-xl flex items-center justify-center">
-                <span className="text-foreground font-bold text-xl">TC</span>
-              </div>
-            </div>
-
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              O Diferencial de Quem Constrói
-            </h2>
-
-            <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-              Somos também os proprietários da <span className="text-discovery-green font-semibold">Tababog Construction</span>, empresa especialista em reforma de casas.
-            </p>
-
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Esta integração nos permite atuar como seu General Contractor (GC), gerenciando diretamente a remodelagem dos ativos para garantir o menor custo operacional e o maior lucro final na venda.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Global Reach - Light section */}
       <section className="section-light py-24">
         <div className="container mx-auto px-6">
