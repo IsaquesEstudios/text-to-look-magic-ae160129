@@ -1,9 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
-import { HeroSection } from "@/components/sections/HeroSection";
+import { SobreHeroSection } from "@/components/sections/SobreHeroSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
 import { Globe, Building, Users, Plane } from "lucide-react";
-import heroHouse from "@/assets/hero-house.jpg";
+import partnershipImg from "@/assets/partnership.jpg";
 
 const regions = [
   {
@@ -31,14 +31,14 @@ const regions = [
 const Sobre = () => {
   return (
     <Layout>
-      <HeroSection
+      <SobreHeroSection
         title="Discovery Investments: Estratégia e Execução no Mercado Americano."
         description="Fundada em agosto de 2025, a Discovery Investments nasceu para democratizar o acesso ao mercado imobiliário dos EUA para brasileiros. Atuamos como sua inteligência em solo americano, cuidando de todo o processo de aquisição, reforma e venda para gerar rentabilidade real em dólar."
         ctaText="Falar com a Discovery"
-        backgroundImage={heroHouse}
+        backgroundImage={partnershipImg}
       />
 
-      {/* Structure */}
+      {/* Structure - Dark section after hero */}
       <section className="section-graphite py-24">
         <div className="container mx-auto px-6">
           <motion.div
@@ -72,8 +72,8 @@ const Sobre = () => {
         </div>
       </section>
 
-      {/* Global Reach */}
-      <section className="section-dark py-24">
+      {/* Global Reach - Light section */}
+      <section className="section-light py-24">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ const Sobre = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold text-discovery-dark">
               Presente Onde Você Estiver
             </h2>
           </motion.div>
@@ -94,21 +94,21 @@ const Sobre = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="text-center p-6 bg-card rounded-xl border border-border"
+                className="text-center p-6 bg-white rounded-xl border border-discovery-green/10 shadow-sm hover:shadow-md hover:border-discovery-green/30 transition-all duration-300"
               >
                 <div className="w-16 h-16 rounded-xl bg-discovery-green/10 flex items-center justify-center mx-auto mb-4">
                   <region.icon className="w-8 h-8 text-discovery-green" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">{region.title}</h3>
-                <p className="text-muted-foreground text-sm">{region.description}</p>
+                <h3 className="text-xl font-semibold text-discovery-dark mb-2">{region.title}</h3>
+                <p className="text-discovery-text text-sm">{region.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="section-graphite py-24">
+      {/* Values - Light cream section */}
+      <section className="section-cream py-24">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <motion.div
@@ -117,7 +117,7 @@ const Sobre = () => {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl md:text-4xl font-bold text-discovery-dark">
                 Nossos Valores
               </h2>
             </motion.div>
@@ -127,10 +127,10 @@ const Sobre = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-center"
+                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
               >
                 <h3 className="text-xl font-semibold text-discovery-green mb-3">Transparência</h3>
-                <p className="text-muted-foreground">
+                <p className="text-discovery-text">
                   Cada etapa do processo é documentada e compartilhada com nossos investidores.
                 </p>
               </motion.div>
@@ -140,10 +140,10 @@ const Sobre = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
               >
                 <h3 className="text-xl font-semibold text-discovery-green mb-3">Excelência</h3>
-                <p className="text-muted-foreground">
+                <p className="text-discovery-text">
                   Qualidade técnica em cada reforma e precisão estratégica em cada leilão.
                 </p>
               </motion.div>
@@ -153,10 +153,10 @@ const Sobre = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="text-center"
+                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
               >
                 <h3 className="text-xl font-semibold text-discovery-green mb-3">Resultados</h3>
-                <p className="text-muted-foreground">
+                <p className="text-discovery-text">
                   Focamos exclusivamente em gerar retorno real para nossos parceiros.
                 </p>
               </motion.div>
