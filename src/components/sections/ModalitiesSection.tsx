@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroLand from "@/assets/hero-land.jpg";
+import terrenosImage from "@/assets/terrenos.webp";
 import heroHouse from "@/assets/hero-house.jpg";
 
 const investments = [
@@ -10,7 +10,7 @@ const investments = [
     title: "Terrenos",
     subtitle: "Leilões de Terrenos nos EUA",
     description: "Adquira terrenos em leilões americanos por preços a baixo do mercado, tenha retornos de até 90% e segurança jurídica.",
-    image: heroLand,
+    image: terrenosImage,
     link: "/terrenos",
   },
   {
