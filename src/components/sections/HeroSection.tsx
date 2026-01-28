@@ -61,17 +61,17 @@ export function HeroSection({
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-0 w-full px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-8"
+        className="relative z-0 w-full px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-20"
       >
         <div className="relative h-[70vh] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
           {/* Top fade effect - very strong smooth disappearing */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-background/90 via-55% to-transparent to-100%" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-background/95 via-55% to-background/20 to-100%" />
           {/* Side fade effects */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
         </div>
       </motion.div>
     </section>
