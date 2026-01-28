@@ -10,6 +10,7 @@ import Casas from "./pages/Casas";
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/pt/sobre" element={<Sobre />} />
           <Route path="/pt/contato" element={<Contato />} />
           <Route path="/pt/blog" element={<Blog />} />
+          <Route path="/pt/blog/:slug" element={<BlogPost />} />
           
           {/* English routes */}
           <Route path="/en" element={<Index />} />
@@ -40,6 +42,7 @@ const App = () => (
           <Route path="/en/sobre" element={<Sobre />} />
           <Route path="/en/contato" element={<Contato />} />
           <Route path="/en/blog" element={<Blog />} />
+          <Route path="/en/blog/:slug" element={<BlogPost />} />
           
           {/* Spanish routes */}
           <Route path="/es" element={<Index />} />
@@ -48,6 +51,7 @@ const App = () => (
           <Route path="/es/sobre" element={<Sobre />} />
           <Route path="/es/contato" element={<Contato />} />
           <Route path="/es/blog" element={<Blog />} />
+          <Route path="/es/blog/:slug" element={<BlogPost />} />
           
           {/* Legacy routes redirect to Portuguese */}
           <Route path="/terrenos" element={<Navigate to="/pt/terrenos" replace />} />
