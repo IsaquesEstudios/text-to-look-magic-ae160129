@@ -25,7 +25,11 @@ const investments = [
 
 export function ModalitiesSection() {
   return (
-    <section className="section-graphite py-24 relative overflow-hidden">
+    <section className="section-light py-24 relative overflow-hidden">
+      {/* Subtle ambient blur */}
+      <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-discovery-green/5 rounded-full blur-[100px]" />
+      <div className="absolute top-1/4 right-1/4 w-[250px] h-[250px] bg-discovery-green/5 rounded-full blur-[100px]" />
+      
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -34,15 +38,15 @@ export function ModalitiesSection() {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-discovery-dark mb-3">
             Nossas Modalidades de Investimento
           </h2>
-          <p className="text-base text-muted-foreground max-w-xl">
+          <p className="text-base text-discovery-text max-w-xl">
             Duas formas estratégicas de investir no mercado imobiliário americano com segurança e rentabilidade.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {investments.map((item, index) => (
             <motion.div
               key={item.title}
@@ -53,23 +57,28 @@ export function ModalitiesSection() {
             >
               <Link
                 to={item.link}
-                className="group block relative overflow-hidden rounded-xl bg-discovery-dark h-48 cursor-pointer transition-all duration-500 hover:shadow-[0_0_30px_rgba(48,120,37,0.2)] border border-transparent hover:border-discovery-green/30"
+                className="group block relative overflow-hidden rounded-2xl bg-white h-48 cursor-pointer transition-all duration-500 border border-discovery-green/30 hover:border-discovery-green/50 shadow-lg hover:shadow-[0_0_40px_rgba(48,120,37,0.2)]"
               >
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                  <div className="absolute -inset-1 bg-discovery-green/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
+                </div>
+
                 {/* Background image on right side with fade effect */}
                 <div 
-                  className="absolute right-0 top-0 bottom-0 w-[50%] bg-cover bg-center opacity-70 group-hover:opacity-85 transition-opacity duration-500"
+                  className="absolute right-0 top-0 bottom-0 w-[55%] bg-cover bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-500"
                   style={{ 
                     backgroundImage: `url(${item.image})`,
-                    maskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%)'
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%)'
                   }}
                 />
                 
                 {/* Extra fade overlay for smoother transition */}
-                <div className="absolute right-0 top-0 bottom-0 w-[50%] bg-gradient-to-r from-discovery-dark via-discovery-dark/50 to-transparent" />
+                <div className="absolute right-0 top-0 bottom-0 w-[55%] bg-gradient-to-r from-white via-white/40 to-transparent" />
                 
                 {/* Content on left side */}
-                <div className="relative z-10 p-6 h-full flex flex-col justify-center max-w-[60%]">
+                <div className="relative z-10 p-6 h-full flex flex-col justify-center max-w-[55%]">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 bg-discovery-green/10 border border-discovery-green/20 group-hover:bg-discovery-green/20 transition-colors duration-300">
                     <item.icon className="w-5 h-5 text-discovery-green" />
                   </div>
@@ -78,11 +87,11 @@ export function ModalitiesSection() {
                     {item.subtitle}
                   </span>
                   
-                  <h3 className="text-lg font-semibold text-foreground mt-1 mb-2 group-hover:text-discovery-green transition-colors duration-300">
+                  <h3 className="text-lg font-semibold text-discovery-dark mt-1 mb-2 group-hover:text-discovery-green transition-colors duration-300">
                     {item.title}
                   </h3>
                   
-                  <p className="text-sm text-foreground/70 leading-relaxed mb-3">
+                  <p className="text-sm text-discovery-text leading-relaxed mb-3">
                     {item.description}
                   </p>
 
@@ -91,6 +100,9 @@ export function ModalitiesSection() {
                     <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>
+
+                {/* Subtle border glow */}
+                <div className="absolute inset-0 rounded-2xl border border-discovery-green/0 group-hover:border-discovery-green/40 transition-colors duration-500 pointer-events-none" />
               </Link>
             </motion.div>
           ))}
