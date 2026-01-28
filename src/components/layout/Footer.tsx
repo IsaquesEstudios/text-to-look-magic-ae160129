@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { MessageCircle, Mail, MapPin } from "lucide-react";
-
 export function Footer() {
-  return (
-    <footer className="section-graphite border-t border-border/30 relative overflow-hidden">
+  return <footer className="section-graphite border-t border-border/30 relative overflow-hidden">
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-discovery-green/5 rounded-full blur-[120px]" />
       
       <div className="container mx-auto px-6 py-16 relative z-10">
@@ -69,13 +67,9 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border/30 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">© 2025 Discovery Investments. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <span>Em parceria com</span>
-            <span className="text-discovery-green font-medium">Tababog Construction</span>
-          </div>
+          <p className="text-muted-foreground text-sm">© 2026 Discovery Investments. Todos os direitos reservados.</p>
+          
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
