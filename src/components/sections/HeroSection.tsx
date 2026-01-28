@@ -63,15 +63,15 @@ export function HeroSection({
         transition={{ duration: 0.8, delay: 0.3 }}
         className="relative z-0 w-full mt-auto px-6 md:px-12 lg:px-20 pb-6 md:pb-12"
       >
-        <div className="relative h-[55vh] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
+        <div className="relative h-[65vh] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
-          {/* Top fade effect - very smooth disappearing */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background from-5% via-background/40 via-30% to-transparent to-60%" />
+          {/* Top fade effect - extended smooth disappearing */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-background/60 via-40% to-transparent to-80%" />
           {/* Side fade effects */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
         </div>
       </motion.div>
     </section>
