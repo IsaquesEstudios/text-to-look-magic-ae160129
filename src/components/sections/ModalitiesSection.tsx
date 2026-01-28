@@ -1,10 +1,8 @@
 import { motion } from "framer-motion";
-import { MapPin, Home, ArrowRight, Users, TrendingUp } from "lucide-react";
+import { MapPin, Home, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroLand from "@/assets/hero-land.jpg";
 import heroHouse from "@/assets/hero-house.jpg";
-import partnership from "@/assets/partnership.jpg";
-import cityscape from "@/assets/cityscape.jpg";
 
 const investments = [
   {
@@ -22,22 +20,6 @@ const investments = [
     description: "Invista em casas para reforma e revenda com retornos de cerca de 30% em 6-12 meses.",
     image: heroHouse,
     link: "/casas",
-  },
-  {
-    icon: Users,
-    title: "Parceria",
-    subtitle: "Investimento Conjunto",
-    description: "Participe de investimentos em grupo com capital reduzido e retornos proporcionais.",
-    image: partnership,
-    link: "/contato",
-  },
-  {
-    icon: TrendingUp,
-    title: "Consultoria",
-    subtitle: "Assessoria Especializada",
-    description: "Receba orientação personalizada para maximizar seus investimentos no mercado americano.",
-    image: cityscape,
-    link: "/contato",
   },
 ];
 
@@ -64,7 +46,7 @@ export function ModalitiesSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {investments.map((item, index) => (
             <motion.div
               key={item.title}
