@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "land": "Terrenos",
+    "houses": "Casas",
+    "about": "Sobre Nosotros",
+    "contact": "Contacto"
+  },
+  "cta": {
+    "talkToConsultant": "Hablar con un Consultor",
+    "dollarizeNow": "Dolarice Su Capital Ahora",
+    "startWhatsApp": "Iniciar Conversación en WhatsApp",
+    "talkToDiscovery": "Hablar con Discovery Investments"
+  },
+  "hero": {
+    "index": {
+      "title": "invertir en inmuebles en EE.UU.",
+      "description": "Proteja su capital contra la inflación invirtiendo en la moneda más fuerte del mundo a través del mercado inmobiliario de EE.UU. Discovery Investments, establecida en agosto de 2025, ofrece un sistema completo de house flipping para brasileños que buscan rentabilidad real y seguridad jurídica."
+    },
+    "contact": {
+      "title": "Conéctese con su Rentabilidad en Dólar.",
+      "description": "Estamos listos para orientar su viaje en el mercado inmobiliario estadounidense. Ya sea para responder preguntas sobre subastas, apertura de LLC o para iniciar su primera inversión, nuestro equipo técnico está a su disposición."
+    }
+  },
+  "modalities": {
+    "title": "Nuestras Modalidades de Inversión",
+    "subtitle": "Dos formas estratégicas de invertir en el mercado inmobiliario estadounidense con seguridad y rentabilidad.",
+    "land": {
+      "title": "Terrenos",
+      "subtitle": "Subastas de Terrenos en EE.UU.",
+      "description": "Adquiera terrenos en subastas estadounidenses a precios por debajo del mercado, con retornos de hasta 90% y seguridad jurídica."
+    },
+    "houses": {
+      "title": "Casas",
+      "subtitle": "House Flipping",
+      "description": "Invierta en casas para reforma y reventa con retornos de aproximadamente 30% en 6-12 meses."
+    },
+    "learnMore": "Saber más"
+  },
+  "comparison": {
+    "title": "Dolarice Su Patrimonio",
+    "subtitle": "Mientras su dinero pierde valor en Brasil, el mercado inmobiliario estadounidense ofrece protección cambiaria y rentabilidad real."
+  },
+  "profitability": {
+    "title": "Rentabilidad Comprobada",
+    "subtitle": "Nuestros números hablan por sí mismos. Resultados reales de operaciones realizadas."
+  },
+  "process": {
+    "title": "Cómo Funciona",
+    "subtitle": "Un proceso transparente y seguro de principio a fin."
+  },
+  "institutional": {
+    "title": "Quiénes Somos",
+    "subtitle": "Discovery Investments: Su puente estratégico hacia el mercado inmobiliario estadounidense."
+  },
+  "ctaSection": {
+    "title": "¿Listo para Comenzar?",
+    "description": "Programe una conversación con nuestros especialistas y descubra cómo dolarizar su patrimonio con seguridad.",
+    "button": "Programar Conversación"
+  },
+  "footer": {
+    "tagline": "Su puente estratégico hacia el mercado inmobiliario estadounidense. Dolarice su patrimonio con seguridad.",
+    "navigation": "Navegación",
+    "investmentModalities": "Modalidades",
+    "contact": "Contacto",
+    "landInvestment": "Inversión en Terrenos",
+    "housesInvestment": "Inversión en Casas",
+    "individualLandPurchase": "Compra Individual de Terrenos",
+    "individualHousesPurchase": "Compra Individual de Casas",
+    "quotasSale": "Venta de Cuotas",
+    "annualMembership": "Membresía Anual",
+    "screeningWhatsApp": "WhatsApp de Selección",
+    "allRightsReserved": "Todos los derechos reservados.",
+    "inPartnershipWith": "En asociación con"
+  },
+  "channels": {
+    "screeningWhatsApp": {
+      "title": "WhatsApp de Selección",
+      "description": "Donde realizamos su calificación técnica y evaluación de aptitud inicial."
+    },
+    "investorSupport": {
+      "title": "Soporte al Inversor",
+      "description": "Canal exclusivo para socios con contratos activos en terrenos o casas."
+    },
+    "globalService": {
+      "title": "Servicio Global",
+      "description": "Atendemos a brasileños residentes en Brasil, Europa, EE.UU. y otras regiones del planeta."
+    }
+  },
+  "contact": {
+    "officialChannels": "Nuestros Canales Oficiales",
+    "discoveryIntelligence": "Discovery Investments: Su Inteligencia en EE.UU.",
+    "aboutDiscovery": "Fundada en agosto de 2025, Discovery Investments es el puente estratégico para brasileños que buscan lucrar a través del House Flipping y subastas de deudas fiscales en Estados Unidos.",
+    "operationalArm": "Con brazo operacional propio a través de",
+    "efficiencyGuarantee": ", garantizamos que cada proyecto sea ejecutado con máxima eficiencia, desde la adjudicación hasta la entrega del título de propiedad.",
+    "whereWeOperate": "Dónde Operamos",
+    "operationalHeadquarters": "Sede Operacional",
+    "operationalHQDescription": "Estados Unidos (Ejecución de subastas y obras).",
+    "investorsServed": "Inversores Atendidos",
+    "investorsServedDescription": "Brasileños en Brasil, Europa, EE.UU. y Asia.",
+    "globalNetwork": "Nuestra sede operacional está enfocada en el mercado inmobiliario estadounidense, pero nuestra red de inversores es global.",
+    "readyNextStep": "¿Listo para dar el próximo paso?",
+    "clickButtonToTalk": "Haga clic en el botón de abajo para hablar directamente con un consultor e iniciar su selección."
+  },
+  "language": {
+    "select": "Idioma",
+    "pt-br": "Português (BR)",
+    "en-us": "English (US)",
+    "es-es": "Español (ES)"
+  }
+}

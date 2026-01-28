@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Home",
+    "land": "Land",
+    "houses": "Houses",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "cta": {
+    "talkToConsultant": "Talk to a Consultant",
+    "dollarizeNow": "Dollarize Your Capital Now",
+    "startWhatsApp": "Start WhatsApp Conversation",
+    "talkToDiscovery": "Talk to Discovery Investments"
+  },
+  "hero": {
+    "index": {
+      "title": "invest in US real estate",
+      "description": "Protect your capital against inflation by investing in the strongest currency in the world through the US real estate market. Discovery Investments, established in August 2025, offers a complete house flipping system for Brazilians seeking real profitability and legal security."
+    },
+    "contact": {
+      "title": "Connect with Your Dollar Returns.",
+      "description": "We are ready to guide your journey in the American real estate market. Whether to answer questions about auctions, LLC formation, or to start your first investment, our technical team is at your disposal."
+    }
+  },
+  "modalities": {
+    "title": "Our Investment Modalities",
+    "subtitle": "Two strategic ways to invest in the American real estate market with security and profitability.",
+    "land": {
+      "title": "Land",
+      "subtitle": "US Land Auctions",
+      "description": "Acquire land at American auctions at below-market prices, with returns up to 90% and legal security."
+    },
+    "houses": {
+      "title": "Houses",
+      "subtitle": "House Flipping",
+      "description": "Invest in houses for renovation and resale with returns of around 30% in 6-12 months."
+    },
+    "learnMore": "Learn more"
+  },
+  "comparison": {
+    "title": "Dollarize Your Assets",
+    "subtitle": "While your money loses value in Brazil, the American real estate market offers currency protection and real profitability."
+  },
+  "profitability": {
+    "title": "Proven Profitability",
+    "subtitle": "Our numbers speak for themselves. Real results from completed operations."
+  },
+  "process": {
+    "title": "How It Works",
+    "subtitle": "A transparent and secure process from start to finish."
+  },
+  "institutional": {
+    "title": "Who We Are",
+    "subtitle": "Discovery Investments: Your strategic bridge to the American real estate market."
+  },
+  "ctaSection": {
+    "title": "Ready to Start?",
+    "description": "Schedule a conversation with our specialists and discover how to dollarize your assets safely.",
+    "button": "Schedule Conversation"
+  },
+  "footer": {
+    "tagline": "Your strategic bridge to the American real estate market. Dollarize your assets safely.",
+    "navigation": "Navigation",
+    "investmentModalities": "Modalities",
+    "contact": "Contact",
+    "landInvestment": "Land Investment",
+    "housesInvestment": "Houses Investment",
+    "individualLandPurchase": "Individual Land Purchase",
+    "individualHousesPurchase": "Individual Houses Purchase",
+    "quotasSale": "Quota Sales",
+    "annualMembership": "Annual Membership",
+    "screeningWhatsApp": "Screening WhatsApp",
+    "allRightsReserved": "All rights reserved.",
+    "inPartnershipWith": "In partnership with"
+  },
+  "channels": {
+    "screeningWhatsApp": {
+      "title": "Screening WhatsApp",
+      "description": "Where we conduct your technical qualification and initial aptitude assessment."
+    },
+    "investorSupport": {
+      "title": "Investor Support",
+      "description": "Exclusive channel for partners with active contracts in land or houses."
+    },
+    "globalService": {
+      "title": "Global Service",
+      "description": "We serve Brazilians residing in Brazil, Europe, USA, and other regions of the planet."
+    }
+  },
+  "contact": {
+    "officialChannels": "Our Official Channels",
+    "discoveryIntelligence": "Discovery Investments: Your Intelligence in the USA",
+    "aboutDiscovery": "Founded in August 2025, Discovery Investments is the strategic bridge for Brazilians seeking to profit through House Flipping and tax debt auctions in the United States.",
+    "operationalArm": "With our own operational arm through",
+    "efficiencyGuarantee": ", we ensure that each project is executed with maximum efficiency, from acquisition to property title delivery.",
+    "whereWeOperate": "Where We Operate",
+    "operationalHeadquarters": "Operational Headquarters",
+    "operationalHQDescription": "United States (Auction and construction execution).",
+    "investorsServed": "Investors Served",
+    "investorsServedDescription": "Brazilians in Brazil, Europe, USA, and Asia.",
+    "globalNetwork": "Our operational headquarters is focused on the American real estate market, but our investor network is global.",
+    "readyNextStep": "Ready to take the next step?",
+    "clickButtonToTalk": "Click the button below to speak directly with a consultant and start your screening."
+  },
+  "language": {
+    "select": "Language",
+    "pt-br": "Português (BR)",
+    "en-us": "English (US)",
+    "es-es": "Español (ES)"
+  }
+}
