@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 
 export function InstitutionalSection() {
   return (
-    <section className="section-graphite py-28 relative overflow-hidden">
+    <section className="section-light py-24 relative overflow-hidden">
       {/* Subtle ambient effects */}
-      <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-discovery-green/5 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-discovery-green/5 rounded-full blur-[100px]" />
       
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
@@ -12,32 +12,31 @@ export function InstitutionalSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto text-center"
+          className="max-w-3xl mx-auto text-center"
         >
-          <div className="flex items-center justify-center gap-6 mb-10">
-            <div className="w-16 h-16 bg-discovery-green rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-primary-foreground font-bold text-2xl">D</span>
+          <div className="flex items-center justify-center gap-5 mb-8">
+            <div className="w-14 h-14 bg-discovery-green rounded-xl flex items-center justify-center shadow-md">
+              <span className="text-primary-foreground font-bold text-xl">D</span>
             </div>
-            <span className="text-muted-foreground text-2xl">+</span>
-            <div className="w-16 h-16 glass-effect border border-border rounded-xl flex items-center justify-center">
-              <span className="text-foreground font-bold text-lg">TC</span>
+            <span className="text-discovery-text text-xl">+</span>
+            <div className="w-14 h-14 bg-discovery-light-bg border border-border rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-discovery-dark font-bold text-base">TC</span>
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-8">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-discovery-dark mb-6">
             Discovery Investments: Sua Ponte Estratégica para os EUA
           </h2>
 
-          <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+          <p className="text-base text-discovery-text leading-relaxed mb-4">
             Fundada em agosto de 2025, a Discovery Investments nasceu para democratizar o mercado 
             imobiliário americano para brasileiros no mundo todo.
           </p>
 
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-base text-discovery-text leading-relaxed">
             Diferente de outras empresas, possuímos braço operacional próprio através da{" "}
             <span className="text-discovery-green font-medium">Tababog Construction</span>, 
-            especialista em reforma de casas. Atuamos como seu General Contractor (GC), 
-            transformando oportunidades de leilão em patrimônio sólido e rentável.
+            especialista em reforma de casas.
           </p>
         </motion.div>
       </div>

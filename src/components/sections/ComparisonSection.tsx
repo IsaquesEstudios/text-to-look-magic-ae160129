@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import heroHouse from "@/assets/hero-house.jpg";
 import heroLand from "@/assets/hero-land.jpg";
 import cityscape from "@/assets/cityscape.jpg";
@@ -8,87 +9,163 @@ const comparisons = [
   {
     image: heroHouse,
     title: "Dólar vs. Moedas Locais",
-    description: "Enquanto moedas de outros países sofrem com a inflação, seu patrimônio é lastreado em Dólar.",
+    description: "Patrimônio lastreado na moeda mais forte do mundo.",
+    size: "large", // spans 2 columns
+    aspectRatio: "aspect-[16/9]",
   },
   {
     image: heroLand,
     title: "Ativo Real vs. Papel",
-    description: "Você possui o título de uma propriedade física em seu nome nos Estados Unidos.",
+    description: "Propriedade física em seu nome nos EUA.",
+    size: "small",
+    aspectRatio: "aspect-[4/3]",
   },
   {
     image: cityscape,
     title: "Segurança Americana",
-    description: "Leis de propriedade estáveis e proteção jurídica superior a qualquer outro mercado global.",
+    description: "Leis estáveis e proteção jurídica superior.",
+    size: "small",
+    aspectRatio: "aspect-[4/3]",
   },
   {
     image: houseRenovation,
     title: "Arbitragem em Leilão",
-    description: "Compramos ativos por uma fração do preço real através de leilões fiscais.",
+    description: "Ativos por fração do preço real.",
+    size: "medium",
+    aspectRatio: "aspect-[3/2]",
   },
 ];
 
 export function ComparisonSection() {
   return (
-    <section className="section-graphite py-28">
+    <section className="section-graphite py-24">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-16"
+          className="mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
             Discovery Investments vs. Mercado Global
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            Entenda por que o investimento em propriedades nos EUA através do nosso modelo supera qualquer outra aplicação financeira.
+          <p className="text-base text-muted-foreground max-w-xl">
+            Entenda por que o investimento em propriedades nos EUA supera outras aplicações.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {comparisons.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group relative overflow-hidden rounded-2xl aspect-[16/10] cursor-pointer"
-            >
-              {/* Background Image */}
+        {/* Asymmetric Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* First Row - Large + Small */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-xl cursor-pointer"
+          >
+            <div className={`${comparisons[0].aspectRatio} relative overflow-hidden`}>
               <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${item.image})` }}
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-60"
+                style={{ backgroundImage: `url(${comparisons[0].image})` }}
               />
-              
-              {/* Gradient Overlays for fade effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-discovery-dark/95" />
-              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/80 via-discovery-dark/20 to-transparent" />
-              
-              {/* Blur overlay on right side */}
-              <div className="absolute right-0 top-0 bottom-0 w-1/2 backdrop-blur-[2px]" 
-                   style={{ 
-                     background: 'linear-gradient(to right, transparent, hsl(0 0% 10% / 0.7))',
-                     maskImage: 'linear-gradient(to right, transparent, black)',
-                     WebkitMaskImage: 'linear-gradient(to right, transparent, black)'
-                   }} 
+              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/40 to-discovery-dark/20" />
+              <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-foreground mb-1">
+                    {comparisons[0].title}
+                  </h3>
+                  <p className="text-sm text-foreground/70 max-w-xs">
+                    {comparisons[0].description}
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" className="w-fit text-xs">
+                  Ver detalhes
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="group relative overflow-hidden rounded-xl cursor-pointer"
+          >
+            <div className={`${comparisons[1].aspectRatio} relative overflow-hidden`}>
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
+                style={{ backgroundImage: `url(${comparisons[1].image})` }}
               />
-              
-              {/* Content */}
-              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
-                <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 drop-shadow-lg">
-                  {item.title}
+              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/50 to-discovery-dark/30" />
+              <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                <h3 className="text-base font-medium text-foreground mb-1">
+                  {comparisons[1].title}
                 </h3>
-                <p className="text-sm md:text-base text-discovery-text-light/90 leading-relaxed max-w-xs drop-shadow-md">
-                  {item.description}
+                <p className="text-xs text-foreground/70">
+                  {comparisons[1].description}
                 </p>
               </div>
+            </div>
+          </motion.div>
 
-              {/* Subtle border glow on hover */}
-              <div className="absolute inset-0 border border-discovery-green/0 group-hover:border-discovery-green/30 rounded-2xl transition-colors duration-500" />
-            </motion.div>
-          ))}
+          {/* Second Row - Small + Small + Medium */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="group relative overflow-hidden rounded-xl cursor-pointer"
+          >
+            <div className="aspect-[5/4] relative overflow-hidden">
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
+                style={{ backgroundImage: `url(${comparisons[2].image})` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/50 to-discovery-dark/30" />
+              <div className="absolute inset-0 p-5 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-base font-medium text-foreground mb-1">
+                    {comparisons[2].title}
+                  </h3>
+                  <p className="text-xs text-foreground/70">
+                    {comparisons[2].description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-xl cursor-pointer"
+          >
+            <div className="aspect-[21/9] relative overflow-hidden">
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
+                style={{ backgroundImage: `url(${comparisons[3].image})` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/40 to-discovery-dark/20" />
+              <div className="absolute inset-0 p-5 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-base font-medium text-foreground mb-1">
+                    {comparisons[3].title}
+                  </h3>
+                  <p className="text-xs text-foreground/70 max-w-xs">
+                    {comparisons[3].description}
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" className="w-fit text-xs">
+                  Saiba mais
+                </Button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
