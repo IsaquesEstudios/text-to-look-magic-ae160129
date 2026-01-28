@@ -1,4 +1,4 @@
-import '@/i18n';
+// i18n is imported in main.tsx before this file
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
