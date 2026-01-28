@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function InstitutionalSection() {
+  const { t } = useTranslation();
+
   return (
     <section className="section-light py-24 relative overflow-hidden">
       {/* Subtle ambient effects */}
@@ -25,18 +28,15 @@ export function InstitutionalSection() {
           </div>
 
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-discovery-dark mb-6">
-            Discovery Investments: Sua Ponte Estratégica para os EUA
+            {t.home.institutional.title}
           </h2>
 
           <p className="text-base text-discovery-text leading-relaxed mb-4">
-            Fundada em agosto de 2025, a Discovery Investments nasceu para democratizar o mercado 
-            imobiliário americano para brasileiros no mundo todo.
+            {t.home.institutional.description}
           </p>
 
           <p className="text-base text-discovery-text leading-relaxed">
-            Diferente de outras empresas, possuímos braço operacional próprio através da{" "}
-            <span className="text-discovery-green font-medium">Tababog Construction</span>, 
-            especialista em reforma de casas.
+            <span className="text-discovery-green font-medium">{t.home.institutional.partnerTitle}</span>: {t.home.institutional.partnerDesc}
           </p>
         </motion.div>
       </div>

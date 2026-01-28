@@ -1,0 +1,330 @@
+export const en = {
+  // Common
+  common: {
+    cta: "Talk to a Consultant",
+    learnMore: "Learn More",
+    readMore: "Read More",
+  },
+
+  // Navigation
+  nav: {
+    home: "Home",
+    investments: "Investments",
+    land: "Land",
+    houses: "Houses",
+    about: "About Us",
+    contact: "Contact",
+    blog: "Blog",
+  },
+
+  // Footer
+  footer: {
+    description: "Your strategic bridge to the American real estate market. Dollarize your assets safely.",
+    navigation: "Navigation",
+    modalities: "Modalities",
+    contact: "Contact",
+    landInvestment: "Land Investment",
+    houseInvestment: "House Investment",
+    individualLand: "Individual Land Purchase",
+    individualHouse: "Individual House Purchase",
+    quotaSale: "Quota Sales",
+    annualMembership: "Annual Membership",
+    whatsappTriage: "WhatsApp Triage",
+    unitedStates: "United States",
+    copyright: "© 2026 Discovery Investments. All rights reserved.",
+  },
+
+  // Home Page
+  home: {
+    hero: {
+      title: "invest in US real estate",
+      description: "Protect your capital against inflation by investing in the world's strongest currency through the US real estate market. Discovery Investments, established in August 2025, offers a complete house flipping system for Brazilians seeking real profitability and legal security.",
+      cta: "Dollarize Your Capital Now",
+    },
+    comparison: {
+      title: "Why Dollarize Your Assets?",
+      subtitle: "While the Brazilian Real loses value year after year, the Dollar remains the most stable and strong currency in the world.",
+      realTitle: "Brazilian Real (BRL)",
+      dollarTitle: "US Dollar (USD)",
+      realPoints: [
+        "Accumulated inflation of 50%+ over the last 10 years",
+        "Political instability directly affects the economy",
+        "Negative real returns on traditional investments",
+      ],
+      dollarPoints: [
+        "World reserve currency for over 70 years",
+        "US economy is the largest and most stable on the planet",
+        "Real estate market with consistent appreciation",
+      ],
+    },
+    profitability: {
+      title: "Real Dollar Returns",
+      subtitle: "Our numbers speak for themselves. Discover the real returns from the American real estate market.",
+      landTitle: "Land",
+      landReturn: "90%",
+      landDesc: "Average return per operation",
+      landTime: "3-6 month cycle",
+      houseTitle: "Houses",
+      houseReturn: "30%",
+      houseDesc: "Average return per operation",
+      houseTime: "6-12 month cycle",
+    },
+    modalities: {
+      title: "Investment Modalities",
+      subtitle: "Choose the modality that best suits your investor profile.",
+      landTitle: "Land",
+      landDesc: "Initial investment from $5,000 with an average return of 90%.",
+      houseTitle: "Houses",
+      houseDesc: "Initial investment from $30,000 with an average return of 30%.",
+    },
+    process: {
+      title: "Simplified Process",
+      subtitle: "From first contact to profit realization, we accompany you every step of the way.",
+      steps: [
+        { title: "Screening", desc: "Initial qualification via WhatsApp" },
+        { title: "Structuring", desc: "Opening your LLC in the US" },
+        { title: "Acquisition", desc: "Strategic auction bidding" },
+        { title: "Liquidation", desc: "Sale and profit realization" },
+      ],
+    },
+    institutional: {
+      title: "Who is Discovery Investments?",
+      description: "Founded in August 2025, Discovery Investments is the strategic bridge for Brazilians seeking to profit through House Flipping and tax debt auctions in the United States.",
+      partnerTitle: "Tababog Construction",
+      partnerDesc: "Our own construction company ensures impeccable technical execution on every renovation.",
+    },
+    cta: {
+      title: "Ready to get started?",
+      description: "Talk to a specialist and discover how to dollarize your assets.",
+      button: "Talk to a Consultant",
+    },
+  },
+
+  // Terrenos Page
+  terrenos: {
+    hero: {
+      title: "Land Investment in the USA: Average Profitability of 90%.",
+      description: "Start your dollarization journey with the highest turnover and margin asset in the American real estate market. Discovery Investments identifies land at strategic auctions, allowing you to acquire properties for a fraction of market value and reap exceptional profits.",
+      cta: "I Want to Invest in Land",
+    },
+    howItWorks: {
+      title: "How we transform debts into extraordinary profits",
+      subtitle: "Many people ask us how it's possible to find land at values so far below market. The answer lies in the US tax debt auction system.",
+      steps: [
+        {
+          title: "The Tax Debt",
+          description: "When a property owner in the US fails to pay property taxes, the local government puts this debt up for sale to recover funds for the county.",
+        },
+        {
+          title: "The Auction Bid",
+          description: "We enter the scene by bidding on the property title (Tax Deed) directly at auction for amounts that represent only the overdue taxes, which allows us to buy $50,000 land for values close to $5,000.",
+        },
+        {
+          title: "The Strategic Sale",
+          description: "After legal acquisition and possession of the title, the land is listed for sale on the conventional market at its real value, allowing the investor to realize the profit from the operation.",
+        },
+      ],
+    },
+    advantages: {
+      title: "Why invest in Land?",
+      items: [
+        "Low initial capital",
+        "Fast 3-6 month cycle",
+        "Average 90% return",
+        "No renovation needed",
+        "100% legal process",
+      ],
+    },
+    profit: {
+      howTitle: "How does the profit work?",
+      howDesc: "The profit at auction is realized at the time of purchase. When we acquire an asset for a fraction of its value, we create a safety margin where, even with fluctuations in the sale price, your principal capital remains profitable.",
+      securityTitle: "Guaranteed Legal Security",
+      securityDesc: "The process is formalized through a company (LLC) in your name and the cycle ends with the official property title delivered to the investor.",
+    },
+    process: {
+      title: "How to Start Your Investment",
+      steps: [
+        { title: "Screening", description: "Technical qualification via WhatsApp to understand your profile." },
+        { title: "Legal Structuring", description: "Full support for opening your LLC in the US." },
+        { title: "Strategic Bidding", description: "Discovery makes the land purchase directly for your company." },
+        { title: "Liquidation", description: "The property is sold and the investor receives the invested capital plus profit." },
+      ],
+    },
+    pricing: {
+      title: "Discovery Service Fee",
+      price: "$500",
+      description: "This fee covers our advisory on strategic acquisition, ensuring you only buy assets with high resale potential.",
+    },
+    cta: {
+      title: "Ready to profit 90% in dollars?",
+      description: "Talk to a Discovery Investments specialist now and find out if you're eligible to start.",
+      button: "Check Land Eligibility",
+    },
+  },
+
+  // Casas Page
+  casas: {
+    hero: {
+      title: "House Investment in the USA: Average Profitability of 30% with Real Assets.",
+      description: "Master the American House Flipping market with the complete structure of Discovery Investments. Acquire properties at strategic auctions for a fraction of market value, renovate with our own construction company, and reap expressive dollar profits.",
+      cta: "I Want to Invest in Houses",
+    },
+    howItWorks: {
+      title: "We Transform Debt-Ridden Houses into Profitable Assets",
+      subtitle: "The secret to our success lies in strategic purchasing and impeccable technical execution.",
+      steps: [
+        {
+          title: "Strategic Purchase",
+          description: "We identify houses with accumulated tax debts and bid on them at Tax Deed auctions directly from the government, eliminating intermediaries and ensuring low prices.",
+        },
+        {
+          title: "Technical Renovation (Remodeling)",
+          description: "Our Tababog Construction team comes in to perform the complete remodeling of the property, drastically increasing its market value.",
+        },
+        {
+          title: "Liquidation",
+          description: "With the house renovated and the title in the investor's name, we complete the sale on the conventional market, delivering the invested capital plus profit.",
+        },
+      ],
+    },
+    advantages: {
+      title: "Why invest in Houses?",
+      items: [
+        "Tangible physical assets",
+        "Own construction company",
+        "Average 30% return",
+        "6-12 month cycle",
+        "Title in your name",
+      ],
+    },
+    security: {
+      title: "Security Guaranteed by Robust Profit Margins",
+      costTitle: "What happens if the renovation costs more?",
+      costDesc: "We work with such a large safety margin (buying properties worth $50,000 post-renovation for values like $5,000) that, even in cases of unforeseen expenses, your principal capital remains protected.",
+      legalTitle: "Title Legal Guarantee",
+      legalDesc: "The investor has full control through their own LLC in the US, and the process only ends with the delivery of the official property title.",
+    },
+    process: {
+      title: "Your 6 to 12 Month Journey",
+      steps: [
+        { title: "Qualification", description: "Technical screening via WhatsApp to understand your investment profile." },
+        { title: "Formalization", description: "Full support for opening your company (LLC) in the US." },
+        { title: "Acquisition and Renovation", description: "House auction bid and immediate start of renovation by our construction company." },
+        { title: "Sale and Profit", description: "Property liquidation and receipt of funds in your company's account." },
+      ],
+    },
+    pricing: {
+      badge: "PROMOTION",
+      title: "Discovery Service Fee for Houses",
+      price: "$3,000",
+      description: "This special rate is valid for the first 10 contracts. The value scales by $500 for every 10 new contracts until reaching the ceiling of $5,000.",
+    },
+    cta: {
+      title: "Ready to profit in dollars with physical properties?",
+      description: "Talk to a Discovery Investments specialist now and secure your promotional rate of $3,000.",
+      button: "Check House Eligibility",
+    },
+  },
+
+  // Sobre Page
+  sobre: {
+    structure: {
+      title: "The Advantage of Those Who Build",
+      description1: "We are also the owners of",
+      tababog: "Tababog Construction",
+      description2: ", a company specialized in house renovation.",
+      description3: "This integration allows us to act as your General Contractor (GC), directly managing the remodeling of assets to ensure the lowest operational cost and highest final profit on sale.",
+    },
+    global: {
+      title: "Present Wherever You Are",
+      regions: [
+        { title: "Brazil", description: "Dollarization and asset protection." },
+        { title: "Europe", description: "Strategic profitability in strong currency." },
+        { title: "USA", description: "Professional management for resident Brazilians." },
+        { title: "Global", description: "Opportunities for Brazilians anywhere on the planet." },
+      ],
+    },
+    values: {
+      title: "Our Values",
+      items: [
+        { title: "Transparency", description: "Every step of the process is documented and shared with our investors." },
+        { title: "Excellence", description: "Technical quality in every renovation and strategic precision in every auction." },
+        { title: "Results", description: "We focus exclusively on generating real returns for our partners." },
+      ],
+    },
+    cta: {
+      title: "Ready to meet our team?",
+      description: "Schedule a conversation and discover how we can accelerate your investment journey.",
+      button: "Talk to a Specialist",
+    },
+  },
+
+  // Contato Page
+  contato: {
+    hero: {
+      title: "Connect with Your Dollar Profitability.",
+      description: "We're ready to guide your journey in the American real estate market.",
+    },
+    channels: {
+      title: "Our Official Channels",
+      items: [
+        { title: "WhatsApp Screening", description: "Where we conduct your technical and initial aptitude qualification." },
+        { title: "Investor Support", description: "Exclusive channel for partners with active land or house contracts." },
+        { title: "Global Service", description: "We serve Brazilians residing in Brazil, Europe, USA, and other regions of the planet." },
+      ],
+    },
+    partnership: {
+      title: "Discovery Investments: Your Intelligence in the US",
+      description1: "Founded in August 2025, Discovery Investments is the strategic bridge for Brazilians seeking to profit through House Flipping and tax debt auctions in the United States.",
+      description2: "With our own operational arm through",
+      tababog: "Tababog Construction",
+      description3: ", we ensure that every project is executed with maximum efficiency, from the auction to the delivery of the property title.",
+    },
+    locations: {
+      title: "Where We Operate",
+      subtitle: "Our operational headquarters is focused on the American real estate market, but our investor network is global.",
+      items: [
+        { title: "Operational Headquarters", description: "United States (Auction and construction execution)." },
+        { title: "Investors Served", description: "Brazilians in Brazil, Europe, USA, and Asia." },
+      ],
+    },
+    cta: {
+      title: "Ready to take the next step?",
+      description: "Click the button below to speak directly with a consultant and start your screening.",
+      button: "Talk to Discovery Investments",
+    },
+  },
+
+  // Blog
+  blog: {
+    title: "Blog",
+    subtitle: "Articles and insights about real estate investments in the USA",
+    latestPosts: "Latest from the Blog",
+    latestPostsSubtitle: "Stay up to date with news and learn more about investments in the USA",
+    readMore: "Read Article",
+    postedOn: "Posted on",
+    posts: [
+      {
+        slug: "how-tax-deed-auctions-work",
+        title: "How Tax Deed Auctions Work in the USA",
+        excerpt: "Understand the complete process of acquiring properties through tax debt auctions and how to profit from this strategy.",
+        date: "January 15, 2026",
+        category: "Education",
+      },
+      {
+        slug: "llc-advantages-brazilian-investor",
+        title: "Advantages of Opening an LLC as a Brazilian Investor",
+        excerpt: "Discover why an LLC is essential to protect your assets and optimize taxes on American investments.",
+        date: "January 10, 2026",
+        category: "Legal",
+      },
+      {
+        slug: "house-flipping-beginners-guide",
+        title: "House Flipping: Complete Guide for Beginners",
+        excerpt: "Everything you need to know to get started in the market of buying, renovating, and selling houses in the United States.",
+        date: "January 5, 2026",
+        category: "Strategy",
+      },
+    ],
+  },
+};

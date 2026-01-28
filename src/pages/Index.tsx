@@ -5,16 +5,20 @@ import { ProfitabilitySection } from "@/components/sections/ProfitabilitySection
 import { ModalitiesSection } from "@/components/sections/ModalitiesSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { InstitutionalSection } from "@/components/sections/InstitutionalSection";
+import { BlogPostsSection } from "@/components/sections/BlogPostsSection";
 import { CTASection } from "@/components/sections/CTASection";
+import { useTranslation } from "@/hooks/useTranslation";
 import heroCover from "@/assets/hero-cover.webp";
 
 const Index = () => {
+  const { t } = useTranslation();
+
   return (
     <Layout>
       <HeroSection
-        title="investir em imóveis nos EUA"
-        description="Proteja seu capital contra a inflação investindo na moeda mais forte do mundo através do mercado imobiliário dos EUA. A Discovery Investments, estabelecida em agosto de 2025, oferece um sistema completo de house flipping para brasileiros que buscam rentabilidade real e segurança jurídica."
-        ctaText="Dolarize seu Capital Agora"
+        title={t.home.hero.title}
+        description={t.home.hero.description}
+        ctaText={t.home.hero.cta}
         backgroundImage={heroCover}
       />
       <ComparisonSection />
@@ -22,6 +26,7 @@ const Index = () => {
       <ModalitiesSection />
       <ProcessSection />
       <InstitutionalSection />
+      <BlogPostsSection />
       <CTASection />
     </Layout>
   );

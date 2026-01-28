@@ -1,30 +1,10 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 import houseBeforeAfter from "@/assets/house-before-after.jpg";
 
-const steps = [
-  {
-    number: "1",
-    title: "Triagem",
-    description: "Qualificação técnica e de aptidão via WhatsApp.",
-  },
-  {
-    number: "2",
-    title: "LLC",
-    description: "Suporte na abertura da sua empresa nos EUA para formalização do investimento.",
-  },
-  {
-    number: "3",
-    title: "Execução",
-    description: "Arremate estratégico no leilão e reforma gerida pela nossa construtora própria.",
-  },
-  {
-    number: "4",
-    title: "Título",
-    description: "Recebimento do lucro e do título de propriedade oficial em seu nome.",
-  },
-];
-
 export function ProcessSection() {
+  const { t } = useTranslation();
+
   return (
     <section className="section-dark py-28 relative overflow-hidden">
       {/* Ambient effects */}
@@ -42,7 +22,7 @@ export function ProcessSection() {
           >
             <img
               src={houseBeforeAfter}
-              alt="Antes e Depois - Casa Abandonada vs Reformada"
+              alt="Before and After - House Transformation"
               className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Multi-layer gradient */}
@@ -59,7 +39,7 @@ export function ProcessSection() {
             
             <div className="absolute bottom-8 left-8 right-8">
               <p className="text-sm text-discovery-green font-medium mb-2">Tababog Construction</p>
-              <p className="text-foreground font-semibold text-2xl">Transformação Completa</p>
+              <p className="text-foreground font-semibold text-2xl">{t.home.institutional.partnerDesc}</p>
             </div>
           </motion.div>
 
@@ -71,12 +51,12 @@ export function ProcessSection() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-10">
-              Seu Ativo Pronto em 6 a 12 Meses
+              {t.home.process.title}
             </h2>
             <div className="space-y-8">
-              {steps.map((step, index) => (
+              {t.home.process.steps.map((step, index) => (
                 <motion.div
-                  key={step.number}
+                  key={step.title}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -84,11 +64,11 @@ export function ProcessSection() {
                   className="flex items-start gap-5 group"
                 >
                   <div className="w-14 h-14 rounded-xl bg-discovery-green flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-[0_0_30px_hsl(113_53%_31%/0.3)] transition-shadow duration-300">
-                    <span className="text-primary-foreground font-bold text-lg">{step.number}</span>
+                    <span className="text-primary-foreground font-bold text-lg">{index + 1}</span>
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-foreground mb-1">{step.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                    <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
                   </div>
                 </motion.div>
               ))}

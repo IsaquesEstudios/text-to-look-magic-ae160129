@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { TrendingUp, Shield } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function ProfitabilitySection() {
+  const { t } = useTranslation();
+
   return (
     <section className="section-light py-24 relative overflow-hidden">
       {/* Subtle ambient effects */}
@@ -16,9 +19,9 @@ export function ProfitabilitySection() {
           className="text-center mb-14"
         >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-discovery-dark mb-3">
-            Lucratividade e Segurança
+            {t.home.profitability.title}
           </h2>
-          <p className="text-base text-discovery-text">O Equilíbrio Superior</p>
+          <p className="text-base text-discovery-text">{t.home.profitability.subtitle}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -33,12 +36,11 @@ export function ProfitabilitySection() {
               <TrendingUp className="w-6 h-6 text-discovery-green" />
             </div>
             <h3 className="text-xl font-semibold text-discovery-dark mb-3">
-              Por que é o modelo mais lucrativo?
+              {t.home.profitability.landTitle}
             </h3>
+            <p className="text-4xl font-bold text-discovery-green mb-2">{t.home.profitability.landReturn}</p>
             <p className="text-discovery-text leading-relaxed text-sm">
-              O lucro médio de <span className="text-discovery-green font-medium">90% para terrenos</span> e{" "}
-              <span className="text-discovery-green font-medium">30% para casas</span> é possível porque adquirimos 
-              propriedades de pessoas que não pagaram seus impostos.
+              {t.home.profitability.landDesc} • {t.home.profitability.landTime}
             </p>
           </motion.div>
 
@@ -53,11 +55,11 @@ export function ProfitabilitySection() {
               <Shield className="w-6 h-6 text-discovery-green" />
             </div>
             <h3 className="text-xl font-semibold text-discovery-dark mb-3">
-              Por que é o modelo mais seguro?
+              {t.home.profitability.houseTitle}
             </h3>
+            <p className="text-4xl font-bold text-discovery-green mb-2">{t.home.profitability.houseReturn}</p>
             <p className="text-discovery-text leading-relaxed text-sm">
-              As chances de prejuízo são mínimas devido à enorme margem de segurança gerada pelo baixo custo de 
-              aquisição. Seu capital permanece protegido pelo valor real do imóvel.
+              {t.home.profitability.houseDesc} • {t.home.profitability.houseTime}
             </p>
           </motion.div>
         </div>

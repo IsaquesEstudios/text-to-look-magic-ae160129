@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import cityscape from "@/assets/cityscape.jpg";
 
 interface CTASectionProps {
@@ -10,10 +11,16 @@ interface CTASectionProps {
 }
 
 export function CTASection({
-  title = "Pronto para ser um Investidor Global?",
-  description = "Cuidamos de toda a burocracia, obra e venda para você lucrar em dólar.",
-  ctaText = "Consultar Aptidão via WhatsApp",
+  title,
+  description,
+  ctaText,
 }: CTASectionProps) {
+  const { t } = useTranslation();
+  
+  const displayTitle = title || t.home.cta.title;
+  const displayDescription = description || t.home.cta.description;
+  const displayCtaText = ctaText || t.home.cta.button;
+
   return (
     <section className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
       {/* Background Image */}
@@ -38,14 +45,14 @@ export function CTASection({
           className="max-w-2xl mx-auto text-center"
         >
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-semibold text-foreground mb-4 sm:mb-6">
-            {title}
+            {displayTitle}
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground mb-8 sm:mb-10 px-2">
-            {description}
+            {displayDescription}
           </p>
           <Button variant="hero" size="lg" className="inline-flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
             <MessageCircle size={18} className="sm:w-5 sm:h-5" />
-            {ctaText}
+            {displayCtaText}
           </Button>
         </motion.div>
       </div>
