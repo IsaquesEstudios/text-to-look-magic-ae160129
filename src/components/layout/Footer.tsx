@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { MessageCircle, Mail, MapPin } from "lucide-react";
+import discoveryLogo from "@/assets/discovery-logo.png";
 export function Footer() {
   return <footer className="section-graphite border-t border-border/30 relative overflow-hidden">
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-discovery-green/5 rounded-full blur-[120px]" />
@@ -8,9 +9,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-discovery-green rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-primary-foreground font-bold text-xl">D</span>
-              </div>
+              <img 
+                src={discoveryLogo} 
+                alt="Discovery Investments" 
+                className="h-10 w-auto"
+              />
               <div>
                 <span className="text-foreground font-semibold">Discovery</span>
                 <span className="text-discovery-green font-semibold"> Investments</span>

@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import discoveryLogo from "@/assets/discovery-logo.png";
 
 const investmentItems = [
   { name: "Terrenos", path: "/terrenos" },
@@ -43,9 +44,11 @@ export function Header() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-discovery-green rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-primary-foreground font-bold text-xl">D</span>
-            </div>
+            <img 
+              src={discoveryLogo} 
+              alt="Discovery Investments" 
+              className="h-10 w-auto"
+            />
             <div className="hidden sm:block">
               <span className="text-foreground font-semibold text-lg">Discovery</span>
               <span className="text-discovery-green font-semibold text-lg"> Investments</span>
