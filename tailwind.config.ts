@@ -14,8 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Playfair Display', 'serif'],
+        sans: ['Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,9 +55,11 @@ export default {
           graphite: "hsl(var(--discovery-graphite))",
           dark: "hsl(var(--discovery-dark))",
           green: "hsl(var(--discovery-green))",
+          "green-light": "hsl(var(--discovery-green-light))",
           "green-glow": "hsl(var(--discovery-green-glow))",
-          gold: "hsl(var(--discovery-gold))",
-          "text-muted": "hsl(var(--discovery-text-muted))",
+          text: "hsl(var(--discovery-text))",
+          "text-light": "hsl(var(--discovery-text-light))",
+          cream: "hsl(var(--discovery-cream))",
         },
       },
       borderRadius: {
