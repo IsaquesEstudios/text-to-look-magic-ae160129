@@ -1,40 +1,26 @@
 import { useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { LanguageSelector } from "@/components/LanguageSelector";
+
+const navItems = [
+  { name: "Início", path: "/" },
+  { name: "Terrenos", path: "/terrenos" },
+  { name: "Casas", path: "/casas" },
+  { name: "Sobre Nós", path: "/sobre" },
+  { name: "Contato", path: "/contato" },
+];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { lang } = useParams<{ lang: string }>();
-  const { t } = useTranslation();
-
-  const currentLang = lang || 'pt-br';
-
-  const navItems = [
-    { name: t('nav.home'), path: `/${currentLang}` },
-    { name: t('nav.land'), path: `/${currentLang}/terrenos` },
-    { name: t('nav.houses'), path: `/${currentLang}/casas` },
-    { name: t('nav.about'), path: `/${currentLang}/sobre` },
-    { name: t('nav.contact'), path: `/${currentLang}/contato` },
-  ];
-
-  const isActive = (path: string) => {
-    if (path === `/${currentLang}`) {
-      return location.pathname === `/${currentLang}` || location.pathname === `/${currentLang}/`;
-    }
-    return location.pathname.startsWith(path);
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-border/30">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link to={`/${currentLang}`} className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-discovery-green rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-primary-foreground font-bold text-xl">D</span>
             </div>
@@ -44,14 +30,13 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`text-sm font-medium transition-all duration-300 hover:text-discovery-green ${
-                  isActive(item.path)
+                  location.pathname === item.path
                     ? "text-discovery-green"
                     : "text-foreground/70"
                 }`}
@@ -61,28 +46,21 @@ export function Header() {
             ))}
           </nav>
 
-          {/* CTA Button + Language Selector */}
-          <div className="hidden lg:flex items-center gap-4">
-            <LanguageSelector />
+          <div className="hidden lg:block">
             <Button variant="cta" size="default">
-              {t('cta.talkToConsultant')}
+              Falar com Consultor
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center gap-2">
-            <LanguageSelector />
-            <button
-              className="text-foreground p-2"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+          <button
+            className="lg:hidden text-foreground p-2"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -98,7 +76,7 @@ export function Header() {
                   to={item.path}
                   onClick={() => setIsOpen(false)}
                   className={`text-lg font-medium transition-colors hover:text-discovery-green ${
-                    isActive(item.path)
+                    location.pathname === item.path
                       ? "text-discovery-green"
                       : "text-foreground/70"
                   }`}
@@ -107,7 +85,7 @@ export function Header() {
                 </Link>
               ))}
               <Button variant="cta" size="lg" className="mt-4">
-                {t('cta.talkToConsultant')}
+                Falar com Consultor
               </Button>
             </nav>
           </motion.div>
