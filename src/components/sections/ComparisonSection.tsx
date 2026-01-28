@@ -55,7 +55,7 @@ export function ComparisonSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative overflow-hidden rounded-xl bg-discovery-dark h-36 sm:h-40 cursor-pointer"
+              className="group relative overflow-hidden rounded-xl bg-discovery-dark h-44 sm:h-40 cursor-pointer"
             >
               {/* Background image on right side with fade effect */}
               <div 
