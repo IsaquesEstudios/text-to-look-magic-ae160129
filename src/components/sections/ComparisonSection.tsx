@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import heroHouse from "@/assets/hero-house.jpg";
 import heroLand from "@/assets/hero-land.jpg";
 import cityscape from "@/assets/cityscape.jpg";
@@ -10,27 +9,21 @@ const comparisons = [
     image: heroHouse,
     title: "Dólar vs. Moedas Locais",
     description: "Enquanto moedas de outros países sofrem com a inflação, seu patrimônio é lastreado em Dólar.",
-    hasButton: true,
-    buttonText: "Ver detalhes",
   },
   {
     image: heroLand,
     title: "Ativo Real vs. Papel",
     description: "Você possui o título de uma propriedade física em seu nome nos Estados Unidos.",
-    hasButton: false,
   },
   {
     image: cityscape,
     title: "Segurança Americana",
     description: "Leis de propriedade estáveis e proteção jurídica superior a qualquer outro mercado global.",
-    hasButton: false,
   },
   {
     image: houseRenovation,
     title: "Arbitragem em Leilão",
     description: "Compramos ativos por uma fração do preço real através de leilões fiscais.",
-    hasButton: true,
-    buttonText: "Saiba mais",
   },
 ];
 
@@ -78,21 +71,13 @@ export function ComparisonSection() {
               <div className="absolute right-0 top-0 bottom-0 w-[45%] bg-gradient-to-r from-discovery-dark via-discovery-dark/60 to-transparent" />
               
               {/* Content on left side */}
-              <div className="relative z-10 p-6 h-full flex flex-col justify-between max-w-[65%]">
-                <div>
-                  <h3 className="text-base md:text-lg font-medium text-foreground mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-foreground/70 leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-                
-                {item.hasButton && (
-                  <Button variant="outline" size="sm" className="w-fit text-xs mt-3">
-                    {item.buttonText}
-                  </Button>
-                )}
+              <div className="relative z-10 p-6 h-full flex flex-col justify-center max-w-[65%]">
+                <h3 className="text-base md:text-lg font-medium text-foreground mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  {item.description}
+                </p>
               </div>
             </motion.div>
           ))}
