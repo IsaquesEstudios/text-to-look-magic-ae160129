@@ -1,29 +1,34 @@
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import heroLand from "@/assets/hero-land.jpg";
 import heroHouse from "@/assets/hero-house.jpg";
 
-const investments = [
-  {
-    icon: MapPin,
-    title: "Terrenos",
-    subtitle: "Leilões de Terrenos nos EUA",
-    description: "Adquira terrenos em leilões americanos por preços a baixo do mercado, tenha retornos de até 90% e segurança jurídica.",
-    image: heroLand,
-    link: "/terrenos",
-  },
-  {
-    icon: Home,
-    title: "Casas",
-    subtitle: "House Flipping",
-    description: "Invista em casas para reforma e revenda com retornos de cerca de 30% em 6-12 meses.",
-    image: heroHouse,
-    link: "/casas",
-  },
-];
-
 export function ModalitiesSection() {
+  const { lang } = useParams<{ lang: string }>();
+  const { t } = useTranslation();
+  const currentLang = lang || 'pt-br';
+
+  const investments = [
+    {
+      icon: MapPin,
+      title: t('modalities.land.title'),
+      subtitle: t('modalities.land.subtitle'),
+      description: t('modalities.land.description'),
+      image: heroLand,
+      link: `/${currentLang}/terrenos`,
+    },
+    {
+      icon: Home,
+      title: t('modalities.houses.title'),
+      subtitle: t('modalities.houses.subtitle'),
+      description: t('modalities.houses.description'),
+      image: heroHouse,
+      link: `/${currentLang}/casas`,
+    },
+  ];
+
   return (
     <section className="section-light py-24 relative overflow-hidden">
       {/* Subtle ambient blur */}
@@ -39,10 +44,10 @@ export function ModalitiesSection() {
           className="mb-12"
         >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-discovery-dark mb-3">
-            Nossas Modalidades de Investimento
+            {t('modalities.title')}
           </h2>
           <p className="text-base text-discovery-text max-w-xl">
-            Duas formas estratégicas de investir no mercado imobiliário americano com segurança e rentabilidade.
+            {t('modalities.subtitle')}
           </p>
         </motion.div>
 
@@ -97,7 +102,7 @@ export function ModalitiesSection() {
                   </p>
 
                   <div className="flex items-center gap-2 text-discovery-green font-medium text-sm">
-                    <span>Saiba mais</span>
+                    <span>{t('modalities.learnMore')}</span>
                     <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>

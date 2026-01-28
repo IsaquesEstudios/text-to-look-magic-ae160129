@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Início",
+    "land": "Terrenos",
+    "houses": "Casas",
+    "about": "Sobre Nós",
+    "contact": "Contato"
+  },
+  "cta": {
+    "talkToConsultant": "Falar com Consultor",
+    "dollarizeNow": "Dolarize seu Capital Agora",
+    "startWhatsApp": "Iniciar Conversa no WhatsApp",
+    "talkToDiscovery": "Falar com a Discovery Investments"
+  },
+  "hero": {
+    "index": {
+      "title": "investir em imóveis nos EUA",
+      "description": "Proteja seu capital contra a inflação investindo na moeda mais forte do mundo através do mercado imobiliário dos EUA. A Discovery Investments, estabelecida em agosto de 2025, oferece um sistema completo de house flipping para brasileiros que buscam rentabilidade real e segurança jurídica."
+    },
+    "contact": {
+      "title": "Conecte-se com sua Rentabilidade em Dólar.",
+      "description": "Estamos prontos para orientar sua jornada no mercado imobiliário americano. Seja para tirar dúvidas sobre leilões, abertura de LLC ou para iniciar seu primeiro investimento, nossa equipe técnica está à disposição."
+    }
+  },
+  "modalities": {
+    "title": "Nossas Modalidades de Investimento",
+    "subtitle": "Duas formas estratégicas de investir no mercado imobiliário americano com segurança e rentabilidade.",
+    "land": {
+      "title": "Terrenos",
+      "subtitle": "Leilões de Terrenos nos EUA",
+      "description": "Adquira terrenos em leilões americanos por preços a baixo do mercado, tenha retornos de até 90% e segurança jurídica."
+    },
+    "houses": {
+      "title": "Casas",
+      "subtitle": "House Flipping",
+      "description": "Invista em casas para reforma e revenda com retornos de cerca de 30% em 6-12 meses."
+    },
+    "learnMore": "Saiba mais"
+  },
+  "comparison": {
+    "title": "Dolarize Seu Patrimônio",
+    "subtitle": "Enquanto seu dinheiro perde valor no Brasil, o mercado imobiliário americano oferece proteção cambial e rentabilidade real."
+  },
+  "profitability": {
+    "title": "Rentabilidade Comprovada",
+    "subtitle": "Nossos números falam por si. Resultados reais de operações realizadas."
+  },
+  "process": {
+    "title": "Como Funciona",
+    "subtitle": "Um processo transparente e seguro do início ao fim."
+  },
+  "institutional": {
+    "title": "Quem Somos",
+    "subtitle": "Discovery Investments: Sua ponte estratégica para o mercado imobiliário americano."
+  },
+  "ctaSection": {
+    "title": "Pronto para Começar?",
+    "description": "Agende uma conversa com nossos especialistas e descubra como dolarizar seu patrimônio com segurança.",
+    "button": "Agendar Conversa"
+  },
+  "footer": {
+    "tagline": "Sua ponte estratégica para o mercado imobiliário americano. Dolarize seu patrimônio com segurança.",
+    "navigation": "Navegação",
+    "investmentModalities": "Modalidades",
+    "contact": "Contato",
+    "landInvestment": "Investimento em Terrenos",
+    "housesInvestment": "Investimento em Casas",
+    "individualLandPurchase": "Compra Individual de Terrenos",
+    "individualHousesPurchase": "Compra Individual de Casas",
+    "quotasSale": "Venda de Cotas",
+    "annualMembership": "Membership Anual",
+    "screeningWhatsApp": "WhatsApp de Triagem",
+    "allRightsReserved": "Todos os direitos reservados.",
+    "inPartnershipWith": "Em parceria com"
+  },
+  "channels": {
+    "screeningWhatsApp": {
+      "title": "WhatsApp de Triagem",
+      "description": "Onde realizamos sua qualificação técnica e de aptidão inicial."
+    },
+    "investorSupport": {
+      "title": "Suporte ao Investidor",
+      "description": "Canal exclusivo para parceiros com contratos ativos em terrenos ou casas."
+    },
+    "globalService": {
+      "title": "Atendimento Global",
+      "description": "Atendemos brasileiros residentes no Brasil, Europa, EUA e demais regiões do planeta."
+    }
+  },
+  "contact": {
+    "officialChannels": "Nossos Canais Oficiais",
+    "discoveryIntelligence": "Discovery Investments: Sua Inteligência nos EUA",
+    "aboutDiscovery": "Fundada em agosto de 2025, a Discovery Investments é a ponte estratégica para brasileiros que buscam lucrar através do House Flipping e leilões de dívidas fiscais nos Estados Unidos.",
+    "operationalArm": "Com braço operacional próprio através da",
+    "efficiencyGuarantee": ", garantimos que cada projeto seja executado com máxima eficiência, do arremate à entrega do título de propriedade.",
+    "whereWeOperate": "Onde Atuamos",
+    "operationalHeadquarters": "Sede Operacional",
+    "operationalHQDescription": "Estados Unidos (Execução de leilões e obras).",
+    "investorsServed": "Investidores Atendidos",
+    "investorsServedDescription": "Brasileiros no Brasil, Europa, EUA e Ásia.",
+    "globalNetwork": "Nossa sede operacional está focada no mercado imobiliário americano, mas nossa rede de investidores é global.",
+    "readyNextStep": "Pronto para dar o próximo passo?",
+    "clickButtonToTalk": "Clique no botão abaixo para falar diretamente com um consultor e iniciar sua triagem."
+  },
+  "language": {
+    "select": "Idioma",
+    "pt-br": "Português (BR)",
+    "en-us": "English (US)",
+    "es-es": "Español (ES)"
+  }
+}
