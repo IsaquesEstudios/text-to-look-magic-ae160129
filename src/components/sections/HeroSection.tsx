@@ -18,7 +18,7 @@ export function HeroSection({
   backgroundImage,
 }: HeroSectionProps) {
   return (
-    <section className="min-h-screen flex flex-col relative overflow-hidden pt-20">
+    <section className="min-h-[85vh] sm:min-h-screen flex flex-col relative overflow-hidden pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-discovery-graphite" />
       
@@ -27,7 +27,7 @@ export function HeroSection({
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-discovery-green/5 rounded-full blur-[150px]" />
       
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-end px-6 pt-12 pb-0 mb-[-40px]">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-end px-6 pt-8 sm:pt-12 pb-0 mb-[-40px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -63,7 +63,7 @@ export function HeroSection({
         transition={{ duration: 0.8, delay: 0.3 }}
         className="relative z-0 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-20 overflow-hidden"
       >
-        <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] rounded-b-[1.5rem] sm:rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
+        <div className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] rounded-b-[1.5rem] sm:rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
             style={{ backgroundImage: `url(${backgroundImage})` }}
