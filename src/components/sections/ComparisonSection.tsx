@@ -1,33 +1,38 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 import heroHouse from "@/assets/hero-house.jpg";
 import heroLand from "@/assets/hero-land.jpg";
 import cityscape from "@/assets/cityscape.jpg";
 import houseRenovation from "@/assets/house-renovation.jpg";
 
-const comparisons = [
-  {
-    image: heroHouse,
-    title: "Dólar vs. Moedas Locais",
-    description: "Enquanto moedas de outros países sofrem com a inflação, seu patrimônio é lastreado em Dólar.",
-  },
-  {
-    image: heroLand,
-    title: "Ativo Real vs. Papel",
-    description: "Você possui o título de uma propriedade física em seu nome nos Estados Unidos.",
-  },
-  {
-    image: cityscape,
-    title: "Segurança Americana",
-    description: "Leis de propriedade estáveis e proteção jurídica superior a qualquer outro mercado global.",
-  },
-  {
-    image: houseRenovation,
-    title: "Arbitragem em Leilão",
-    description: "Compramos ativos por uma fração do preço real através de leilões fiscais.",
-  },
-];
+const images = [heroHouse, heroLand, cityscape, houseRenovation];
 
 export function ComparisonSection() {
+  const { t } = useTranslation();
+
+  const comparisons = [
+    {
+      image: heroHouse,
+      title: t.home.comparison.dollarTitle,
+      description: t.home.comparison.dollarPoints[0],
+    },
+    {
+      image: heroLand,
+      title: t.home.comparison.dollarPoints[1],
+      description: t.home.comparison.dollarPoints[2],
+    },
+    {
+      image: cityscape,
+      title: t.home.comparison.realTitle,
+      description: t.home.comparison.realPoints[0],
+    },
+    {
+      image: houseRenovation,
+      title: t.home.comparison.realPoints[1],
+      description: t.home.comparison.realPoints[2],
+    },
+  ];
+
   return (
     <section className="section-graphite py-24">
       <div className="container mx-auto px-6">
@@ -39,10 +44,10 @@ export function ComparisonSection() {
           className="mb-12"
         >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-            Discovery Investments vs. Mercado Global
+            {t.home.comparison.title}
           </h2>
           <p className="text-base text-muted-foreground max-w-xl">
-            Entenda por que o investimento em propriedades nos EUA supera outras aplicações.
+            {t.home.comparison.subtitle}
           </p>
         </motion.div>
 
@@ -50,7 +55,7 @@ export function ComparisonSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {comparisons.map((item, index) => (
             <motion.div
-              key={item.title}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

@@ -3,19 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "@/hooks/useTranslation";
+import { getLanguageFromPath } from "@/i18n";
 import discoveryLogo from "@/assets/discovery-logo.png";
-
-const investmentItems = [
-  { name: "Terrenos", path: "/terrenos" },
-  { name: "Casas", path: "/casas" },
-];
-
-const navItems = [
-  { name: "Início", path: "/" },
-  { name: "Investimentos", path: null, hasDropdown: true },
-  { name: "Sobre Nós", path: "/sobre" },
-  { name: "Contato", path: "/contato" },
-];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +14,23 @@ export function Header() {
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation();
+  const currentLang = getLanguageFromPath(location.pathname);
 
-  const isInvestmentActive = location.pathname === "/terrenos" || location.pathname === "/casas";
+  const investmentItems = [
+    { name: t.nav.land, path: `/${currentLang}/terrenos` },
+    { name: t.nav.houses, path: `/${currentLang}/casas` },
+  ];
+
+  const navItems = [
+    { name: t.nav.home, path: `/${currentLang}` },
+    { name: t.nav.investments, path: null, hasDropdown: true },
+    { name: t.nav.about, path: `/${currentLang}/sobre` },
+    { name: t.nav.blog, path: `/${currentLang}/blog` },
+    { name: t.nav.contact, path: `/${currentLang}/contato` },
+  ];
+
+  const isInvestmentActive = location.pathname.includes("/terrenos") || location.pathname.includes("/casas");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +49,7 @@ export function Header() {
     }`}>
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to={`/${currentLang}`} className="flex items-center gap-3">
             <img 
               src={discoveryLogo} 
               alt="Discovery Investments" 
@@ -122,18 +128,22 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden lg:block">
+          <div className="hidden lg:flex items-center gap-4">
+            <LanguageSwitcher />
             <Button variant="cta" size="default">
-              Falar com Consultor
+              {t.common.cta}
             </Button>
           </div>
 
-          <button
-            className="lg:hidden text-foreground p-2"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex lg:hidden items-center gap-3">
+            <LanguageSwitcher />
+            <button
+              className="text-foreground p-2"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -210,7 +220,7 @@ export function Header() {
                 )
               ))}
               <Button variant="cta" size="lg" className="mt-4">
-                Falar com Consultor
+                {t.common.cta}
               </Button>
             </nav>
           </motion.div>

@@ -1,0 +1,330 @@
+export const es = {
+  // Common
+  common: {
+    cta: "Hablar con un Consultor",
+    learnMore: "Saber Más",
+    readMore: "Leer Más",
+  },
+
+  // Navigation
+  nav: {
+    home: "Inicio",
+    investments: "Inversiones",
+    land: "Terrenos",
+    houses: "Casas",
+    about: "Sobre Nosotros",
+    contact: "Contacto",
+    blog: "Blog",
+  },
+
+  // Footer
+  footer: {
+    description: "Tu puente estratégico hacia el mercado inmobiliario estadounidense. Dolariza tu patrimonio con seguridad.",
+    navigation: "Navegación",
+    modalities: "Modalidades",
+    contact: "Contacto",
+    landInvestment: "Inversión en Terrenos",
+    houseInvestment: "Inversión en Casas",
+    individualLand: "Compra Individual de Terrenos",
+    individualHouse: "Compra Individual de Casas",
+    quotaSale: "Venta de Cuotas",
+    annualMembership: "Membresía Anual",
+    whatsappTriage: "WhatsApp de Triaje",
+    unitedStates: "Estados Unidos",
+    copyright: "© 2026 Discovery Investments. Todos los derechos reservados.",
+  },
+
+  // Home Page
+  home: {
+    hero: {
+      title: "invertir en bienes raíces de EE.UU.",
+      description: "Protege tu capital contra la inflación invirtiendo en la moneda más fuerte del mundo a través del mercado inmobiliario de EE.UU. Discovery Investments, establecida en agosto de 2025, ofrece un sistema completo de house flipping para brasileños que buscan rentabilidad real y seguridad jurídica.",
+      cta: "Dolariza tu Capital Ahora",
+    },
+    comparison: {
+      title: "¿Por qué Dolarizar tu Patrimonio?",
+      subtitle: "Mientras el Real brasileño pierde valor año tras año, el Dólar se mantiene como la moneda más estable y fuerte del mundo.",
+      realTitle: "Real Brasileño (BRL)",
+      dollarTitle: "Dólar Estadounidense (USD)",
+      realPoints: [
+        "Inflación acumulada de más del 50% en los últimos 10 años",
+        "La inestabilidad política afecta directamente la economía",
+        "Rendimientos reales negativos en inversiones tradicionales",
+      ],
+      dollarPoints: [
+        "Moneda de reserva mundial por más de 70 años",
+        "La economía de EE.UU. es la más grande y estable del planeta",
+        "Mercado inmobiliario con valorización consistente",
+      ],
+    },
+    profitability: {
+      title: "Rentabilidad Real en Dólares",
+      subtitle: "Nuestros números hablan por sí mismos. Conoce los retornos reales del mercado inmobiliario estadounidense.",
+      landTitle: "Terrenos",
+      landReturn: "90%",
+      landDesc: "Retorno promedio por operación",
+      landTime: "Ciclo de 3-6 meses",
+      houseTitle: "Casas",
+      houseReturn: "30%",
+      houseDesc: "Retorno promedio por operación",
+      houseTime: "Ciclo de 6-12 meses",
+    },
+    modalities: {
+      title: "Modalidades de Inversión",
+      subtitle: "Elige la modalidad que mejor se adapte a tu perfil de inversor.",
+      landTitle: "Terrenos",
+      landDesc: "Inversión inicial desde $5,000 con retorno promedio del 90%.",
+      houseTitle: "Casas",
+      houseDesc: "Inversión inicial desde $30,000 con retorno promedio del 30%.",
+    },
+    process: {
+      title: "Proceso Simplificado",
+      subtitle: "Desde el primer contacto hasta la realización de ganancias, te acompañamos en cada paso.",
+      steps: [
+        { title: "Triaje", desc: "Calificación inicial por WhatsApp" },
+        { title: "Estructuración", desc: "Apertura de tu LLC en EE.UU." },
+        { title: "Adquisición", desc: "Oferta estratégica en subasta" },
+        { title: "Liquidación", desc: "Venta y realización de ganancias" },
+      ],
+    },
+    institutional: {
+      title: "¿Quién es Discovery Investments?",
+      description: "Fundada en agosto de 2025, Discovery Investments es el puente estratégico para brasileños que buscan lucrar a través del House Flipping y subastas de deudas fiscales en Estados Unidos.",
+      partnerTitle: "Tababog Construction",
+      partnerDesc: "Nuestra propia empresa constructora garantiza una ejecución técnica impecable en cada renovación.",
+    },
+    cta: {
+      title: "¿Listo para comenzar?",
+      description: "Habla con un especialista y descubre cómo dolarizar tu patrimonio.",
+      button: "Hablar con un Consultor",
+    },
+  },
+
+  // Terrenos Page
+  terrenos: {
+    hero: {
+      title: "Inversión en Terrenos en EE.UU.: Rentabilidad Promedio del 90%.",
+      description: "Inicia tu camino de dolarización con el activo de mayor rotación y margen del mercado inmobiliario estadounidense. Discovery Investments identifica terrenos en subastas estratégicas, permitiéndote adquirir propiedades por una fracción de su valor de mercado y cosechar ganancias excepcionales.",
+      cta: "Quiero Invertir en Terrenos",
+    },
+    howItWorks: {
+      title: "Cómo transformamos deudas en ganancias extraordinarias",
+      subtitle: "Muchas personas nos preguntan cómo es posible encontrar terrenos a valores tan por debajo del mercado. La respuesta está en el sistema de subastas de deudas fiscales de EE.UU.",
+      steps: [
+        {
+          title: "La Deuda Fiscal",
+          description: "Cuando un propietario en EE.UU. deja de pagar los impuestos sobre la propiedad (Property Tax), el gobierno local pone esta deuda a la venta para recuperar fondos para el condado.",
+        },
+        {
+          title: "La Oferta en Subasta",
+          description: "Nosotros entramos en escena ofertando por el título de propiedad (Tax Deed) directamente en subasta por cantidades que representan solo los impuestos atrasados, lo que permite comprar terrenos de $50,000 por valores cercanos a $5,000.",
+        },
+        {
+          title: "La Venta Estratégica",
+          description: "Después de la adquisición legal y la posesión del título, el terreno se pone a la venta en el mercado convencional por su valor real, permitiendo al inversor realizar la ganancia de la operación.",
+        },
+      ],
+    },
+    advantages: {
+      title: "¿Por qué invertir en Terrenos?",
+      items: [
+        "Capital inicial bajo",
+        "Ciclo rápido de 3-6 meses",
+        "Retorno promedio del 90%",
+        "Sin necesidad de renovación",
+        "Proceso 100% legal",
+      ],
+    },
+    profit: {
+      howTitle: "¿Cómo funciona la ganancia?",
+      howDesc: "La ganancia en la subasta se realiza en el momento de la compra. Cuando adquirimos un activo por una fracción de su valor, creamos un margen de seguridad donde, incluso con fluctuaciones en el precio de venta, tu capital principal permanece rentable.",
+      securityTitle: "Seguridad Jurídica Garantizada",
+      securityDesc: "El proceso se formaliza a través de una empresa (LLC) a tu nombre y el ciclo termina con el título oficial de propiedad entregado al inversor.",
+    },
+    process: {
+      title: "Cómo Iniciar tu Inversión",
+      steps: [
+        { title: "Triaje", description: "Calificación técnica por WhatsApp para entender tu perfil." },
+        { title: "Estructuración Legal", description: "Apoyo total para la apertura de tu LLC en EE.UU." },
+        { title: "Oferta Estratégica", description: "Discovery realiza la compra del terreno directamente para tu empresa." },
+        { title: "Liquidación", description: "La propiedad se vende y el inversor recibe el capital invertido más la ganancia." },
+      ],
+    },
+    pricing: {
+      title: "Tarifa de Servicio Discovery",
+      price: "$500",
+      description: "Esta tarifa cubre nuestra asesoría en adquisición estratégica, asegurando que solo compres activos con alto potencial de reventa.",
+    },
+    cta: {
+      title: "¿Listo para ganar 90% en dólares?",
+      description: "Habla ahora con un especialista de Discovery Investments y descubre si eres elegible para comenzar.",
+      button: "Verificar Elegibilidad para Terrenos",
+    },
+  },
+
+  // Casas Page
+  casas: {
+    hero: {
+      title: "Inversión en Casas en EE.UU.: Rentabilidad Promedio del 30% con Activos Reales.",
+      description: "Domina el mercado estadounidense de House Flipping con la estructura completa de Discovery Investments. Adquiere propiedades en subastas estratégicas por una fracción del valor de mercado, renueva con nuestra propia empresa constructora y cosecha ganancias expresivas en dólares.",
+      cta: "Quiero Invertir en Casas",
+    },
+    howItWorks: {
+      title: "Transformamos Casas con Deudas en Activos Rentables",
+      subtitle: "El secreto de nuestro éxito está en la compra estratégica y la ejecución técnica impecable.",
+      steps: [
+        {
+          title: "Compra Estratégica",
+          description: "Identificamos casas con deudas fiscales acumuladas y ofertamos por ellas en subastas de Tax Deed directamente del gobierno, eliminando intermediarios y garantizando precios bajos.",
+        },
+        {
+          title: "Renovación Técnica (Remodelación)",
+          description: "Nuestro equipo de Tababog Construction entra para realizar la remodelación completa del inmueble, aumentando drásticamente su valor de mercado.",
+        },
+        {
+          title: "Liquidación",
+          description: "Con la casa renovada y el título a nombre del inversor, completamos la venta en el mercado convencional, entregando el capital invertido más la ganancia.",
+        },
+      ],
+    },
+    advantages: {
+      title: "¿Por qué invertir en Casas?",
+      items: [
+        "Activos físicos tangibles",
+        "Empresa constructora propia",
+        "Retorno promedio del 30%",
+        "Ciclo de 6-12 meses",
+        "Título a tu nombre",
+      ],
+    },
+    security: {
+      title: "Seguridad Garantizada por Márgenes de Ganancia Robustos",
+      costTitle: "¿Qué pasa si la renovación cuesta más?",
+      costDesc: "Trabajamos con un margen de seguridad tan grande (comprando propiedades que valen $50,000 post-renovación por valores como $5,000) que, incluso en casos de gastos imprevistos, tu capital principal permanece protegido.",
+      legalTitle: "Garantía Legal del Título",
+      legalDesc: "El inversor tiene control total a través de su propia LLC en EE.UU., y el proceso solo termina con la entrega del título oficial de propiedad.",
+    },
+    process: {
+      title: "Tu Viaje de 6 a 12 Meses",
+      steps: [
+        { title: "Calificación", description: "Triaje técnico por WhatsApp para entender tu perfil de inversión." },
+        { title: "Formalización", description: "Apoyo total para la apertura de tu empresa (LLC) en EE.UU." },
+        { title: "Adquisición y Renovación", description: "Oferta en subasta de la casa e inicio inmediato de la renovación por nuestra constructora." },
+        { title: "Venta y Ganancia", description: "Liquidación de la propiedad y recepción de fondos en la cuenta de tu empresa." },
+      ],
+    },
+    pricing: {
+      badge: "PROMOCIÓN",
+      title: "Tarifa de Servicio Discovery para Casas",
+      price: "$3,000",
+      description: "Esta tarifa especial es válida para los primeros 10 contratos. El valor escala en $500 por cada 10 nuevos contratos hasta alcanzar el techo de $5,000.",
+    },
+    cta: {
+      title: "¿Listo para ganar en dólares con propiedades físicas?",
+      description: "Habla ahora con un especialista de Discovery Investments y asegura tu tarifa promocional de $3,000.",
+      button: "Verificar Elegibilidad para Casas",
+    },
+  },
+
+  // Sobre Page
+  sobre: {
+    structure: {
+      title: "La Ventaja de Quienes Construyen",
+      description1: "También somos propietarios de",
+      tababog: "Tababog Construction",
+      description2: ", una empresa especializada en renovación de casas.",
+      description3: "Esta integración nos permite actuar como tu General Contractor (GC), gestionando directamente la remodelación de activos para garantizar el menor costo operativo y la mayor ganancia final en la venta.",
+    },
+    global: {
+      title: "Presentes Donde Estés",
+      regions: [
+        { title: "Brasil", description: "Dolarización y protección de patrimonio." },
+        { title: "Europa", description: "Rentabilidad estratégica en moneda fuerte." },
+        { title: "EE.UU.", description: "Gestión profesional para brasileños residentes." },
+        { title: "Global", description: "Oportunidades para brasileños en cualquier lugar del planeta." },
+      ],
+    },
+    values: {
+      title: "Nuestros Valores",
+      items: [
+        { title: "Transparencia", description: "Cada paso del proceso está documentado y compartido con nuestros inversores." },
+        { title: "Excelencia", description: "Calidad técnica en cada renovación y precisión estratégica en cada subasta." },
+        { title: "Resultados", description: "Nos enfocamos exclusivamente en generar retornos reales para nuestros socios." },
+      ],
+    },
+    cta: {
+      title: "¿Listo para conocer a nuestro equipo?",
+      description: "Agenda una conversación y descubre cómo podemos acelerar tu viaje de inversión.",
+      button: "Hablar con un Especialista",
+    },
+  },
+
+  // Contato Page
+  contato: {
+    hero: {
+      title: "Conéctate con tu Rentabilidad en Dólares.",
+      description: "Estamos listos para guiar tu camino en el mercado inmobiliario estadounidense.",
+    },
+    channels: {
+      title: "Nuestros Canales Oficiales",
+      items: [
+        { title: "WhatsApp de Triaje", description: "Donde realizamos tu calificación técnica y de aptitud inicial." },
+        { title: "Soporte al Inversor", description: "Canal exclusivo para socios con contratos activos de terrenos o casas." },
+        { title: "Atención Global", description: "Atendemos a brasileños que residen en Brasil, Europa, EE.UU. y otras regiones del planeta." },
+      ],
+    },
+    partnership: {
+      title: "Discovery Investments: Tu Inteligencia en EE.UU.",
+      description1: "Fundada en agosto de 2025, Discovery Investments es el puente estratégico para brasileños que buscan lucrar a través del House Flipping y subastas de deudas fiscales en Estados Unidos.",
+      description2: "Con nuestro propio brazo operativo a través de",
+      tababog: "Tababog Construction",
+      description3: ", garantizamos que cada proyecto se ejecute con máxima eficiencia, desde la subasta hasta la entrega del título de propiedad.",
+    },
+    locations: {
+      title: "Dónde Operamos",
+      subtitle: "Nuestra sede operativa está enfocada en el mercado inmobiliario estadounidense, pero nuestra red de inversores es global.",
+      items: [
+        { title: "Sede Operativa", description: "Estados Unidos (Ejecución de subastas y obras)." },
+        { title: "Inversores Atendidos", description: "Brasileños en Brasil, Europa, EE.UU. y Asia." },
+      ],
+    },
+    cta: {
+      title: "¿Listo para dar el siguiente paso?",
+      description: "Haz clic en el botón de abajo para hablar directamente con un consultor e iniciar tu triaje.",
+      button: "Hablar con Discovery Investments",
+    },
+  },
+
+  // Blog
+  blog: {
+    title: "Blog",
+    subtitle: "Artículos e ideas sobre inversiones inmobiliarias en EE.UU.",
+    latestPosts: "Lo Último del Blog",
+    latestPostsSubtitle: "Mantente al día con las noticias y aprende más sobre inversiones en EE.UU.",
+    readMore: "Leer Artículo",
+    postedOn: "Publicado el",
+    posts: [
+      {
+        slug: "como-funcionan-subastas-tax-deed",
+        title: "Cómo Funcionan las Subastas de Tax Deed en EE.UU.",
+        excerpt: "Entiende el proceso completo de adquisición de propiedades a través de subastas de deudas fiscales y cómo lucrar con esta estrategia.",
+        date: "15 de enero de 2026",
+        category: "Educación",
+      },
+      {
+        slug: "ventajas-llc-inversor-brasileno",
+        title: "Ventajas de Abrir una LLC como Inversor Brasileño",
+        excerpt: "Descubre por qué una LLC es esencial para proteger tu patrimonio y optimizar impuestos en inversiones estadounidenses.",
+        date: "10 de enero de 2026",
+        category: "Legal",
+      },
+      {
+        slug: "house-flipping-guia-principiantes",
+        title: "House Flipping: Guía Completa para Principiantes",
+        excerpt: "Todo lo que necesitas saber para comenzar en el mercado de compra, renovación y venta de casas en Estados Unidos.",
+        date: "5 de enero de 2026",
+        category: "Estrategia",
+      },
+    ],
+  },
+};

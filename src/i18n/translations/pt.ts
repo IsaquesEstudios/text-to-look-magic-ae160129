@@ -1,0 +1,330 @@
+export const pt = {
+  // Common
+  common: {
+    cta: "Falar com Consultor",
+    learnMore: "Saiba Mais",
+    readMore: "Ler Mais",
+  },
+
+  // Navigation
+  nav: {
+    home: "Início",
+    investments: "Investimentos",
+    land: "Terrenos",
+    houses: "Casas",
+    about: "Sobre Nós",
+    contact: "Contato",
+    blog: "Blog",
+  },
+
+  // Footer
+  footer: {
+    description: "Sua ponte estratégica para o mercado imobiliário americano. Dolarize seu patrimônio com segurança.",
+    navigation: "Navegação",
+    modalities: "Modalidades",
+    contact: "Contato",
+    landInvestment: "Investimento em Terrenos",
+    houseInvestment: "Investimento em Casas",
+    individualLand: "Compra Individual de Terrenos",
+    individualHouse: "Compra Individual de Casas",
+    quotaSale: "Venda de Cotas",
+    annualMembership: "Membership Anual",
+    whatsappTriage: "WhatsApp de Triagem",
+    unitedStates: "Estados Unidos",
+    copyright: "© 2026 Discovery Investments. Todos os direitos reservados.",
+  },
+
+  // Home Page
+  home: {
+    hero: {
+      title: "investir em imóveis nos EUA",
+      description: "Proteja seu capital contra a inflação investindo na moeda mais forte do mundo através do mercado imobiliário dos EUA. A Discovery Investments, estabelecida em agosto de 2025, oferece um sistema completo de house flipping para brasileiros que buscam rentabilidade real e segurança jurídica.",
+      cta: "Dolarize seu Capital Agora",
+    },
+    comparison: {
+      title: "Por que Dolarizar seu Patrimônio?",
+      subtitle: "Enquanto o Real perde valor ano após ano, o Dólar se mantém como a moeda mais estável e forte do mundo.",
+      realTitle: "Real (BRL)",
+      dollarTitle: "Dólar (USD)",
+      realPoints: [
+        "Inflação acumulada de 50%+ nos últimos 10 anos",
+        "Instabilidade política afeta diretamente a economia",
+        "Rendimentos reais negativos em aplicações tradicionais",
+      ],
+      dollarPoints: [
+        "Moeda de reserva mundial há mais de 70 anos",
+        "Economia dos EUA é a maior e mais estável do planeta",
+        "Mercado imobiliário com valorização consistente",
+      ],
+    },
+    profitability: {
+      title: "Rentabilidade Real em Dólar",
+      subtitle: "Nossos números falam por si. Conheça os retornos reais do mercado imobiliário americano.",
+      landTitle: "Terrenos",
+      landReturn: "90%",
+      landDesc: "Retorno médio por operação",
+      landTime: "3-6 meses de ciclo",
+      houseTitle: "Casas",
+      houseReturn: "30%",
+      houseDesc: "Retorno médio por operação",
+      houseTime: "6-12 meses de ciclo",
+    },
+    modalities: {
+      title: "Modalidades de Investimento",
+      subtitle: "Escolha a modalidade que melhor se adapta ao seu perfil de investidor.",
+      landTitle: "Terrenos",
+      landDesc: "Investimento inicial a partir de $5.000 com retorno médio de 90%.",
+      houseTitle: "Casas",
+      houseDesc: "Investimento inicial a partir de $30.000 com retorno médio de 30%.",
+    },
+    process: {
+      title: "Processo Simplificado",
+      subtitle: "Do primeiro contato à realização do lucro, acompanhamos você em cada etapa.",
+      steps: [
+        { title: "Triagem", desc: "Qualificação inicial via WhatsApp" },
+        { title: "Estruturação", desc: "Abertura da sua LLC nos EUA" },
+        { title: "Aquisição", desc: "Arremate estratégico no leilão" },
+        { title: "Liquidação", desc: "Venda e realização do lucro" },
+      ],
+    },
+    institutional: {
+      title: "Quem é a Discovery Investments?",
+      description: "Fundada em agosto de 2025, a Discovery Investments é a ponte estratégica para brasileiros que buscam lucrar através do House Flipping e leilões de dívidas fiscais nos Estados Unidos.",
+      partnerTitle: "Tababog Construction",
+      partnerDesc: "Nossa construtora própria garante execução técnica impecável em cada reforma.",
+    },
+    cta: {
+      title: "Pronto para começar?",
+      description: "Fale com um especialista e descubra como dolarizar seu patrimônio.",
+      button: "Falar com Consultor",
+    },
+  },
+
+  // Terrenos Page
+  terrenos: {
+    hero: {
+      title: "Investimento em Terrenos nos EUA: Lucratividade Média de 90%.",
+      description: "Inicie sua jornada de dolarização com o ativo de maior giro e margem do mercado imobiliário americano. A Discovery Investments identifica terrenos em leilões estratégicos, permitindo que você adquira propriedades por uma fração do valor de mercado e colha lucros excepcionais.",
+      cta: "Quero Investir em Terrenos",
+    },
+    howItWorks: {
+      title: "Como transformamos dívidas em lucros extraordinários",
+      subtitle: "Muitas pessoas nos perguntam como é possível encontrar terrenos por valores tão abaixo do mercado. A resposta está no sistema de leilões de dívidas fiscais dos EUA.",
+      steps: [
+        {
+          title: "A Dívida Fiscal",
+          description: "Quando um proprietário nos EUA deixa de pagar os impostos territoriais (Property Tax), o governo local coloca essa dívida à venda para recuperar os fundos para o condado.",
+        },
+        {
+          title: "O Arremate no Leilão",
+          description: "Nós entramos em cena arrematando o título da propriedade (Tax Deed) diretamente em leilão por valores que representam apenas o montante dos impostos atrasados, o que permite comprar terrenos de $50.000 por valores próximos a $5.000.",
+        },
+        {
+          title: "A Venda Estratégica",
+          description: "Após a aquisição legal e a posse do título, o terreno é colocado à venda no mercado convencional pelo seu valor real, permitindo que o investidor realize o lucro da operação.",
+        },
+      ],
+    },
+    advantages: {
+      title: "Por que investir em Terrenos?",
+      items: [
+        "Capital inicial baixo",
+        "Ciclo rápido de 3-6 meses",
+        "Retorno médio de 90%",
+        "Sem necessidade de reforma",
+        "Processo 100% legal",
+      ],
+    },
+    profit: {
+      howTitle: "Como funciona o lucro?",
+      howDesc: "O lucro no leilão é realizado no momento da compra. Quando adquirimos um ativo por uma fração do seu valor, criamos uma margem de segurança onde, mesmo com oscilações no preço de venda, seu capital principal permanece rentável.",
+      securityTitle: "Segurança Jurídica Garantida",
+      securityDesc: "O processo é formalizado através de uma empresa (LLC) em seu nome e o ciclo termina com o título oficial da propriedade entregue ao investidor.",
+    },
+    process: {
+      title: "Como Iniciar seu Investimento",
+      steps: [
+        { title: "Triagem", description: "Qualificação técnica via WhatsApp para entender seu perfil." },
+        { title: "Estruturação Legal", description: "Suporte total para a abertura da sua LLC nos EUA." },
+        { title: "Arremate Estratégico", description: "A Discovery realiza a compra do terreno diretamente para sua empresa." },
+        { title: "Liquidação", description: "O imóvel é vendido e o investidor recebe o capital investido somado ao lucro." },
+      ],
+    },
+    pricing: {
+      title: "Taxa de Serviço Discovery",
+      price: "$500",
+      description: "Esta taxa cobre nossa assessoria na aquisição estratégica, garantindo que você compre apenas ativos com alto potencial de revenda.",
+    },
+    cta: {
+      title: "Pronto para lucrar 90% em dólares?",
+      description: "Fale agora com um especialista da Discovery Investments e saiba se você está apto a começar.",
+      button: "Consultar Aptidão para Terrenos",
+    },
+  },
+
+  // Casas Page
+  casas: {
+    hero: {
+      title: "Investimento em Casas nos EUA: Lucratividade Média de 30% com Ativos Reais.",
+      description: "Domine o mercado de House Flipping americano com a estrutura completa da Discovery Investments. Adquira propriedades em leilões estratégicos por uma fração do valor de mercado, realize a reforma com nossa construtora própria e colha lucros expressivos em dólar.",
+      cta: "Quero Investir em Casas",
+    },
+    howItWorks: {
+      title: "Transformamos Casas com Dívidas em Patrimônio Lucrativo",
+      subtitle: "O segredo do nosso sucesso está na compra estratégica e na execução técnica impecável.",
+      steps: [
+        {
+          title: "Compra Estratégica",
+          description: "Identificamos casas com dívidas fiscais acumuladas e as arrematamos em leilões de Tax Deed diretamente do governo, eliminando intermediários e garantindo preços baixos.",
+        },
+        {
+          title: "Reforma Técnica (Remodelagem)",
+          description: "Nossa equipe da Tababog Construction entra em cena para realizar a remodelagem completa do imóvel, aumentando drasticamente o seu valor de mercado.",
+        },
+        {
+          title: "Liquidação",
+          description: "Com a casa reformada e o título em nome do investidor, realizamos a venda no mercado convencional, entregando o capital investido somado ao lucro.",
+        },
+      ],
+    },
+    advantages: {
+      title: "Por que investir em Casas?",
+      items: [
+        "Ativos físicos tangíveis",
+        "Construtora própria",
+        "Retorno médio de 30%",
+        "Ciclo de 6-12 meses",
+        "Título em seu nome",
+      ],
+    },
+    security: {
+      title: "Segurança Garantida por Margens de Lucro Robustas",
+      costTitle: "O que acontece se a obra custar mais?",
+      costDesc: "Trabalhamos com uma margem de segurança tão grande (comprando por valores como $5.000 propriedades que valem $50.000 pós-obra) que, mesmo em casos de gastos imprevistos, seu capital principal permanece protegido.",
+      legalTitle: "Garantia Jurídica do Título",
+      legalDesc: "O investidor possui o controle total através de sua própria LLC nos EUA, e o processo só termina com a entrega do título oficial de propriedade.",
+    },
+    process: {
+      title: "Sua Jornada de 6 a 12 Meses",
+      steps: [
+        { title: "Qualificação", description: "Triagem técnica via WhatsApp para entender seu perfil de investimento." },
+        { title: "Formalização", description: "Suporte total para abertura da sua empresa (LLC) nos EUA." },
+        { title: "Aquisição e Obra", description: "Arremate da casa no leilão e início imediato da reforma pela nossa construtora." },
+        { title: "Venda e Lucro", description: "Liquidação do imóvel e recebimento dos valores na conta da sua empresa." },
+      ],
+    },
+    pricing: {
+      badge: "PROMOÇÃO",
+      title: "Taxa de Serviço Discovery para Casas",
+      price: "$3.000",
+      description: "Esta taxa especial é válida para os primeiros 10 contratos. O valor escala em $500 a cada 10 novos contratos até atingir o teto de $5.000.",
+    },
+    cta: {
+      title: "Pronto para lucrar em dólar com imóveis físicos?",
+      description: "Fale agora com um especialista da Discovery Investments e garanta sua taxa promocional de $3.000.",
+      button: "Consultar Aptidão para Casas",
+    },
+  },
+
+  // Sobre Page
+  sobre: {
+    structure: {
+      title: "O Diferencial de Quem Constrói",
+      description1: "Somos também os proprietários da",
+      tababog: "Tababog Construction",
+      description2: ", empresa especialista em reforma de casas.",
+      description3: "Esta integração nos permite atuar como seu General Contractor (GC), gerenciando diretamente a remodelagem dos ativos para garantir o menor custo operacional e o maior lucro final na venda.",
+    },
+    global: {
+      title: "Presente Onde Você Estiver",
+      regions: [
+        { title: "Brasil", description: "Dolarização e proteção de patrimônio." },
+        { title: "Europa", description: "Rentabilidade estratégica em moeda forte." },
+        { title: "EUA", description: "Gestão profissional para brasileiros residentes." },
+        { title: "Global", description: "Oportunidades para brasileiros em qualquer lugar do planeta." },
+      ],
+    },
+    values: {
+      title: "Nossos Valores",
+      items: [
+        { title: "Transparência", description: "Cada etapa do processo é documentada e compartilhada com nossos investidores." },
+        { title: "Excelência", description: "Qualidade técnica em cada reforma e precisão estratégica em cada leilão." },
+        { title: "Resultados", description: "Focamos exclusivamente em gerar retorno real para nossos parceiros." },
+      ],
+    },
+    cta: {
+      title: "Pronto para conhecer nossa equipe?",
+      description: "Agende uma conversa e descubra como podemos acelerar sua jornada de investimento.",
+      button: "Falar com um Especialista",
+    },
+  },
+
+  // Contato Page
+  contato: {
+    hero: {
+      title: "Conecte-se com sua Rentabilidade em Dólar.",
+      description: "Estamos prontos para orientar sua jornada no mercado imobiliário americano.",
+    },
+    channels: {
+      title: "Nossos Canais Oficiais",
+      items: [
+        { title: "WhatsApp de Triagem", description: "Onde realizamos sua qualificação técnica e de aptidão inicial." },
+        { title: "Suporte ao Investidor", description: "Canal exclusivo para parceiros com contratos ativos em terrenos ou casas." },
+        { title: "Atendimento Global", description: "Atendemos brasileiros residentes no Brasil, Europa, EUA e demais regiões do planeta." },
+      ],
+    },
+    partnership: {
+      title: "Discovery Investments: Sua Inteligência nos EUA",
+      description1: "Fundada em agosto de 2025, a Discovery Investments é a ponte estratégica para brasileiros que buscam lucrar através do House Flipping e leilões de dívidas fiscais nos Estados Unidos.",
+      description2: "Com braço operacional próprio através da",
+      tababog: "Tababog Construction",
+      description3: ", garantimos que cada projeto seja executado com máxima eficiência, do arremate à entrega do título de propriedade.",
+    },
+    locations: {
+      title: "Onde Atuamos",
+      subtitle: "Nossa sede operacional está focada no mercado imobiliário americano, mas nossa rede de investidores é global.",
+      items: [
+        { title: "Sede Operacional", description: "Estados Unidos (Execução de leilões e obras)." },
+        { title: "Investidores Atendidos", description: "Brasileiros no Brasil, Europa, EUA e Ásia." },
+      ],
+    },
+    cta: {
+      title: "Pronto para dar o próximo passo?",
+      description: "Clique no botão abaixo para falar diretamente com um consultor e iniciar sua triagem.",
+      button: "Falar com a Discovery Investments",
+    },
+  },
+
+  // Blog
+  blog: {
+    title: "Blog",
+    subtitle: "Artigos e insights sobre investimentos imobiliários nos EUA",
+    latestPosts: "Últimas do Blog",
+    latestPostsSubtitle: "Fique por dentro das novidades e aprenda mais sobre investimentos nos EUA",
+    readMore: "Ler Artigo",
+    postedOn: "Publicado em",
+    posts: [
+      {
+        slug: "como-funciona-leilao-tax-deed",
+        title: "Como Funciona um Leilão de Tax Deed nos EUA",
+        excerpt: "Entenda o processo completo de aquisição de imóveis através de leilões de dívidas fiscais e como lucrar com essa estratégia.",
+        date: "15 de Janeiro, 2026",
+        category: "Educação",
+      },
+      {
+        slug: "vantagens-llc-investidor-brasileiro",
+        title: "Vantagens de Abrir uma LLC como Investidor Brasileiro",
+        excerpt: "Descubra por que uma LLC é essencial para proteger seu patrimônio e otimizar impostos nos investimentos americanos.",
+        date: "10 de Janeiro, 2026",
+        category: "Legal",
+      },
+      {
+        slug: "house-flipping-guia-iniciantes",
+        title: "House Flipping: Guia Completo para Iniciantes",
+        excerpt: "Tudo que você precisa saber para começar no mercado de compra, reforma e venda de casas nos Estados Unidos.",
+        date: "5 de Janeiro, 2026",
+        category: "Estratégia",
+      },
+    ],
+  },
+};

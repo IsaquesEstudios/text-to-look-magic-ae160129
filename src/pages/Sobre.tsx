@@ -2,36 +2,17 @@ import { Layout } from "@/components/layout/Layout";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
 import { Globe, Building, Users, Plane } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const regions = [
-  {
-    icon: Building,
-    title: "Brasil",
-    description: "Dolarização e proteção de patrimônio.",
-  },
-  {
-    icon: Globe,
-    title: "Europa",
-    description: "Rentabilidade estratégica em moeda forte.",
-  },
-  {
-    icon: Users,
-    title: "EUA",
-    description: "Gestão profissional para brasileiros residentes.",
-  },
-  {
-    icon: Plane,
-    title: "Global",
-    description: "Oportunidades para brasileiros em qualquer lugar do planeta.",
-  },
-];
+const iconMap = [Building, Globe, Users, Plane];
 
 const Sobre = () => {
+  const { t } = useTranslation();
+
   return (
     <Layout>
-
       {/* Structure - Dark section after hero */}
-      <section className="section-graphite py-24">
+      <section className="section-graphite py-24 pt-32">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -50,15 +31,15 @@ const Sobre = () => {
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              O Diferencial de Quem Constrói
+              {t.sobre.structure.title}
             </h2>
 
             <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-              Somos também os proprietários da <span className="text-discovery-green font-semibold">Tababog Construction</span>, empresa especialista em reforma de casas.
+              {t.sobre.structure.description1} <span className="text-discovery-green font-semibold">{t.sobre.structure.tababog}</span>{t.sobre.structure.description2}
             </p>
 
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Esta integração nos permite atuar como seu General Contractor (GC), gerenciando diretamente a remodelagem dos ativos para garantir o menor custo operacional e o maior lucro final na venda.
+              {t.sobre.structure.description3}
             </p>
           </motion.div>
         </div>
@@ -74,27 +55,30 @@ const Sobre = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-discovery-dark">
-              Presente Onde Você Estiver
+              {t.sobre.global.title}
             </h2>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {regions.map((region, index) => (
-              <motion.div
-                key={region.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center p-6 bg-white rounded-xl border border-discovery-green/10 shadow-sm hover:shadow-md hover:border-discovery-green/30 transition-all duration-300"
-              >
-                <div className="w-16 h-16 rounded-xl bg-discovery-green/10 flex items-center justify-center mx-auto mb-4">
-                  <region.icon className="w-8 h-8 text-discovery-green" />
-                </div>
-                <h3 className="text-xl font-semibold text-discovery-dark mb-2">{region.title}</h3>
-                <p className="text-discovery-text text-sm">{region.description}</p>
-              </motion.div>
-            ))}
+            {t.sobre.global.regions.map((region, index) => {
+              const Icon = iconMap[index];
+              return (
+                <motion.div
+                  key={region.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center p-6 bg-white rounded-xl border border-discovery-green/10 shadow-sm hover:shadow-md hover:border-discovery-green/30 transition-all duration-300"
+                >
+                  <div className="w-16 h-16 rounded-xl bg-discovery-green/10 flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-8 h-8 text-discovery-green" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-discovery-dark mb-2">{region.title}</h3>
+                  <p className="text-discovery-text text-sm">{region.description}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -110,57 +94,35 @@ const Sobre = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl md:text-4xl font-bold text-discovery-dark">
-                Nossos Valores
+                {t.sobre.values.title}
               </h2>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
-              >
-                <h3 className="text-xl font-semibold text-discovery-green mb-3">Transparência</h3>
-                <p className="text-discovery-text">
-                  Cada etapa do processo é documentada e compartilhada com nossos investidores.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
-              >
-                <h3 className="text-xl font-semibold text-discovery-green mb-3">Excelência</h3>
-                <p className="text-discovery-text">
-                  Qualidade técnica em cada reforma e precisão estratégica em cada leilão.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
-              >
-                <h3 className="text-xl font-semibold text-discovery-green mb-3">Resultados</h3>
-                <p className="text-discovery-text">
-                  Focamos exclusivamente em gerar retorno real para nossos parceiros.
-                </p>
-              </motion.div>
+              {t.sobre.values.items.map((value, index) => (
+                <motion.div
+                  key={value.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center bg-white rounded-xl p-8 border border-discovery-green/10 shadow-sm"
+                >
+                  <h3 className="text-xl font-semibold text-discovery-green mb-3">{value.title}</h3>
+                  <p className="text-discovery-text">
+                    {value.description}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       <CTASection
-        title="Pronto para conhecer nossa equipe?"
-        description="Agende uma conversa e descubra como podemos acelerar sua jornada de investimento."
-        ctaText="Falar com um Especialista"
+        title={t.sobre.cta.title}
+        description={t.sobre.cta.description}
+        ctaText={t.sobre.cta.button}
       />
     </Layout>
   );
