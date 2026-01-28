@@ -27,7 +27,7 @@ export function HeroSection({
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-discovery-green/5 rounded-full blur-[150px]" />
       
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-0 mb-[-80px]">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-end px-6 pt-12 pb-0 mb-[-40px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,15 +61,15 @@ export function HeroSection({
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-0 w-full mt-auto px-6 md:px-12 lg:px-20 pb-6 md:pb-12"
+        className="relative z-0 w-full px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-8"
       >
-        <div className="relative h-[65vh] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
+        <div className="relative h-[70vh] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
-          {/* Top fade effect - strong smooth disappearing */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-background/80 via-50% to-transparent to-100%" />
+          {/* Top fade effect - very strong smooth disappearing */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background from-0% via-background/90 via-55% to-transparent to-100%" />
           {/* Side fade effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
         </div>
