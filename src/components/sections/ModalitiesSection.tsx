@@ -9,7 +9,7 @@ const investments = [
     icon: MapPin,
     title: "Terrenos",
     subtitle: "Leilões de Terrenos nos EUA",
-    description: "Adquira terrenos em leilões americanos com alta valorização e segurança jurídica.",
+    description: "Adquira terrenos em leilões americanos com retornos de até 90% e segurança jurídica.",
     image: heroLand,
     link: "/terrenos",
   },
@@ -17,7 +17,7 @@ const investments = [
     icon: Home,
     title: "Casas",
     subtitle: "House Flipping",
-    description: "Invista em casas para reforma e revenda com retornos de 15-25% em 6-12 meses.",
+    description: "Invista em casas para reforma e revenda com retornos de cerca de 30% em 6-12 meses.",
     image: heroHouse,
     link: "/casas",
   },
@@ -46,7 +46,7 @@ export function ModalitiesSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {investments.map((item, index) => (
             <motion.div
               key={item.title}
@@ -65,16 +65,15 @@ export function ModalitiesSection() {
                   <div className="absolute -inset-1 bg-discovery-green/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
                 </div>
 
-                {/* Image with fade effect */}
-                <div className="relative h-48 overflow-hidden">
+                {/* Image with subtle fade effect */}
+                <div className="relative h-56 overflow-hidden">
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
                     style={{ backgroundImage: `url(${item.image})` }}
                   />
-                  {/* Fade overlays */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/70 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-transparent to-white/40" />
+                  {/* Subtle fade overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20" />
                 </div>
 
                 {/* Content */}
