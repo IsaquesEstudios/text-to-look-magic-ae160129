@@ -56,21 +56,23 @@ export function HeroSection({
         </motion.div>
       </div>
 
-      {/* Bottom Image with fade effect */}
+      {/* Bottom Image with border effect */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-0 w-full h-[45vh] mt-auto"
+        className="relative z-0 w-full mt-auto px-6 md:px-12 lg:px-20"
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
-        {/* Top fade effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-transparent" />
-        {/* Side fade effects */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
+        <div className="relative h-[45vh] rounded-t-[2rem] md:rounded-t-[3rem] overflow-hidden border-t border-l border-r border-border/30">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+          {/* Top fade effect */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-transparent" />
+          {/* Side fade effects */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
+        </div>
       </motion.div>
     </section>
   );
