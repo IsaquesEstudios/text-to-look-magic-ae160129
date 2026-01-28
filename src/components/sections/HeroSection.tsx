@@ -27,7 +27,7 @@ export function HeroSection({
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-discovery-green/5 rounded-full blur-[150px]" />
       
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-end px-6 pt-8 sm:pt-12 pb-0 mb-[-40px]">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-end px-6 pt-8 sm:pt-12 lg:pt-24 pb-0 mb-[-40px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,7 +61,7 @@ export function HeroSection({
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-0 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-20 overflow-hidden"
+        className="relative z-0 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-20 lg:-mt-32 overflow-hidden"
       >
         <div className="relative h-[32vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] rounded-b-[1.5rem] sm:rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
