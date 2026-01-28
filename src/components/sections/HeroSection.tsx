@@ -25,7 +25,7 @@ export function HeroSection({
       
       {/* Left Side - Content */}
       <div className="w-full lg:w-1/2 bg-background flex items-center relative z-10">
-        <div className="container mx-auto px-6 py-20 lg:py-0">
+        <div className="w-full px-6 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))] lg:pr-12 py-20 lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
