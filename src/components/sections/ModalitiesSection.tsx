@@ -46,7 +46,7 @@ export function ModalitiesSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {investments.map((item, index) => (
             <motion.div
               key={item.title}
@@ -57,41 +57,42 @@ export function ModalitiesSection() {
             >
               <Link
                 to={item.link}
-                className="group block relative overflow-hidden rounded-2xl bg-white h-72 md:h-80 cursor-pointer transition-all duration-500 border border-discovery-green/30 hover:border-discovery-green/50 shadow-lg hover:shadow-[0_0_40px_rgba(48,120,37,0.2)]"
+                className="group block relative overflow-hidden rounded-2xl bg-white cursor-pointer transition-all duration-500 border border-discovery-green/30 hover:border-discovery-green/50 shadow-lg hover:shadow-[0_0_40px_rgba(48,120,37,0.2)]"
               >
                 {/* Glow effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
                   <div className="absolute -inset-1 bg-discovery-green/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
                 </div>
 
-                {/* Background image on right side with fade effect */}
-                <div 
-                  className="absolute right-0 top-0 bottom-0 w-[55%] bg-cover bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ 
-                    backgroundImage: `url(${item.image})`,
-                    maskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%)'
-                  }}
-                />
+                {/* Image section at top */}
+                <div className="relative h-56 overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${item.image})` }}
+                  />
+                  
+                  {/* White fade overlay - transitions to green on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent transition-opacity duration-500 group-hover:opacity-0" />
+                  
+                  {/* Green fade overlay - appears on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-discovery-green/20 to-discovery-green/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
                 
-                {/* Extra fade overlay for smoother transition */}
-                <div className="absolute right-0 top-0 bottom-0 w-[55%] bg-gradient-to-r from-white via-white/40 to-transparent" />
-                
-                {/* Content on left side */}
-                <div className="relative z-10 p-6 h-full flex flex-col justify-center max-w-[55%]">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 bg-discovery-green/10 border border-discovery-green/20 group-hover:bg-discovery-green/20 transition-colors duration-300">
-                    <item.icon className="w-5 h-5 text-discovery-green" />
+                {/* Content section */}
+                <div className="relative z-10 p-6 pt-4">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-discovery-green/10 border border-discovery-green/20 group-hover:bg-discovery-green/20 transition-colors duration-300 -mt-14">
+                    <item.icon className="w-6 h-6 text-discovery-green" />
                   </div>
                   
                   <span className="text-xs font-medium text-discovery-green uppercase tracking-wider">
                     {item.subtitle}
                   </span>
                   
-                  <h3 className="text-lg font-semibold text-discovery-dark mt-1 mb-2 group-hover:text-discovery-green transition-colors duration-300">
+                  <h3 className="text-xl font-semibold text-discovery-dark mt-1 mb-3 group-hover:text-discovery-green transition-colors duration-300">
                     {item.title}
                   </h3>
                   
-                  <p className="text-sm text-discovery-text leading-relaxed mb-3">
+                  <p className="text-sm text-discovery-text leading-relaxed mb-4">
                     {item.description}
                   </p>
 
