@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import houseRenovation from "@/assets/house-renovation.jpg";
+import houseBeforeAfter from "@/assets/house-before-after.jpg";
 
 const steps = [
   {
@@ -41,8 +41,8 @@ export function ProcessSection() {
             className="relative rounded-2xl overflow-hidden group"
           >
             <img
-              src={houseRenovation}
-              alt="Antes e Depois - Reforma"
+              src={houseBeforeAfter}
+              alt="Antes e Depois - Casa Abandonada vs Reformada"
               className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Multi-layer gradient */}
