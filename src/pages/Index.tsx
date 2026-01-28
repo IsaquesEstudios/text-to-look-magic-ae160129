@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <Layout>
       <HeroSection
-        title="Discovery Investments: O Caminho Seguro para Dolarizar seu Patrimônio."
+        title="investir em imóveis nos EUA"
         description="Proteja seu capital contra a inflação investindo na moeda mais forte do mundo através do mercado imobiliário dos EUA. A Discovery Investments, estabelecida em agosto de 2025, oferece um sistema completo de house flipping para brasileiros que buscam rentabilidade real e segurança jurídica."
         ctaText="Dolarize seu Capital Agora"
         backgroundImage={heroHouse}
