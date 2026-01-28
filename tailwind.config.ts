@@ -60,6 +60,8 @@ export default {
           text: "hsl(var(--discovery-text))",
           "text-light": "hsl(var(--discovery-text-light))",
           cream: "hsl(var(--discovery-cream))",
+          white: "hsl(var(--discovery-white))",
+          "light-bg": "hsl(var(--discovery-light-bg))",
         },
       },
       borderRadius: {
