@@ -19,20 +19,20 @@ export function TerrenosHeroSection({
 }: TerrenosHeroSectionProps) {
   return (
     <section className="min-h-[85vh] relative overflow-hidden pt-20">
-      {/* Background - gradient transition to next section */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-discovery-graphite" />
+      {/* Full background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      />
       
-      {/* Image on the right side */}
-      <div className="absolute inset-y-0 right-0 w-full lg:w-1/2">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
-        {/* Fade effects to blend image */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-discovery-graphite" />
-        <div className="absolute inset-0 bg-gradient-to-t from-discovery-graphite via-transparent to-background/30" />
-      </div>
+      {/* Dark overlay on the left where text is */}
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 via-40% to-background/30 to-70%" />
+      
+      {/* Bottom gradient to blend with next section */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-discovery-graphite" />
+      
+      {/* Top gradient for header area */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-transparent h-32" />
       
       {/* Ambient blur effects */}
       <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-discovery-green/10 rounded-full blur-[120px]" />
