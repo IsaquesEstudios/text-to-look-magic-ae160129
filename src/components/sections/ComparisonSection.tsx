@@ -47,7 +47,7 @@ export function ComparisonSection() {
         </motion.div>
 
         {/* Grid 2x2 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {comparisons.map((item, index) => (
             <motion.div
               key={item.title}
@@ -55,11 +55,11 @@ export function ComparisonSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative overflow-hidden rounded-xl bg-discovery-dark h-40 cursor-pointer"
+              className="group relative overflow-hidden rounded-xl bg-discovery-dark h-36 sm:h-40 cursor-pointer"
             >
               {/* Background image on right side with fade effect */}
               <div 
-                className="absolute right-0 top-0 bottom-0 w-[45%] bg-cover bg-center opacity-60 group-hover:opacity-70 transition-opacity duration-500"
+                className="absolute right-0 top-0 bottom-0 w-[40%] sm:w-[45%] bg-cover bg-center opacity-60 group-hover:opacity-70 transition-opacity duration-500"
                 style={{ 
                   backgroundImage: `url(${item.image})`,
                   maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
@@ -68,14 +68,14 @@ export function ComparisonSection() {
               />
               
               {/* Extra fade overlay for smoother transition */}
-              <div className="absolute right-0 top-0 bottom-0 w-[45%] bg-gradient-to-r from-discovery-dark via-discovery-dark/60 to-transparent" />
+              <div className="absolute right-0 top-0 bottom-0 w-[40%] sm:w-[45%] bg-gradient-to-r from-discovery-dark via-discovery-dark/60 to-transparent" />
               
               {/* Content on left side */}
-              <div className="relative z-10 p-6 h-full flex flex-col justify-center max-w-[65%]">
-                <h3 className="text-base md:text-lg font-medium text-foreground mb-2">
+              <div className="relative z-10 p-4 sm:p-6 h-full flex flex-col justify-center max-w-[60%] sm:max-w-[65%]">
+                <h3 className="text-sm sm:text-base md:text-lg font-medium text-foreground mb-1 sm:mb-2">
                   {item.title}
                 </h3>
-                <p className="text-sm text-foreground/70 leading-relaxed">
+                <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed">
                   {item.description}
                 </p>
               </div>
