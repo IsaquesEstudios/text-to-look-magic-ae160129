@@ -34,8 +34,12 @@ const modalities = [
 
 export function ModalitiesSection() {
   return (
-    <section className="section-graphite py-24">
-      <div className="container mx-auto px-6">
+    <section className="section-graphite py-28 relative overflow-hidden">
+      {/* Ambient blur */}
+      <div className="absolute top-1/2 left-0 w-[300px] h-[300px] bg-discovery-green/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-discovery-green/5 rounded-full blur-[120px]" />
+      
+      <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -43,7 +47,7 @@ export function ModalitiesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4">
             Nossas Modalidades de Investimento
           </h2>
           <p className="text-lg text-muted-foreground">
@@ -59,18 +63,18 @@ export function ModalitiesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`relative rounded-2xl p-6 border transition-all duration-300 hover:scale-105 ${
+              className={`relative rounded-2xl p-6 border transition-all duration-500 group ${
                 item.featured
-                  ? "bg-card border-discovery-green glow-green"
-                  : "bg-card border-border hover:border-discovery-green/50"
+                  ? "premium-card border-discovery-green/40 shadow-[0_0_40px_hsl(113_53%_31%/0.2)]"
+                  : "premium-card border-transparent hover:border-discovery-green/30"
               }`}
             >
               {item.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-discovery-green text-primary-foreground text-xs font-bold rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-discovery-green text-primary-foreground text-xs font-semibold rounded-full shadow-lg">
                   PROMOÇÃO
                 </div>
               )}
-              <div className="w-12 h-12 rounded-lg bg-discovery-green/10 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-discovery-green/10 flex items-center justify-center mb-4 group-hover:bg-discovery-green/20 transition-colors duration-300">
                 <item.icon className="w-6 h-6 text-discovery-green" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>

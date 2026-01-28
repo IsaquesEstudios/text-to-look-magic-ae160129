@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,56 +6,61 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 142 71% 45%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 113 53% 31%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 15 8% 43%;
 
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 113 53% 31%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 20%;
-    --input: 0 0% 15%;
-    --ring: 142 71% 45%;
+    --input: 0 0% 18%;
+    --ring: 113 53% 31%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Custom Discovery tokens */
-    --discovery-black: 0 0% 0%;
-    --discovery-graphite: 0 0% 10%;
-    --discovery-dark: 0 0% 7%;
-    --discovery-green: 142 71% 45%;
-    --discovery-green-glow: 142 76% 36%;
-    --discovery-gold: 45 93% 47%;
-    --discovery-text-muted: 0 0% 70%;
+    --discovery-black: 0 0% 8%;
+    --discovery-graphite: 0 0% 14%;
+    --discovery-dark: 0 0% 10%;
+    --discovery-green: 113 53% 31%;
+    --discovery-green-light: 113 45% 45%;
+    --discovery-green-glow: 113 60% 25%;
+    --discovery-text: 15 8% 43%;
+    --discovery-text-light: 0 0% 85%;
+    --discovery-cream: 30 20% 95%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(142 71% 45% / 0.1) 0%, transparent 50%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%) 0%, hsl(0 0% 5%) 100%);
-    --gradient-cta: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 76% 36%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(113 53% 31% / 0.15) 0%, transparent 50%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(113 53% 31%) 0%, hsl(113 60% 25%) 100%);
+    --gradient-fade-right: linear-gradient(to right, transparent, hsl(0 0% 10%));
+    --gradient-fade-bottom: linear-gradient(to bottom, transparent, hsl(0 0% 10%));
 
-    --shadow-glow: 0 0 40px hsl(142 71% 45% / 0.3);
-    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 60px hsl(113 53% 31% / 0.25);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-premium: 0 20px 60px hsl(0 0% 0% / 0.5);
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
   }
 }
 
@@ -70,16 +75,12 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', sans-serif;
-    @apply font-bold tracking-tight;
-  }
-
-  .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
+    @apply font-semibold tracking-tight;
   }
 }
 
@@ -94,7 +95,7 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--discovery-green)) 0%, hsl(var(--discovery-gold)) 100%);
+    background-image: linear-gradient(135deg, hsl(var(--discovery-green)) 0%, hsl(var(--discovery-green-light)) 100%);
   }
 
   .glow-green {
@@ -102,11 +103,45 @@
   }
 
   .border-glow {
-    border: 1px solid hsl(var(--discovery-green) / 0.5);
-    box-shadow: 0 0 20px hsl(var(--discovery-green) / 0.2);
+    border: 1px solid hsl(var(--discovery-green) / 0.4);
+    box-shadow: 0 0 30px hsl(var(--discovery-green) / 0.15);
   }
 
   .card-gradient {
     background: var(--gradient-card);
+  }
+
+  .glass-effect {
+    background: hsl(0 0% 100% / 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .blur-overlay {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .premium-card {
+    @apply relative overflow-hidden rounded-2xl;
+    background: linear-gradient(145deg, hsl(0 0% 14%) 0%, hsl(0 0% 10%) 100%);
+    box-shadow: var(--shadow-premium);
+  }
+
+  .fade-image {
+    mask-image: linear-gradient(to right, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 60%, transparent 100%);
+  }
+
+  .image-card-fade {
+    position: relative;
+  }
+
+  .image-card-fade::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 40%, hsl(0 0% 10%) 100%);
+    pointer-events: none;
   }
 }
