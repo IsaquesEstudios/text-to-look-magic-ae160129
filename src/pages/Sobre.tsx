@@ -1,9 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
-import { SobreHeroSection } from "@/components/sections/SobreHeroSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
 import { Globe, Building, Users, Plane } from "lucide-react";
-import partnershipImg from "@/assets/partnership.jpg";
 
 const regions = [
   {
@@ -31,12 +29,6 @@ const regions = [
 const Sobre = () => {
   return (
     <Layout>
-      <SobreHeroSection
-        title="Discovery Investments: Estratégia e Execução no Mercado Americano."
-        description="Fundada em agosto de 2025, a Discovery Investments nasceu para democratizar o acesso ao mercado imobiliário dos EUA para brasileiros. Atuamos como sua inteligência em solo americano, cuidando de todo o processo de aquisição, reforma e venda para gerar rentabilidade real em dólar."
-        ctaText="Falar com a Discovery"
-        backgroundImage={partnershipImg}
-      />
 
       {/* Structure - Dark section after hero */}
       <section className="section-graphite py-24">
