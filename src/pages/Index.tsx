@@ -6,7 +6,7 @@ import { ModalitiesSection } from "@/components/sections/ModalitiesSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { InstitutionalSection } from "@/components/sections/InstitutionalSection";
 import { CTASection } from "@/components/sections/CTASection";
-import heroHouse from "@/assets/hero-house.jpg";
+import heroCover from "@/assets/hero-cover.webp";
 
 const Index = () => {
   return (
@@ -15,7 +15,7 @@ const Index = () => {
         title="investir em imóveis nos EUA"
         description="Proteja seu capital contra a inflação investindo na moeda mais forte do mundo através do mercado imobiliário dos EUA. A Discovery Investments, estabelecida em agosto de 2025, oferece um sistema completo de house flipping para brasileiros que buscam rentabilidade real e segurança jurídica."
         ctaText="Dolarize seu Capital Agora"
-        backgroundImage={heroHouse}
+        backgroundImage={heroCover}
       />
       <ComparisonSection />
       <ProfitabilitySection />
