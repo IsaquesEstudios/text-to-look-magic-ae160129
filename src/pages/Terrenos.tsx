@@ -1,8 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
-import { HeroSection } from "@/components/sections/HeroSection";
+import { TerrenosHeroSection } from "@/components/sections/TerrenosHeroSection";
+import { AdvantagesSection } from "@/components/sections/AdvantagesSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { motion } from "framer-motion";
-import { TrendingUp, DollarSign, Clock, Shield, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import heroLand from "@/assets/hero-land.jpg";
 
 const flowSteps = [
@@ -20,29 +21,6 @@ const flowSteps = [
   },
 ];
 
-const advantages = [
-  {
-    icon: TrendingUp,
-    title: "Alta Rentabilidade",
-    description: "Os terrenos oferecem uma margem média de 90% sobre o valor investido.",
-  },
-  {
-    icon: DollarSign,
-    title: "Baixo Custo de Entrada",
-    description: "Por não exigir reformas, o terreno permite um aporte inicial menor que o de casas.",
-  },
-  {
-    icon: Clock,
-    title: "Giro de Capital",
-    description: "O ciclo médio de retorno entre o arremate e a venda final varia de 6 meses a 1 ano.",
-  },
-  {
-    icon: Shield,
-    title: "Segurança Patrimonial",
-    description: "Você adquire um ativo físico real, protegido pelo sistema jurídico americano.",
-  },
-];
-
 const processSteps = [
   { number: "1", title: "Triagem", description: "Qualificação técnica via WhatsApp para entender seu perfil." },
   { number: "2", title: "Estruturação Legal", description: "Suporte total para a abertura da sua LLC nos EUA." },
@@ -53,14 +31,14 @@ const processSteps = [
 const Terrenos = () => {
   return (
     <Layout>
-      <HeroSection
+      <TerrenosHeroSection
         title="Investimento em Terrenos nos EUA: Lucratividade Média de 90%."
         description="Inicie sua jornada de dolarização com o ativo de maior giro e margem do mercado imobiliário americano. A Discovery Investments identifica terrenos em leilões estratégicos, permitindo que você adquira propriedades por uma fração do valor de mercado e colha lucros excepcionais."
         ctaText="Quero Investir em Terrenos"
         backgroundImage={heroLand}
       />
 
-      {/* How it Works */}
+      {/* How it Works - Dark section after hero */}
       <section className="section-graphite py-24">
         <div className="container mx-auto px-6">
           <motion.div
@@ -101,53 +79,21 @@ const Terrenos = () => {
         </div>
       </section>
 
-      {/* Advantages */}
-      <section className="section-dark py-24">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              As Vantagens de Investir em Terra
-            </h2>
-          </motion.div>
+      {/* Advantages - Light section with image */}
+      <AdvantagesSection image={heroLand} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {advantages.map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center p-6"
-              >
-                <div className="w-16 h-16 rounded-xl bg-discovery-green/10 flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-8 h-8 text-discovery-green" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-muted-foreground text-sm">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Profitability */}
-      <section className="section-graphite py-24">
+      {/* Profitability - White section */}
+      <section className="section-cream py-24">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-card rounded-2xl p-8 border border-border"
+              className="bg-white rounded-2xl p-8 border border-discovery-green/10 shadow-sm"
             >
-              <h3 className="text-2xl font-bold text-foreground mb-4">Como funciona o lucro?</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-2xl font-bold text-discovery-dark mb-4">Como funciona o lucro?</h3>
+              <p className="text-discovery-text leading-relaxed">
                 O lucro no leilão é realizado no momento da compra. Quando adquirimos um ativo por uma fração do seu valor, criamos uma margem de segurança onde, mesmo com oscilações no preço de venda, seu capital principal permanece rentável.
               </p>
             </motion.div>
@@ -155,10 +101,10 @@ const Terrenos = () => {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-card rounded-2xl p-8 border border-border"
+              className="bg-white rounded-2xl p-8 border border-discovery-green/10 shadow-sm"
             >
-              <h3 className="text-2xl font-bold text-foreground mb-4">Segurança Jurídica Garantida</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-2xl font-bold text-discovery-dark mb-4">Segurança Jurídica Garantida</h3>
+              <p className="text-discovery-text leading-relaxed">
                 O processo é formalizado através de uma empresa (LLC) em seu nome e o ciclo termina com o título oficial da propriedade entregue ao investidor.
               </p>
             </motion.div>
@@ -166,7 +112,7 @@ const Terrenos = () => {
         </div>
       </section>
 
-      {/* Process */}
+      {/* Process - Dark section */}
       <section className="section-dark py-24">
         <div className="container mx-auto px-6">
           <motion.div
@@ -203,18 +149,18 @@ const Terrenos = () => {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="section-graphite py-24">
+      {/* Pricing - Light section */}
+      <section className="section-light py-24">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="max-w-md mx-auto text-center bg-card rounded-2xl p-8 border-2 border-discovery-green glow-green"
+            className="max-w-md mx-auto text-center bg-white rounded-2xl p-8 border-2 border-discovery-green shadow-lg"
           >
-            <h2 className="text-2xl font-bold text-foreground mb-4">Taxa de Serviço Discovery</h2>
+            <h2 className="text-2xl font-bold text-discovery-dark mb-4">Taxa de Serviço Discovery</h2>
             <p className="text-5xl font-bold text-discovery-green mb-2">$500</p>
-            <p className="text-muted-foreground">
+            <p className="text-discovery-text">
               Esta taxa cobre nossa assessoria na aquisição estratégica, garantindo que você compre apenas ativos com alto potencial de revenda.
             </p>
           </motion.div>
