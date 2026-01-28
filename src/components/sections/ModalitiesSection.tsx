@@ -57,7 +57,7 @@ export function ModalitiesSection() {
             >
               <Link
                 to={item.link}
-                className="group block relative overflow-hidden rounded-2xl bg-white h-48 cursor-pointer transition-all duration-500 border border-discovery-green/30 hover:border-discovery-green/50 shadow-lg hover:shadow-[0_0_40px_rgba(48,120,37,0.2)]"
+                className="group block relative overflow-hidden rounded-2xl bg-white h-72 md:h-80 cursor-pointer transition-all duration-500 border border-discovery-green/30 hover:border-discovery-green/50 shadow-lg hover:shadow-[0_0_40px_rgba(48,120,37,0.2)]"
               >
                 {/* Glow effect on hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
