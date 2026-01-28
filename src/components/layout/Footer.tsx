@@ -1,20 +1,13 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { MessageCircle, Mail, MapPin } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 export function Footer() {
-  const { lang } = useParams<{ lang: string }>();
-  const { t } = useTranslation();
-  const currentLang = lang || 'pt-br';
-
   return (
     <footer className="section-graphite border-t border-border/30 relative overflow-hidden">
-      {/* Ambient blur */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-discovery-green/5 rounded-full blur-[120px]" />
       
       <div className="container mx-auto px-6 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-discovery-green rounded-xl flex items-center justify-center shadow-lg">
@@ -26,49 +19,38 @@ export function Footer() {
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {t('footer.tagline')}
+              Sua ponte estratégica para o mercado imobiliário americano. Dolarize seu patrimônio com segurança.
             </p>
           </div>
 
-          {/* Links */}
           <div className="space-y-4">
-            <h4 className="text-foreground font-semibold">{t('footer.navigation')}</h4>
+            <h4 className="text-foreground font-semibold">Navegação</h4>
             <nav className="flex flex-col gap-3">
-              <Link to={`/${currentLang}`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">
-                {t('nav.home')}
-              </Link>
-              <Link to={`/${currentLang}/terrenos`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">
-                {t('footer.landInvestment')}
-              </Link>
-              <Link to={`/${currentLang}/casas`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">
-                {t('footer.housesInvestment')}
-              </Link>
-              <Link to={`/${currentLang}/sobre`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">
-                {t('nav.about')}
-              </Link>
+              <Link to="/" className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">Início</Link>
+              <Link to="/terrenos" className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">Investimento em Terrenos</Link>
+              <Link to="/casas" className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">Investimento em Casas</Link>
+              <Link to="/sobre" className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">Sobre Nós</Link>
             </nav>
           </div>
 
-          {/* Modalities */}
           <div className="space-y-4">
-            <h4 className="text-foreground font-semibold">{t('footer.investmentModalities')}</h4>
+            <h4 className="text-foreground font-semibold">Modalidades</h4>
             <nav className="flex flex-col gap-3">
-              <span className="text-muted-foreground text-sm">{t('footer.individualLandPurchase')}</span>
-              <span className="text-muted-foreground text-sm">{t('footer.individualHousesPurchase')}</span>
-              <span className="text-muted-foreground text-sm">{t('footer.quotasSale')}</span>
-              <span className="text-muted-foreground text-sm">{t('footer.annualMembership')}</span>
+              <span className="text-muted-foreground text-sm">Compra Individual de Terrenos</span>
+              <span className="text-muted-foreground text-sm">Compra Individual de Casas</span>
+              <span className="text-muted-foreground text-sm">Venda de Cotas</span>
+              <span className="text-muted-foreground text-sm">Membership Anual</span>
             </nav>
           </div>
 
-          {/* Contact */}
           <div className="space-y-4">
-            <h4 className="text-foreground font-semibold">{t('footer.contact')}</h4>
+            <h4 className="text-foreground font-semibold">Contato</h4>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 text-muted-foreground text-sm">
                 <div className="w-8 h-8 rounded-lg bg-discovery-green/10 flex items-center justify-center">
                   <MessageCircle size={16} className="text-discovery-green" />
                 </div>
-                <span>{t('footer.screeningWhatsApp')}</span>
+                <span>WhatsApp de Triagem</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground text-sm">
                 <div className="w-8 h-8 rounded-lg bg-discovery-green/10 flex items-center justify-center">
@@ -87,11 +69,9 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border/30 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
-            © 2025 Discovery Investments. {t('footer.allRightsReserved')}
-          </p>
+          <p className="text-muted-foreground text-sm">© 2025 Discovery Investments. Todos os direitos reservados.</p>
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <span>{t('footer.inPartnershipWith')}</span>
+            <span>Em parceria com</span>
             <span className="text-discovery-green font-medium">Tababog Construction</span>
           </div>
         </div>
