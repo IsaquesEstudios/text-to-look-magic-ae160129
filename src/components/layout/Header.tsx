@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -20,12 +20,26 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
   const isInvestmentActive = location.pathname === "/terrenos" || location.pathname === "/casas";
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-border/30">
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+      isScrolled 
+        ? "bg-discovery-dark/95 backdrop-blur-lg border-border/30" 
+        : "bg-discovery-dark/80 backdrop-blur-md border-transparent"
+    }`}>
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
@@ -126,7 +140,7 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass-effect border-b border-border/30"
+            className="lg:hidden bg-discovery-dark/95 backdrop-blur-lg border-b border-border/30"
           >
             <nav className="container mx-auto px-6 py-6 flex flex-col gap-4">
               {navItems.map((item) => (
