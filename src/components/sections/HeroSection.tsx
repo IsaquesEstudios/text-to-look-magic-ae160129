@@ -18,7 +18,7 @@ export function HeroSection({
   backgroundImage,
 }: HeroSectionProps) {
   return (
-    <section className="min-h-[85vh] sm:min-h-screen flex flex-col relative overflow-hidden pt-20">
+    <section className="min-h-[75vh] sm:min-h-screen flex flex-col relative overflow-hidden pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-discovery-graphite" />
       
@@ -63,7 +63,7 @@ export function HeroSection({
         transition={{ duration: 0.8, delay: 0.3 }}
         className="relative z-0 w-full px-4 sm:px-6 md:px-12 lg:px-20 pb-6 md:pb-12 -mt-20 overflow-hidden"
       >
-        <div className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] rounded-b-[1.5rem] sm:rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
+        <div className="relative h-[32vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] rounded-b-[1.5rem] sm:rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden border-b border-l border-r border-border/30">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
             style={{ backgroundImage: `url(${backgroundImage})` }}
