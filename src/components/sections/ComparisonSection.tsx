@@ -9,30 +9,28 @@ const comparisons = [
   {
     image: heroHouse,
     title: "Dólar vs. Moedas Locais",
-    description: "Patrimônio lastreado na moeda mais forte do mundo.",
-    size: "large", // spans 2 columns
-    aspectRatio: "aspect-[16/9]",
+    description: "Enquanto moedas de outros países sofrem com a inflação, seu patrimônio é lastreado em Dólar.",
+    hasButton: true,
+    buttonText: "Ver detalhes",
   },
   {
     image: heroLand,
     title: "Ativo Real vs. Papel",
-    description: "Propriedade física em seu nome nos EUA.",
-    size: "small",
-    aspectRatio: "aspect-[4/3]",
+    description: "Você possui o título de uma propriedade física em seu nome nos Estados Unidos.",
+    hasButton: false,
   },
   {
     image: cityscape,
     title: "Segurança Americana",
-    description: "Leis estáveis e proteção jurídica superior.",
-    size: "small",
-    aspectRatio: "aspect-[4/3]",
+    description: "Leis de propriedade estáveis e proteção jurídica superior a qualquer outro mercado global.",
+    hasButton: false,
   },
   {
     image: houseRenovation,
     title: "Arbitragem em Leilão",
-    description: "Ativos por fração do preço real.",
-    size: "medium",
-    aspectRatio: "aspect-[3/2]",
+    description: "Compramos ativos por uma fração do preço real através de leilões fiscais.",
+    hasButton: true,
+    buttonText: "Saiba mais",
   },
 ];
 
@@ -55,117 +53,49 @@ export function ComparisonSection() {
           </p>
         </motion.div>
 
-        {/* Asymmetric Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* First Row - Large + Small */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="md:col-span-2 group relative overflow-hidden rounded-xl cursor-pointer"
-          >
-            <div className={`${comparisons[0].aspectRatio} relative overflow-hidden`}>
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-60"
-                style={{ backgroundImage: `url(${comparisons[0].image})` }}
+        {/* Grid 2x2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {comparisons.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group relative overflow-hidden rounded-xl bg-discovery-dark h-40 cursor-pointer"
+            >
+              {/* Background image on right side with fade effect */}
+              <div 
+                className="absolute right-0 top-0 bottom-0 w-[45%] bg-cover bg-center opacity-60 group-hover:opacity-70 transition-opacity duration-500"
+                style={{ 
+                  backgroundImage: `url(${item.image})`,
+                  maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)'
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/40 to-discovery-dark/20" />
-              <div className="absolute inset-0 p-6 flex flex-col justify-between">
+              
+              {/* Extra fade overlay for smoother transition */}
+              <div className="absolute right-0 top-0 bottom-0 w-[45%] bg-gradient-to-r from-discovery-dark via-discovery-dark/60 to-transparent" />
+              
+              {/* Content on left side */}
+              <div className="relative z-10 p-6 h-full flex flex-col justify-between max-w-[65%]">
                 <div>
-                  <h3 className="text-lg font-medium text-foreground mb-1">
-                    {comparisons[0].title}
+                  <h3 className="text-base md:text-lg font-medium text-foreground mb-2">
+                    {item.title}
                   </h3>
-                  <p className="text-sm text-foreground/70 max-w-xs">
-                    {comparisons[0].description}
+                  <p className="text-sm text-foreground/70 leading-relaxed">
+                    {item.description}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="w-fit text-xs">
-                  Ver detalhes
-                </Button>
+                
+                {item.hasButton && (
+                  <Button variant="outline" size="sm" className="w-fit text-xs mt-3">
+                    {item.buttonText}
+                  </Button>
+                )}
               </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="group relative overflow-hidden rounded-xl cursor-pointer"
-          >
-            <div className={`${comparisons[1].aspectRatio} relative overflow-hidden`}>
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
-                style={{ backgroundImage: `url(${comparisons[1].image})` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/50 to-discovery-dark/30" />
-              <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                <h3 className="text-base font-medium text-foreground mb-1">
-                  {comparisons[1].title}
-                </h3>
-                <p className="text-xs text-foreground/70">
-                  {comparisons[1].description}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Second Row - Small + Small + Medium */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="group relative overflow-hidden rounded-xl cursor-pointer"
-          >
-            <div className="aspect-[5/4] relative overflow-hidden">
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
-                style={{ backgroundImage: `url(${comparisons[2].image})` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/50 to-discovery-dark/30" />
-              <div className="absolute inset-0 p-5 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-base font-medium text-foreground mb-1">
-                    {comparisons[2].title}
-                  </h3>
-                  <p className="text-xs text-foreground/70">
-                    {comparisons[2].description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="md:col-span-2 group relative overflow-hidden rounded-xl cursor-pointer"
-          >
-            <div className="aspect-[21/9] relative overflow-hidden">
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-50"
-                style={{ backgroundImage: `url(${comparisons[3].image})` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-discovery-dark/90 via-discovery-dark/40 to-discovery-dark/20" />
-              <div className="absolute inset-0 p-5 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-base font-medium text-foreground mb-1">
-                    {comparisons[3].title}
-                  </h3>
-                  <p className="text-xs text-foreground/70 max-w-xs">
-                    {comparisons[3].description}
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" className="w-fit text-xs">
-                  Saiba mais
-                </Button>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
