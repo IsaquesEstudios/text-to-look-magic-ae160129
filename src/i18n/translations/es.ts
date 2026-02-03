@@ -93,6 +93,17 @@ export const es = {
       partnerTitle: "Tababog Construction",
       partnerDesc: "Nuestra propia empresa constructora garantiza una ejecución técnica impecable en cada renovación.",
     },
+    properties: {
+      title: "Nuestras Propiedades",
+      subtitle: "Sigue las propiedades que estamos adquiriendo y renovando para nuestros inversores.",
+      statusAvailable: "Disponible",
+      statusInContract: "En Contrato",
+      statusSold: "Vendido",
+      viewPhotos: "Ver Fotos",
+      seeMore: "Saber Más",
+      viewOnZillow: "Ver en Zillow",
+      galleryTitle: "Galería de Fotos",
+    },
     cta: {
       title: "¿Listo para comenzar?",
       description: "Habla con un especialista y descubre cómo dolarizar tu patrimonio.",

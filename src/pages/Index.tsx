@@ -5,6 +5,7 @@ import { ProfitabilitySection } from "@/components/sections/ProfitabilitySection
 import { ModalitiesSection } from "@/components/sections/ModalitiesSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { InstitutionalSection } from "@/components/sections/InstitutionalSection";
+import { PropertiesSection } from "@/components/sections/PropertiesSection";
 import { BlogPostsSection } from "@/components/sections/BlogPostsSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -26,6 +27,7 @@ const Index = () => {
       <ModalitiesSection />
       <ProcessSection />
       <InstitutionalSection />
+      <PropertiesSection />
       <BlogPostsSection />
       <CTASection />
     </Layout>
