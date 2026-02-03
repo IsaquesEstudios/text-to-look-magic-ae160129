@@ -13,11 +13,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useQuery } from "@tanstack/react-query";
+import {
+  fetchBlogPostBySlug,
+  fetchLatestBlogPosts,
+  formatPostDate,
+  calculateReadTime,
+  BlogPost as BlogPostType,
+} from "@/lib/blog";
+import { Skeleton } from "@/components/ui/skeleton";
 import cityscape from "@/assets/cityscape.jpg";
 import { useEffect } from "react";
 
-// Fake content for articles (will be replaced with real content later)
-const fakeArticleContent = {
+// Fallback content for articles (used when database has no content)
+const fallbackArticleContent = {
   pt: {
     author: "Equipe Discovery",
     readTime: "8 min de leitura",
@@ -37,23 +46,8 @@ const fakeArticleContent = {
         <li><strong>Vacation Rentals:</strong> Propriedades para aluguel de temporada em regiões turísticas.</li>
       </ul>
       
-      <h2>O processo de investimento</h2>
-      <p>Investir em imóveis nos EUA como estrangeiro envolve algumas etapas importantes:</p>
-      <ol>
-        <li><strong>Abertura de conta bancária:</strong> Necessário para movimentação financeira no país.</li>
-        <li><strong>Obtenção do ITIN:</strong> Número de identificação fiscal para não-residentes.</li>
-        <li><strong>Estruturação societária:</strong> Criação de LLC para proteção patrimonial.</li>
-        <li><strong>Due diligence:</strong> Análise detalhada da propriedade e mercado local.</li>
-        <li><strong>Fechamento do negócio:</strong> Processo de closing com title company.</li>
-      </ol>
-      
-      <h2>Aspectos tributários</h2>
-      <p>É fundamental entender as obrigações fiscais tanto nos EUA quanto no Brasil. A renda obtida com imóveis americanos está sujeita à tributação nos Estados Unidos, mas existem tratados que evitam a bitributação.</p>
-      <p>Recomendamos sempre contar com assessoria especializada para garantir conformidade com todas as regulamentações aplicáveis.</p>
-      
       <h2>Conclusão</h2>
       <p>Investir em imóveis nos Estados Unidos pode ser uma excelente estratégia de diversificação e proteção patrimonial. Com o parceiro certo e conhecimento adequado do mercado, é possível obter retornos consistentes e construir um portfólio sólido de propriedades no exterior.</p>
-      <p>A Discovery Investments está pronta para guiá-lo em cada etapa dessa jornada, oferecendo expertise local e suporte completo para investidores brasileiros.</p>
     `,
   },
   en: {
@@ -75,23 +69,8 @@ const fakeArticleContent = {
         <li><strong>Vacation Rentals:</strong> Properties for seasonal rental in tourist regions.</li>
       </ul>
       
-      <h2>The investment process</h2>
-      <p>Investing in US real estate as a foreigner involves some important steps:</p>
-      <ol>
-        <li><strong>Opening a bank account:</strong> Required for financial transactions in the country.</li>
-        <li><strong>Obtaining an ITIN:</strong> Tax identification number for non-residents.</li>
-        <li><strong>Corporate structuring:</strong> Creating an LLC for asset protection.</li>
-        <li><strong>Due diligence:</strong> Detailed analysis of the property and local market.</li>
-        <li><strong>Closing the deal:</strong> Closing process with a title company.</li>
-      </ol>
-      
-      <h2>Tax aspects</h2>
-      <p>It's essential to understand tax obligations in both the US and your home country. Income from American properties is subject to taxation in the United States, but there are treaties that avoid double taxation.</p>
-      <p>We always recommend having specialized advice to ensure compliance with all applicable regulations.</p>
-      
       <h2>Conclusion</h2>
       <p>Investing in real estate in the United States can be an excellent strategy for diversification and asset protection. With the right partner and adequate market knowledge, it's possible to obtain consistent returns and build a solid portfolio of properties abroad.</p>
-      <p>Discovery Investments is ready to guide you through every step of this journey, offering local expertise and complete support for international investors.</p>
     `,
   },
   es: {
@@ -113,23 +92,8 @@ const fakeArticleContent = {
         <li><strong>Alquileres Vacacionales:</strong> Propiedades para alquiler de temporada en regiones turísticas.</li>
       </ul>
       
-      <h2>El proceso de inversión</h2>
-      <p>Invertir en inmuebles en EE.UU. como extranjero implica algunos pasos importantes:</p>
-      <ol>
-        <li><strong>Apertura de cuenta bancaria:</strong> Necesario para movimientos financieros en el país.</li>
-        <li><strong>Obtención del ITIN:</strong> Número de identificación fiscal para no residentes.</li>
-        <li><strong>Estructuración societaria:</strong> Creación de LLC para protección patrimonial.</li>
-        <li><strong>Due diligence:</strong> Análisis detallado de la propiedad y mercado local.</li>
-        <li><strong>Cierre del negocio:</strong> Proceso de closing con title company.</li>
-      </ol>
-      
-      <h2>Aspectos tributarios</h2>
-      <p>Es fundamental entender las obligaciones fiscales tanto en EE.UU. como en su país de origen. Los ingresos obtenidos con inmuebles estadounidenses están sujetos a tributación en Estados Unidos, pero existen tratados que evitan la doble tributación.</p>
-      <p>Siempre recomendamos contar con asesoría especializada para garantizar el cumplimiento de todas las regulaciones aplicables.</p>
-      
       <h2>Conclusión</h2>
       <p>Invertir en inmuebles en Estados Unidos puede ser una excelente estrategia de diversificación y protección patrimonial. Con el socio adecuado y conocimiento apropiado del mercado, es posible obtener retornos consistentes y construir un portafolio sólido de propiedades en el exterior.</p>
-      <p>Discovery Investments está lista para guiarlo en cada etapa de este viaje, ofreciendo experiencia local y soporte completo para inversores internacionales.</p>
     `,
   },
 };
@@ -139,20 +103,72 @@ const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  // Find the post by slug
-  const post = t.blog.posts.find((p) => p.slug === slug);
+  // Fetch post from database
+  const { data: dbPost, isLoading: isLoadingPost } = useQuery({
+    queryKey: ["blogPost", slug, lang],
+    queryFn: () => fetchBlogPostBySlug(slug || "", lang),
+    enabled: !!slug,
+  });
+
+  // Fetch related posts
+  const { data: relatedPosts = [] } = useQuery({
+    queryKey: ["relatedBlogPosts", lang],
+    queryFn: () => fetchLatestBlogPosts(lang, 4),
+  });
+
+  // Fallback to translation posts if no database post
+  const translationPost = t.blog.posts.find((p) => p.slug === slug);
+  const post = dbPost || translationPost;
 
   useEffect(() => {
-    if (!post) {
+    if (!isLoadingPost && !post) {
       navigate(`/${lang}/blog`, { replace: true });
     }
-  }, [post, navigate, lang]);
+  }, [post, navigate, lang, isLoadingPost]);
+
+  if (isLoadingPost) {
+    return (
+      <Layout>
+        <section className="section-graphite pt-32 pb-16">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto">
+              <Skeleton className="h-8 w-48 mb-8" />
+              <Skeleton className="h-6 w-24 mb-4" />
+              <Skeleton className="h-12 w-full mb-6" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
 
   if (!post) {
     return null;
   }
 
-  const articleContent = fakeArticleContent[lang as keyof typeof fakeArticleContent];
+  const isDbPost = (p: BlogPostType | typeof translationPost): p is BlogPostType => {
+    return p !== null && p !== undefined && "id" in p && "published_at" in p;
+  };
+
+  // Get content based on source
+  const fallbackContent = fallbackArticleContent[lang as keyof typeof fallbackArticleContent];
+  const postTitle = post.title;
+  const postCategory = post.category || "";
+  const postDate = isDbPost(post)
+    ? formatPostDate(post.published_at, lang)
+    : translationPost?.date || "";
+  const postImage = isDbPost(post) && post.image_url ? post.image_url : cityscape;
+  const postAuthor = isDbPost(post) && post.author ? post.author : fallbackContent.author;
+  const postReadTime = isDbPost(post) && post.content
+    ? calculateReadTime(post.content, lang)
+    : fallbackContent.readTime;
+  const postContent = isDbPost(post) && post.content ? post.content : fallbackContent.content;
+
+  // Filter related posts (exclude current post)
+  const filteredRelatedPosts = relatedPosts.length > 0
+    ? relatedPosts.filter((p) => p.slug !== slug).slice(0, 2)
+    : t.blog.posts.filter((p) => p.slug !== slug).slice(0, 2);
 
   return (
     <Layout>
@@ -160,13 +176,13 @@ const BlogPost = () => {
       <section className="section-graphite pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={cityscape}
-            alt={post.title}
+            src={postImage}
+            alt={postTitle}
             className="w-full h-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/60" />
         </div>
-        
+
         <div className="container mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -179,7 +195,10 @@ const BlogPost = () => {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to={`/${lang}`} className="text-muted-foreground hover:text-foreground">
+                    <Link
+                      to={`/${lang}`}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       Home
                     </Link>
                   </BreadcrumbLink>
@@ -187,7 +206,10 @@ const BlogPost = () => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to={`/${lang}/blog`} className="text-muted-foreground hover:text-foreground">
+                    <Link
+                      to={`/${lang}/blog`}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       Blog
                     </Link>
                   </BreadcrumbLink>
@@ -195,7 +217,7 @@ const BlogPost = () => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-foreground/80 line-clamp-1 max-w-[200px]">
-                    {post.title}
+                    {postTitle}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -204,27 +226,27 @@ const BlogPost = () => {
             {/* Category */}
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-discovery-green text-primary-foreground text-xs font-semibold rounded-full mb-4">
               <Tag size={12} />
-              {post.category}
+              {postCategory}
             </span>
 
             {/* Title */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-              {post.title}
+              {postTitle}
             </h1>
 
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <span className="inline-flex items-center gap-2">
                 <User size={16} />
-                {articleContent.author}
+                {postAuthor}
               </span>
               <span className="inline-flex items-center gap-2">
                 <Calendar size={16} />
-                {post.date}
+                {postDate}
               </span>
               <span className="inline-flex items-center gap-2">
                 <Clock size={16} />
-                {articleContent.readTime}
+                {postReadTime}
               </span>
             </div>
           </motion.div>
@@ -246,8 +268,8 @@ const BlogPost = () => {
                 {/* Featured Image */}
                 <div className="relative rounded-2xl overflow-hidden mb-10 aspect-video">
                   <img
-                    src={cityscape}
-                    alt={post.title}
+                    src={postImage}
+                    alt={postTitle}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -263,7 +285,7 @@ const BlogPost = () => {
                     prose-ol:my-4 prose-ol:pl-6
                     [&_.lead]:text-xl [&_.lead]:text-discovery-text/80 [&_.lead]:leading-relaxed [&_.lead]:mb-8 [&_.lead]:font-medium
                   "
-                  dangerouslySetInnerHTML={{ __html: articleContent.content }}
+                  dangerouslySetInnerHTML={{ __html: postContent }}
                 />
 
                 {/* Share Section */}
@@ -271,7 +293,11 @@ const BlogPost = () => {
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
                       <span className="text-discovery-text font-medium">
-                        {lang === "pt" ? "Compartilhar:" : lang === "es" ? "Compartir:" : "Share:"}
+                        {lang === "pt"
+                          ? "Compartilhar:"
+                          : lang === "es"
+                          ? "Compartir:"
+                          : "Share:"}
                       </span>
                       <Button variant="outline" size="icon" className="rounded-full">
                         <Share2 size={18} />
@@ -280,7 +306,11 @@ const BlogPost = () => {
                     <Link to={`/${lang}/blog`}>
                       <Button variant="outline" className="gap-2">
                         <ArrowLeft size={18} />
-                        {lang === "pt" ? "Voltar ao Blog" : lang === "es" ? "Volver al Blog" : "Back to Blog"}
+                        {lang === "pt"
+                          ? "Voltar ao Blog"
+                          : lang === "es"
+                          ? "Volver al Blog"
+                          : "Back to Blog"}
                       </Button>
                     </Link>
                   </div>
@@ -296,48 +326,59 @@ const BlogPost = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-2xl font-bold text-discovery-dark mb-8">
-              {lang === "pt" ? "Artigos Relacionados" : lang === "es" ? "Artículos Relacionados" : "Related Articles"}
+              {lang === "pt"
+                ? "Artigos Relacionados"
+                : lang === "es"
+                ? "Artículos Relacionados"
+                : "Related Articles"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {t.blog.posts
-                .filter((p) => p.slug !== slug)
-                .slice(0, 2)
-                .map((relatedPost, index) => (
+              {filteredRelatedPosts.map((relatedPost, index) => {
+                const relatedIsDbPost = isDbPost(relatedPost);
+                const relatedSlug = relatedPost.slug;
+                const relatedTitle = relatedPost.title;
+                const relatedImage =
+                  relatedIsDbPost && relatedPost.image_url
+                    ? relatedPost.image_url
+                    : cityscape;
+                const relatedCategory = relatedPost.category || "";
+                const relatedExcerpt = relatedPost.excerpt || "";
+
+                return (
                   <motion.article
-                    key={relatedPost.slug}
+                    key={relatedSlug}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                     className="bg-white rounded-2xl overflow-hidden border border-discovery-green/10 shadow-sm hover:shadow-lg transition-all duration-300 group"
                   >
-                    <Link to={`/${lang}/blog/${relatedPost.slug}`} className="block">
+                    <Link to={`/${lang}/blog/${relatedSlug}`} className="block">
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={cityscape}
-                          alt={relatedPost.title}
+                          src={relatedImage}
+                          alt={relatedTitle}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-4 left-4">
                           <span className="inline-flex items-center gap-1 px-3 py-1 bg-discovery-green text-primary-foreground text-xs font-semibold rounded-full">
-                            {relatedPost.category}
+                            <Tag size={12} />
+                            {relatedCategory}
                           </span>
                         </div>
                       </div>
-                      <div className="p-6">
-                        <h3 className="text-lg font-semibold text-discovery-dark mb-2 group-hover:text-discovery-green transition-colors line-clamp-2">
-                          {relatedPost.title}
+                      <div className="p-5">
+                        <h3 className="text-lg font-semibold text-discovery-dark group-hover:text-discovery-green transition-colors line-clamp-2">
+                          {relatedTitle}
                         </h3>
-                        <p className="text-discovery-text text-sm mb-3 line-clamp-2">
-                          {relatedPost.excerpt}
+                        <p className="text-discovery-text text-sm mt-2 line-clamp-2">
+                          {relatedExcerpt}
                         </p>
-                        <span className="text-xs text-discovery-text/60">
-                          {relatedPost.date}
-                        </span>
                       </div>
                     </Link>
                   </motion.article>
-                ))}
+                );
+              })}
             </div>
           </div>
         </div>

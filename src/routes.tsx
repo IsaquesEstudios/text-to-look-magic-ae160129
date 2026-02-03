@@ -25,6 +25,43 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
 );
 
+// Languages for iteration
+const languages: Language[] = ["pt", "en", "es"];
+
+// Helper to generate static routes for a given page
+const generateLanguageRoutes = (
+  path: string,
+  Component: React.LazyExoticComponent<() => JSX.Element>
+): RouteRecord[] => {
+  return languages.map((lang) => ({
+    path: path ? `${lang}/${path}` : lang,
+    element: (
+      <SuspenseWrapper>
+        <Component />
+      </SuspenseWrapper>
+    ),
+  }));
+};
+
+// Generate blog post routes with getStaticPaths
+// Uses translation files as source of truth for SSG build
+// During runtime, posts are fetched from database with fallback to translations
+const generateBlogPostRoutes = (): RouteRecord[] => {
+  return languages.map((lang) => ({
+    path: `${lang}/blog/:slug`,
+    element: (
+      <SuspenseWrapper>
+        <BlogPost />
+      </SuspenseWrapper>
+    ),
+    // For SSG, we use translation posts as the source
+    // New posts added to database will work as SPA navigation
+    // To include database posts in SSG, a rebuild is required
+    getStaticPaths: () =>
+      translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`),
+  }));
+};
+
 // Define all routes with App as the layout
 export const routes: RouteRecord[] = [
   {
@@ -41,185 +78,16 @@ export const routes: RouteRecord[] = [
         ),
       },
 
-      // Portuguese routes
-      {
-        path: "pt",
-        element: (
-          <SuspenseWrapper>
-            <Index />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/terrenos",
-        element: (
-          <SuspenseWrapper>
-            <Terrenos />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/casas",
-        element: (
-          <SuspenseWrapper>
-            <Casas />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/sobre",
-        element: (
-          <SuspenseWrapper>
-            <Sobre />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/contato",
-        element: (
-          <SuspenseWrapper>
-            <Contato />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/blog",
-        element: (
-          <SuspenseWrapper>
-            <Blog />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "pt/blog/:slug",
-        element: (
-          <SuspenseWrapper>
-            <BlogPost />
-          </SuspenseWrapper>
-        ),
-        getStaticPaths: () =>
-          translations.pt.blog.posts.map((post) => `/pt/blog/${post.slug}`),
-      },
+      // Language-specific routes
+      ...generateLanguageRoutes("", Index),
+      ...generateLanguageRoutes("terrenos", Terrenos),
+      ...generateLanguageRoutes("casas", Casas),
+      ...generateLanguageRoutes("sobre", Sobre),
+      ...generateLanguageRoutes("contato", Contato),
+      ...generateLanguageRoutes("blog", Blog),
 
-      // English routes
-      {
-        path: "en",
-        element: (
-          <SuspenseWrapper>
-            <Index />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/terrenos",
-        element: (
-          <SuspenseWrapper>
-            <Terrenos />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/casas",
-        element: (
-          <SuspenseWrapper>
-            <Casas />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/sobre",
-        element: (
-          <SuspenseWrapper>
-            <Sobre />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/contato",
-        element: (
-          <SuspenseWrapper>
-            <Contato />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/blog",
-        element: (
-          <SuspenseWrapper>
-            <Blog />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "en/blog/:slug",
-        element: (
-          <SuspenseWrapper>
-            <BlogPost />
-          </SuspenseWrapper>
-        ),
-        getStaticPaths: () =>
-          translations.en.blog.posts.map((post) => `/en/blog/${post.slug}`),
-      },
-
-      // Spanish routes
-      {
-        path: "es",
-        element: (
-          <SuspenseWrapper>
-            <Index />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/terrenos",
-        element: (
-          <SuspenseWrapper>
-            <Terrenos />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/casas",
-        element: (
-          <SuspenseWrapper>
-            <Casas />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/sobre",
-        element: (
-          <SuspenseWrapper>
-            <Sobre />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/contato",
-        element: (
-          <SuspenseWrapper>
-            <Contato />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/blog",
-        element: (
-          <SuspenseWrapper>
-            <Blog />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "es/blog/:slug",
-        element: (
-          <SuspenseWrapper>
-            <BlogPost />
-          </SuspenseWrapper>
-        ),
-        getStaticPaths: () =>
-          translations.es.blog.posts.map((post) => `/es/blog/${post.slug}`),
-      },
+      // Blog post routes with dynamic slugs
+      ...generateBlogPostRoutes(),
 
       // Legacy routes (will redirect client-side)
       {
