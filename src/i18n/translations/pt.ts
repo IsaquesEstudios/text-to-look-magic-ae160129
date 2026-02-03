@@ -99,6 +99,7 @@ export const pt = {
       statusAvailable: "Disponível",
       statusInContract: "Em Contrato",
       statusSold: "Vendido",
+      statusInRenovation: "Em Reforma",
       viewPhotos: "Ver Fotos",
       seeMore: "Saiba Mais",
       viewOnZillow: "Ver no Zillow",
