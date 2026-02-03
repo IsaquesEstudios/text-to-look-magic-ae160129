@@ -32,7 +32,7 @@ import casa2Photo9 from "@/assets/properties/casa-2/photo-9.webp";
 // Property images - Casa 3
 import casa3Cover from "@/assets/properties/casa-3/cover.jpg";
 
-export type PropertyStatus = "available" | "in_contract" | "sold";
+export type PropertyStatus = "available" | "in_contract" | "sold" | "in_renovation";
 
 export interface Property {
   id: string;
@@ -85,7 +85,7 @@ const properties: Property[] = [
   {
     id: "casa-3",
     address: "107 Coolidge Ave, Elkland, PA",
-    status: "available",
+    status: "in_renovation",
     coverImage: casa3Cover,
     images: [casa3Cover],
     externalLink: "https://www.zillow.com/homedetails/107-Coolidge-Ave-Elkland-PA-16920/230067442_zpid/",
@@ -99,12 +99,14 @@ function PropertyCard({ property, onClick }: { property: Property; onClick: () =
     available: "bg-discovery-green text-white",
     in_contract: "bg-amber-500 text-white",
     sold: "bg-red-500 text-white",
+    in_renovation: "bg-blue-500 text-white",
   };
 
   const statusLabels: Record<PropertyStatus, string> = {
     available: t.home.properties.statusAvailable,
     in_contract: t.home.properties.statusInContract,
     sold: t.home.properties.statusSold,
+    in_renovation: t.home.properties.statusInRenovation,
   };
 
   return (
