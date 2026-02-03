@@ -1,59 +1,140 @@
-# Plano: Sistema de Blog Dinâmico com Upload de Imagens
 
-## ✅ Status: Implementado
 
----
+# Plano: Corrigir Erro de SSG com localStorage
 
-## O que foi implementado
+## O Problema
 
-### 1. Lovable Cloud ✅
-- Infraestrutura de banco de dados ativada
-- Storage para imagens configurado
+O erro **"ReferenceError: localStorage is not defined"** acontece durante o processo de **Static Site Generation (SSG)** no servidor da Coolify. O código está sendo executado no Node.js, onde APIs do navegador como `localStorage` não existem.
 
-### 2. Banco de Dados ✅
-**Tabela: `blog_posts`**
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | UUID | Identificador único |
-| slug | TEXT | URL amigável (único por idioma) |
-| language | TEXT | Idioma (pt, en, es) |
-| title | TEXT | Título do post |
-| excerpt | TEXT | Resumo/descrição curta |
-| content | TEXT | Conteúdo completo (HTML/Markdown) |
-| category | TEXT | Categoria do post |
-| image_url | TEXT | URL da imagem de capa |
-| author | TEXT | Nome do autor |
-| published_at | TIMESTAMP | Data de publicação |
-| created_at | TIMESTAMP | Data de criação |
-| updated_at | TIMESTAMP | Data de atualização |
+### Causa Raiz
 
-- RLS habilitado com política de leitura pública para posts publicados
-- Trigger para atualização automática de `updated_at`
+O arquivo `src/integrations/supabase/client.ts` (gerado automaticamente) contém:
 
-### 3. Storage ✅
-- **Bucket:** `blog-images` (público)
-- Política de acesso público para leitura de imagens
+```typescript
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    storage: localStorage, // ← ERRO: não existe no Node.js
+    ...
+  }
+});
+```
 
-### 4. Código ✅
-- **src/lib/blog.ts:** Funções para buscar posts do banco
-- **src/pages/Blog.tsx:** Usa useQuery com fallback para traduções
-- **src/pages/BlogPost.tsx:** Carrega post dinâmico por slug/idioma
-- **src/components/sections/BlogPostsSection.tsx:** Últimos 3 posts do banco
-- **src/routes.tsx:** Refatorado e simplificado
+## A Solução
+
+Como o arquivo `client.ts` é auto-gerado e não pode ser editado, vou criar um **wrapper SSR-safe** que detecta se está rodando no navegador ou no servidor.
 
 ---
 
-## Como funciona
+## Etapas de Implementação
 
-1. **No build (SSG):** Posts são gerados a partir dos arquivos de tradução
-2. **Em runtime:** Posts são buscados do banco de dados com fallback para traduções
-3. **Novo post no banco:** Funciona imediatamente via SPA, mas para incluir no SSG precisa de rebuild
+### 1. Criar Storage SSR-Safe
+
+Criar um novo arquivo `src/lib/ssr-storage.ts` com uma implementação de storage que funciona tanto no navegador quanto no servidor:
+
+```typescript
+// Storage que funciona no SSR (retorna memória vazia no servidor)
+const createSSRSafeStorage = () => {
+  if (typeof window !== 'undefined') {
+    return window.localStorage;
+  }
+  // No-op storage para SSR
+  return {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+    clear: () => {},
+    length: 0,
+    key: () => null,
+  };
+};
+```
+
+### 2. Criar Cliente Supabase SSR-Safe
+
+Criar um novo arquivo `src/lib/supabase-ssr.ts` que importa o cliente original mas oferece uma versão segura para SSR:
+
+```typescript
+import { createClient } from '@supabase/supabase-js';
+import { ssrSafeStorage } from './ssr-storage';
+
+// Cliente SSR-safe para uso em toda a aplicação
+export const supabaseSSR = createClient(URL, KEY, {
+  auth: {
+    storage: ssrSafeStorage,
+    persistSession: typeof window !== 'undefined',
+    autoRefreshToken: typeof window !== 'undefined',
+  }
+});
+```
+
+### 3. Atualizar lib/blog.ts
+
+Modificar para usar o cliente SSR-safe em vez do original:
+
+```typescript
+import { supabaseSSR } from './supabase-ssr';
+// usar supabaseSSR em vez de supabase
+```
+
+### 4. Atualizar Páginas que Usam Supabase
+
+Garantir que todas as páginas Blog, BlogPost e BlogPostsSection usem o cliente SSR-safe.
 
 ---
 
-## Próximos passos sugeridos
+## Detalhes Técnicos
 
-1. **Inserir posts no banco:** Adicionar conteúdo real via Cloud UI
-2. **Upload de imagens:** Fazer upload das imagens para o bucket `blog-images`
-3. **Painel de administração:** (Opcional) Interface para gerenciar posts
+### Arquivos a Criar
+1. `src/lib/ssr-storage.ts` - Storage compatível com SSR
+2. `src/lib/supabase-ssr.ts` - Cliente Supabase SSR-safe
+
+### Arquivos a Modificar
+1. `src/lib/blog.ts` - Usar cliente SSR-safe
+2. `src/pages/Blog.tsx` - Verificar imports
+3. `src/pages/BlogPost.tsx` - Verificar imports
+4. `src/components/sections/BlogPostsSection.tsx` - Verificar imports
+
+### Como Funciona
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                    BUILD TIME (SSG)                      │
+│                                                          │
+│  Node.js Server                                          │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │ typeof window === 'undefined' ✓                    │ │
+│  │                                                    │ │
+│  │ → Usa memória fake (no-op storage)                 │ │
+│  │ → persistSession: false                            │ │
+│  │ → autoRefreshToken: false                          │ │
+│  │                                                    │ │
+│  │ Resultado: Build completa sem erros!               │ │
+│  └────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│                   RUNTIME (Browser)                      │
+│                                                          │
+│  Browser do Usuário                                      │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │ typeof window !== 'undefined' ✓                    │ │
+│  │                                                    │ │
+│  │ → Usa localStorage real                            │ │
+│  │ → persistSession: true                             │ │
+│  │ → autoRefreshToken: true                           │ │
+│  │                                                    │ │
+│  │ Resultado: Funciona normalmente!                   │ │
+│  └────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Resultado Esperado
+
+Após a implementação:
+- O build SSG na Coolify completará com sucesso
+- O site funcionará normalmente no navegador
+- As funcionalidades de autenticação (se usadas) continuarão funcionando
+- O blog híbrido (SSG + dados dinâmicos) funcionará como esperado
 
