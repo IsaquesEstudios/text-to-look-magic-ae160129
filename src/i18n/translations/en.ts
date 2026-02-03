@@ -93,6 +93,17 @@ export const en = {
       partnerTitle: "Tababog Construction",
       partnerDesc: "Our own construction company ensures impeccable technical execution on every renovation.",
     },
+    properties: {
+      title: "Our Properties",
+      subtitle: "Follow the properties we are acquiring and renovating for our investors.",
+      statusAvailable: "Available",
+      statusInContract: "In Contract",
+      statusSold: "Sold",
+      viewPhotos: "View Photos",
+      seeMore: "Learn More",
+      viewOnZillow: "View on Zillow",
+      galleryTitle: "Photo Gallery",
+    },
     cta: {
       title: "Ready to get started?",
       description: "Talk to a specialist and discover how to dollarize your assets.",
