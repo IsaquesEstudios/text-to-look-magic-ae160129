@@ -18,6 +18,17 @@ import casa1Photo8 from "@/assets/properties/casa-1/photo-8.webp";
 import casa1Photo9 from "@/assets/properties/casa-1/photo-9.webp";
 import casa1Photo10 from "@/assets/properties/casa-1/photo-10.webp";
 
+// Property images - Casa 2
+import casa2Cover from "@/assets/properties/casa-2/cover.webp";
+import casa2Photo2 from "@/assets/properties/casa-2/photo-2.webp";
+import casa2Photo3 from "@/assets/properties/casa-2/photo-3.webp";
+import casa2Photo4 from "@/assets/properties/casa-2/photo-4.webp";
+import casa2Photo5 from "@/assets/properties/casa-2/photo-5.webp";
+import casa2Photo6 from "@/assets/properties/casa-2/photo-6.webp";
+import casa2Photo7 from "@/assets/properties/casa-2/photo-7.webp";
+import casa2Photo8 from "@/assets/properties/casa-2/photo-8.webp";
+import casa2Photo9 from "@/assets/properties/casa-2/photo-9.webp";
+
 export type PropertyStatus = "available" | "in_contract" | "sold";
 
 export interface Property {
@@ -49,6 +60,24 @@ const properties: Property[] = [
       casa1Photo10,
     ],
     externalLink: "https://www.zillow.com/homedetails/501-W-Hudson-St-Elmira-NY-14904/29957315_zpid/",
+  },
+  {
+    id: "casa-2",
+    address: "506 Luce St, Elmira, NY 14904",
+    status: "sold",
+    coverImage: casa2Cover,
+    images: [
+      casa2Cover,
+      casa2Photo2,
+      casa2Photo3,
+      casa2Photo4,
+      casa2Photo5,
+      casa2Photo6,
+      casa2Photo7,
+      casa2Photo8,
+      casa2Photo9,
+    ],
+    externalLink: "https://www.zillow.com/homedetails/506-Luce-St-Elmira-NY-14904/29960311_zpid/",
   },
 ];
 
