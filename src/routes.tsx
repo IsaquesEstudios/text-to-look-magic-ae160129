@@ -7,6 +7,7 @@ import App from "./App";
 const Index = lazy(() => import("./pages/Index"));
 const Terrenos = lazy(() => import("./pages/Terrenos"));
 const Casas = lazy(() => import("./pages/Casas"));
+const Imoveis = lazy(() => import("./pages/Imoveis"));
 const Sobre = lazy(() => import("./pages/Sobre"));
 const Contato = lazy(() => import("./pages/Contato"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -82,6 +83,7 @@ export const routes: RouteRecord[] = [
       ...generateLanguageRoutes("", Index),
       ...generateLanguageRoutes("terrenos", Terrenos),
       ...generateLanguageRoutes("casas", Casas),
+      ...generateLanguageRoutes("imoveis", Imoveis),
       ...generateLanguageRoutes("sobre", Sobre),
       ...generateLanguageRoutes("contato", Contato),
       ...generateLanguageRoutes("blog", Blog),
