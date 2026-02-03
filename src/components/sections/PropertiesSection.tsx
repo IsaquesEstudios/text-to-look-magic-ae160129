@@ -29,6 +29,9 @@ import casa2Photo7 from "@/assets/properties/casa-2/photo-7.webp";
 import casa2Photo8 from "@/assets/properties/casa-2/photo-8.webp";
 import casa2Photo9 from "@/assets/properties/casa-2/photo-9.webp";
 
+// Property images - Casa 3
+import casa3Cover from "@/assets/properties/casa-3/cover.jpg";
+
 export type PropertyStatus = "available" | "in_contract" | "sold";
 
 export interface Property {
@@ -78,6 +81,14 @@ const properties: Property[] = [
       casa2Photo9,
     ],
     externalLink: "https://www.zillow.com/homedetails/506-Luce-St-Elmira-NY-14904/29960311_zpid/",
+  },
+  {
+    id: "casa-3",
+    address: "107 Coolidge Ave, Elkland, PA",
+    status: "available",
+    coverImage: casa3Cover,
+    images: [casa3Cover],
+    externalLink: "https://www.zillow.com/homedetails/107-Coolidge-Ave-Elkland-PA-16920/230067442_zpid/",
   },
 ];
 
