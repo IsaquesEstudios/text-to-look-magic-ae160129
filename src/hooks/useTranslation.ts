@@ -13,3 +13,9 @@ export function useLanguage(): Language {
   const location = useLocation();
   return getLanguageFromPath(location.pathname);
 }
+
+// SSR-safe function to get translation by path (can be used outside React components)
+export function getTranslationByPath(pathname: string) {
+  const lang = getLanguageFromPath(pathname);
+  return { t: translations[lang], lang };
+}

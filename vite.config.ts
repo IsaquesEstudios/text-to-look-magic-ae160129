@@ -18,4 +18,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // SSG Configuration
+  ssgOptions: {
+    script: "defer", // Critical: avoids race condition with manifest
+    formatting: "minify",
+    dirStyle: "nested",
+  },
+  ssr: {
+    noExternal: ["@tanstack/react-query"],
+  },
 }));
