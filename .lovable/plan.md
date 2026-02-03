@@ -1,125 +1,137 @@
 
 
-# Plano de Implementação: Static Site Generation (SSG) com vite-react-ssg
+# Plano: Sistema de Blog Dinâmico com Upload de Imagens
 
 ## Objetivo
-Implementar SSG para pré-renderizar todas as páginas do site em HTML estático no momento do build, garantindo melhor SEO e indexação pelo Google para os três idiomas (PT, EN, ES).
+Criar uma infraestrutura completa para gerenciar posts do blog dinamicamente, incluindo upload de imagens para cada artigo.
 
 ---
 
-## Visão Geral da Mudança
+## Arquitetura Proposta
 
-O site atualmente renderiza tudo no cliente (CSR). Com SSG, cada página será pré-renderizada como HTML estático durante o build, incluindo:
+### Estrutura do Banco de Dados
 
-- **18 páginas estáticas** (6 páginas × 3 idiomas)
-- **9 páginas dinâmicas de blog** (3 posts × 3 idiomas)
-- **Total: 27 páginas HTML estáticas**
+**Tabela: `blog_posts`**
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| id | UUID | Identificador único |
+| slug | TEXT | URL amigável (único por idioma) |
+| language | TEXT | Idioma (pt, en, es) |
+| title | TEXT | Título do post |
+| excerpt | TEXT | Resumo/descrição curta |
+| content | TEXT | Conteúdo completo (HTML/Markdown) |
+| category | TEXT | Categoria do post |
+| image_url | TEXT | URL da imagem de capa |
+| author | TEXT | Nome do autor |
+| published_at | TIMESTAMP | Data de publicação |
+| created_at | TIMESTAMP | Data de criação |
+| updated_at | TIMESTAMP | Data de atualização |
+
+### Storage para Imagens
+
+- **Bucket:** `blog-images`
+- **Público:** Sim (imagens precisam ser acessíveis)
+- **Estrutura:** `blog-images/{post-id}/cover.jpg`
 
 ---
 
-## Etapas de Implementação
+## Mudanças Necessárias
 
-### 1. Instalar Dependências
-Adicionar `vite-react-ssg` ao projeto para habilitar a geração estática.
+### 1. Habilitar Lovable Cloud
+Ativar a infraestrutura de backend gerenciada pelo Lovable para ter acesso a banco de dados e storage.
 
-### 2. Configurar vite.config.ts
-Adicionar as opções de SSG:
-- `script: "defer"` - Evita race condition do manifest
-- `formatting: "minify"` - Minifica o HTML gerado
-- `dirStyle: "directory"` - Gera pastas com index.html
-- `ssr.noExternal` - Inclui dependências necessárias
+### 2. Criar Tabela e Bucket
+Migração SQL para criar a tabela `blog_posts` e o bucket de imagens.
 
-### 3. Refatorar src/main.tsx
-- Substituir `createRoot()` por `ViteReactSSG()`
-- Exportar rotas como `RouteRecord[]`
-- Configurar QueryClient para SSG com cache otimizado
+### 3. Adaptar Páginas do Blog
+- **Blog.tsx:** Buscar posts do banco de dados em vez dos arquivos de tradução
+- **BlogPost.tsx:** Carregar conteúdo dinâmico por slug e idioma
+- **BlogPostsSection.tsx:** Buscar últimos 3 posts do banco
 
-### 4. Reestruturar src/App.tsx
-- Separar o componente App da lógica de rotas
-- Criar array de rotas compatível com vite-react-ssg
-- Implementar `getStaticPaths` para rotas dinâmicas do blog
+### 4. Adaptar SSG para Dados Dinâmicos
+- **getStaticPaths:** Buscar slugs do banco de dados no momento do build
+- **Loaders:** Carregar dados dos posts durante a geração estática
 
-### 5. Atualizar package.json
-- Alterar script de build para: `"build": "vite-react-ssg build"`
+### 5. Criar Painel de Administração (Opcional)
+Interface para criar/editar/excluir posts e fazer upload de imagens.
 
-### 6. Adaptar Hook useTranslation
-- Criar versão que funciona tanto no SSR quanto no cliente
-- Usar `useLoaderData` para dados de idioma quando disponível
+---
 
-### 7. Configurar SEO com Head
-- Substituir qualquer uso de react-helmet por `import { Head } from "vite-react-ssg"`
-- Adicionar meta tags dinâmicas por página e idioma
+## Fluxo de Funcionamento
 
-### 8. Atualizar vercel.json para Fallback
-- Manter regra de rewrite para navegação SPA pós-hidratação
+```text
+[Build SSG]
+    │
+    ├── getStaticPaths busca slugs no banco de dados
+    │
+    ├── Para cada slug/idioma:
+    │   └── Loader busca dados do post
+    │       └── Gera HTML estático com conteúdo
+    │
+    └── Resultado: Páginas estáticas com conteúdo do banco
+```
 
 ---
 
 ## Detalhes Técnicos
 
-### Estrutura de Rotas para SSG
-
-```text
-Rotas Estáticas (geradas automaticamente):
-├── /pt                    -> dist/pt/index.html
-├── /pt/terrenos           -> dist/pt/terrenos/index.html
-├── /pt/casas              -> dist/pt/casas/index.html
-├── /pt/sobre              -> dist/pt/sobre/index.html
-├── /pt/contato            -> dist/pt/contato/index.html
-├── /pt/blog               -> dist/pt/blog/index.html
-├── /en                    -> dist/en/index.html
-├── /en/terrenos           -> dist/en/terrenos/index.html
-... (mesma estrutura para EN e ES)
-
-Rotas Dinâmicas (requerem getStaticPaths):
-├── /pt/blog/:slug         -> getStaticPaths retorna slugs de posts PT
-├── /en/blog/:slug         -> getStaticPaths retorna slugs de posts EN
-├── /es/blog/:slug         -> getStaticPaths retorna slugs de posts ES
+### Consulta de Posts por Idioma
+Para listar posts na página do blog, a query filtra por idioma:
+```
+SELECT * FROM blog_posts 
+WHERE language = 'pt' 
+ORDER BY published_at DESC
 ```
 
-### Implementação de getStaticPaths
+### getStaticPaths Dinâmico
+No build, buscar todos os slugs de todos os idiomas:
+```
+SELECT slug, language FROM blog_posts WHERE published_at IS NOT NULL
+```
 
-Para cada rota dinâmica de blog, será necessário:
-1. Buscar todos os slugs disponíveis no idioma
-2. Retornar array de paths para pré-renderização
+### Upload de Imagens
+Cada imagem será armazenada no bucket com caminho único baseado no ID do post.
 
-### QueryClient Otimizado para SSG
+---
 
-Configuração necessária:
-- `staleTime: 5 minutos` - Evita refetch desnecessário
-- `refetchOnMount: false` - Usa dados pré-carregados
-- `refetchOnWindowFocus: false` - Previne requisições extras
-
-### Arquivos que Serão Modificados
+## Arquivos a Serem Modificados
 
 | Arquivo | Mudança |
 |---------|---------|
-| package.json | Adicionar dependência e alterar script build |
-| vite.config.ts | Adicionar ssgOptions e ssr config |
-| src/main.tsx | Usar ViteReactSSG com rotas |
-| src/App.tsx | Reestruturar para exportar rotas |
-| src/hooks/useTranslation.ts | Adaptar para SSR |
-| vercel.json | Manter configuração de rewrite |
+| src/pages/Blog.tsx | Usar useQuery para buscar posts do Supabase |
+| src/pages/BlogPost.tsx | Carregar post por slug/idioma do banco |
+| src/components/sections/BlogPostsSection.tsx | Buscar últimos posts do banco |
+| src/routes.tsx | getStaticPaths busca slugs do banco no build |
+| src/lib/supabase.ts | Cliente Supabase (criado automaticamente) |
 
 ### Novos Arquivos
 
 | Arquivo | Propósito |
 |---------|-----------|
-| src/routes.tsx | Definição central de rotas para SSG |
+| supabase/migrations/xxx_create_blog_posts.sql | Criação da tabela e bucket |
+| src/lib/blog.ts | Funções para buscar/criar posts |
 
 ---
 
-## Resultado Esperado
+## Próximo Passo Imediato
 
-Após a implementação:
-1. Build gerará pasta `dist/` com HTML estático para cada página
-2. Google poderá indexar todo o conteúdo sem JavaScript
-3. Navegação continua funcionando como SPA após hidratação
-4. Cada idioma terá URLs próprias com conteúdo pré-renderizado
+Para começar, preciso habilitar o **Lovable Cloud** no projeto. Isso irá:
+1. Criar a infraestrutura de banco de dados
+2. Disponibilizar storage para imagens
+3. Configurar automaticamente as variáveis de ambiente necessárias
+
+Após aprovação, vou:
+1. Habilitar Lovable Cloud
+2. Criar a migração SQL para a tabela e bucket
+3. Adaptar as páginas do blog para buscar dados dinâmicos
+4. Atualizar o SSG para usar dados do banco
 
 ---
 
-## Considerações para Deploy na Vercel
+## Considerações sobre o SSG
 
-O `vercel.json` atual já está configurado corretamente para SPAs. Com SSG, a Vercel servirá automaticamente os arquivos estáticos gerados, e o rewrite serve como fallback para navegação dinâmica.
+Com dados dinâmicos:
+- **No build:** Posts são buscados do banco e páginas são geradas
+- **Novo post:** Requer novo build para aparecer na versão estática
+- **Fallback SPA:** Navegação cliente-side continua funcionando com useQuery
 
