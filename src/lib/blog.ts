@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseSSR } from "./supabase-ssr";
 import { Language } from "@/i18n";
 
 // Type definition for blog post from database
@@ -19,7 +19,7 @@ export interface BlogPost {
 
 // Fetch all published posts for a specific language
 export async function fetchBlogPosts(language: Language): Promise<BlogPost[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseSSR
     .from("blog_posts")
     .select("*")
     .eq("language", language)
@@ -40,7 +40,7 @@ export async function fetchBlogPostBySlug(
   slug: string,
   language: Language
 ): Promise<BlogPost | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseSSR
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
@@ -62,7 +62,7 @@ export async function fetchLatestBlogPosts(
   language: Language,
   limit: number = 3
 ): Promise<BlogPost[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseSSR
     .from("blog_posts")
     .select("*")
     .eq("language", language)
@@ -83,7 +83,7 @@ export async function fetchLatestBlogPosts(
 export async function fetchAllBlogSlugs(): Promise<
   { slug: string; language: Language }[]
 > {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseSSR
     .from("blog_posts")
     .select("slug, language")
     .not("published_at", "is", null);
