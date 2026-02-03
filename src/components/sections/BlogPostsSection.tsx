@@ -13,14 +13,18 @@ export function BlogPostsSection() {
   const location = useLocation();
   const currentLang = getLanguageFromPath(location.pathname);
 
-  const { data: posts = [], isLoading } = useQuery({
+  // Use translation posts as initial data to avoid hydration mismatch
+  const translationPosts = t.blog.posts.slice(0, 3);
+
+  const { data: dbPosts, isLoading } = useQuery({
     queryKey: ["latestBlogPosts", currentLang],
     queryFn: () => fetchLatestBlogPosts(currentLang, 3),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Fallback to translation posts if no database posts
-  const displayPosts: (BlogPost | typeof t.blog.posts[0])[] =
-    posts.length > 0 ? posts : t.blog.posts.slice(0, 3);
+  // Use database posts if available and not empty, otherwise fallback to translations
+  const displayPosts: (BlogPost | typeof translationPosts[0])[] =
+    dbPosts && dbPosts.length > 0 ? dbPosts : translationPosts;
 
   const isDbPost = (post: BlogPost | typeof t.blog.posts[0]): post is BlogPost => {
     return "id" in post && "published_at" in post;
