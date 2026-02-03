@@ -104,6 +104,7 @@ export const en = {
       seeMore: "Learn More",
       viewOnZillow: "View on Zillow",
       galleryTitle: "Photo Gallery",
+      viewAll: "View All Properties",
     },
     cta: {
       title: "Ready to get started?",
@@ -338,5 +339,14 @@ export const en = {
         category: "Strategy",
       },
     ],
+  },
+
+  // Properties Page
+  properties: {
+    hero: {
+      title: "Our Properties",
+      subtitle: "Explore all the properties we are acquiring and renovating for our investors.",
+    },
+    count: "{count} properties listed",
   },
 };
