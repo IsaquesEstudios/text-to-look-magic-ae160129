@@ -130,8 +130,10 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-4">
             <LanguageSwitcher />
-            <Button variant="cta" size="default">
-              {t.common.cta}
+            <Button variant="cta" size="default" asChild>
+              <a href="https://wa.link/0sgbl5" target="_blank" rel="noopener noreferrer">
+                {t.common.cta}
+              </a>
             </Button>
           </div>
 
@@ -219,8 +221,10 @@ export function Header() {
                   </Link>
                 )
               ))}
-              <Button variant="cta" size="lg" className="mt-4">
-                {t.common.cta}
+              <Button variant="cta" size="lg" className="mt-4" asChild>
+                <a href="https://wa.link/0sgbl5" target="_blank" rel="noopener noreferrer">
+                  {t.common.cta}
+                </a>
               </Button>
             </nav>
           </motion.div>

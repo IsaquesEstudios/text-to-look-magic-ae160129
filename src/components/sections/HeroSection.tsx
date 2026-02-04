@@ -6,15 +6,15 @@ interface HeroSectionProps {
   title: string;
   description: string;
   ctaText: string;
-  ctaLink?: string;
   backgroundImage: string;
 }
+
+const WHATSAPP_LINK = "https://wa.link/0sgbl5";
 
 export function HeroSection({
   title,
   description,
   ctaText,
-  ctaLink = "#",
   backgroundImage,
 }: HeroSectionProps) {
   return (
@@ -48,7 +48,7 @@ export function HeroSection({
           </p>
           
           <Button variant="hero" size="xl" asChild>
-            <a href={ctaLink} className="inline-flex items-center gap-3">
+            <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3">
               {ctaText}
               <ArrowRight size={20} />
             </a>
