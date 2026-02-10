@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const SITE_URL = "https://text-to-look-magic.lovable.app";
+const SITE_URL = "https://discoveryinvestimentos.com";
 
 const languages = ["pt", "en", "es"];
 
