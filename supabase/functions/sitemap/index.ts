@@ -113,8 +113,7 @@ ${urls}</urlset>`;
 
     return new Response(sitemap, {
       headers: {
-        ...corsHeaders,
-        "Content-Type": "application/xml; charset=utf-8",
+        "Content-Type": "text/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600",
       },
     });
