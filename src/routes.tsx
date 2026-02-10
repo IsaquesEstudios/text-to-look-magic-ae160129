@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import type { RouteRecord } from "vite-react-ssg";
 import { translations, Language } from "@/i18n";
+import { fetchAllBlogSlugs } from "@/lib/blog";
 import App from "./App";
 
 // Lazy load pages for code splitting
@@ -55,11 +56,29 @@ const generateBlogPostRoutes = (): RouteRecord[] => {
         <BlogPost />
       </SuspenseWrapper>
     ),
-    // For SSG, we use translation posts as the source
-    // New posts added to database will work as SPA navigation
-    // To include database posts in SSG, a rebuild is required
-    getStaticPaths: () =>
-      translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`),
+    // Fetch slugs from database during build for full SSG coverage
+    // Falls back to translation files if DB is unavailable
+    getStaticPaths: async () => {
+      try {
+        const dbSlugs = await fetchAllBlogSlugs();
+        const langSlugs = dbSlugs
+          .filter((s) => s.language === lang)
+          .map((s) => `/${lang}/blog/${s.slug}`);
+
+        if (langSlugs.length > 0) {
+          // Merge with translation slugs to ensure all are covered
+          const translationSlugs = translations[lang].blog.posts.map(
+            (post) => `/${lang}/blog/${post.slug}`
+          );
+          const allSlugs = [...new Set([...langSlugs, ...translationSlugs])];
+          return allSlugs;
+        }
+      } catch (e) {
+        console.warn(`SSG: Failed to fetch blog slugs from DB for ${lang}, using translations`, e);
+      }
+      // Fallback to translation files
+      return translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
+    },
   }));
 };
 
