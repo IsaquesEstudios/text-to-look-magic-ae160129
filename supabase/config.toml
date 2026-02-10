@@ -2,3 +2,6 @@ project_id = "zebifcfhjnglycwfgraq"
 
 [functions.create-blog-post]
 verify_jwt = false
+
+[functions.upload-blog-image]
+verify_jwt = false
