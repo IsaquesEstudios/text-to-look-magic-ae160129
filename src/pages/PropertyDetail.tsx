@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertyExpenses } from "@/components/painel/property/PropertyExpenses";
+import { PropertyShareAssignment } from "@/components/painel/property/PropertyShareAssignment";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -164,6 +165,15 @@ export default function PropertyDetail() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Share Assignment (Admin only) */}
+        {isAdmin && (
+          <PropertyShareAssignment
+            propertyId={property.id}
+            sharePrice={Number(property.share_price)}
+            availableShares={property.available_shares}
+          />
         )}
 
         {/* Tabs */}
