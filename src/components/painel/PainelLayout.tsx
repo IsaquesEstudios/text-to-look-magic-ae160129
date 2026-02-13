@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, Shield, LayoutDashboard, PieChart, Building2, Receipt } from "lucide-react";
+import { LogOut, Home, Shield, LayoutDashboard, PieChart, Building2, Receipt, History } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
@@ -14,6 +14,7 @@ const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Imóveis", icon: Building2, path: "/painel/imoveis" },
   { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
+  { label: "Atividades", icon: History, path: "/painel/atividades" },
 ];
 
 const userNavItems = [

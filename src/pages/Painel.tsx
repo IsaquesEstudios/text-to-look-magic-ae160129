@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserDashboard } from "@/components/painel/UserDashboard";
 import { PainelLayout } from "@/components/painel/PainelLayout";
@@ -40,26 +40,24 @@ function AdminDashboardContent() {
   });
 
   const { data: activities } = useQuery({
-    queryKey: ["admin-activity"],
+    queryKey: ["admin-activity-recent"],
     queryFn: async () => {
       const [sharesRes, profilesRes] = await Promise.all([
         supabase
           .from("shares")
           .select("id, quantity, amount_paid, purchased_at, property_id, user_id")
           .order("purchased_at", { ascending: false })
-          .limit(10),
+          .limit(5),
         supabase
           .from("profiles")
           .select("id, user_id, full_name, created_at")
           .order("created_at", { ascending: false })
-          .limit(10),
+          .limit(5),
       ]);
 
-      // Build a name map from profiles
       const allProfiles = profilesRes.data ?? [];
       const nameMap = new Map(allProfiles.map((p) => [p.user_id, p.full_name || "Usuário"]));
 
-      // For share user_ids not in the recent profiles, fetch their names
       const shareUserIds = (sharesRes.data ?? []).map((s) => s.user_id).filter((id) => !nameMap.has(id));
       if (shareUserIds.length > 0) {
         const { data: extraProfiles } = await supabase
@@ -87,7 +85,7 @@ function AdminDashboardContent() {
 
       return [...shareActivities, ...profileActivities]
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 15);
+        .slice(0, 5);
     },
   });
 
@@ -134,12 +132,17 @@ function AdminDashboardContent() {
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base font-semibold">Atividade Recente</CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base font-semibold">Atividade Recente</CardTitle>
+            </div>
+            <Link to="/painel/atividades" className="text-xs text-primary hover:underline">
+              Ver tudo
+            </Link>
           </div>
         </CardHeader>
-        <CardContent className="max-h-[350px] overflow-y-auto custom-scrollbar">
+        <CardContent>
           {!activities || activities.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade recente</p>
           ) : (
