@@ -24,11 +24,11 @@ const userNavItems = [
 ];
 
 export function PainelLayout({ children }: PainelLayoutProps) {
-  const { user, isAdmin, profile, signOut } = useAuth();
+  const { user, isAdmin, isLoading, profile, signOut } = useAuth();
   const location = useLocation();
 
-  const navItems = isAdmin ? adminNavItems : userNavItems;
-  const showSidebar = navItems.length > 0;
+  const navItems = isLoading ? [] : (isAdmin ? adminNavItems : userNavItems);
+  const showSidebar = !isLoading && navItems.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
