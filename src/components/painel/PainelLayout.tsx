@@ -10,6 +10,12 @@ interface PainelLayoutProps {
   children: ReactNode;
 }
 
+const adminNavItems = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
+  { label: "Imóveis", icon: Building2, path: "/painel/imoveis" },
+  { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
+];
+
 const userNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Minhas Cotas", icon: PieChart, path: "/painel/cotas" },
@@ -21,8 +27,8 @@ export function PainelLayout({ children }: PainelLayoutProps) {
   const { user, isAdmin, profile, signOut } = useAuth();
   const location = useLocation();
 
-  const navItems = isAdmin ? [] : userNavItems;
-  const showSidebar = !isAdmin && navItems.length > 0;
+  const navItems = isAdmin ? adminNavItems : userNavItems;
+  const showSidebar = navItems.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
