@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -46,15 +46,27 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const queryClient = useQueryClient();
+  const defaultTab = searchParams.get("tab") || "community";
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
+
+  // Mark as read when landing on community tab
+  useEffect(() => {
+    if (user && id && defaultTab === "community") {
+      supabase
+        .from("property_message_reads")
+        .upsert({ user_id: user.id, property_id: id, last_read_at: new Date().toISOString() }, { onConflict: "user_id,property_id" })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["property-news"] }));
+    }
+  }, [user, id, defaultTab, queryClient]);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -134,7 +146,7 @@ export default function PropertyDetail() {
   const soldShares = property.total_shares - property.available_shares;
   const isInRepair = ["purchased", "renovating", "selling"].includes(property.status);
   const userHasShares = isAdmin || (userShares && userShares.length > 0);
-  const showCommunityTabs = isInRepair && userHasShares;
+  const showCommunityTabs = userHasShares;
   const canPurchase = property.available_shares > 0 && property.status === "available" && !isAdmin;
 
   const handlePurchase = async () => {
@@ -310,14 +322,22 @@ export default function PropertyDetail() {
 
         {/* Tabs - only visible for properties in repair process and shareholders */}
         {showCommunityTabs && (
-        <Tabs defaultValue="community">
+        <Tabs defaultValue={defaultTab} onValueChange={(val) => {
+          if (val === "community" && user && id) {
+            // Mark messages as read
+            supabase
+              .from("property_message_reads")
+              .upsert({ user_id: user.id, property_id: id, last_read_at: new Date().toISOString() }, { onConflict: "user_id,property_id" })
+              .then(() => queryClient.invalidateQueries({ queryKey: ["property-news"] }));
+          }
+        }}>
           <TabsList className="bg-secondary/50 border-0 p-1 rounded-xl h-auto">
             <TabsTrigger
               value="community"
               className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm px-4 py-2 text-sm"
             >
               <MessageSquare className="h-4 w-4" />
-              Comunidade
+              Novidades
             </TabsTrigger>
             <TabsTrigger
               value="expenses"
