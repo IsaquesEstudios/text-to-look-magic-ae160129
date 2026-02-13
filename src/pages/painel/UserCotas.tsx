@@ -116,7 +116,7 @@ export default function UserCotas() {
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
                         <p className="font-semibold text-sm text-foreground">
-                          {totalQuantity}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
+                          {prop.total_shares - (prop.available_shares ?? 0)}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
                         </p>
                       </div>
                       <div>
