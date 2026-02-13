@@ -20,6 +20,9 @@ const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const UserCotas = lazy(() => import("./pages/painel/UserCotas"));
 const UserOportunidades = lazy(() => import("./pages/painel/UserOportunidades"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
+const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
+const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
+const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -206,6 +209,22 @@ export const routes: RouteRecord[] = [
         element: (
           <ClientOnly>
             <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/imoveis",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><AdminImoveisPage /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/usuarios",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper>
           </ClientOnly>
         ),
       },
