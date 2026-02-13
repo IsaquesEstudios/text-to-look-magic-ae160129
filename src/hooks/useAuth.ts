@@ -4,96 +4,88 @@ import type { User, Session } from "@supabase/supabase-js";
 
 export type AppRole = "admin" | "user";
 
-interface AuthState {
-  user: User | null;
-  session: Session | null;
-  roles: AppRole[];
-  isAdmin: boolean;
-  isLoading: boolean;
-  profile: {
-    full_name: string | null;
-    credits: number;
-  } | null;
-}
-
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    session: null,
-    roles: [],
-    isAdmin: false,
-    isLoading: true,
-    profile: null,
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [roles, setRoles] = useState<AppRole[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<{ full_name: string | null; credits: number } | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchUserData = async (userId: string) => {
+      try {
+        const [rolesResult, profileResult] = await Promise.all([
+          supabase.from("user_roles").select("role").eq("user_id", userId),
+          supabase.from("profiles").select("full_name, credits").eq("user_id", userId).maybeSingle(),
+        ]);
+
+        if (!isMounted) return;
+
+        const userRoles = (rolesResult.data?.map((r) => r.role as AppRole)) ?? [];
+        setRoles(userRoles);
+        setIsAdmin(userRoles.includes("admin"));
+        setProfile(
+          profileResult.data
+            ? { full_name: profileResult.data.full_name, credits: Number(profileResult.data.credits) }
+            : null
+        );
+      } catch {
+        if (!isMounted) return;
+        setRoles([]);
+        setIsAdmin(false);
+        setProfile(null);
+      }
+    };
+
+    // Listener for ongoing auth changes (does NOT control isLoading)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        if (!isMounted) return;
+        setSession(session);
+        setUser(session?.user ?? null);
+
         if (session?.user) {
-          try {
-            const [rolesResult, profileResult] = await Promise.all([
-              supabase
-                .from("user_roles")
-                .select("role")
-                .eq("user_id", session.user.id),
-              supabase
-                .from("profiles")
-                .select("full_name, credits")
-                .eq("user_id", session.user.id)
-                .maybeSingle(),
-            ]);
-
-            const roles = (rolesResult.data?.map((r) => r.role as AppRole)) ?? [];
-
-            setState({
-              user: session.user,
-              session,
-              roles,
-              isAdmin: roles.includes("admin"),
-              isLoading: false,
-              profile: profileResult.data
-                ? {
-                    full_name: profileResult.data.full_name,
-                    credits: Number(profileResult.data.credits),
-                  }
-                : null,
-            });
-          } catch {
-            // Even if queries fail, still set user as logged in
-            setState({
-              user: session.user,
-              session,
-              roles: [],
-              isAdmin: false,
-              isLoading: false,
-              profile: null,
-            });
-          }
+          // Use setTimeout to avoid deadlock from awaiting inside callback
+          setTimeout(() => fetchUserData(session.user.id), 0);
         } else {
-          setState({
-            user: null,
-            session: null,
-            roles: [],
-            isAdmin: false,
-            isLoading: false,
-            profile: null,
-          });
+          setRoles([]);
+          setIsAdmin(false);
+          setProfile(null);
         }
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        setState((s) => ({ ...s, isLoading: false }));
-      }
-    });
+    // Initial load (controls isLoading)
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
 
-    return () => subscription.unsubscribe();
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await fetchUserData(session.user.id);
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
-  return { ...state, signOut };
+  return { user, session, roles, isAdmin, isLoading, profile, signOut };
 }
