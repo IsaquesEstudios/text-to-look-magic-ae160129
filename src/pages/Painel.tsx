@@ -139,7 +139,7 @@ function AdminDashboardContent() {
             <CardTitle className="text-base font-semibold">Atividade Recente</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="max-h-[350px] overflow-y-auto">
+        <CardContent className="max-h-[350px] overflow-y-auto custom-scrollbar">
           {!activities || activities.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade recente</p>
           ) : (
