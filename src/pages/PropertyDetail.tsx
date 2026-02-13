@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertyExpenses } from "@/components/painel/property/PropertyExpenses";
-import { PropertyShareAssignment } from "@/components/painel/property/PropertyShareAssignment";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -311,14 +311,6 @@ export default function PropertyDetail() {
           </section>
         )}
 
-        {/* Admin: Share Assignment */}
-        {isAdmin && (
-          <PropertyShareAssignment
-            propertyId={property.id}
-            sharePrice={Number(property.share_price)}
-            availableShares={property.available_shares}
-          />
-        )}
 
         {/* Tabs - only visible for properties in repair process and shareholders */}
         {showCommunityTabs && (
