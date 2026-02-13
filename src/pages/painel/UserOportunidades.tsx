@@ -129,7 +129,7 @@ export default function UserOportunidades() {
                                 key={i}
                                 className={`flex-1 rounded-[2px] transition-colors ${
                                   isMine
-                                    ? "bg-chart-4"
+                                    ? "bg-primary/60"
                                     : isSold
                                       ? "bg-primary"
                                       : "bg-secondary/80"
@@ -139,7 +139,7 @@ export default function UserOportunidades() {
                           })}
                         </div>
                         {mine > 0 && (
-                          <p className="text-[10px] text-chart-4 mt-1 font-medium">
+                          <p className="text-[10px] text-primary/60 mt-1 font-medium">
                             Você possui {mine} cota{mine > 1 ? "s" : ""}
                           </p>
                         )}
