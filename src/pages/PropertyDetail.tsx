@@ -129,64 +129,50 @@ export default function PropertyDetail() {
 
   return (
     <PainelLayout>
-      <div className="space-y-8">
-        {/* Back + Property Info */}
-        <div className="flex items-start gap-4">
-          <Link
-            to="/painel"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </Link>
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{property.title}</h1>
-              <Badge className={`${status.color} border-0 text-xs`}>{status.label}</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              {property.location}
-            </p>
+      <div className="space-y-6">
+        {/* Back link */}
+        <Link
+          to="/painel"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </Link>
+
+        {/* Title + Badge + Location */}
+        <div>
+          <div className="flex flex-wrap items-center gap-3 mb-1.5">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              {property.title}
+            </h1>
+            <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
           </div>
+          <p className="text-sm text-muted-foreground/80 flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5" />
+            {property.location}
+          </p>
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="rounded-2xl border border-border/30 bg-card/40 p-4 text-center">
-            <DollarSign className="h-4 w-4 text-muted-foreground/50 mx-auto mb-1" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço Total</p>
-            <p className="text-lg font-bold text-foreground mt-0.5">
-              ${Number(property.purchase_price).toLocaleString("pt-BR")}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border/30 bg-card/40 p-4 text-center">
-            <TrendingUp className="h-4 w-4 text-primary/50 mx-auto mb-1" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno Est.</p>
-            <p className="text-lg font-bold text-primary mt-0.5">
-              {Number(property.estimated_return_pct)}%
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border/30 bg-card/40 p-4 text-center">
-            <Users className="h-4 w-4 text-muted-foreground/50 mx-auto mb-1" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-            <p className="text-lg font-bold text-foreground mt-0.5">
-              {soldShares}/{property.total_shares}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border/30 bg-card/40 p-4 text-center">
-            <DollarSign className="h-4 w-4 text-muted-foreground/50 mx-auto mb-1" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço/Cota</p>
-            <p className="text-lg font-bold text-foreground mt-0.5">
-              ${Number(property.share_price).toLocaleString("pt-BR")}
-            </p>
-          </div>
+          {[
+            { icon: DollarSign, label: "Preço Total", value: `$${Number(property.purchase_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/40" },
+            { icon: TrendingUp, label: "Retorno Est.", value: `${Number(property.estimated_return_pct)}%`, iconClass: "text-primary/60", valueClass: "text-primary" },
+            { icon: Users, label: "Cotas", value: `${soldShares}/${property.total_shares}`, iconClass: "text-muted-foreground/40" },
+            { icon: DollarSign, label: "Preço/Cota", value: `$${Number(property.share_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/40" },
+          ].map((stat, i) => (
+            <div key={i} className="rounded-xl border border-border/20 bg-card/30 backdrop-blur-sm p-4 text-center space-y-1">
+              <stat.icon className={`h-4 w-4 mx-auto ${stat.iconClass}`} />
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">{stat.label}</p>
+              <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
+            </div>
+          ))}
         </div>
 
         {/* Hero Cover */}
         <div
-          className="relative w-full rounded-2xl overflow-hidden bg-secondary/50 cursor-pointer group"
-          style={{ aspectRatio: "18/9" }}
+          className="relative w-full rounded-2xl overflow-hidden bg-secondary/30 cursor-pointer group"
+          style={{ aspectRatio: "2/1" }}
           onClick={() => setLightboxIndex(0)}
         >
           {property.cover_image_url ? (
@@ -196,13 +182,10 @@ export default function PropertyDetail() {
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground/20 text-sm">
               Sem foto de capa
             </div>
           )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-
         </div>
 
         {/* Gallery Thumbnails */}
