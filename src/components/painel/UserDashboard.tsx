@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, TrendingUp, PieChart, Building2, Loader2, ArrowUpRight, Clock, ShoppingCart, CreditCard, History } from "lucide-react";
+import { Wallet, TrendingUp, PieChart, Building2, Loader2, ArrowUpRight, Clock, ShoppingCart, CreditCard, History, MessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
@@ -79,6 +79,64 @@ export function UserDashboard() {
 
       items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       return items.slice(0, 6);
+    },
+    enabled: !!user,
+  });
+
+  // Properties the user has shares in, with unread message count
+  const { data: propertyNews } = useQuery({
+    queryKey: ["property-news", user?.id],
+    queryFn: async () => {
+      // Get user's properties via shares
+      const { data: userShares, error: sharesErr } = await supabase
+        .from("shares")
+        .select("property_id, properties(id, title, cover_image_url, status)")
+        .eq("user_id", user!.id);
+      if (sharesErr) throw sharesErr;
+      if (!userShares?.length) return [];
+
+      // Deduplicate properties
+      const propertyMap = new Map<string, any>();
+      userShares.forEach((s) => {
+        const prop = s.properties as any;
+        if (prop && !propertyMap.has(prop.id)) propertyMap.set(prop.id, prop);
+      });
+      const propertyIds = Array.from(propertyMap.keys());
+
+      // Get read timestamps
+      const { data: reads } = await supabase
+        .from("property_message_reads")
+        .select("property_id, last_read_at")
+        .eq("user_id", user!.id)
+        .in("property_id", propertyIds);
+
+      const readMap = new Map<string, string>();
+      reads?.forEach((r) => readMap.set(r.property_id, r.last_read_at));
+
+      // Get message counts per property (all messages + unread)
+      const results = await Promise.all(
+        propertyIds.map(async (pid) => {
+          const lastRead = readMap.get(pid);
+          let unreadQuery = supabase
+            .from("property_messages")
+            .select("id", { count: "exact", head: true })
+            .eq("property_id", pid);
+          if (lastRead) {
+            unreadQuery = unreadQuery.gt("created_at", lastRead);
+          }
+          const { count } = await unreadQuery;
+          const prop = propertyMap.get(pid);
+          return {
+            id: pid,
+            title: prop.title,
+            cover_image_url: prop.cover_image_url,
+            status: prop.status,
+            unread: count ?? 0,
+          };
+        })
+      );
+
+      return results;
     },
     enabled: !!user,
   });
@@ -162,45 +220,50 @@ export function UserDashboard() {
         </div>
       </div>
 
-      {/* Quick links */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          to="/painel/cotas"
-          className="group flex items-center justify-between rounded-2xl border border-border/30 bg-card/40 p-5 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground text-sm">Minhas Cotas</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {totalShares > 0 ? `${totalShares} cotas ativas` : "Nenhuma cota ainda"}
-            </p>
-          </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-        </Link>
+      {/* Property News / Novidades */}
+      {propertyNews && propertyNews.length > 0 && (
+        <div>
+          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            Novidades dos seus imóveis
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {propertyNews.map((prop) => (
+              <Link
+                key={prop.id}
+                to={`/painel/imovel/${prop.id}`}
+                className="group relative flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
+              >
+                <div className="h-11 w-11 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
+                  {prop.cover_image_url ? (
+                    <img src={prop.cover_image_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-muted-foreground/20" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground text-sm truncate">{prop.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {prop.unread > 0
+                      ? `${prop.unread > 9 ? "+9" : prop.unread} nova${prop.unread === 1 ? "" : "s"} atualização${prop.unread === 1 ? "" : "ões"}`
+                      : "Nenhuma novidade"}
+                  </p>
+                </div>
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
 
-        <Link
-          to="/painel/oportunidades"
-          className="group flex items-center justify-between rounded-2xl border border-border/30 bg-card/40 p-5 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground text-sm">Oportunidades</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {availableProperties?.length ?? 0} imóve{(availableProperties?.length ?? 0) === 1 ? "l" : "is"} disponíve{(availableProperties?.length ?? 0) === 1 ? "l" : "is"}
-            </p>
+                {/* Notification badge */}
+                {prop.unread > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                    {prop.unread > 9 ? "+9" : prop.unread}
+                  </span>
+                )}
+              </Link>
+            ))}
           </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-        </Link>
-
-        <Link
-          to="/painel/extrato"
-          className="group flex items-center justify-between rounded-2xl border border-border/30 bg-card/40 p-5 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground text-sm">Extrato</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Histórico de movimentações</p>
-          </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-        </Link>
-      </div>
+        </div>
+      )}
       {/* History + Opportunities side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Activity */}

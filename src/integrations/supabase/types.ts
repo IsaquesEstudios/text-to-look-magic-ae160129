@@ -240,6 +240,35 @@ export type Database = {
           },
         ]
       }
+      property_message_reads: {
+        Row: {
+          id: string
+          last_read_at: string
+          property_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_read_at?: string
+          property_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_read_at?: string
+          property_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_message_reads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_messages: {
         Row: {
           content: string | null
