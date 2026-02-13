@@ -126,9 +126,14 @@ export default function PropertyDetail() {
   }
 
   const status = statusLabels[property.status] || statusLabels.available;
-  const soldShares = property.total_shares - property.available_shares;
+  const totalShares = property.total_shares ?? 0;
+  const availableShares = property.available_shares ?? 0;
+  const soldShares = totalShares - availableShares;
+  const purchasePrice = Number(property.purchase_price) || 0;
+  const estimatedReturn = Number(property.estimated_return_pct) || 0;
+  const sharePrice = Number(property.share_price) || 0;
   const userHasShares = isAdmin || (userShares && userShares.length > 0);
-  const canPurchase = property.available_shares > 0 && property.status === "available" && !isAdmin;
+  const canPurchase = availableShares > 0 && property.status === "available" && !isAdmin;
 
   const handlePurchase = async () => {
     if (!user || !id) return;
@@ -173,10 +178,10 @@ export default function PropertyDetail() {
         {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: DollarSign, label: "Preço Total", value: `$${Number(property.purchase_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/60" },
-            { icon: TrendingUp, label: "Retorno Est.", value: `${Number(property.estimated_return_pct)}%`, iconClass: "text-primary", valueClass: "text-primary" },
-            { icon: Users, label: "Cotas", value: `${soldShares}/${property.total_shares}`, iconClass: "text-muted-foreground/60" },
-            { icon: DollarSign, label: "Preço/Cota", value: `$${Number(property.share_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/60" },
+            { icon: DollarSign, label: "Preço Total", value: `$${purchasePrice.toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
+            { icon: TrendingUp, label: "Retorno Est.", value: `${estimatedReturn}%`, iconClass: "text-primary", valueClass: "text-primary" },
+            { icon: Users, label: "Cotas", value: `${soldShares}/${totalShares}`, iconClass: "text-muted-foreground/60" },
+            { icon: DollarSign, label: "Preço/Cota", value: `$${sharePrice.toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
           ].map((stat, i) => (
             <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
               <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
@@ -189,11 +194,11 @@ export default function PropertyDetail() {
         {/* Share Progress Bar */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{soldShares} de {property.total_shares} cotas preenchidas</span>
-            <span className="font-medium text-foreground">{Math.round((soldShares / property.total_shares) * 100)}%</span>
+            <span>{soldShares} de {totalShares} cotas preenchidas</span>
+            <span className="font-medium text-foreground">{totalShares > 0 ? Math.round((soldShares / totalShares) * 100) : 0}%</span>
           </div>
           <div className="flex gap-1 w-full">
-            {Array.from({ length: property.total_shares }).map((_, i) => (
+            {Array.from({ length: totalShares }).map((_, i) => (
               <div
                 key={i}
                 className={`h-3 flex-1 rounded-sm transition-colors ${
@@ -222,8 +227,8 @@ export default function PropertyDetail() {
                     Ao confirmar, você estará adquirindo <strong>1 cota</strong> do imóvel{" "}
                     <strong>{property.title}</strong>.
                   </span>
-                  <span className="block text-lg font-bold text-foreground">
-                    Valor: ${Number(property.share_price).toLocaleString("pt-BR")}
+                   <span className="block text-lg font-bold text-foreground">
+                    Valor: ${sharePrice.toLocaleString("en-US")}
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     Ao confirmar, você declara estar de acordo com os termos de investimento.
