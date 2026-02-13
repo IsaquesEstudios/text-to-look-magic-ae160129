@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { ComponentType, Suspense, lazy } from "react";
 import type { RouteRecord } from "vite-react-ssg";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
@@ -30,6 +30,14 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
 );
 
+// Client-only wrapper - renders nothing during SSG build, renders normally on client
+const ClientOnly = ({ children }: { children: React.ReactNode }) => {
+  if (typeof window === "undefined") {
+    return <PageLoader />;
+  }
+  return <>{children}</>;
+};
+
 // Languages for iteration
 const languages: Language[] = ["pt", "en", "es"];
 
@@ -49,8 +57,6 @@ const generateLanguageRoutes = (
 };
 
 // Generate blog post routes with getStaticPaths
-// Uses translation files as source of truth for SSG build
-// During runtime, posts are fetched from database with fallback to translations
 const generateBlogPostRoutes = (): RouteRecord[] => {
   return languages.map((lang) => ({
     path: `${lang}/blog/:slug`,
@@ -59,8 +65,6 @@ const generateBlogPostRoutes = (): RouteRecord[] => {
         <BlogPost />
       </SuspenseWrapper>
     ),
-    // Fetch slugs from database during build for full SSG coverage
-    // Falls back to translation files if DB is unavailable
     getStaticPaths: async () => {
       try {
         const dbSlugs = await fetchAllBlogSlugs();
@@ -69,7 +73,6 @@ const generateBlogPostRoutes = (): RouteRecord[] => {
           .map((s) => `/${lang}/blog/${s.slug}`);
 
         if (langSlugs.length > 0) {
-          // Merge with translation slugs to ensure all are covered
           const translationSlugs = translations[lang].blog.posts.map(
             (post) => `/${lang}/blog/${post.slug}`
           );
@@ -79,7 +82,6 @@ const generateBlogPostRoutes = (): RouteRecord[] => {
       } catch (e) {
         console.warn(`SSG: Failed to fetch blog slugs from DB for ${lang}, using translations`, e);
       }
-      // Fallback to translation files
       return translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
     },
   }));
@@ -155,18 +157,30 @@ export const routes: RouteRecord[] = [
         ),
       },
 
-      // Auth & Dashboard
+      // Auth & Dashboard - Client-only (no SSG)
       {
         path: "auth",
-        element: <SuspenseWrapper><Auth /></SuspenseWrapper>,
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><Auth /></SuspenseWrapper>
+          </ClientOnly>
+        ),
       },
       {
         path: "painel",
-        element: <SuspenseWrapper><Painel /></SuspenseWrapper>,
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><Painel /></SuspenseWrapper>
+          </ClientOnly>
+        ),
       },
       {
         path: "painel/imovel/:id",
-        element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>,
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>
+          </ClientOnly>
+        ),
       },
 
       // 404
