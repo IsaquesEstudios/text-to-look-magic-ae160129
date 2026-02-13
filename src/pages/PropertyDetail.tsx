@@ -142,7 +142,7 @@ export default function PropertyDetail() {
         {/* Title + Badge + Location */}
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1.5">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               {property.title}
             </h1>
             <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
@@ -156,15 +156,15 @@ export default function PropertyDetail() {
         {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: DollarSign, label: "Preço Total", value: `$${Number(property.purchase_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/40" },
-            { icon: TrendingUp, label: "Retorno Est.", value: `${Number(property.estimated_return_pct)}%`, iconClass: "text-primary/60", valueClass: "text-primary" },
-            { icon: Users, label: "Cotas", value: `${soldShares}/${property.total_shares}`, iconClass: "text-muted-foreground/40" },
-            { icon: DollarSign, label: "Preço/Cota", value: `$${Number(property.share_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/40" },
+            { icon: DollarSign, label: "Preço Total", value: `$${Number(property.purchase_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/60" },
+            { icon: TrendingUp, label: "Retorno Est.", value: `${Number(property.estimated_return_pct)}%`, iconClass: "text-primary", valueClass: "text-primary" },
+            { icon: Users, label: "Cotas", value: `${soldShares}/${property.total_shares}`, iconClass: "text-muted-foreground/60" },
+            { icon: DollarSign, label: "Preço/Cota", value: `$${Number(property.share_price).toLocaleString("pt-BR")}`, iconClass: "text-muted-foreground/60" },
           ].map((stat, i) => (
-            <div key={i} className="rounded-xl border border-border/20 bg-card/30 backdrop-blur-sm p-4 text-center space-y-1">
-              <stat.icon className={`h-4 w-4 mx-auto ${stat.iconClass}`} />
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">{stat.label}</p>
-              <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
+            <div key={i} className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-5 text-center space-y-1.5">
+              <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">{stat.label}</p>
+              <p className={`text-xl font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
             </div>
           ))}
         </div>
