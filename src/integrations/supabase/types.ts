@@ -59,15 +59,293 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          credits: number
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          available_shares: number
+          cover_image_url: string | null
+          created_at: string
+          created_by: string
+          estimated_return_pct: number
+          id: string
+          location: string
+          purchase_price: number
+          share_price: number
+          status: string
+          title: string
+          total_shares: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          available_shares?: number
+          cover_image_url?: string | null
+          created_at?: string
+          created_by: string
+          estimated_return_pct?: number
+          id?: string
+          location: string
+          purchase_price: number
+          share_price: number
+          status?: string
+          title: string
+          total_shares?: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          available_shares?: number
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string
+          estimated_return_pct?: number
+          id?: string
+          location?: string
+          purchase_price?: number
+          share_price?: number
+          status?: string
+          title?: string
+          total_shares?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      property_expenses: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          price: number
+          product: string
+          property_id: string
+          quantity: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          price: number
+          product: string
+          property_id: string
+          quantity?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          price?: number
+          product?: string
+          property_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_expenses_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          property_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          property_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          property_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_images_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_messages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          media_type: string | null
+          media_url: string | null
+          property_id: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          property_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          property_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_messages_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shares: {
+        Row: {
+          amount_paid: number
+          id: string
+          property_id: string
+          purchased_at: string
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          id?: string
+          property_id: string
+          purchased_at?: string
+          quantity?: number
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          id?: string
+          property_id?: string
+          purchased_at?: string
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shares_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -194,6 +472,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

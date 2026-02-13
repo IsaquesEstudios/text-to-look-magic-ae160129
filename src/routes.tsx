@@ -14,6 +14,9 @@ const Contato = lazy(() => import("./pages/Contato"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Painel = lazy(() => import("./pages/Painel"));
+const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -150,6 +153,20 @@ export const routes: RouteRecord[] = [
             <Blog />
           </SuspenseWrapper>
         ),
+      },
+
+      // Auth & Dashboard
+      {
+        path: "auth",
+        element: <SuspenseWrapper><Auth /></SuspenseWrapper>,
+      },
+      {
+        path: "painel",
+        element: <SuspenseWrapper><Painel /></SuspenseWrapper>,
+      },
+      {
+        path: "painel/imovel/:id",
+        element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>,
       },
 
       // 404
