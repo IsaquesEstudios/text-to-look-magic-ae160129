@@ -130,49 +130,24 @@ export default function PropertyDetail() {
   return (
     <PainelLayout>
       <div className="space-y-8">
-        {/* Back */}
-        <Link
-          to="/painel"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar
-        </Link>
-
-        {/* Hero Cover */}
-        <div
-          className="relative w-full rounded-2xl overflow-hidden bg-secondary/50 cursor-pointer group"
-          style={{ aspectRatio: "21/9" }}
-          onClick={() => setLightboxIndex(0)}
-        >
-          {property.cover_image_url ? (
-            <img
-              src={property.cover_image_url}
-              alt={property.title}
-              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
-              Sem foto de capa
+        {/* Back + Property Info */}
+        <div className="flex items-start gap-4">
+          <Link
+            to="/painel"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Link>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{property.title}</h1>
+              <Badge className={`${status.color} border-0 text-xs`}>{status.label}</Badge>
             </div>
-          )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-
-          {/* Info overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{property.title}</h1>
-                  <Badge className={`${status.color} border-0 text-xs`}>{status.label}</Badge>
-                </div>
-                <p className="text-sm text-foreground/70 flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
-                  {property.location}
-                </p>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <MapPin className="h-4 w-4" />
+              {property.location}
+            </p>
           </div>
         </div>
 
@@ -208,15 +183,37 @@ export default function PropertyDetail() {
           </div>
         </div>
 
+        {/* Hero Cover */}
+        <div
+          className="relative w-full rounded-2xl overflow-hidden bg-secondary/50 cursor-pointer group"
+          style={{ aspectRatio: "18/9" }}
+          onClick={() => setLightboxIndex(0)}
+        >
+          {property.cover_image_url ? (
+            <img
+              src={property.cover_image_url}
+              alt={property.title}
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
+              Sem foto de capa
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+
+        </div>
+
         {/* Gallery Thumbnails */}
         {images && images.length > 0 && (
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">Galeria</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {images.map((img, i) => (
                 <div
                   key={img.id}
-                  className="aspect-square rounded-xl overflow-hidden bg-secondary/50 cursor-pointer group"
+                  className="aspect-[4/3] rounded-xl overflow-hidden bg-secondary/50 cursor-pointer group"
                   onClick={() => setLightboxIndex(property.cover_image_url ? i + 1 : i)}
                 >
                   <img
