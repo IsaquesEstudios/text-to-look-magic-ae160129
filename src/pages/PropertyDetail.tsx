@@ -204,6 +204,26 @@ export default function PropertyDetail() {
           ))}
         </div>
 
+        {/* Share Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{soldShares} de {property.total_shares} cotas preenchidas</span>
+            <span className="font-medium text-foreground">{Math.round((soldShares / property.total_shares) * 100)}%</span>
+          </div>
+          <div className="flex gap-1 w-full">
+            {Array.from({ length: property.total_shares }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-3 flex-1 rounded-sm transition-colors ${
+                  i < soldShares
+                    ? "bg-primary"
+                    : "bg-secondary"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Participate Button */}
         {canPurchase && (
           <AlertDialog>
