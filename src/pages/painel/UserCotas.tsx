@@ -57,7 +57,7 @@ export default function UserCotas() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {shares.map((share) => {
               const prop = share.properties as any;
               if (!prop) return null;
@@ -68,26 +68,26 @@ export default function UserCotas() {
                 <Link
                   key={share.id}
                   to={`/painel/imovel/${prop.id}`}
-                  className="group flex rounded-2xl border border-border/30 bg-card/40 overflow-hidden hover:bg-card/70 transition-all duration-300"
+                  className="group flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
                 >
-                  <div className="w-32 sm:w-44 flex-shrink-0 bg-secondary/50">
+                  <div className="aspect-[16/10] bg-secondary/50 overflow-hidden">
                     {prop.cover_image_url ? (
                       <img
                         src={prop.cover_image_url}
                         alt={prop.title}
-                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full min-h-[120px] flex items-center justify-center">
-                        <Building2 className="h-7 w-7 text-muted-foreground/20" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Building2 className="h-8 w-8 text-muted-foreground/20" />
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 p-5 flex flex-col justify-center">
+                  <div className="p-4 flex flex-col gap-3 flex-1">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-semibold text-foreground">{prop.title}</h3>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <h3 className="font-semibold text-foreground leading-tight">{prop.title}</h3>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />
                           {prop.location}
                         </p>
@@ -95,22 +95,22 @@ export default function UserCotas() {
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
                     </div>
 
-                    <div className="flex flex-wrap gap-x-8 gap-y-2 mt-4 text-sm">
+                    <div className="grid grid-cols-3 gap-2 text-center mt-auto">
                       <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-                        <p className="font-semibold text-foreground">{share.quantity}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                        <p className="font-semibold text-sm text-foreground">{share.quantity}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
-                        <p className="font-semibold text-foreground">${Number(share.amount_paid).toLocaleString("pt-BR")}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
+                        <p className="font-semibold text-sm text-foreground">${Number(share.amount_paid).toLocaleString("pt-BR")}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno Est.</p>
-                        <p className="font-semibold text-primary">${estimatedValue.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
+                        <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</p>
                       </div>
                     </div>
 
-                    <Badge variant="outline" className="mt-3 w-fit text-[10px] border-primary/30 text-primary">
+                    <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
                       {returnPct}% retorno estimado
                     </Badge>
                   </div>
