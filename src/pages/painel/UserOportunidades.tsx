@@ -29,6 +29,24 @@ export default function UserOportunidades() {
     enabled: !!user,
   });
 
+  // Fetch user's own shares to show "minhas" on bar
+  const { data: myShares } = useQuery({
+    queryKey: ["my-shares-map", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shares")
+        .select("property_id, quantity")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      const map = new Map<string, number>();
+      data?.forEach((s) => {
+        map.set(s.property_id, (map.get(s.property_id) || 0) + s.quantity);
+      });
+      return map;
+    },
+    enabled: !!user,
+  });
+
   if (authLoading || isLoading) {
     return (
       <PainelLayout>
@@ -89,28 +107,45 @@ export default function UserOportunidades() {
                   </div>
 
                   {/* Segmented shares bar */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-                      <p className="text-[11px] text-muted-foreground">
-                        <span className="font-semibold text-foreground">{property.total_shares - property.available_shares}</span>
-                        <span className="text-muted-foreground/60">/{property.total_shares}</span>
-                      </p>
-                    </div>
-                    <div className="flex gap-[2px] h-2 rounded-full overflow-hidden">
-                      {Array.from({ length: property.total_shares }).map((_, i) => {
-                        const sold = property.total_shares - property.available_shares;
-                        return (
-                          <div
-                            key={i}
-                            className={`flex-1 rounded-[2px] transition-colors ${
-                              i < sold ? "bg-primary" : "bg-secondary/80"
-                            }`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
+                  {(() => {
+                    const sold = property.total_shares - property.available_shares;
+                    const mine = myShares?.get(property.id) || 0;
+                    return (
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            <span className="font-semibold text-foreground">{sold}</span>
+                            <span className="text-muted-foreground/60">/{property.total_shares}</span>
+                          </p>
+                        </div>
+                        <div className="flex gap-[2px] h-2 rounded-full overflow-hidden">
+                          {Array.from({ length: property.total_shares }).map((_, i) => {
+                            // First `mine` sold segments are the user's, rest are others', rest are available
+                            const isMine = i < mine;
+                            const isSold = i < sold;
+                            return (
+                              <div
+                                key={i}
+                                className={`flex-1 rounded-[2px] transition-colors ${
+                                  isMine
+                                    ? "bg-chart-4"
+                                    : isSold
+                                      ? "bg-primary"
+                                      : "bg-secondary/80"
+                                }`}
+                              />
+                            );
+                          })}
+                        </div>
+                        {mine > 0 && (
+                          <p className="text-[10px] text-chart-4 mt-1 font-medium">
+                            Você possui {mine} cota{mine > 1 ? "s" : ""}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex items-center justify-between pt-2 border-t border-border/20">
                     <div>
