@@ -55,15 +55,29 @@ function AdminDashboardContent() {
           .limit(10),
       ]);
 
+      // Build a name map from profiles
+      const allProfiles = profilesRes.data ?? [];
+      const nameMap = new Map(allProfiles.map((p) => [p.user_id, p.full_name || "Usuário"]));
+
+      // For share user_ids not in the recent profiles, fetch their names
+      const shareUserIds = (sharesRes.data ?? []).map((s) => s.user_id).filter((id) => !nameMap.has(id));
+      if (shareUserIds.length > 0) {
+        const { data: extraProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name")
+          .in("user_id", shareUserIds);
+        (extraProfiles ?? []).forEach((p) => nameMap.set(p.user_id, p.full_name || "Usuário"));
+      }
+
       const shareActivities: ActivityItem[] = (sharesRes.data ?? []).map((s) => ({
         id: `share-${s.id}`,
         type: "share_purchase" as const,
-        description: `Nova cota adquirida — R$ ${Number(s.amount_paid).toLocaleString("pt-BR")}`,
+        description: `${nameMap.get(s.user_id) || "Usuário"} adquiriu uma cota — R$ ${Number(s.amount_paid).toLocaleString("pt-BR")}`,
         timestamp: s.purchased_at,
         icon: ShoppingCart,
       }));
 
-      const profileActivities: ActivityItem[] = (profilesRes.data ?? []).map((p) => ({
+      const profileActivities: ActivityItem[] = allProfiles.map((p) => ({
         id: `profile-${p.id}`,
         type: "user_registration" as const,
         description: `${p.full_name || "Novo usuário"} se registrou`,
