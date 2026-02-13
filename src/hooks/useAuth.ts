@@ -30,34 +30,45 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
-          // Fetch roles and profile in parallel
-          const [rolesResult, profileResult] = await Promise.all([
-            supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", session.user.id),
-            supabase
-              .from("profiles")
-              .select("full_name, credits")
-              .eq("user_id", session.user.id)
-              .maybeSingle(),
-          ]);
+          try {
+            const [rolesResult, profileResult] = await Promise.all([
+              supabase
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", session.user.id),
+              supabase
+                .from("profiles")
+                .select("full_name, credits")
+                .eq("user_id", session.user.id)
+                .maybeSingle(),
+            ]);
 
-          const roles = (rolesResult.data?.map((r) => r.role as AppRole)) ?? [];
+            const roles = (rolesResult.data?.map((r) => r.role as AppRole)) ?? [];
 
-          setState({
-            user: session.user,
-            session,
-            roles,
-            isAdmin: roles.includes("admin"),
-            isLoading: false,
-            profile: profileResult.data
-              ? {
-                  full_name: profileResult.data.full_name,
-                  credits: Number(profileResult.data.credits),
-                }
-              : null,
-          });
+            setState({
+              user: session.user,
+              session,
+              roles,
+              isAdmin: roles.includes("admin"),
+              isLoading: false,
+              profile: profileResult.data
+                ? {
+                    full_name: profileResult.data.full_name,
+                    credits: Number(profileResult.data.credits),
+                  }
+                : null,
+            });
+          } catch {
+            // Even if queries fail, still set user as logged in
+            setState({
+              user: session.user,
+              session,
+              roles: [],
+              isAdmin: false,
+              isLoading: false,
+              profile: null,
+            });
+          }
         } else {
           setState({
             user: null,
