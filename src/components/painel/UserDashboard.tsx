@@ -5,7 +5,6 @@ import { Wallet, TrendingUp, PieChart, Building2, Loader2, ArrowUpRight, Clock, 
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
-import discoveryLogo from "@/assets/discovery-logo.png";
 
 export function UserDashboard() {
   const { user, profile } = useAuth();
@@ -265,11 +264,6 @@ export function UserDashboard() {
           </div>
         </div>
       )}
-      {/* Subtle branding */}
-      <div className="flex justify-center py-2">
-        <img src={discoveryLogo} alt="Discovery Investments" className="h-7 opacity-[0.08]" />
-      </div>
-
       {/* History + Opportunities side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Activity */}
