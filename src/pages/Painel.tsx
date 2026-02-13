@@ -3,11 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserDashboard } from "@/components/painel/UserDashboard";
 import { PainelLayout } from "@/components/painel/PainelLayout";
-import { Loader2 } from "lucide-react";
+import { Loader2, Building2, Users, PieChart, TrendingUp, UserPlus, ShoppingCart, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Building2, Users, PieChart, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+type ActivityItem = {
+  id: string;
+  type: "share_purchase" | "user_registration";
+  description: string;
+  timestamp: string;
+  icon: typeof ShoppingCart;
+};
 
 function AdminDashboardContent() {
   const { data: stats, isLoading } = useQuery({
@@ -27,6 +36,44 @@ function AdminDashboardContent() {
         totalSharesSold: shares.reduce((acc, s) => acc + s.quantity, 0),
         totalRevenue: shares.reduce((acc, s) => acc + Number(s.amount_paid), 0),
       };
+    },
+  });
+
+  const { data: activities } = useQuery({
+    queryKey: ["admin-activity"],
+    queryFn: async () => {
+      const [sharesRes, profilesRes] = await Promise.all([
+        supabase
+          .from("shares")
+          .select("id, quantity, amount_paid, purchased_at, property_id, user_id")
+          .order("purchased_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("profiles")
+          .select("id, user_id, full_name, created_at")
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
+
+      const shareActivities: ActivityItem[] = (sharesRes.data ?? []).map((s) => ({
+        id: `share-${s.id}`,
+        type: "share_purchase" as const,
+        description: `Nova cota adquirida — R$ ${Number(s.amount_paid).toLocaleString("pt-BR")}`,
+        timestamp: s.purchased_at,
+        icon: ShoppingCart,
+      }));
+
+      const profileActivities: ActivityItem[] = (profilesRes.data ?? []).map((p) => ({
+        id: `profile-${p.id}`,
+        type: "user_registration" as const,
+        description: `${p.full_name || "Novo usuário"} se registrou`,
+        timestamp: p.created_at,
+        icon: UserPlus,
+      }));
+
+      return [...shareActivities, ...profileActivities]
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 15);
     },
   });
 
@@ -70,6 +117,42 @@ function AdminDashboardContent() {
           </Card>
         ))}
       </div>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-base font-semibold">Atividade Recente</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="max-h-[350px] overflow-y-auto">
+          {!activities || activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade recente</p>
+          ) : (
+            <div className="space-y-1">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-center gap-3 py-2.5 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <activity.icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(activity.timestamp), {
+                        addSuffix: true,
+                        locale: ptBR,
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
