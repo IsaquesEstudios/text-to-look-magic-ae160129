@@ -88,6 +88,30 @@ export default function UserOportunidades() {
                     </p>
                   </div>
 
+                  {/* Segmented shares bar */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        <span className="font-semibold text-foreground">{property.total_shares - property.available_shares}</span>
+                        <span className="text-muted-foreground/60">/{property.total_shares}</span>
+                      </p>
+                    </div>
+                    <div className="flex gap-[2px] h-2 rounded-full overflow-hidden">
+                      {Array.from({ length: property.total_shares }).map((_, i) => {
+                        const sold = property.total_shares - property.available_shares;
+                        return (
+                          <div
+                            key={i}
+                            className={`flex-1 rounded-[2px] transition-colors ${
+                              i < sold ? "bg-primary" : "bg-secondary/80"
+                            }`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="flex items-center justify-between pt-2 border-t border-border/20">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50">Por cota</p>
