@@ -40,6 +40,25 @@ export default function UserCotas() {
 
   if (!user) return null;
 
+  // Aggregate shares by property
+  const propertyMap = new Map<string, { prop: any; totalQuantity: number; totalPaid: number }>();
+  shares?.forEach((share) => {
+    const prop = share.properties as any;
+    if (!prop) return;
+    const existing = propertyMap.get(prop.id);
+    if (existing) {
+      existing.totalQuantity += share.quantity;
+      existing.totalPaid += Number(share.amount_paid);
+    } else {
+      propertyMap.set(prop.id, {
+        prop,
+        totalQuantity: share.quantity,
+        totalPaid: Number(share.amount_paid),
+      });
+    }
+  });
+  const aggregated = Array.from(propertyMap.values());
+
   return (
     <PainelLayout>
       <div className="space-y-6">
@@ -48,7 +67,7 @@ export default function UserCotas() {
           <p className="text-sm text-muted-foreground mt-1">Imóveis em que você participa</p>
         </div>
 
-        {!shares?.length ? (
+        {!aggregated.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
             <Building2 className="h-9 w-9 mb-3 opacity-25" />
             <p className="text-sm">Você ainda não possui cotas</p>
@@ -58,15 +77,13 @@ export default function UserCotas() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {shares.map((share) => {
-              const prop = share.properties as any;
-              if (!prop) return null;
+            {aggregated.map(({ prop, totalQuantity, totalPaid }) => {
               const returnPct = Number(prop.estimated_return_pct);
-              const estimatedValue = Number(share.amount_paid) * (1 + returnPct / 100);
+              const estimatedValue = totalPaid * (1 + returnPct / 100);
 
               return (
                 <Link
-                  key={share.id}
+                  key={prop.id}
                   to={`/painel/imovel/${prop.id}`}
                   className="group flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
                 >
@@ -98,11 +115,13 @@ export default function UserCotas() {
                     <div className="grid grid-cols-3 gap-2 text-center mt-auto">
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-                        <p className="font-semibold text-sm text-foreground">{share.quantity}</p>
+                        <p className="font-semibold text-sm text-foreground">
+                          {totalQuantity}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
+                        </p>
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
-                        <p className="font-semibold text-sm text-foreground">${Number(share.amount_paid).toLocaleString("pt-BR")}</p>
+                        <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("pt-BR")}</p>
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
