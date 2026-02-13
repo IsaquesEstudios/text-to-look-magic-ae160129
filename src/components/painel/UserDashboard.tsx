@@ -92,7 +92,7 @@ export function UserDashboard() {
         .from("shares")
         .select("property_id, properties(id, title, cover_image_url, status)")
         .eq("user_id", user!.id);
-      console.log("[propertyNews] userShares:", userShares, "error:", sharesErr);
+      if (sharesErr) throw sharesErr;
       if (sharesErr) throw sharesErr;
       if (!userShares?.length) return [];
 
