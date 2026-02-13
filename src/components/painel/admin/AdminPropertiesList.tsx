@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Pencil, MapPin, Home, TreePine, Loader2, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  available: { label: "Disponível", color: "bg-primary/20 text-primary" },
-  purchased: { label: "Comprado", color: "bg-blue-500/20 text-blue-400" },
-  renovating: { label: "Em Reforma", color: "bg-yellow-500/20 text-yellow-400" },
-  selling: { label: "Vendendo", color: "bg-purple-500/20 text-purple-400" },
-  sold: { label: "Vendido", color: "bg-muted text-muted-foreground" },
+const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
+  available: { label: "Disponível", variant: "default" },
+  purchased: { label: "Comprado", variant: "secondary" },
+  renovating: { label: "Em Reforma", variant: "outline" },
+  selling: { label: "Vendendo", variant: "secondary" },
+  sold: { label: "Vendido", variant: "outline" },
 };
 
 interface Props {
@@ -33,88 +33,94 @@ export function AdminPropertiesList({ onEdit }: Props) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!properties?.length) {
     return (
-      <Card className="bg-card/50 border-border/50">
-        <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-          <Building2 className="h-12 w-12 mb-4 opacity-50" />
-          <p>Nenhum imóvel cadastrado</p>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Building2 className="h-10 w-10 mb-3 opacity-30" />
+        <p className="text-sm">Nenhum imóvel cadastrado</p>
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {properties.map((property) => {
         const status = statusLabels[property.status] || statusLabels.available;
         return (
           <Card
             key={property.id}
-            className="bg-card/50 border-border/50 overflow-hidden hover:border-primary/30 transition-colors"
+            className="group border-border/30 bg-card/40 overflow-hidden hover:bg-card/70 transition-all duration-300"
           >
-            <div className="aspect-video relative bg-muted">
+            <div className="aspect-[16/10] relative bg-secondary/50">
               {property.cover_image_url ? (
                 <img
                   src={property.cover_image_url}
                   alt={property.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   {property.type === "house" ? (
-                    <Home className="h-12 w-12 text-muted-foreground/30" />
+                    <Home className="h-10 w-10 text-muted-foreground/20" />
                   ) : (
-                    <TreePine className="h-12 w-12 text-muted-foreground/30" />
+                    <TreePine className="h-10 w-10 text-muted-foreground/20" />
                   )}
                 </div>
               )}
-              <Badge className={`absolute top-2 right-2 ${status.color} border-0`}>
-                {status.label}
-              </Badge>
+              <div className="absolute top-3 right-3">
+                <Badge variant={status.variant} className="text-xs font-medium shadow-sm">
+                  {status.label}
+                </Badge>
+              </div>
             </div>
+
             <CardContent className="p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground">{property.title}</h3>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {property.location}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground truncate">{property.title}</h3>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{property.location}</span>
                   </p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => onEdit(property.id)}>
-                  <Pencil className="h-4 w-4" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary flex-shrink-0"
+                  onClick={() => onEdit(property.id)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
                 <div>
-                  <p className="text-muted-foreground">Preço</p>
-                  <p className="font-medium text-foreground">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Preço</p>
+                  <p className="font-semibold text-foreground">
                     ${Number(property.purchase_price).toLocaleString("pt-BR")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Retorno Est.</p>
-                  <p className="font-medium text-primary">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
+                  <p className="font-semibold text-primary">
                     {Number(property.estimated_return_pct)}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Cotas</p>
-                  <p className="font-medium text-foreground">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                  <p className="font-semibold text-foreground">
                     {property.available_shares}/{property.total_shares}
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Preço/Cota</p>
-                  <p className="font-medium text-foreground">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Preço/Cota</p>
+                  <p className="font-semibold text-foreground">
                     ${Number(property.share_price).toLocaleString("pt-BR")}
                   </p>
                 </div>
@@ -122,7 +128,7 @@ export function AdminPropertiesList({ onEdit }: Props) {
 
               <Link
                 to={`/painel/imovel/${property.id}`}
-                className="block text-center text-sm text-primary hover:underline mt-2"
+                className="block text-center text-xs font-medium text-primary hover:text-primary/80 transition-colors pt-1"
               >
                 Ver detalhes →
               </Link>
@@ -133,4 +139,3 @@ export function AdminPropertiesList({ onEdit }: Props) {
     </div>
   );
 }
-
