@@ -17,6 +17,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
+const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
+const PropertyGastosPage = lazy(() => import("./pages/painel/PropertyGastosPage"));
 const UserCotas = lazy(() => import("./pages/painel/UserCotas"));
 const UserOportunidades = lazy(() => import("./pages/painel/UserOportunidades"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
@@ -210,6 +212,22 @@ export const routes: RouteRecord[] = [
         element: (
           <ClientOnly>
             <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/imovel/:id/novidades",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/imovel/:id/gastos",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper>
           </ClientOnly>
         ),
       },

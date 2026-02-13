@@ -1,15 +1,13 @@
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PainelLayout } from "@/components/painel/PainelLayout";
-import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
-import { PropertyExpenses } from "@/components/painel/property/PropertyExpenses";
+import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,13 +21,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
-  ArrowLeft,
   MapPin,
   DollarSign,
   TrendingUp,
   Users,
-  MessageSquare,
-  Receipt,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -46,27 +41,15 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const queryClient = useQueryClient();
-  const defaultTab = searchParams.get("tab") || "community";
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
-
-  // Mark as read when landing on community tab
-  useEffect(() => {
-    if (user && id && defaultTab === "community") {
-      supabase
-        .from("property_message_reads")
-        .upsert({ user_id: user.id, property_id: id, last_read_at: new Date().toISOString() }, { onConflict: "user_id,property_id" })
-        .then(() => queryClient.invalidateQueries({ queryKey: ["property-news"] }));
-    }
-  }, [user, id, defaultTab, queryClient]);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -144,9 +127,7 @@ export default function PropertyDetail() {
 
   const status = statusLabels[property.status] || statusLabels.available;
   const soldShares = property.total_shares - property.available_shares;
-  const isInRepair = ["purchased", "renovating", "selling"].includes(property.status);
   const userHasShares = isAdmin || (userShares && userShares.length > 0);
-  const showCommunityTabs = userHasShares;
   const canPurchase = property.available_shares > 0 && property.status === "available" && !isAdmin;
 
   const handlePurchase = async () => {
@@ -177,21 +158,10 @@ export default function PropertyDetail() {
   return (
     <PainelLayout>
       <div className="space-y-6">
-        {/* Back link */}
-        <Link
-          to="/painel"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar
-        </Link>
-
-        {/* Title + Badge + Location */}
+        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="overview" />
+        {/* Badge + Location */}
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1.5">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-              {property.title}
-            </h1>
             <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
           </div>
           <p className="text-sm text-muted-foreground/80 flex items-center gap-1.5">
@@ -312,41 +282,6 @@ export default function PropertyDetail() {
         )}
 
 
-        {/* Tabs - only visible for properties in repair process and shareholders */}
-        {showCommunityTabs && (
-        <Tabs defaultValue={defaultTab} onValueChange={(val) => {
-          if (val === "community" && user && id) {
-            // Mark messages as read
-            supabase
-              .from("property_message_reads")
-              .upsert({ user_id: user.id, property_id: id, last_read_at: new Date().toISOString() }, { onConflict: "user_id,property_id" })
-              .then(() => queryClient.invalidateQueries({ queryKey: ["property-news"] }));
-          }
-        }}>
-          <TabsList className="bg-secondary/50 border-0 p-1 rounded-xl h-auto">
-            <TabsTrigger
-              value="community"
-              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm px-4 py-2 text-sm"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Novidades
-            </TabsTrigger>
-            <TabsTrigger
-              value="expenses"
-              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm px-4 py-2 text-sm"
-            >
-              <Receipt className="h-4 w-4" />
-              Gastos
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="community" className="mt-4">
-            <PropertyCommunity propertyId={property.id} />
-          </TabsContent>
-          <TabsContent value="expenses" className="mt-4">
-            <PropertyExpenses propertyId={property.id} />
-          </TabsContent>
-        </Tabs>
-        )}
       </div>
 
       {/* Lightbox */}
