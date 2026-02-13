@@ -1,14 +1,27 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertyExpenses } from "@/components/painel/property/PropertyExpenses";
 import { PropertyShareAssignment } from "@/components/painel/property/PropertyShareAssignment";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   MapPin,
@@ -36,6 +49,8 @@ export default function PropertyDetail() {
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [purchasing, setPurchasing] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -120,6 +135,26 @@ export default function PropertyDetail() {
   const isInRepair = ["purchased", "renovating", "selling"].includes(property.status);
   const userHasShares = isAdmin || (userShares && userShares.length > 0);
   const showCommunityTabs = isInRepair && userHasShares;
+  const canPurchase = property.available_shares > 0 && property.status === "available" && !isAdmin;
+
+  const handlePurchase = async () => {
+    if (!user || !id) return;
+    setPurchasing(true);
+    try {
+      const { error } = await supabase.rpc("purchase_share", {
+        p_property_id: id,
+        p_user_id: user.id,
+      });
+      if (error) throw error;
+      toast.success("Cota adquirida com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["property-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares", id] });
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao adquirir cota");
+    } finally {
+      setPurchasing(false);
+    }
+  };
 
   // Combine cover + gallery for lightbox
   const allImages = [
@@ -169,7 +204,41 @@ export default function PropertyDetail() {
           ))}
         </div>
 
-        {/* Hero Cover */}
+        {/* Participate Button */}
+        {canPurchase && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="lg" className="w-full sm:w-auto text-base font-semibold px-8">
+                Participar
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar participação</AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <span className="block">
+                    Ao confirmar, você estará adquirindo <strong>1 cota</strong> do imóvel{" "}
+                    <strong>{property.title}</strong>.
+                  </span>
+                  <span className="block text-lg font-bold text-foreground">
+                    Valor: ${Number(property.share_price).toLocaleString("pt-BR")}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Ao confirmar, você declara estar de acordo com os termos de investimento.
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handlePurchase} disabled={purchasing}>
+                  {purchasing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
         <div
           className="relative w-full rounded-2xl overflow-hidden bg-secondary/30 cursor-pointer group"
           style={{ aspectRatio: "2/1" }}

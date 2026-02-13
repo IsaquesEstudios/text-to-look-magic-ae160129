@@ -343,6 +343,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      purchase_share: {
+        Args: { p_property_id: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
