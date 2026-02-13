@@ -221,12 +221,20 @@ export function UserDashboard() {
       </div>
 
       {/* Property News / Novidades */}
-      {propertyNews && propertyNews.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            Novidades dos seus imóveis
-          </h2>
+      <div>
+        <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          Novidades dos seus imóveis
+        </h2>
+        {!propertyNews?.length ? (
+          <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Building2 className="h-8 w-8 mb-2 opacity-20" />
+            <p className="text-sm">Você ainda não possui cotas em nenhum imóvel</p>
+            <Link to="/painel/oportunidades" className="text-xs text-primary hover:underline mt-1">
+              Ver oportunidades →
+            </Link>
+          </div>
+        ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {propertyNews.map((prop) => (
               <Link
@@ -262,8 +270,8 @@ export function UserDashboard() {
               </Link>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {/* History + Opportunities side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Activity */}
