@@ -72,7 +72,7 @@ function AdminDashboardContent() {
       const shareActivities: ActivityItem[] = (sharesRes.data ?? []).map((s) => ({
         id: `share-${s.id}`,
         type: "share_purchase" as const,
-        description: `${nameMap.get(s.user_id) || "Usuário"} adquiriu uma cota — R$ ${Number(s.amount_paid).toLocaleString("pt-BR")}`,
+        description: `${nameMap.get(s.user_id) || "Usuário"} adquiriu uma cota — $ ${Number(s.amount_paid).toLocaleString("en-US")}`,
         timestamp: s.purchased_at,
         icon: ShoppingCart,
       }));
@@ -105,7 +105,7 @@ function AdminDashboardContent() {
     { label: "Cotas Vendidas", value: stats?.totalSharesSold ?? 0, icon: PieChart },
     {
       label: "Receita Total",
-      value: `R$ ${(stats?.totalRevenue ?? 0).toLocaleString("pt-BR")}`,
+      value: `$ ${(stats?.totalRevenue ?? 0).toLocaleString("en-US")}`,
       icon: TrendingUp,
     },
   ];
