@@ -201,47 +201,99 @@ export function UserDashboard() {
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
         </Link>
       </div>
-      {/* Recent Activity */}
-      <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
-          <div className="flex items-center gap-2">
-            <History className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-foreground text-sm">Histórico Recente</h3>
+      {/* History + Opportunities side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Recent Activity */}
+        <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden flex flex-col" style={{ height: 350 }}>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <History className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-foreground text-sm">Histórico Recente</h3>
+            </div>
+            <Link to="/painel/extrato" className="text-xs text-primary hover:underline">
+              Ver tudo →
+            </Link>
           </div>
-          <Link to="/painel/extrato" className="text-xs text-primary hover:underline">
-            Ver tudo →
-          </Link>
+          <div className="flex-1 overflow-y-auto">
+            {!recentActivity?.length ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                Nenhuma atividade ainda
+              </div>
+            ) : (
+              <div className="divide-y divide-border/10">
+                {recentActivity.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
+                    <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      item.icon === "share" ? "bg-primary/10" : "bg-accent/10"
+                    }`}>
+                      {item.icon === "share" ? (
+                        <ShoppingCart className="h-4 w-4 text-primary" />
+                      ) : (
+                        <CreditCard className="h-4 w-4 text-accent" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
+                      <Clock className="h-3 w-3" />
+                      {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: ptBR })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {!recentActivity?.length ? (
-          <div className="px-5 py-10 text-center text-muted-foreground text-sm">
-            Nenhuma atividade ainda
+        {/* Opportunities */}
+        <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden flex flex-col" style={{ height: 350 }}>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-foreground text-sm">Oportunidades</h3>
+            </div>
+            <Link to="/painel/oportunidades" className="text-xs text-primary hover:underline">
+              Ver todas →
+            </Link>
           </div>
-        ) : (
-          <div className="divide-y divide-border/10">
-            {recentActivity.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  item.icon === "share" ? "bg-primary/10" : "bg-accent/10"
-                }`}>
-                  {item.icon === "share" ? (
-                    <ShoppingCart className="h-4 w-4 text-primary" />
-                  ) : (
-                    <CreditCard className="h-4 w-4 text-accent" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
-                </div>
-                <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
-                  <Clock className="h-3 w-3" />
-                  {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: ptBR })}
-                </div>
+          <div className="flex-1 overflow-y-auto">
+            {!availableProperties?.length ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                Nenhuma oportunidade disponível
               </div>
-            ))}
+            ) : (
+              <div className="divide-y divide-border/10">
+                {availableProperties.slice(0, 5).map((prop) => (
+                  <Link
+                    key={prop.id}
+                    to={`/painel/imovel/${prop.id}`}
+                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors group"
+                  >
+                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-secondary/50 flex-shrink-0">
+                      {prop.cover_image_url ? (
+                        <img src={prop.cover_image_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Building2 className="h-4 w-4 text-muted-foreground/20" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">{prop.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{prop.location}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-bold text-foreground">${Number(prop.share_price).toLocaleString("pt-BR")}</p>
+                      <p className="text-[11px] text-primary font-medium">{prop.available_shares} cotas</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
