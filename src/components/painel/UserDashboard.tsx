@@ -277,7 +277,7 @@ export function UserDashboard() {
               Ver tudo →
             </Link>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {!recentActivity?.length ? (
               <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
                 Nenhuma atividade ainda
