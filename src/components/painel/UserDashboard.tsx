@@ -1,7 +1,9 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, TrendingUp, PieChart, Building2, Loader2, ArrowUpRight } from "lucide-react";
+import { Wallet, TrendingUp, PieChart, Building2, Loader2, ArrowUpRight, Clock, ShoppingCart, CreditCard, History } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 
 export function UserDashboard() {
@@ -30,6 +32,53 @@ export function UserDashboard() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: recentActivity } = useQuery({
+    queryKey: ["user-recent-activity", user?.id],
+    queryFn: async () => {
+      const [sharesRes, creditsRes] = await Promise.all([
+        supabase
+          .from("shares")
+          .select("id, purchased_at, quantity, amount_paid, properties(title)")
+          .eq("user_id", user!.id)
+          .order("purchased_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("credit_transactions")
+          .select("id, created_at, type, amount, description")
+          .eq("user_id", user!.id)
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+
+      const items: { id: string; date: string; icon: "share" | "credit"; title: string; detail: string }[] = [];
+
+      sharesRes.data?.forEach((s) => {
+        const prop = s.properties as any;
+        items.push({
+          id: s.id,
+          date: s.purchased_at,
+          icon: "share",
+          title: `Cota adquirida`,
+          detail: `${s.quantity}x em ${prop?.title ?? "Imóvel"} — $${Number(s.amount_paid).toLocaleString("pt-BR")}`,
+        });
+      });
+
+      creditsRes.data?.forEach((c) => {
+        items.push({
+          id: c.id,
+          date: c.created_at,
+          icon: "credit",
+          title: c.type === "deposit" ? "Depósito" : c.type === "withdrawal" ? "Saque" : c.type,
+          detail: c.description || `$${Number(c.amount).toLocaleString("pt-BR")}`,
+        });
+      });
+
+      items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      return items.slice(0, 6);
     },
     enabled: !!user,
   });
@@ -151,6 +200,48 @@ export function UserDashboard() {
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
         </Link>
+      </div>
+      {/* Recent Activity */}
+      <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
+          <div className="flex items-center gap-2">
+            <History className="h-4 w-4 text-muted-foreground" />
+            <h3 className="font-semibold text-foreground text-sm">Histórico Recente</h3>
+          </div>
+          <Link to="/painel/extrato" className="text-xs text-primary hover:underline">
+            Ver tudo →
+          </Link>
+        </div>
+
+        {!recentActivity?.length ? (
+          <div className="px-5 py-10 text-center text-muted-foreground text-sm">
+            Nenhuma atividade ainda
+          </div>
+        ) : (
+          <div className="divide-y divide-border/10">
+            {recentActivity.map((item) => (
+              <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  item.icon === "share" ? "bg-primary/10" : "bg-accent/10"
+                }`}>
+                  {item.icon === "share" ? (
+                    <ShoppingCart className="h-4 w-4 text-primary" />
+                  ) : (
+                    <CreditCard className="h-4 w-4 text-accent" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{item.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
+                  <Clock className="h-3 w-3" />
+                  {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: ptBR })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
