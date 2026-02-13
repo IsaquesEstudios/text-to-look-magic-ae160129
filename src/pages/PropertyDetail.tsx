@@ -82,6 +82,21 @@ export default function PropertyDetail() {
     enabled: !!id && !!user && isAdmin,
   });
 
+  const { data: userShares } = useQuery({
+    queryKey: ["user-shares", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shares")
+        .select("id")
+        .eq("property_id", id!)
+        .eq("user_id", user!.id)
+        .limit(1);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id && !!user,
+  });
+
   if (authLoading || isLoading) {
     return (
       <PainelLayout>
@@ -102,6 +117,9 @@ export default function PropertyDetail() {
 
   const status = statusLabels[property.status] || statusLabels.available;
   const soldShares = property.total_shares - property.available_shares;
+  const isInRepair = ["purchased", "renovating", "selling"].includes(property.status);
+  const userHasShares = isAdmin || (userShares && userShares.length > 0);
+  const showCommunityTabs = isInRepair && userHasShares;
 
   // Combine cover + gallery for lightbox
   const allImages = [
@@ -221,7 +239,8 @@ export default function PropertyDetail() {
           />
         )}
 
-        {/* Tabs */}
+        {/* Tabs - only visible for properties in repair process and shareholders */}
+        {showCommunityTabs && (
         <Tabs defaultValue="community">
           <TabsList className="bg-secondary/50 border-0 p-1 rounded-xl h-auto">
             <TabsTrigger
@@ -246,6 +265,7 @@ export default function PropertyDetail() {
             <PropertyExpenses propertyId={property.id} />
           </TabsContent>
         </Tabs>
+        )}
       </div>
 
       {/* Lightbox */}
