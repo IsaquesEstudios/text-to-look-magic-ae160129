@@ -17,6 +17,9 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
+const UserCotas = lazy(() => import("./pages/painel/UserCotas"));
+const UserOportunidades = lazy(() => import("./pages/painel/UserOportunidades"));
+const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -171,6 +174,30 @@ export const routes: RouteRecord[] = [
         element: (
           <ClientOnly>
             <SuspenseWrapper><Painel /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/cotas",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><UserCotas /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/oportunidades",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><UserOportunidades /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/extrato",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><UserExtrato /></SuspenseWrapper>
           </ClientOnly>
         ),
       },
