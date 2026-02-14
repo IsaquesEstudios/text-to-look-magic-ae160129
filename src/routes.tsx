@@ -26,6 +26,7 @@ const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
+const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -244,6 +245,14 @@ export const routes: RouteRecord[] = [
         element: (
           <ClientOnly>
             <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper>
+          </ClientOnly>
+        ),
+      },
+      {
+        path: "painel/usuarios/:userId",
+        element: (
+          <ClientOnly>
+            <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper>
           </ClientOnly>
         ),
       },

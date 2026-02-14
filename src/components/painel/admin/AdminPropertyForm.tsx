@@ -30,6 +30,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     total_shares: "",
     share_price: "",
     status: "available",
+    estimated_auction_value: "",
+    estimated_renovation_cost: "",
+    estimated_timeline: "",
   });
 
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -59,6 +62,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           total_shares: String(p.total_shares),
           share_price: String(p.share_price),
           status: p.status,
+          estimated_auction_value: String(p.estimated_auction_value ?? 0),
+          estimated_renovation_cost: String(p.estimated_renovation_cost ?? 0),
+          estimated_timeline: p.estimated_timeline ?? "",
         });
         setCoverImage(p.cover_image_url);
       }
@@ -128,6 +134,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         status: form.status,
         cover_image_url: coverImage,
         created_by: user.id,
+        estimated_auction_value: parseFloat(form.estimated_auction_value) || 0,
+        estimated_renovation_cost: parseFloat(form.estimated_renovation_cost) || 0,
+        estimated_timeline: form.estimated_timeline.trim(),
       };
 
       let propId = propertyId;
@@ -310,11 +319,48 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="available">Disponível</option>
-                <option value="purchased">Comprado</option>
-                <option value="renovating">Em Reforma</option>
-                <option value="selling">Vendendo</option>
+                <option value="auctioned">Arrematado</option>
+                <option value="waiting_permit">Aguardando Alvará</option>
+                <option value="renovation_in_progress">Reforma em Andamento</option>
+                <option value="for_sale">À Venda</option>
+                <option value="under_contract">Sob Contrato</option>
                 <option value="sold">Vendido</option>
               </select>
+            </div>
+
+            {/* New Estimation Fields */}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
+                <Input
+                  id="auctionValue"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.estimated_auction_value}
+                  onChange={(e) => setForm({ ...form, estimated_auction_value: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
+                <Input
+                  id="renovationCost"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.estimated_renovation_cost}
+                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="timeline">Prazo Estimado</Label>
+                <Input
+                  id="timeline"
+                  value={form.estimated_timeline}
+                  onChange={(e) => setForm({ ...form, estimated_timeline: e.target.value })}
+                  placeholder="Ex: 6 meses"
+                />
+              </div>
             </div>
 
             {/* Cover Image */}

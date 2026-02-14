@@ -125,7 +125,10 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           created_by: string
+          estimated_auction_value: number | null
+          estimated_renovation_cost: number | null
           estimated_return_pct: number
+          estimated_timeline: string | null
           id: string
           location: string
           purchase_price: number
@@ -141,7 +144,10 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by: string
+          estimated_auction_value?: number | null
+          estimated_renovation_cost?: number | null
           estimated_return_pct?: number
+          estimated_timeline?: string | null
           id?: string
           location: string
           purchase_price: number
@@ -157,7 +163,10 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
+          estimated_auction_value?: number | null
+          estimated_renovation_cost?: number | null
           estimated_return_pct?: number
+          estimated_timeline?: string | null
           id?: string
           location?: string
           purchase_price?: number
@@ -341,6 +350,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_payment_images: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          type: string
+          uploaded_by: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          type: string
+          uploaded_by: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          type?: string
+          uploaded_by?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

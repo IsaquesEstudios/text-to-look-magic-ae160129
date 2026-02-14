@@ -33,9 +33,11 @@ import {
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   available: { label: "Disponível", color: "bg-primary/90 text-primary-foreground" },
-  purchased: { label: "Comprado", color: "bg-accent/90 text-accent-foreground" },
-  renovating: { label: "Em Reforma", color: "bg-secondary text-foreground" },
-  selling: { label: "Vendendo", color: "bg-secondary text-foreground" },
+  auctioned: { label: "Arrematado", color: "bg-accent/90 text-accent-foreground" },
+  waiting_permit: { label: "Aguardando Alvará", color: "bg-secondary text-foreground" },
+  renovation_in_progress: { label: "Reforma em Andamento", color: "bg-secondary text-foreground" },
+  for_sale: { label: "À Venda", color: "bg-primary/90 text-primary-foreground" },
+  under_contract: { label: "Sob Contrato", color: "bg-accent/90 text-accent-foreground" },
   sold: { label: "Vendido", color: "bg-muted text-muted-foreground" },
 };
 

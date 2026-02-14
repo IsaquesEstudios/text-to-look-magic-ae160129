@@ -8,9 +8,11 @@ import { Link } from "react-router-dom";
 
 const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
   available: { label: "Disponível", variant: "default" },
-  purchased: { label: "Comprado", variant: "secondary" },
-  renovating: { label: "Em Reforma", variant: "outline" },
-  selling: { label: "Vendendo", variant: "secondary" },
+  auctioned: { label: "Arrematado", variant: "secondary" },
+  waiting_permit: { label: "Aguardando Alvará", variant: "outline" },
+  renovation_in_progress: { label: "Reforma em Andamento", variant: "outline" },
+  for_sale: { label: "À Venda", variant: "default" },
+  under_contract: { label: "Sob Contrato", variant: "secondary" },
   sold: { label: "Vendido", variant: "outline" },
 };
 
