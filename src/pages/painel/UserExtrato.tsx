@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
+import { Loader2, ArrowDownLeft, ArrowUpRight, Receipt, CreditCard } from "lucide-react";
 import { PainelLayout } from "@/components/painel/PainelLayout";
+import { Button } from "@/components/ui/button";
 
 export default function UserExtrato() {
   const { user, profile, isLoading: authLoading } = useAuth();
@@ -83,9 +84,28 @@ export default function UserExtrato() {
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Extrato</h1>
             <p className="text-sm text-muted-foreground mt-1">Histórico de movimentações</p>
           </div>
-          <div className="text-right">
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Saldo atual</p>
-            <p className="text-lg font-bold text-primary">${credits.toLocaleString("pt-BR")}</p>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Saldo atual</p>
+              <p className="text-lg font-bold text-primary">${credits.toLocaleString("en-US")}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                const amount = prompt("Qual valor deseja recarregar? (em dólares)");
+                if (amount && !isNaN(Number(amount)) && Number(amount) > 0) {
+                  const msg = encodeURIComponent(
+                    `Olá! Gostaria de fazer uma recarga de créditos no valor de $${Number(amount).toLocaleString("en-US")}. Meu e-mail cadastrado é: ${user?.email || "N/A"}`
+                  );
+                  window.open(`https://wa.me/14752985931?text=${msg}`, "_blank");
+                }
+              }}
+            >
+              <CreditCard className="h-4 w-4" />
+              Recarga
+            </Button>
           </div>
         </div>
 
