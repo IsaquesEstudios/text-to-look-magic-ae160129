@@ -27,7 +27,12 @@ export default function PropertyNovidadesPage() {
           { user_id: user.id, property_id: id, last_read_at: new Date().toISOString() },
           { onConflict: "user_id,property_id" }
         )
-        .then(() => queryClient.invalidateQueries({ queryKey: ["property-news"] }));
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["property-news"] });
+          queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
+          queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
+          queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
+        });
     }
   }, [user, id, queryClient]);
 

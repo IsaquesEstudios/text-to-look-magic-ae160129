@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertyExpenses } from "@/components/painel/property/PropertyExpenses";
@@ -12,10 +12,28 @@ export default function PropertyGastosPage() {
   const { id } = useParams<{ id: string }>();
   const { user, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
+
+  // Mark expenses as read
+  useEffect(() => {
+    if (user && id) {
+      supabase
+        .from("property_expense_reads")
+        .upsert(
+          { user_id: user.id, property_id: id, last_read_at: new Date().toISOString() },
+          { onConflict: "user_id,property_id" }
+        )
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
+          queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
+          queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
+        });
+    }
+  }, [user, id, queryClient]);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],

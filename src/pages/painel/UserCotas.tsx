@@ -4,8 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Loader2, MapPin, ArrowUpRight } from "lucide-react";
+import { Building2, Loader2, MapPin, ArrowUpRight, Bell } from "lucide-react";
 import { PainelLayout } from "@/components/painel/PainelLayout";
+import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
 export default function UserCotas() {
   const { user, isLoading: authLoading } = useAuth();
@@ -28,18 +29,6 @@ export default function UserCotas() {
     enabled: !!user,
   });
 
-  if (authLoading || isLoading) {
-    return (
-      <PainelLayout>
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </div>
-      </PainelLayout>
-    );
-  }
-
-  if (!user) return null;
-
   // Aggregate shares by property
   const propertyMap = new Map<string, { prop: any; totalQuantity: number; totalPaid: number }>();
   shares?.forEach((share) => {
@@ -58,6 +47,28 @@ export default function UserCotas() {
     }
   });
   const aggregated = Array.from(propertyMap.values());
+  const propertyIds = aggregated.map((a) => a.prop.id);
+
+  const { data: unreadMap } = useMultiPropertyUnreadCounts(propertyIds);
+
+  // Sort: properties with unread items first
+  const sorted = [...aggregated].sort((a, b) => {
+    const aUnread = unreadMap ? (unreadMap.get(a.prop.id)?.novidades ?? 0) + (unreadMap.get(a.prop.id)?.gastos ?? 0) : 0;
+    const bUnread = unreadMap ? (unreadMap.get(b.prop.id)?.novidades ?? 0) + (unreadMap.get(b.prop.id)?.gastos ?? 0) : 0;
+    return bUnread - aUnread;
+  });
+
+  if (authLoading || isLoading) {
+    return (
+      <PainelLayout>
+        <div className="flex justify-center py-16">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
+      </PainelLayout>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <PainelLayout>
@@ -67,7 +78,7 @@ export default function UserCotas() {
           <p className="text-sm text-muted-foreground mt-1">Imóveis em que você participa</p>
         </div>
 
-        {!aggregated.length ? (
+        {!sorted.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
             <Building2 className="h-9 w-9 mb-3 opacity-25" />
             <p className="text-sm">Você ainda não possui cotas</p>
@@ -77,16 +88,24 @@ export default function UserCotas() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {aggregated.map(({ prop, totalQuantity, totalPaid }) => {
+            {sorted.map(({ prop, totalQuantity, totalPaid }) => {
               const returnPct = Number(prop.estimated_return_pct);
               const estimatedValue = totalPaid * (1 + returnPct / 100);
+              const counts = unreadMap?.get(prop.id);
+              const totalUnread = (counts?.novidades ?? 0) + (counts?.gastos ?? 0);
 
               return (
                 <Link
                   key={prop.id}
                   to={`/painel/imovel/${prop.id}`}
-                  className="group flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
+                  className="group relative flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
                 >
+                  {totalUnread > 0 && (
+                    <span className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md">
+                      <Bell className="h-3 w-3" />
+                      {totalUnread > 9 ? "+9" : totalUnread}
+                    </span>
+                  )}
                   <div className="aspect-[16/10] bg-secondary/50 overflow-hidden">
                     {prop.cover_image_url ? (
                       <img
