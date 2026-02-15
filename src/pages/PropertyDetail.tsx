@@ -165,7 +165,7 @@ export default function PropertyDetail() {
   return (
     <PainelLayout>
       <div className="space-y-6">
-        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="overview" />
+        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="overview" hasShares={!!(userShares && userShares.length > 0)} />
         {/* Badge + Location */}
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1.5">

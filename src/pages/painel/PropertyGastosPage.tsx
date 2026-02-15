@@ -87,7 +87,7 @@ export default function PropertyGastosPage() {
   return (
     <PainelLayout>
       <div className="space-y-6">
-        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="gastos" />
+        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="gastos" hasShares={!!(userShares && userShares.length > 0)} />
         <PropertyExpenses propertyId={property.id} />
       </div>
     </PainelLayout>

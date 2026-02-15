@@ -1,22 +1,28 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, LayoutDashboard, MessageSquare, Receipt } from "lucide-react";
 import { usePropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   propertyId: string;
   propertyTitle: string;
   active: "overview" | "novidades" | "gastos";
+  hasShares?: boolean;
 }
 
 const navItems = [
-  { key: "overview" as const, label: "Visão Geral", icon: LayoutDashboard, path: "", badgeKey: null },
-  { key: "novidades" as const, label: "Novidades", icon: MessageSquare, path: "/novidades", badgeKey: "novidades" as const },
-  { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos", badgeKey: "gastos" as const },
+  { key: "overview" as const, label: "Visão Geral", icon: LayoutDashboard, path: "", restricted: false, badgeKey: null },
+  { key: "novidades" as const, label: "Novidades", icon: MessageSquare, path: "/novidades", restricted: true, badgeKey: "novidades" as const },
+  { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos", restricted: true, badgeKey: "gastos" as const },
 ];
 
-export function PropertySubNav({ propertyId, propertyTitle, active }: Props) {
+export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }: Props) {
   const basePath = `/painel/imovel/${propertyId}`;
   const { data: unread } = usePropertyUnreadCounts(propertyId);
+  const { isAdmin } = useAuth();
+
+  const showRestricted = isAdmin || !!hasShares;
+  const visibleItems = navItems.filter((item) => !item.restricted || showRestricted);
 
   return (
     <div className="space-y-4">
@@ -33,7 +39,7 @@ export function PropertySubNav({ propertyId, propertyTitle, active }: Props) {
       </h1>
 
       <nav className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const count = item.badgeKey && unread ? unread[item.badgeKey] : 0;
           return (
             <Link
