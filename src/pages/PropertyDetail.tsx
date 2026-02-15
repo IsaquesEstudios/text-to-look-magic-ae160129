@@ -125,7 +125,7 @@ export default function PropertyDetail() {
   const purchasePrice = Number(property.purchase_price) || 0;
   const estimatedReturn = Number(property.estimated_return_pct) || 0;
   const sharePrice = Number(property.share_price) || 0;
-  const canPurchase = availableShares > 0 && property.status === "available" && !isAdmin;
+  const canPurchase = availableShares > 0 && property.status !== "sold" && !isAdmin;
 
   const handlePurchase = async () => {
     if (!user || !id) return;
