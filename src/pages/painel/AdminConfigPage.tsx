@@ -34,30 +34,31 @@ export default function AdminConfigPage() {
       t.state_code.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSave = async (id: string, stateCode: string) => {
-    const newRate = parseFloat(editingRates[id] ?? "");
-    if (isNaN(newRate) || newRate < 0) {
-      toast({ title: "Valor inválido", variant: "destructive" });
-      return;
+  const handleSaveAll = async () => {
+    const entries = Object.entries(editingRates);
+    if (entries.length === 0) return;
+    setSaving("all");
+    let hasError = false;
+    for (const [id, value] of entries) {
+      const newRate = parseFloat(value);
+      if (isNaN(newRate) || newRate < 0) continue;
+      const { error } = await supabase
+        .from("us_state_taxes")
+        .update({ tax_rate: newRate })
+        .eq("id", id);
+      if (error) hasError = true;
     }
-    setSaving(id);
-    const { error } = await supabase
-      .from("us_state_taxes")
-      .update({ tax_rate: newRate })
-      .eq("id", id);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (hasError) {
+      toast({ title: "Erro ao salvar algumas tarifas", variant: "destructive" });
     } else {
-      toast({ title: `Tarifa de ${stateCode} atualizada` });
-      setEditingRates((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
+      toast({ title: "Tarifas atualizadas com sucesso" });
+      setEditingRates({});
       queryClient.invalidateQueries({ queryKey: ["us-state-taxes"] });
     }
     setSaving(null);
   };
+
+  const hasChanges = Object.keys(editingRates).length > 0;
 
   const statesWithTax = taxes?.filter((t) => t.tax_rate > 0).length ?? 0;
   const avgRate = taxes?.length
@@ -151,27 +152,28 @@ export default function AdminConfigPage() {
                           className="w-20 text-right h-8 text-sm"
                         />
                         <span className="text-xs text-muted-foreground">%</span>
-                        {isEditing && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-primary"
-                            disabled={saving === tax.id}
-                            onClick={() => handleSave(tax.id, tax.state_code)}
-                          >
-                            {saving === tax.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Save className="h-4 w-4" />
-                            )}
-                          </Button>
-                        )}
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
+          </div>
+
+          {/* Save all button */}
+          <div className="pt-4 border-t border-border/50">
+            <Button
+              className="w-full gap-2"
+              disabled={!hasChanges || saving === "all"}
+              onClick={handleSaveAll}
+            >
+              {saving === "all" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Salvar Alterações {hasChanges && `(${Object.keys(editingRates).length})`}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
