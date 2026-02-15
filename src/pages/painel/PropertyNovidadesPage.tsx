@@ -1,22 +1,16 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 import { Loader2 } from "lucide-react";
 
 export default function PropertyNovidadesPage() {
   const { id } = useParams<{ id: string }>();
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
-  const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [authLoading, user, navigate]);
 
   // Mark as read
   useEffect(() => {
@@ -69,32 +63,24 @@ export default function PropertyNovidadesPage() {
     enabled: !!id && !!user,
   });
 
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
-      <PainelLayout>
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-      </PainelLayout>
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
   const hasAccess = isAdmin || (userShares && userShares.length > 0);
 
   if (!property || !hasAccess) {
-    return (
-      <PainelLayout>
-        <p className="text-center text-muted-foreground py-16">Acesso não permitido.</p>
-      </PainelLayout>
-    );
+    return <p className="text-center text-muted-foreground py-16">Acesso não permitido.</p>;
   }
 
   return (
-    <PainelLayout>
-      <div className="space-y-6">
-        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="novidades" hasShares={!!(userShares && userShares.length > 0)} />
-        <PropertyCommunity propertyId={property.id} />
-      </div>
-    </PainelLayout>
+    <div className="space-y-6">
+      <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="novidades" hasShares={!!(userShares && userShares.length > 0)} />
+      <PropertyCommunity propertyId={property.id} />
+    </div>
   );
 }

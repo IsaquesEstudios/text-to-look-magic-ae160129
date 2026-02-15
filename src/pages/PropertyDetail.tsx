@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PainelLayout } from "@/components/painel/PainelLayout";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 
 import { Badge } from "@/components/ui/badge";
@@ -43,15 +42,11 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [authLoading, user, navigate]);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -109,22 +104,16 @@ export default function PropertyDetail() {
     enabled: !!id && !!user,
   });
 
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
-      <PainelLayout>
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-      </PainelLayout>
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
   if (!property) {
-    return (
-      <PainelLayout>
-        <p className="text-center text-muted-foreground py-16">Imóvel não encontrado.</p>
-      </PainelLayout>
-    );
+    return <p className="text-center text-muted-foreground py-16">Imóvel não encontrado.</p>;
   }
 
   const status = statusLabels[property.status] || statusLabels.available;
@@ -134,7 +123,6 @@ export default function PropertyDetail() {
   const purchasePrice = Number(property.purchase_price) || 0;
   const estimatedReturn = Number(property.estimated_return_pct) || 0;
   const sharePrice = Number(property.share_price) || 0;
-  const userHasShares = isAdmin || (userShares && userShares.length > 0);
   const canPurchase = availableShares > 0 && property.status === "available" && !isAdmin;
 
   const handlePurchase = async () => {
@@ -156,17 +144,15 @@ export default function PropertyDetail() {
     }
   };
 
-  // Combine cover + gallery for lightbox
   const allImages = [
     ...(property.cover_image_url ? [{ id: "cover", image_url: property.cover_image_url }] : []),
     ...(images ?? []),
   ];
 
   return (
-    <PainelLayout>
+    <>
       <div className="space-y-6">
         <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="overview" hasShares={!!(userShares && userShares.length > 0)} />
-        {/* Badge + Location */}
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1.5">
             <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
@@ -177,7 +163,6 @@ export default function PropertyDetail() {
           </p>
         </div>
 
-        {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { icon: DollarSign, label: "Preço Total", value: `$${purchasePrice.toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
@@ -193,7 +178,6 @@ export default function PropertyDetail() {
           ))}
         </div>
 
-        {/* Share Progress Bar */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>{soldShares} de {totalShares} cotas preenchidas</span>
@@ -204,16 +188,13 @@ export default function PropertyDetail() {
               <div
                 key={i}
                 className={`h-3 flex-1 rounded-sm transition-colors ${
-                  i < soldShares
-                    ? "bg-primary"
-                    : "bg-secondary"
+                  i < soldShares ? "bg-primary" : "bg-secondary"
                 }`}
               />
             ))}
           </div>
         </div>
 
-        {/* Participate Button */}
         {canPurchase && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -229,7 +210,7 @@ export default function PropertyDetail() {
                     Ao confirmar, você estará adquirindo <strong>1 cota</strong> do imóvel{" "}
                     <strong>{property.title}</strong>.
                   </span>
-                   <span className="block text-lg font-bold text-foreground">
+                  <span className="block text-lg font-bold text-foreground">
                     Valor: ${sharePrice.toLocaleString("en-US")}
                   </span>
                   <span className="block text-xs text-muted-foreground">
@@ -266,7 +247,6 @@ export default function PropertyDetail() {
           )}
         </div>
 
-        {/* Gallery Thumbnails */}
         {images && images.length > 0 && (
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">Galeria</h2>
@@ -287,11 +267,8 @@ export default function PropertyDetail() {
             </div>
           </section>
         )}
-
-
       </div>
 
-      {/* Lightbox */}
       {lightboxIndex !== null && allImages.length > 0 && (
         <div
           className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center"
@@ -339,6 +316,6 @@ export default function PropertyDetail() {
           </div>
         </div>
       )}
-    </PainelLayout>
+    </>
   );
 }

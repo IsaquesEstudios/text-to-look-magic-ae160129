@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { PainelLayout } from "@/components/painel/PainelLayout";
 import { Loader2, ShoppingCart, UserPlus, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,12 +15,7 @@ type ActivityItem = {
 };
 
 export default function AdminAtividadesPage() {
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authLoading && (!user || !isAdmin)) navigate("/auth");
-  }, [authLoading, user, isAdmin, navigate]);
+  const { user, isAdmin } = useAuth();
 
   const { data: activities, isLoading } = useQuery({
     queryKey: ["admin-activity-full"],
@@ -75,62 +67,56 @@ export default function AdminAtividadesPage() {
     },
   });
 
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
-      <PainelLayout>
-        <div className="flex justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </PainelLayout>
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
-  if (!user || !isAdmin) return null;
-
   return (
-    <PainelLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Histórico de Atividades</h1>
-          <p className="text-sm text-muted-foreground mt-1">Todas as ações realizadas no painel</p>
-        </div>
-
-        <Card className="bg-card/50 border-border/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <CardTitle className="text-base font-semibold">Atividades</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
-            {!activities || activities.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade registrada</p>
-            ) : (
-              <div className="space-y-1">
-                {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-3 py-2.5 px-2 rounded-md hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <activity.icon className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-foreground truncate">{activity.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(activity.timestamp), {
-                          addSuffix: true,
-                          locale: ptBR,
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Histórico de Atividades</h1>
+        <p className="text-sm text-muted-foreground mt-1">Todas as ações realizadas no painel</p>
       </div>
-    </PainelLayout>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-base font-semibold">Atividades</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
+          {!activities || activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade registrada</p>
+          ) : (
+            <div className="space-y-1">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-center gap-3 py-2.5 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <activity.icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(activity.timestamp), {
+                        addSuffix: true,
+                        locale: ptBR,
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

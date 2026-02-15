@@ -1,19 +1,11 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ArrowDownLeft, ArrowUpRight, Receipt, CreditCard } from "lucide-react";
-import { PainelLayout } from "@/components/painel/PainelLayout";
 import { Button } from "@/components/ui/button";
 
 export default function UserExtrato() {
-  const { user, profile, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [authLoading, user, navigate]);
+  const { user, profile } = useAuth();
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["credit-transactions", user?.id],
@@ -43,17 +35,13 @@ export default function UserExtrato() {
     enabled: !!user,
   });
 
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
-      <PainelLayout>
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </div>
-      </PainelLayout>
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
     );
   }
-
-  if (!user) return null;
 
   const timeline = [
     ...(transactions?.map((t) => ({
@@ -77,83 +65,81 @@ export default function UserExtrato() {
   const credits = profile?.credits ?? 0;
 
   return (
-    <PainelLayout>
-      <div className="space-y-6">
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">Extrato</h1>
-            <p className="text-sm text-muted-foreground mt-1">Histórico de movimentações</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Saldo atual</p>
-              <p className="text-lg font-bold text-primary">${credits.toLocaleString("en-US")}</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                const amount = prompt("Qual valor deseja recarregar? (em dólares)");
-                if (amount && !isNaN(Number(amount)) && Number(amount) > 0) {
-                  const msg = encodeURIComponent(
-                    `Olá! Gostaria de fazer uma recarga de créditos no valor de $${Number(amount).toLocaleString("en-US")}. Meu e-mail cadastrado é: ${user?.email || "N/A"}`
-                  );
-                  window.open(`https://wa.me/14752985931?text=${msg}`, "_blank");
-                }
-              }}
-            >
-              <CreditCard className="h-4 w-4" />
-              Recarga
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Extrato</h1>
+          <p className="text-sm text-muted-foreground mt-1">Histórico de movimentações</p>
         </div>
-
-        {!timeline.length ? (
-          <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Receipt className="h-9 w-9 mb-3 opacity-25" />
-            <p className="text-sm">Nenhuma movimentação ainda</p>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Saldo atual</p>
+            <p className="text-lg font-bold text-primary">${credits.toLocaleString("en-US")}</p>
           </div>
-        ) : (
-          <div className="space-y-2">
-            {timeline.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 rounded-xl border border-border/20 bg-card/30 px-4 py-3"
-              >
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  item.isCredit ? "bg-primary/10" : "bg-secondary"
-                }`}>
-                  {item.isCredit ? (
-                    <ArrowDownLeft className="h-4 w-4 text-primary" />
-                  ) : (
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const amount = prompt("Qual valor deseja recarregar? (em dólares)");
+              if (amount && !isNaN(Number(amount)) && Number(amount) > 0) {
+                const msg = encodeURIComponent(
+                  `Olá! Gostaria de fazer uma recarga de créditos no valor de $${Number(amount).toLocaleString("en-US")}. Meu e-mail cadastrado é: ${user?.email || "N/A"}`
+                );
+                window.open(`https://wa.me/14752985931?text=${msg}`, "_blank");
+              }
+            }}
+          >
+            <CreditCard className="h-4 w-4" />
+            Recarga
+          </Button>
+        </div>
+      </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground truncate">{item.description}</p>
-                  <p className="text-[11px] text-muted-foreground/60">
-                    {new Date(item.date).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
+      {!timeline.length ? (
+        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <Receipt className="h-9 w-9 mb-3 opacity-25" />
+          <p className="text-sm">Nenhuma movimentação ainda</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {timeline.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-4 rounded-xl border border-border/20 bg-card/30 px-4 py-3"
+            >
+              <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                item.isCredit ? "bg-primary/10" : "bg-secondary"
+              }`}>
+                {item.isCredit ? (
+                  <ArrowDownLeft className="h-4 w-4 text-primary" />
+                ) : (
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
 
-                <p className={`text-sm font-semibold flex-shrink-0 ${
-                  item.isCredit ? "text-primary" : "text-foreground"
-                }`}>
-                  {item.isCredit ? "+" : ""}${Math.abs(item.amount).toLocaleString("pt-BR")}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-foreground truncate">{item.description}</p>
+                <p className="text-[11px] text-muted-foreground/60">
+                  {new Date(item.date).toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </PainelLayout>
+
+              <p className={`text-sm font-semibold flex-shrink-0 ${
+                item.isCredit ? "text-primary" : "text-foreground"
+              }`}>
+                {item.isCredit ? "+" : ""}${Math.abs(item.amount).toLocaleString("pt-BR")}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
