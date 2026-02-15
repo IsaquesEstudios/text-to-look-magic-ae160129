@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Suspense, useEffect } from "react";
+import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 
 // Optimized QueryClient for SSG
 const queryClient = new QueryClient({
@@ -44,6 +45,7 @@ const RootRedirect = () => {
 
 const App = () => {
   const location = useLocation();
+  const auth = useAuthInternal();
   
   // Handle root redirect
   if (location.pathname === "/") {
@@ -58,14 +60,16 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Outlet />
-        </Suspense>
-      </TooltipProvider>
+      <AuthContext.Provider value={auth}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
+        </TooltipProvider>
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 };
