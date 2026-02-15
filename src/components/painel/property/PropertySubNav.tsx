@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, LayoutDashboard, MessageSquare, Receipt } from "lucide-react";
 import { usePropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,6 +21,16 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }:
   const { data: unread } = usePropertyUnreadCounts(propertyId);
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+    // Check if there's meaningful history within our app to go back to
+    if (window.history.length > 1 && document.referrer) {
+      navigate(-1);
+    } else {
+      navigate("/painel");
+    }
+  };
 
   const showRestricted = isAdmin || !!hasShares;
   const visibleItems = navItems.filter((item) => !item.restricted || showRestricted);
@@ -29,7 +38,7 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }:
   return (
     <div className="space-y-4">
       <button
-        onClick={() => navigate(-1)}
+        onClick={handleBack}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />

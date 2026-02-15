@@ -27,7 +27,11 @@ export default function PropertyNovidadesPage() {
           { user_id: user.id, property_id: id, last_read_at: new Date().toISOString() },
           { onConflict: "user_id,property_id" }
         )
-        .then(() => {
+        .then(({ error }) => {
+          if (error) {
+            console.error("Failed to mark messages as read:", error);
+            return;
+          }
           queryClient.invalidateQueries({ queryKey: ["property-news"] });
           queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
           queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });

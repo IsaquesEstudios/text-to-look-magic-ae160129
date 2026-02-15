@@ -66,6 +66,8 @@ export function useUnreadNews() {
       return total;
     },
     enabled: !!user && !isAdmin,
+    refetchOnMount: "always",
+    staleTime: 0,
     refetchInterval: 60000,
   });
 

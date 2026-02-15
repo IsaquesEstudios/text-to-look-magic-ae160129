@@ -158,6 +158,8 @@ export function UserDashboard() {
       return results;
     },
     enabled: !!user,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 
   const credits = profile?.credits ?? 0;

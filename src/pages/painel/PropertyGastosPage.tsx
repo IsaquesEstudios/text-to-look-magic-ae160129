@@ -27,7 +27,11 @@ export default function PropertyGastosPage() {
           { user_id: user.id, property_id: id, last_read_at: new Date().toISOString() },
           { onConflict: "user_id,property_id" }
         )
-        .then(() => {
+        .then(({ error }) => {
+          if (error) {
+            console.error("Failed to mark expenses as read:", error);
+            return;
+          }
           queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
           queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
           queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
