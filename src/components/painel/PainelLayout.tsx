@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { Button } from "@/components/ui/button";
 import { LogOut, Home, Shield, LayoutDashboard, PieChart, Building2, Receipt, History } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -27,6 +28,7 @@ const userNavItems = [
 export function PainelLayout({ children }: PainelLayoutProps) {
   const { user, isAdmin, isLoading, profile, signOut } = useAuth();
   const location = useLocation();
+  const totalUnread = useUnreadNews();
 
   const navItems = isLoading ? [] : (isAdmin ? adminNavItems : userNavItems);
   const showSidebar = !isLoading && navItems.length > 0;
@@ -72,12 +74,13 @@ export function PainelLayout({ children }: PainelLayoutProps) {
             <nav className="flex-1 p-3 space-y-1 mt-2">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
+                const showBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                      "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                       isActive
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
@@ -85,6 +88,11 @@ export function PainelLayout({ children }: PainelLayoutProps) {
                   >
                     <item.icon className="h-4 w-4 flex-shrink-0" />
                     {item.label}
+                    {showBadge && (
+                      <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                        {totalUnread > 9 ? "+9" : totalUnread}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -98,12 +106,13 @@ export function PainelLayout({ children }: PainelLayoutProps) {
             <nav className="flex items-center justify-around h-14 px-2">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
+                const showBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={cn(
-                      "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors",
+                      "relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors",
                       isActive
                         ? "text-primary"
                         : "text-muted-foreground"
@@ -111,6 +120,11 @@ export function PainelLayout({ children }: PainelLayoutProps) {
                   >
                     <item.icon className="h-5 w-5" />
                     {item.label}
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
+                        {totalUnread > 9 ? "+9" : totalUnread}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
