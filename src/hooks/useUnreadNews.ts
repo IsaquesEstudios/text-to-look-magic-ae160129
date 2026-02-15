@@ -22,27 +22,46 @@ export function useUnreadNews() {
 
       const propertyIds = [...new Set(userShares.map((s) => s.property_id))];
 
-      // Get read timestamps
-      const { data: reads } = await supabase
+      // Get message read timestamps
+      const { data: msgReads } = await supabase
         .from("property_message_reads")
         .select("property_id, last_read_at")
         .eq("user_id", user!.id)
         .in("property_id", propertyIds);
 
-      const readMap = new Map<string, string>();
-      reads?.forEach((r) => readMap.set(r.property_id, r.last_read_at));
+      const msgReadMap = new Map<string, string>();
+      msgReads?.forEach((r) => msgReadMap.set(r.property_id, r.last_read_at));
 
-      // Count unread across all properties
+      // Get expense read timestamps
+      const { data: expReads } = await supabase
+        .from("property_expense_reads")
+        .select("property_id, last_read_at")
+        .eq("user_id", user!.id)
+        .in("property_id", propertyIds);
+
+      const expReadMap = new Map<string, string>();
+      expReads?.forEach((r) => expReadMap.set(r.property_id, r.last_read_at));
+
+      // Count unread across all properties (messages + expenses)
       let total = 0;
       for (const pid of propertyIds) {
-        const lastRead = readMap.get(pid);
-        let q = supabase
+        const msgLastRead = msgReadMap.get(pid);
+        let mq = supabase
           .from("property_messages")
           .select("id", { count: "exact", head: true })
           .eq("property_id", pid);
-        if (lastRead) q = q.gt("created_at", lastRead);
-        const { count } = await q;
-        total += count ?? 0;
+        if (msgLastRead) mq = mq.gt("created_at", msgLastRead);
+        const { count: mc } = await mq;
+        total += mc ?? 0;
+
+        const expLastRead = expReadMap.get(pid);
+        let eq = supabase
+          .from("property_expenses")
+          .select("id", { count: "exact", head: true })
+          .eq("property_id", pid);
+        if (expLastRead) eq = eq.gt("created_at", expLastRead);
+        const { count: ec } = await eq;
+        total += ec ?? 0;
       }
       return total;
     },
@@ -50,7 +69,7 @@ export function useUnreadNews() {
     refetchInterval: 60000,
   });
 
-  // Realtime: invalidate on new messages
+  // Realtime: invalidate on new messages or expenses
   useEffect(() => {
     if (!user || isAdmin) return;
 
@@ -62,6 +81,17 @@ export function useUnreadNews() {
         () => {
           queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
           queryClient.invalidateQueries({ queryKey: ["property-news"] });
+          queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
+          queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "property_expenses" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
+          queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
+          queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
         }
       )
       .subscribe();

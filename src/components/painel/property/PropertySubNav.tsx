@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, LayoutDashboard, MessageSquare, Receipt } from "lucide-react";
+import { usePropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
 interface Props {
   propertyId: string;
@@ -8,18 +9,19 @@ interface Props {
 }
 
 const navItems = [
-  { key: "overview" as const, label: "Visão Geral", icon: LayoutDashboard, path: "" },
-  { key: "novidades" as const, label: "Novidades", icon: MessageSquare, path: "/novidades" },
-  { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos" },
+  { key: "overview" as const, label: "Visão Geral", icon: LayoutDashboard, path: "", badgeKey: null },
+  { key: "novidades" as const, label: "Novidades", icon: MessageSquare, path: "/novidades", badgeKey: "novidades" as const },
+  { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos", badgeKey: "gastos" as const },
 ];
 
 export function PropertySubNav({ propertyId, propertyTitle, active }: Props) {
   const basePath = `/painel/imovel/${propertyId}`;
+  const { data: unread } = usePropertyUnreadCounts(propertyId);
 
   return (
     <div className="space-y-4">
       <Link
-        to="/painel"
+        to="/painel/cotas"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -31,20 +33,28 @@ export function PropertySubNav({ propertyId, propertyTitle, active }: Props) {
       </h1>
 
       <nav className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
-        {navItems.map((item) => (
-          <Link
-            key={item.key}
-            to={`${basePath}${item.path}`}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              active === item.key
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-card/50"
-            }`}
-          >
-            <item.icon className="h-4 w-4" />
-            {item.label}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const count = item.badgeKey && unread ? unread[item.badgeKey] : 0;
+          return (
+            <Link
+              key={item.key}
+              to={`${basePath}${item.path}`}
+              className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                active === item.key
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+              }`}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+              {count > 0 && (
+                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                  {count > 9 ? "+9" : count}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
