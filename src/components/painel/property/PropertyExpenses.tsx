@@ -92,6 +92,8 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
   };
 
+  const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   // Summary calculations
   const calcTotal = (e: { price: number; quantity: number; tax_rate?: number | null }) => {
     const base = Number(e.price) * e.quantity;
@@ -213,13 +215,13 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                     <td className="p-3 text-foreground">{expense.product}</td>
                     <td className="p-3 text-center text-foreground">{expense.quantity}</td>
                     <td className="p-3 text-right text-foreground">
-                      ${Number(expense.price).toLocaleString("pt-BR")}
+                      ${fmt(Number(expense.price))}
                     </td>
                     <td className="p-3 text-center text-muted-foreground text-xs">
                       {expense.state_code ? `${expense.state_code} (${expense.tax_rate}%)` : "—"}
                     </td>
                     <td className="p-3 text-right font-medium text-foreground">
-                      ${calcTotal(expense).toLocaleString("pt-BR")}
+                      ${fmt(calcTotal(expense))}
                     </td>
                     {isAdmin && (
                       <td className="p-3">
@@ -253,12 +255,12 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
             {Object.entries(categoryTotals).map(([cat, total]) => (
               <div key={cat} className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{cat}</span>
-                <span className="text-foreground">${total.toLocaleString("pt-BR")}</span>
+                <span className="text-foreground">${fmt(total)}</span>
               </div>
             ))}
             <div className="border-t border-border/50 pt-2 flex justify-between font-bold">
               <span className="text-foreground">Total</span>
-              <span className="text-primary">${totalSpent.toLocaleString("pt-BR")}</span>
+              <span className="text-primary">${fmt(totalSpent)}</span>
             </div>
           </CardContent>
         </Card>
