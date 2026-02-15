@@ -83,20 +83,17 @@ export function UserDashboard() {
     enabled: !!user,
   });
 
-  // Properties the user has shares in, with unread message count
+  // Properties the user has shares in, with unread message + expense count
   const { data: propertyNews } = useQuery({
     queryKey: ["property-news", user?.id],
     queryFn: async () => {
-      // Get user's properties via shares
       const { data: userShares, error: sharesErr } = await supabase
         .from("shares")
         .select("property_id, properties(id, title, cover_image_url, status)")
         .eq("user_id", user!.id);
       if (sharesErr) throw sharesErr;
-      if (sharesErr) throw sharesErr;
       if (!userShares?.length) return [];
 
-      // Deduplicate properties
       const propertyMap = new Map<string, any>();
       userShares.forEach((s) => {
         const prop = s.properties as any;
@@ -104,39 +101,60 @@ export function UserDashboard() {
       });
       const propertyIds = Array.from(propertyMap.keys());
 
-      // Get read timestamps
-      const { data: reads } = await supabase
-        .from("property_message_reads")
-        .select("property_id, last_read_at")
-        .eq("user_id", user!.id)
-        .in("property_id", propertyIds);
+      // Get read timestamps for messages and expenses
+      const [{ data: msgReads }, { data: expReads }] = await Promise.all([
+        supabase
+          .from("property_message_reads")
+          .select("property_id, last_read_at")
+          .eq("user_id", user!.id)
+          .in("property_id", propertyIds),
+        supabase
+          .from("property_expense_reads")
+          .select("property_id, last_read_at")
+          .eq("user_id", user!.id)
+          .in("property_id", propertyIds),
+      ]);
 
-      const readMap = new Map<string, string>();
-      reads?.forEach((r) => readMap.set(r.property_id, r.last_read_at));
+      const msgReadMap = new Map<string, string>();
+      msgReads?.forEach((r) => msgReadMap.set(r.property_id, r.last_read_at));
+      const expReadMap = new Map<string, string>();
+      expReads?.forEach((r) => expReadMap.set(r.property_id, r.last_read_at));
 
-      // Get message counts per property (all messages + unread)
       const results = await Promise.all(
         propertyIds.map(async (pid) => {
-          const lastRead = readMap.get(pid);
-          let unreadQuery = supabase
+          const msgLastRead = msgReadMap.get(pid);
+          let mq = supabase
             .from("property_messages")
             .select("id", { count: "exact", head: true })
             .eq("property_id", pid);
-          if (lastRead) {
-            unreadQuery = unreadQuery.gt("created_at", lastRead);
-          }
-          const { count } = await unreadQuery;
+          if (msgLastRead) mq = mq.gt("created_at", msgLastRead);
+          const { count: mc } = await mq;
+
+          const expLastRead = expReadMap.get(pid);
+          let eq = supabase
+            .from("property_expenses")
+            .select("id", { count: "exact", head: true })
+            .eq("property_id", pid);
+          if (expLastRead) eq = eq.gt("created_at", expLastRead);
+          const { count: ec } = await eq;
+
           const prop = propertyMap.get(pid);
+          const unreadMessages = mc ?? 0;
+          const unreadExpenses = ec ?? 0;
           return {
             id: pid,
             title: prop.title,
             cover_image_url: prop.cover_image_url,
             status: prop.status,
-            unread: count ?? 0,
+            unread: unreadMessages + unreadExpenses,
+            unreadMessages,
+            unreadExpenses,
           };
         })
       );
 
+      // Sort: properties with unread first
+      results.sort((a, b) => b.unread - a.unread);
       return results;
     },
     enabled: !!user,
@@ -225,7 +243,7 @@ export function UserDashboard() {
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          Novidades dos seus imóveis
+          Atualizações dos seus imóveis
         </h2>
         {!propertyNews?.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
@@ -240,7 +258,7 @@ export function UserDashboard() {
             {propertyNews.map((prop) => (
               <Link
                 key={prop.id}
-                to={`/painel/imovel/${prop.id}/novidades`}
+                to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
                 className="group relative flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
               >
                 <div className="h-11 w-11 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
@@ -256,8 +274,11 @@ export function UserDashboard() {
                   <h3 className="font-semibold text-foreground text-sm truncate">{prop.title}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {prop.unread > 0
-                      ? `${prop.unread > 9 ? "+9" : prop.unread} nova${prop.unread === 1 ? "" : "s"} atualização${prop.unread === 1 ? "" : "ões"}`
-                      : "Nenhuma novidade"}
+                      ? [
+                          prop.unreadMessages > 0 ? `${prop.unreadMessages} novidade${prop.unreadMessages === 1 ? "" : "s"}` : null,
+                          prop.unreadExpenses > 0 ? `${prop.unreadExpenses} gasto${prop.unreadExpenses === 1 ? "" : "s"}` : null,
+                        ].filter(Boolean).join(" · ")
+                      : "Sem atualizações"}
                   </p>
                 </div>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
