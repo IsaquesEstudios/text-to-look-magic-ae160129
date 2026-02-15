@@ -217,6 +217,8 @@ export type Database = {
           product: string
           property_id: string
           quantity: number
+          state_code: string | null
+          tax_rate: number | null
         }
         Insert: {
           category: string
@@ -226,6 +228,8 @@ export type Database = {
           product: string
           property_id: string
           quantity?: number
+          state_code?: string | null
+          tax_rate?: number | null
         }
         Update: {
           category?: string
@@ -235,6 +239,8 @@ export type Database = {
           product?: string
           property_id?: string
           quantity?: number
+          state_code?: string | null
+          tax_rate?: number | null
         }
         Relationships: [
           {
@@ -379,6 +385,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      us_state_taxes: {
+        Row: {
+          id: string
+          state_code: string
+          state_name: string
+          tax_rate: number
+        }
+        Insert: {
+          id?: string
+          state_code: string
+          state_name: string
+          tax_rate?: number
+        }
+        Update: {
+          id?: string
+          state_code?: string
+          state_name?: string
+          tax_rate?: number
+        }
+        Relationships: []
       }
       user_payment_images: {
         Row: {

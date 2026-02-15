@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 
 interface Props {
@@ -17,7 +18,21 @@ export function PropertyExpenses({ propertyId }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ category: "", product: "", quantity: "1", price: "" });
+  const [form, setForm] = useState({ category: "", product: "", quantity: "1", price: "", state_code: "" });
+
+  const { data: stateTaxes } = useQuery({
+    queryKey: ["us-state-taxes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("us_state_taxes")
+        .select("*")
+        .order("state_name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const selectedTax = stateTaxes?.find((s) => s.state_code === form.state_code);
 
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["property-expenses", propertyId],
@@ -35,17 +50,20 @@ export function PropertyExpenses({ propertyId }: Props) {
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdding(true);
+    const taxRate = selectedTax?.tax_rate ?? 0;
     const { error } = await supabase.from("property_expenses").insert({
       property_id: propertyId,
       category: form.category.trim(),
       product: form.product.trim(),
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
+      state_code: form.state_code || null,
+      tax_rate: taxRate,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      setForm({ category: "", product: "", quantity: "1", price: "" });
+      setForm({ category: "", product: "", quantity: "1", price: "", state_code: "" });
       queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
     }
     setAdding(false);
@@ -57,11 +75,17 @@ export function PropertyExpenses({ propertyId }: Props) {
   };
 
   // Summary calculations
-  const totalSpent = expenses?.reduce((sum, e) => sum + Number(e.price) * e.quantity, 0) ?? 0;
+  const calcTotal = (e: { price: number; quantity: number; tax_rate?: number | null }) => {
+    const base = Number(e.price) * e.quantity;
+    const tax = base * (Number(e.tax_rate ?? 0) / 100);
+    return base + tax;
+  };
+
+  const totalSpent = expenses?.reduce((sum, e) => sum + calcTotal(e), 0) ?? 0;
   const categoryTotals: Record<string, number> = {};
   expenses?.forEach((e) => {
     const cat = e.category;
-    categoryTotals[cat] = (categoryTotals[cat] || 0) + Number(e.price) * e.quantity;
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + calcTotal(e);
   });
 
   if (isLoading) {
@@ -120,6 +144,26 @@ export function PropertyExpenses({ propertyId }: Props) {
                   required
                 />
               </div>
+              <div className="w-36">
+                <label className="text-xs text-muted-foreground">Tarifa (Estado)</label>
+                <Select value={form.state_code} onValueChange={(v) => setForm({ ...form, state_code: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stateTaxes?.map((s) => (
+                      <SelectItem key={s.state_code} value={s.state_code}>
+                        {s.state_code} ({s.tax_rate}%)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {selectedTax && form.price && (
+                <div className="text-xs text-muted-foreground self-end pb-2">
+                  +${((parseFloat(form.price || "0") * selectedTax.tax_rate) / 100).toFixed(2)} tax
+                </div>
+              )}
               <Button type="submit" variant="cta" size="sm" disabled={adding}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               </Button>
@@ -139,6 +183,7 @@ export function PropertyExpenses({ propertyId }: Props) {
                   <th className="text-left p-3 text-muted-foreground font-medium">Produto</th>
                   <th className="text-center p-3 text-muted-foreground font-medium">Qtd</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Preço</th>
+                  <th className="text-center p-3 text-muted-foreground font-medium">Tarifa</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
                 </tr>
@@ -152,8 +197,11 @@ export function PropertyExpenses({ propertyId }: Props) {
                     <td className="p-3 text-right text-foreground">
                       ${Number(expense.price).toLocaleString("pt-BR")}
                     </td>
+                    <td className="p-3 text-center text-muted-foreground text-xs">
+                      {expense.state_code ? `${expense.state_code} (${expense.tax_rate}%)` : "—"}
+                    </td>
                     <td className="p-3 text-right font-medium text-foreground">
-                      ${(Number(expense.price) * expense.quantity).toLocaleString("pt-BR")}
+                      ${calcTotal(expense).toLocaleString("pt-BR")}
                     </td>
                     {isAdmin && (
                       <td className="p-3">
