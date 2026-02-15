@@ -133,6 +133,7 @@ export type Database = {
           location: string
           purchase_price: number
           share_price: number
+          state_code: string | null
           status: string
           title: string
           total_shares: number
@@ -152,6 +153,7 @@ export type Database = {
           location: string
           purchase_price: number
           share_price: number
+          state_code?: string | null
           status?: string
           title: string
           total_shares?: number
@@ -171,6 +173,7 @@ export type Database = {
           location?: string
           purchase_price?: number
           share_price?: number
+          state_code?: string | null
           status?: string
           title?: string
           total_shares?: number

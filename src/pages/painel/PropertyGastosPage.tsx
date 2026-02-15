@@ -39,7 +39,7 @@ export default function PropertyGastosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("id, title")
+        .select("id, title, state_code")
         .eq("id", id!)
         .maybeSingle();
       if (error) throw error;
@@ -80,7 +80,7 @@ export default function PropertyGastosPage() {
   return (
     <div className="space-y-6">
       <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="gastos" hasShares={!!(userShares && userShares.length > 0)} />
-      <PropertyExpenses propertyId={property.id} />
+      <PropertyExpenses propertyId={property.id} propertyStateCode={property.state_code ?? undefined} />
     </div>
   );
 }

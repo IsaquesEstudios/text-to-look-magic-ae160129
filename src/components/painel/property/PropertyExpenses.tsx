@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,14 +11,16 @@ import { Plus, Trash2, Loader2 } from "lucide-react";
 
 interface Props {
   propertyId: string;
+  propertyStateCode?: string;
 }
 
-export function PropertyExpenses({ propertyId }: Props) {
+export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ category: "", product: "", quantity: "1", price: "", state_code: "" });
+  const defaultInitialized = useRef(false);
 
   const { data: stateTaxes } = useQuery({
     queryKey: ["us-state-taxes"],
@@ -47,6 +49,22 @@ export function PropertyExpenses({ propertyId }: Props) {
     },
   });
 
+  // Set default state_code: last expense's state, or property's state
+  useEffect(() => {
+    if (defaultInitialized.current) return;
+    if (!stateTaxes) return;
+    if (expenses === undefined) return;
+    
+    const lastExpenseState = expenses?.length
+      ? expenses[expenses.length - 1].state_code
+      : null;
+    const defaultState = lastExpenseState || propertyStateCode || "";
+    if (defaultState && stateTaxes.some((s) => s.state_code === defaultState)) {
+      setForm((f) => ({ ...f, state_code: defaultState }));
+    }
+    defaultInitialized.current = true;
+  }, [stateTaxes, expenses, propertyStateCode]);
+
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdding(true);
@@ -63,7 +81,7 @@ export function PropertyExpenses({ propertyId }: Props) {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      setForm({ category: "", product: "", quantity: "1", price: "", state_code: "" });
+      setForm((prev) => ({ category: "", product: "", quantity: "1", price: "", state_code: prev.state_code }));
       queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
     }
     setAdding(false);
