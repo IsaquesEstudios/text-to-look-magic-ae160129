@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ArrowLeft, LayoutDashboard, MessageSquare, Receipt } from "lucide-react";
 import { usePropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
@@ -20,19 +21,20 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }:
   const basePath = `/painel/imovel/${propertyId}`;
   const { data: unread } = usePropertyUnreadCounts(propertyId);
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const showRestricted = isAdmin || !!hasShares;
   const visibleItems = navItems.filter((item) => !item.restricted || showRestricted);
 
   return (
     <div className="space-y-4">
-      <Link
-        to="/painel/cotas"
+      <button
+        onClick={() => navigate(-1)}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Voltar
-      </Link>
+      </button>
 
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
         {propertyTitle}
@@ -54,7 +56,11 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }:
               <item.icon className="h-4 w-4" />
               {item.label}
               {count > 0 && (
-                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                <span className={`min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                  item.badgeKey === "gastos"
+                    ? "bg-amber-500 text-white"
+                    : "bg-destructive text-destructive-foreground"
+                }`}>
                   {count > 9 ? "+9" : count}
                 </span>
               )}
