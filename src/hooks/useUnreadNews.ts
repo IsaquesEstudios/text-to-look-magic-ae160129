@@ -92,6 +92,7 @@ export function useUnreadNews() {
         { event: "INSERT", schema: "public", table: "property_expenses" },
         () => {
           queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
+          queryClient.invalidateQueries({ queryKey: ["property-news"] });
           queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
           queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
         }
