@@ -31,6 +31,7 @@ export default function PropertyGastosPage() {
           queryClient.invalidateQueries({ queryKey: ["property-unread-counts"] });
           queryClient.invalidateQueries({ queryKey: ["multi-property-unread"] });
           queryClient.invalidateQueries({ queryKey: ["total-unread-news"] });
+          queryClient.invalidateQueries({ queryKey: ["property-news"] });
         });
     }
   }, [user, id, queryClient]);

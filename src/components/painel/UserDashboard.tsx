@@ -285,7 +285,11 @@ export function UserDashboard() {
 
                 {/* Notification badge */}
                 {prop.unread > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                  <span className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full text-[11px] font-bold flex items-center justify-center ${
+                    prop.unreadExpenses > 0 && prop.unreadMessages === 0
+                      ? "bg-amber-500 text-white"
+                      : "bg-destructive text-destructive-foreground"
+                  }`}>
                     {prop.unread > 9 ? "+9" : prop.unread}
                   </span>
                 )}
