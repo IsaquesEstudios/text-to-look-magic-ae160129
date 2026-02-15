@@ -1,10 +1,35 @@
-import { useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
 export type AppRole = "admin" | "user";
 
-export function useAuth() {
+export interface AuthState {
+  user: User | null;
+  session: Session | null;
+  roles: AppRole[];
+  isAdmin: boolean;
+  isLoading: boolean;
+  profile: { full_name: string | null; credits: number } | null;
+  signOut: () => Promise<void>;
+}
+
+const defaultState: AuthState = {
+  user: null,
+  session: null,
+  roles: [],
+  isAdmin: false,
+  isLoading: true,
+  profile: null,
+  signOut: async () => {},
+};
+
+export const AuthContext = createContext<AuthState>(defaultState);
+
+/**
+ * Internal hook that manages auth state. Called ONCE inside AuthProvider.
+ */
+export function useAuthInternal(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
@@ -40,7 +65,6 @@ export function useAuth() {
       }
     };
 
-    // Listener for ongoing auth changes (does NOT control isLoading)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (!isMounted) return;
@@ -48,7 +72,6 @@ export function useAuth() {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Use setTimeout to avoid deadlock from awaiting inside callback
           setTimeout(() => fetchUserData(session.user.id), 0);
         } else {
           setRoles([]);
@@ -58,7 +81,6 @@ export function useAuth() {
       }
     );
 
-    // Initial load (controls isLoading)
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -83,9 +105,19 @@ export function useAuth() {
     };
   }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, []);
 
-  return { user, session, roles, isAdmin, isLoading, profile, signOut };
+  return useMemo(
+    () => ({ user, session, roles, isAdmin, isLoading, profile, signOut }),
+    [user, session, roles, isAdmin, isLoading, profile, signOut]
+  );
+}
+
+/**
+ * Consumer hook — all components use this to access the shared auth state.
+ */
+export function useAuth(): AuthState {
+  return useContext(AuthContext);
 }
