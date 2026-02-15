@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserDashboard } from "@/components/painel/UserDashboard";
-import { PainelLayout } from "@/components/painel/PainelLayout";
+import { Link } from "react-router-dom";
 import { Loader2, Building2, Users, PieChart, TrendingUp, UserPlus, ShoppingCart, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -230,28 +228,6 @@ function AdminDashboardContent() {
 }
 
 export default function Painel() {
-  const { user, isLoading, isAdmin } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/auth");
-    }
-  }, [isLoading, user, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
-  return (
-    <PainelLayout>
-      {isAdmin ? <AdminDashboardContent /> : <UserDashboard />}
-    </PainelLayout>
-  );
+  const { isAdmin } = useAuth();
+  return isAdmin ? <AdminDashboardContent /> : <UserDashboard />;
 }

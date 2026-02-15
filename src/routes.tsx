@@ -1,10 +1,10 @@
-import { ComponentType, Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import type { RouteRecord } from "vite-react-ssg";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
 import App from "./App";
 
-// Lazy load pages for code splitting
+// Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const Terrenos = lazy(() => import("./pages/Terrenos"));
 const Casas = lazy(() => import("./pages/Casas"));
@@ -15,6 +15,8 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+
+// Panel pages (client-only)
 const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
@@ -28,92 +30,77 @@ const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
 
-// Loading fallback component
+// PainelLayout is the persistent layout for all /painel/* routes
+const PainelLayoutModule = lazy(() =>
+  import("./components/painel/PainelLayout").then((m) => ({ default: m.PainelLayout }))
+);
+
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <div className="animate-pulse text-muted-foreground">Carregando...</div>
   </div>
 );
 
-// Wrapper component to handle Suspense for lazy loaded pages
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
 );
 
-// Client-only wrapper - renders nothing during SSG build, renders normally on client
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-  if (typeof window === "undefined") {
-    return <PageLoader />;
-  }
+  if (typeof window === "undefined") return <PageLoader />;
   return <>{children}</>;
 };
 
-// Languages for iteration
 const languages: Language[] = ["pt", "en", "es"];
 
-// Helper to generate static routes for a given page
 const generateLanguageRoutes = (
   path: string,
   Component: React.LazyExoticComponent<() => JSX.Element>
-): RouteRecord[] => {
-  return languages.map((lang) => ({
+): RouteRecord[] =>
+  languages.map((lang) => ({
     path: path ? `${lang}/${path}` : lang,
-    element: (
-      <SuspenseWrapper>
-        <Component />
-      </SuspenseWrapper>
-    ),
+    element: <SuspenseWrapper><Component /></SuspenseWrapper>,
   }));
-};
 
-// Generate blog post routes with getStaticPaths
-const generateBlogPostRoutes = (): RouteRecord[] => {
-  return languages.map((lang) => ({
+const generateBlogPostRoutes = (): RouteRecord[] =>
+  languages.map((lang) => ({
     path: `${lang}/blog/:slug`,
-    element: (
-      <SuspenseWrapper>
-        <BlogPost />
-      </SuspenseWrapper>
-    ),
+    element: <SuspenseWrapper><BlogPost /></SuspenseWrapper>,
     getStaticPaths: async () => {
       try {
         const dbSlugs = await fetchAllBlogSlugs();
-        const langSlugs = dbSlugs
-          .filter((s) => s.language === lang)
-          .map((s) => `/${lang}/blog/${s.slug}`);
-
+        const langSlugs = dbSlugs.filter((s) => s.language === lang).map((s) => `/${lang}/blog/${s.slug}`);
         if (langSlugs.length > 0) {
-          const translationSlugs = translations[lang].blog.posts.map(
-            (post) => `/${lang}/blog/${post.slug}`
-          );
-          const allSlugs = [...new Set([...langSlugs, ...translationSlugs])];
-          return allSlugs;
+          const translationSlugs = translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
+          return [...new Set([...langSlugs, ...translationSlugs])];
         }
       } catch (e) {
-        console.warn(`SSG: Failed to fetch blog slugs from DB for ${lang}, using translations`, e);
+        console.warn(`SSG: Failed to fetch blog slugs for ${lang}`, e);
       }
       return translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
     },
   }));
-};
 
-// Define all routes with App as the layout
+// Panel child routes — rendered inside PainelLayout's <Outlet />
+const panelChildren: RouteRecord[] = [
+  { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
+  { path: "cotas", element: <SuspenseWrapper><UserCotas /></SuspenseWrapper> },
+  { path: "oportunidades", element: <SuspenseWrapper><UserOportunidades /></SuspenseWrapper> },
+  { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
+  { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
+  { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
+  { path: "imovel/:id/gastos", element: <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper> },
+  { path: "imoveis", element: <SuspenseWrapper><AdminImoveisPage /></SuspenseWrapper> },
+  { path: "usuarios", element: <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper> },
+  { path: "usuarios/:userId", element: <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper> },
+  { path: "atividades", element: <SuspenseWrapper><AdminAtividadesPage /></SuspenseWrapper> },
+];
+
 export const routes: RouteRecord[] = [
   {
     path: "/",
     element: <App />,
     children: [
-      // Root redirect page
-      {
-        index: true,
-        element: (
-          <SuspenseWrapper>
-            <Index />
-          </SuspenseWrapper>
-        ),
-      },
-
-      // Language-specific routes
+      { index: true, element: <SuspenseWrapper><Index /></SuspenseWrapper> },
       ...generateLanguageRoutes("", Index),
       ...generateLanguageRoutes("terrenos", Terrenos),
       ...generateLanguageRoutes("casas", Casas),
@@ -121,159 +108,27 @@ export const routes: RouteRecord[] = [
       ...generateLanguageRoutes("sobre", Sobre),
       ...generateLanguageRoutes("contato", Contato),
       ...generateLanguageRoutes("blog", Blog),
-
-      // Blog post routes with dynamic slugs
       ...generateBlogPostRoutes(),
 
-      // Legacy routes (will redirect client-side)
-      {
-        path: "terrenos",
-        element: (
-          <SuspenseWrapper>
-            <Terrenos />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "casas",
-        element: (
-          <SuspenseWrapper>
-            <Casas />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "sobre",
-        element: (
-          <SuspenseWrapper>
-            <Sobre />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "contato",
-        element: (
-          <SuspenseWrapper>
-            <Contato />
-          </SuspenseWrapper>
-        ),
-      },
-      {
-        path: "blog",
-        element: (
-          <SuspenseWrapper>
-            <Blog />
-          </SuspenseWrapper>
-        ),
-      },
+      // Legacy routes
+      { path: "terrenos", element: <SuspenseWrapper><Terrenos /></SuspenseWrapper> },
+      { path: "casas", element: <SuspenseWrapper><Casas /></SuspenseWrapper> },
+      { path: "sobre", element: <SuspenseWrapper><Sobre /></SuspenseWrapper> },
+      { path: "contato", element: <SuspenseWrapper><Contato /></SuspenseWrapper> },
+      { path: "blog", element: <SuspenseWrapper><Blog /></SuspenseWrapper> },
 
-      // Auth & Dashboard - Client-only (no SSG)
-      {
-        path: "auth",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><Auth /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
+      // Auth
+      { path: "auth", element: <ClientOnly><SuspenseWrapper><Auth /></SuspenseWrapper></ClientOnly> },
+
+      // Panel — persistent layout with nested children
       {
         path: "painel",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><Painel /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/cotas",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><UserCotas /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/oportunidades",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><UserOportunidades /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/extrato",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><UserExtrato /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/imovel/:id",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><PropertyDetail /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/imovel/:id/novidades",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/imovel/:id/gastos",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/imoveis",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><AdminImoveisPage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/usuarios",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/usuarios/:userId",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
-      },
-      {
-        path: "painel/atividades",
-        element: (
-          <ClientOnly>
-            <SuspenseWrapper><AdminAtividadesPage /></SuspenseWrapper>
-          </ClientOnly>
-        ),
+        element: <ClientOnly><SuspenseWrapper><PainelLayoutModule /></SuspenseWrapper></ClientOnly>,
+        children: panelChildren,
       },
 
       // 404
-      {
-        path: "*",
-        element: (
-          <SuspenseWrapper>
-            <NotFound />
-          </SuspenseWrapper>
-        ),
-      },
+      { path: "*", element: <SuspenseWrapper><NotFound /></SuspenseWrapper> },
     ],
   },
 ];
