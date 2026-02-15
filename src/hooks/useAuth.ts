@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+const isBrowser = typeof window !== "undefined";
+
 export type AppRole = "admin" | "user";
 
 export interface AuthState {
@@ -38,6 +40,10 @@ export function useAuthInternal(): AuthState {
   const [profile, setProfile] = useState<{ full_name: string | null; credits: number } | null>(null);
 
   useEffect(() => {
+    if (!isBrowser) {
+      setIsLoading(false);
+      return;
+    }
     let isMounted = true;
 
     const fetchUserData = async (userId: string) => {
