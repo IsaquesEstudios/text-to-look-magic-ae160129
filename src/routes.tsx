@@ -29,6 +29,7 @@ const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
+const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
 
 // PainelLayout is the persistent layout for all /painel/* routes
 const PainelLayoutModule = lazy(() =>
@@ -93,6 +94,7 @@ const panelChildren: RouteRecord[] = [
   { path: "usuarios", element: <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper> },
   { path: "usuarios/:userId", element: <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper> },
   { path: "atividades", element: <SuspenseWrapper><AdminAtividadesPage /></SuspenseWrapper> },
+  { path: "configuracoes", element: <SuspenseWrapper><AdminConfigPage /></SuspenseWrapper> },
 ];
 
 export const routes: RouteRecord[] = [
