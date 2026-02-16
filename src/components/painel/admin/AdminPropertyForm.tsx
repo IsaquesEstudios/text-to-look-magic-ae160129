@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
 
 interface Props {
@@ -25,8 +25,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     type: "house" as "house" | "land",
     title: "",
     location: "",
-    purchase_price: "",
-    estimated_return_pct: "",
+    state_code: "",
     total_shares: "",
     share_price: "",
     status: "available",
@@ -37,6 +36,23 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+
+  // Fetch US states for dropdown
+  const { data: usStates } = useQuery({
+    queryKey: ["us-states"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("us_state_taxes")
+        .select("state_code, state_name")
+        .order("state_name");
+      return data ?? [];
+    },
+  });
+
+  // Computed total
+  const totalProjeto =
+    (parseFloat(form.estimated_auction_value) || 0) +
+    (parseFloat(form.estimated_renovation_cost) || 0);
 
   // Load existing property
   useEffect(() => {
@@ -57,8 +73,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           type: p.type as "house" | "land",
           title: p.title,
           location: p.location,
-          purchase_price: String(p.purchase_price),
-          estimated_return_pct: String(p.estimated_return_pct),
+          state_code: p.state_code ?? "",
           total_shares: String(p.total_shares),
           share_price: String(p.share_price),
           status: p.status,
@@ -126,8 +141,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         type: form.type,
         title: form.title.trim(),
         location: form.location.trim(),
-        purchase_price: parseFloat(form.purchase_price),
-        estimated_return_pct: parseFloat(form.estimated_return_pct),
+        state_code: form.state_code || null,
+        purchase_price: totalProjeto,
+        estimated_return_pct: 0,
         total_shares: parseInt(form.total_shares),
         share_price: parseFloat(form.share_price),
         available_shares: parseInt(form.total_shares),
@@ -159,9 +175,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
       // Sync gallery images
       if (propId) {
-        // Delete old images
         await supabase.from("property_images").delete().eq("property_id", propId);
-        // Insert new ones
         if (galleryImages.length > 0) {
           await supabase.from("property_images").insert(
             galleryImages.map((url, i) => ({
@@ -228,59 +242,84 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Title & Location */}
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="title">Título</Label>
+              <Input
+                id="title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="Casa em Orlando"
+                required
+                maxLength={200}
+              />
+            </div>
+
+            {/* City & State */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="title">Título</Label>
-                <Input
-                  id="title"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Casa em Orlando"
-                  required
-                  maxLength={200}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Localização</Label>
+                <Label htmlFor="location">Cidade</Label>
                 <Input
                   id="location"
                   value={form.location}
                   onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  placeholder="Orlando, FL"
+                  placeholder="Orlando"
                   required
                   maxLength={200}
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="state">Estado</Label>
+                <select
+                  id="state"
+                  value={form.state_code}
+                  onChange={(e) => setForm({ ...form, state_code: e.target.value })}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  required
+                >
+                  <option value="">Selecione o estado</option>
+                  {usStates?.map((s) => (
+                    <option key={s.state_code} value={s.state_code}>
+                      {s.state_name} ({s.state_code})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Financials */}
+            {/* Auction & Renovation Values */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="price">Preço de Compra ($)</Label>
+                <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
                 <Input
-                  id="price"
+                  id="auctionValue"
                   type="number"
                   step="0.01"
                   min="0"
-                  value={form.purchase_price}
-                  onChange={(e) => setForm({ ...form, purchase_price: e.target.value })}
-                  required
+                  value={form.estimated_auction_value}
+                  onChange={(e) => setForm({ ...form, estimated_auction_value: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="return">Retorno Estimado (%)</Label>
+                <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
                 <Input
-                  id="return"
+                  id="renovationCost"
                   type="number"
                   step="0.01"
                   min="0"
-                  max="999"
-                  value={form.estimated_return_pct}
-                  onChange={(e) => setForm({ ...form, estimated_return_pct: e.target.value })}
-                  required
+                  value={form.estimated_renovation_cost}
+                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: e.target.value })}
                 />
               </div>
+            </div>
+
+            {/* Total do Projeto (computed) */}
+            <div className="space-y-2">
+              <Label>Total do Projeto ($)</Label>
+              <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
+                {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">Valor de arremate + valor de reforma</p>
             </div>
 
             {/* Shares */}
@@ -310,6 +349,17 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
+            {/* Timeline */}
+            <div className="space-y-2">
+              <Label htmlFor="timeline">Prazo Estimado</Label>
+              <Input
+                id="timeline"
+                value={form.estimated_timeline}
+                onChange={(e) => setForm({ ...form, estimated_timeline: e.target.value })}
+                placeholder="Ex: 6 meses"
+              />
+            </div>
+
             {/* Status */}
             <div className="space-y-2">
               <Label>Status</Label>
@@ -326,41 +376,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <option value="under_contract">Sob Contrato</option>
                 <option value="sold">Vendido</option>
               </select>
-            </div>
-
-            {/* New Estimation Fields */}
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
-                <Input
-                  id="auctionValue"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={form.estimated_auction_value}
-                  onChange={(e) => setForm({ ...form, estimated_auction_value: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
-                <Input
-                  id="renovationCost"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={form.estimated_renovation_cost}
-                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="timeline">Prazo Estimado</Label>
-                <Input
-                  id="timeline"
-                  value={form.estimated_timeline}
-                  onChange={(e) => setForm({ ...form, estimated_timeline: e.target.value })}
-                  placeholder="Ex: 6 meses"
-                />
-              </div>
             </div>
 
             {/* Cover Image */}
