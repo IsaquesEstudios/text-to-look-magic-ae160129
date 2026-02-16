@@ -94,10 +94,9 @@ export default function PropertyDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("shares")
-        .select("id")
+        .select("id, quantity")
         .eq("property_id", id!)
-        .eq("user_id", user!.id)
-        .limit(1);
+        .eq("user_id", user!.id);
       if (error) throw error;
       return data;
     },
@@ -196,6 +195,12 @@ export default function PropertyDetail() {
             ))}
           </div>
         </div>
+
+        {userShares && userShares.length > 0 && (
+          <p className="text-sm font-medium text-primary">
+            Você possui {userShares.reduce((sum, s) => sum + s.quantity, 0)} cota{userShares.reduce((sum, s) => sum + s.quantity, 0) !== 1 ? "s" : ""} neste imóvel
+          </p>
+        )}
 
         {canPurchase && (
           <AlertDialog>
