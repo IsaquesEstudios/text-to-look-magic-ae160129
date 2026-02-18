@@ -354,7 +354,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
                 <Gavel className="h-5 w-5 text-primary" />
               </div>
               <div className="min-w-0">
-                <span className="font-bold text-sm sm:text-base text-foreground truncate block">{auction.title}</span>
+                <span className="font-bold text-sm sm:text-base text-foreground block">{auction.title}</span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <CalendarDays className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">
