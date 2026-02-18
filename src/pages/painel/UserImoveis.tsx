@@ -61,17 +61,14 @@ export default function UserCotas() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Minhas Cotas</h1>
-        <p className="text-sm text-muted-foreground mt-1">Imóveis em que você participa</p>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Imóveis</h1>
+        <p className="text-sm text-muted-foreground mt-1">Projetos em que você investe</p>
       </div>
 
       {!sorted.length ? (
         <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
           <Building2 className="h-9 w-9 mb-3 opacity-25" />
-          <p className="text-sm">Você ainda não possui cotas</p>
-          <Link to="/painel/oportunidades" className="text-xs text-primary hover:underline mt-2">
-            Ver oportunidades →
-          </Link>
+          <p className="text-sm">Você ainda não possui imóveis vinculados</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -118,25 +115,19 @@ export default function UserCotas() {
                     <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-center mt-auto">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-                      <p className="font-semibold text-sm text-foreground">
-                        {prop.total_shares - (prop.available_shares ?? 0)}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
-                      </p>
-                    </div>
+                  <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
-                      <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("pt-BR")}</p>
+                      <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
-                      <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno Est.</p>
+                      <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
 
                   <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
-                    {returnPct}% retorno estimado
+                    +{returnPct}% margem estimada
                   </Badge>
                 </div>
               </Link>
