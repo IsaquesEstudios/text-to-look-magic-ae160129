@@ -21,8 +21,7 @@ const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
 const PropertyGastosPage = lazy(() => import("./pages/painel/PropertyGastosPage"));
-const UserCotas = lazy(() => import("./pages/painel/UserCotas"));
-const UserOportunidades = lazy(() => import("./pages/painel/UserOportunidades"));
+const UserImoveis = lazy(() => import("./pages/painel/UserImoveis"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
@@ -87,8 +86,7 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 // Panel child routes — rendered inside PainelLayout's <Outlet />
 const panelChildren: RouteRecord[] = [
   { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
-  { path: "cotas", element: <SuspenseWrapper><UserCotas /></SuspenseWrapper> },
-  { path: "oportunidades", element: <SuspenseWrapper><UserOportunidades /></SuspenseWrapper> },
+  { path: "meus-imoveis", element: <SuspenseWrapper><UserImoveis /></SuspenseWrapper> },
   { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
