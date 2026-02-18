@@ -2,13 +2,17 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 function MiniCountdown({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -33,21 +37,34 @@ function MiniCountdown({ targetDate }: { targetDate: string }) {
 export default function UserLeiloesPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions"],
     queryFn: async () => {
-      console.log("[UserLeiloesPage] Fetching auctions...");
       const { data, error } = await supabase
         .from("auctions")
         .select("*")
         .order("scheduled_start", { ascending: false });
-      console.log("[UserLeiloesPage] Result:", { data, error, count: data?.length });
       if (error) throw error;
       return data;
     },
   });
 
-  // Mark auctions as read when visiting this page
+  const auctionIds = auctions?.map((a) => a.id) ?? [];
+  const { data: allItems } = useQuery({
+    queryKey: ["auction-items-all", auctionIds],
+    queryFn: async () => {
+      if (auctionIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("auction_items")
+        .select("*")
+        .in("auction_id", auctionIds);
+      if (error) throw error;
+      return data;
+    },
+    enabled: auctionIds.length > 0,
+  });
+
   useEffect(() => {
     if (user && auctions) {
       markAuctionsRead(user.id).then(() => {
@@ -56,10 +73,87 @@ export default function UserLeiloesPage() {
     }
   }, [user, auctions, queryClient]);
 
+  const itemsByAuction = new Map<string, typeof allItems>();
+  allItems?.forEach((item) => {
+    const list = itemsByAuction.get(item.auction_id) ?? [];
+    list.push(item);
+    itemsByAuction.set(item.auction_id, list);
+  });
+
   const active = auctions?.filter((a) => a.status !== "finished") ?? [];
   const finished = auctions?.filter((a) => a.status === "finished") ?? [];
 
   if (isLoading) return <div className="animate-pulse text-muted-foreground">Carregando...</div>;
+
+  const renderAuction = (auction: (typeof auctions)[number]) => {
+    const now = new Date();
+    const start = new Date(auction.scheduled_start);
+    const isStarted = auction.status === "active" || start <= now;
+    const items = itemsByAuction.get(auction.id) ?? [];
+
+    return (
+      <AccordionItem key={auction.id} value={auction.id} className="border-b border-border/50">
+        <AccordionTrigger className="hover:no-underline px-1 py-4">
+          <div className="flex items-center justify-between w-full pr-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="font-semibold text-sm truncate">{auction.title}</span>
+              {isStarted && auction.status !== "finished" ? (
+                <Badge className="bg-discovery-green text-primary-foreground text-[10px] px-2">Ativo</Badge>
+              ) : auction.status === "finished" ? (
+                <Badge variant="secondary" className="text-[10px] px-2">Encerrado</Badge>
+              ) : (
+                <Badge variant="outline" className="text-[10px] px-2">Em breve</Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0 text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              {isStarted ? (
+                <span className="text-xs text-discovery-green font-medium">Aberto</span>
+              ) : (
+                <MiniCountdown targetDate={auction.scheduled_start} />
+              )}
+              <span className="text-[10px] hidden sm:inline">
+                {format(start, "dd MMM yyyy", { locale: ptBR })}
+              </span>
+            </div>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-1 pb-4">
+          {auction.description && (
+            <p className="text-xs text-muted-foreground mb-3">{auction.description}</p>
+          )}
+          {items.length > 0 ? (
+            <div className="grid gap-2">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-start gap-3 p-3 rounded-lg bg-secondary/30">
+                  <div className="h-9 w-9 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    {item.type === "terreno" ? (
+                      <TreePine className="h-4 w-4 text-primary" />
+                    ) : (
+                      <Home className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{item.title}</p>
+                    {item.location && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <MapPin className="h-3 w-3" /> {item.location}
+                      </p>
+                    )}
+                    {item.description && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground italic">Nenhum imóvel cadastrado neste leilão</p>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -71,67 +165,20 @@ export default function UserLeiloesPage() {
       </div>
 
       {active.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold">Próximos & Ativos</h2>
-          <div className="grid gap-4">
-            {active.map((auction) => {
-              const now = new Date();
-              const start = new Date(auction.scheduled_start);
-              const isStarted = auction.status === "active" || start <= now;
-              return (
-                <Link key={auction.id} to={`/painel/leilao/${auction.id}`}>
-                  <Card className="hover:border-primary/30 transition-colors cursor-pointer">
-                    <CardContent className="p-5 flex items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold truncate">{auction.title}</span>
-                          {isStarted ? (
-                            <Badge className="bg-discovery-green text-primary-foreground text-xs">Ativo</Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs">Em breve</Badge>
-                          )}
-                        </div>
-                        {auction.description && <p className="text-xs text-muted-foreground line-clamp-1">{auction.description}</p>}
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          {isStarted ? (
-                            <span className="text-xs text-discovery-green font-medium">Aberto</span>
-                          ) : (
-                            <MiniCountdown targetDate={auction.scheduled_start} />
-                          )}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {format(start, "dd MMM yyyy", { locale: ptBR })}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Próximos & Ativos</h2>
+          <Accordion type="single" collapsible>
+            {active.map(renderAuction)}
+          </Accordion>
         </div>
       )}
 
       {finished.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-muted-foreground">Encerrados</h2>
-          <div className="grid gap-3">
-            {finished.map((auction) => (
-              <Link key={auction.id} to={`/painel/leilao/${auction.id}`}>
-                <Card className="opacity-60 hover:opacity-80 transition-opacity cursor-pointer">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <span className="font-medium text-sm">{auction.title}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(auction.scheduled_start), "dd MMM yyyy", { locale: ptBR })}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+        <div>
+          <h2 className="text-lg font-semibold text-muted-foreground mb-2">Encerrados</h2>
+          <Accordion type="single" collapsible>
+            {finished.map(renderAuction)}
+          </Accordion>
         </div>
       )}
 
