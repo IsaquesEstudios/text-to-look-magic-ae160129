@@ -10,19 +10,19 @@ import { useEffect } from "react";
 
 const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
+  { label: "Leilões", icon: Gavel, path: "/painel/leiloes" },
   { label: "Imóveis", icon: Building2, path: "/painel/imoveis" },
   { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
   { label: "Atividades", icon: History, path: "/painel/atividades" },
   { label: "Configurações", icon: Settings, path: "/painel/configuracoes" },
-  { label: "Leilões", icon: Gavel, path: "/painel/leiloes" },
 ];
 
 const userNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
+  { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
   { label: "Minhas Cotas", icon: PieChart, path: "/painel/cotas" },
   { label: "Oportunidades", icon: Building2, path: "/painel/oportunidades" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
-  { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
 ];
 
 /**
