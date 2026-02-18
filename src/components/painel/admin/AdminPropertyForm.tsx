@@ -31,6 +31,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     status: "available",
     estimated_auction_value: "",
     estimated_renovation_cost: "",
+    estimated_return_pct: "",
     estimated_timeline: "",
   });
 
@@ -79,6 +80,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           status: p.status,
           estimated_auction_value: String(p.estimated_auction_value ?? 0),
           estimated_renovation_cost: String(p.estimated_renovation_cost ?? 0),
+          estimated_return_pct: String(p.estimated_return_pct ?? 0),
           estimated_timeline: p.estimated_timeline ?? "",
         });
         setCoverImage(p.cover_image_url);
@@ -143,7 +145,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         location: form.location.trim(),
         state_code: form.state_code || null,
         purchase_price: totalProjeto,
-        estimated_return_pct: 0,
+        estimated_return_pct: parseFloat(form.estimated_return_pct) || 0,
         total_shares: parseInt(form.total_shares),
         share_price: parseFloat(form.share_price),
         available_shares: parseInt(form.total_shares),
@@ -313,13 +315,32 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Total do Projeto (computed) */}
-            <div className="space-y-2">
-              <Label>Total do Projeto ($)</Label>
-              <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
-                {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {/* Total do Projeto (computed) + Return % */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Total do Projeto ($)</Label>
+                <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
+                  {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-muted-foreground">Arremate + Reforma</p>
               </div>
-              <p className="text-xs text-muted-foreground">Valor de arremate + valor de reforma</p>
+              <div className="space-y-2">
+                <Label htmlFor="returnPct">Retorno Estimado (%)</Label>
+                <Input
+                  id="returnPct"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={form.estimated_return_pct}
+                  onChange={(e) => setForm({ ...form, estimated_return_pct: e.target.value })}
+                  placeholder="Ex: 30"
+                />
+                {totalProjeto > 0 && parseFloat(form.estimated_return_pct) > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Valor de mercado: ${(totalProjeto * (1 + (parseFloat(form.estimated_return_pct) || 0) / 100)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Shares */}

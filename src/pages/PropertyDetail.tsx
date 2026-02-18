@@ -90,8 +90,11 @@ export default function PropertyDetail() {
   }
 
   const status = statusLabels[property.status] || statusLabels.available;
-  const purchasePrice = Number(property.purchase_price) || 0;
-  const marketValue = Number(property.purchase_price) * (1 + (Number(property.estimated_return_pct) || 0) / 100);
+  const auctionValue = Number(property.estimated_auction_value) || 0;
+  const renovationCost = Number(property.estimated_renovation_cost) || 0;
+  const purchasePrice = auctionValue + renovationCost;
+  const returnPct = Number(property.estimated_return_pct) || 0;
+  const marketValue = purchasePrice * (1 + returnPct / 100);
   const calculatedReturn = purchasePrice > 0 ? ((marketValue - purchasePrice) / purchasePrice) * 100 : 0;
 
   const allImages = [
@@ -117,8 +120,8 @@ export default function PropertyDetail() {
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-2">Estimativas do Projeto</p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {[
-              { icon: DollarSign, label: "Arremate", value: `$${(Number(property.estimated_auction_value) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-              { icon: DollarSign, label: "Reforma", value: `$${(Number(property.estimated_renovation_cost) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Arremate", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Reforma", value: `$${renovationCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: DollarSign, label: "Total do Projeto", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: DollarSign, label: "Valor de Mercado", value: `$${marketValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: TrendingUp, label: "Retorno Est.", value: `${calculatedReturn.toFixed(1)}%`, iconClass: "text-primary", valueClass: "text-primary" },
