@@ -184,7 +184,7 @@ export default function UserLeiloesPage() {
     const items = itemsByAuction.get(auction.id) ?? [];
 
     return (
-      <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl mb-3 overflow-hidden bg-card/50">
+      <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
         <AccordionTrigger className="hover:no-underline px-4 sm:px-5 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pr-3 gap-3">
             {/* Left: Title + badge */}
@@ -240,7 +240,7 @@ export default function UserLeiloesPage() {
       {active.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold mb-3">Próximos & Ativos</h2>
-          <Accordion type="single" collapsible className="space-y-0">
+          <Accordion type="single" collapsible className="flex flex-col gap-3">
             {active.map(renderAuction)}
           </Accordion>
         </div>
@@ -249,7 +249,7 @@ export default function UserLeiloesPage() {
       {finished.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-muted-foreground mb-3">Encerrados</h2>
-          <Accordion type="single" collapsible className="space-y-0">
+          <Accordion type="single" collapsible className="flex flex-col gap-3">
             {finished.map(renderAuction)}
           </Accordion>
         </div>
