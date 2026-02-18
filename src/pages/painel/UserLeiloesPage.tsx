@@ -119,22 +119,24 @@ function AuctionItemCard({ item }: { item: any }) {
           <>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço</p>
-                <p className="font-semibold text-foreground">${Number(prop.purchase_price).toLocaleString("pt-BR")}</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Total do Projeto</p>
+                <p className="font-semibold text-foreground">${Number(prop.purchase_price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
                 <p className="font-semibold text-primary">{Number(prop.estimated_return_pct)}%</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Valor Arremate + Reforma</p>
                 <p className="font-semibold text-foreground">
-                  {prop.total_shares - (prop.available_shares ?? 0)}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
+                  ${Number(prop.estimated_auction_value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} + ${Number(prop.estimated_renovation_cost ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço/Cota</p>
-                <p className="font-semibold text-foreground">${Number(prop.share_price).toLocaleString("pt-BR")}</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Valor de Mercado</p>
+                <p className="font-semibold text-foreground">
+                  ${(Number(prop.purchase_price) * (1 + Number(prop.estimated_return_pct) / 100)).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </p>
               </div>
             </div>
             <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
