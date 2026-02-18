@@ -222,6 +222,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
     },
     onSuccess: async () => {
       await refreshProfile();
+      queryClient.invalidateQueries({ queryKey: ["my-auction-deposits"] });
       toast({ title: "Depósito realizado com sucesso!" });
       setRawAmount(0);
       setDisplayAmount("");
@@ -277,6 +278,31 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
   });
 
   const auctionIds = auctions?.map((a) => a.id) ?? [];
+
+  // Fetch user's deposits across all auctions
+  const { data: myDeposits } = useQuery({
+    queryKey: ["my-auction-deposits", auctionIds, user?.id],
+    queryFn: async () => {
+      if (!user || auctionIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("auction_deposits")
+        .select("auction_id, amount, created_at")
+        .eq("user_id", user.id)
+        .in("auction_id", auctionIds)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: auctionIds.length > 0 && !!user,
+  });
+
+  const depositsByAuction = new Map<string, typeof myDeposits>();
+  myDeposits?.forEach((d) => {
+    const list = depositsByAuction.get(d.auction_id) ?? [];
+    list.push(d);
+    depositsByAuction.set(d.auction_id, list);
+  });
+
   const { data: allItems } = useQuery({
     queryKey: ["auction-items-all", auctionIds],
     queryFn: async () => {
@@ -315,6 +341,8 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
     const start = new Date(auction.scheduled_start);
     const isStarted = auction.status === "active" || start <= new Date();
     const items = itemsByAuction.get(auction.id) ?? [];
+    const myAuctionDeposits = depositsByAuction.get(auction.id) ?? [];
+    const myTotal = myAuctionDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
 
     return (
       <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
@@ -332,6 +360,14 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
                   <span className="text-xs text-muted-foreground">
                     {format(start, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                   </span>
+                  {!isAdmin && myTotal > 0 && (
+                    <>
+                      <span className="text-muted-foreground/30">•</span>
+                      <span className="text-xs font-semibold text-discovery-green">
+                        ${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })} investido
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -346,6 +382,29 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
           {auction.description && (
             <p className="text-sm text-muted-foreground">{auction.description}</p>
+          )}
+
+          {/* My deposits summary */}
+          {!isAdmin && myAuctionDeposits.length > 0 && (
+            <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">Meus Depósitos</span>
+                </div>
+                <span className="text-sm font-bold text-primary">
+                  ${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {myAuctionDeposits.map((dep, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{format(new Date(dep.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
+                    <span className="font-medium text-foreground">${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Deposit form for non-finished auctions */}
