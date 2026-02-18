@@ -170,14 +170,12 @@ export default function UserLeiloesPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTitle: string }) {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [rawAmount, setRawAmount] = useState(0);
   const [displayAmount, setDisplayAmount] = useState("");
-  const [localCredits, setLocalCredits] = useState<number | null>(null);
 
-  const credits = localCredits ?? profile?.credits ?? 0;
+  const credits = profile?.credits ?? 0;
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/[^0-9]/g, "");
@@ -211,7 +209,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         .eq("user_id", user!.id);
       if (creditError) throw creditError;
 
-      // Log transaction (non-blocking - don't fail deposit if this errors)
+      // Log transaction (non-blocking)
       supabase.from("credit_transactions").insert({
         user_id: user!.id,
         amount: -val,
@@ -221,12 +219,9 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
       }).then(({ error: txError }) => {
         if (txError) console.warn("Transaction log failed:", txError.message);
       });
-
-      return newCredits;
     },
-    onSuccess: (newCredits) => {
-      setLocalCredits(newCredits);
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    onSuccess: async () => {
+      await refreshProfile();
       toast({ title: "Depósito realizado com sucesso!" });
       setRawAmount(0);
       setDisplayAmount("");
