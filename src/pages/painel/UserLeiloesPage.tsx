@@ -3,12 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -83,53 +82,84 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
 }
 
 function AuctionItemCard({ item }: { item: any }) {
-  return (
+  const prop = item.properties;
+  const image = prop?.cover_image_url || item.image_url;
+  const title = prop?.title || item.title;
+  const location = prop?.location || item.location;
+  const type = prop?.type === "house" || item.type === "casa" ? "Casa" : "Terreno";
+  const hasProperty = !!prop;
+
+  const content = (
     <div className="group relative flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
-      {/* Image */}
       <div className="aspect-[16/10] bg-secondary/50 overflow-hidden relative">
-        {item.image_url ? (
-          <img
-            src={item.image_url}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        {image ? (
+          <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            {item.type === "terreno" ? (
-              <TreePine className="h-8 w-8 text-muted-foreground/20" />
-            ) : (
-              <Home className="h-8 w-8 text-muted-foreground/20" />
-            )}
+            {type === "Terreno" ? <TreePine className="h-8 w-8 text-muted-foreground/20" /> : <Home className="h-8 w-8 text-muted-foreground/20" />}
           </div>
         )}
-        <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">
-          {item.type === "terreno" ? "Terreno" : "Casa"}
-        </Badge>
+        <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">{type}</Badge>
       </div>
 
-      {/* Content */}
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        <div>
-          <h3 className="font-semibold text-foreground leading-tight">{item.title}</h3>
-          {item.location && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <MapPin className="h-3 w-3" />
-              {item.location}
-            </p>
-          )}
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-foreground leading-tight">{title}</h3>
+            {location && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <MapPin className="h-3 w-3" /> {location}
+              </p>
+            )}
+          </div>
+          {hasProperty && <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />}
         </div>
-        {item.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>
+
+        {hasProperty && (
+          <>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço</p>
+                <p className="font-semibold text-foreground">${Number(prop.purchase_price).toLocaleString("pt-BR")}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
+                <p className="font-semibold text-primary">{Number(prop.estimated_return_pct)}%</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
+                <p className="font-semibold text-foreground">
+                  {prop.total_shares - (prop.available_shares ?? 0)}<span className="text-muted-foreground/60 font-normal">/{prop.total_shares}</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Preço/Cota</p>
+                <p className="font-semibold text-foreground">${Number(prop.share_price).toLocaleString("pt-BR")}</p>
+              </div>
+            </div>
+            <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
+              {Number(prop.estimated_return_pct)}% retorno estimado
+            </Badge>
+          </>
+        )}
+
+        {!hasProperty && item.description && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
         )}
       </div>
     </div>
   );
+
+  if (hasProperty) {
+    return <Link to={`/painel/imovel/${prop.id}`} className="block">{content}</Link>;
+  }
+  return content;
 }
 
 export default function UserLeiloesPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions"],
@@ -150,7 +180,7 @@ export default function UserLeiloesPage() {
       if (auctionIds.length === 0) return [];
       const { data, error } = await supabase
         .from("auction_items")
-        .select("*")
+        .select("*, properties(*)")
         .in("auction_id", auctionIds);
       if (error) throw error;
       return data;
