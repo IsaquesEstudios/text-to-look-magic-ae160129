@@ -175,6 +175,9 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
   const queryClient = useQueryClient();
   const [rawAmount, setRawAmount] = useState(0);
   const [displayAmount, setDisplayAmount] = useState("");
+  const [localCredits, setLocalCredits] = useState<number | null>(null);
+
+  const credits = localCredits ?? profile?.credits ?? 0;
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/[^0-9]/g, "");
@@ -191,7 +194,9 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
     mutationFn: async () => {
       const val = rawAmount / 100;
       if (val <= 0) throw new Error("Valor inválido");
-      if (profile && val > profile.credits) throw new Error("Créditos insuficientes");
+      if (val > credits) throw new Error("Créditos insuficientes");
+
+      const newCredits = credits - val;
 
       const { error } = await supabase.from("auction_deposits").insert({
         auction_id: auctionId,
@@ -202,7 +207,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
 
       const { error: creditError } = await supabase
         .from("profiles")
-        .update({ credits: (profile?.credits ?? 0) - val })
+        .update({ credits: newCredits })
         .eq("user_id", user!.id);
       if (creditError) throw creditError;
 
@@ -213,8 +218,11 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         description: `Depósito no leilão: ${auctionTitle}`,
         created_by: user!.id,
       });
+
+      return newCredits;
     },
-    onSuccess: () => {
+    onSuccess: (newCredits) => {
+      setLocalCredits(newCredits);
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast({ title: "Depósito realizado com sucesso!" });
       setRawAmount(0);
@@ -230,7 +238,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         <span className="text-sm font-semibold text-foreground">Depositar Créditos</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+        Saldo disponível: <span className="font-semibold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
       </p>
       <div className="flex gap-2">
         <div className="relative flex-1">
