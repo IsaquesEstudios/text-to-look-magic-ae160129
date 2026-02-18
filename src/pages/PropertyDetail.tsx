@@ -1,24 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import {
   MapPin,
   DollarSign,
@@ -45,8 +32,6 @@ export default function PropertyDetail() {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [purchasing, setPurchasing] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -74,19 +59,6 @@ export default function PropertyDetail() {
       return data;
     },
     enabled: !!id && !!user,
-  });
-
-  const { data: shares } = useQuery({
-    queryKey: ["property-shares", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("shares")
-        .select("*")
-        .eq("property_id", id!);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id && !!user && isAdmin,
   });
 
   const { data: userShares } = useQuery({
@@ -118,32 +90,8 @@ export default function PropertyDetail() {
   }
 
   const status = statusLabels[property.status] || statusLabels.available;
-  const totalShares = property.total_shares ?? 0;
-  const availableShares = property.available_shares ?? 0;
-  const soldShares = totalShares - availableShares;
   const purchasePrice = Number(property.purchase_price) || 0;
   const estimatedReturn = Number(property.estimated_return_pct) || 0;
-  const sharePrice = Number(property.share_price) || 0;
-  const canPurchase = availableShares > 0 && property.status !== "sold" && !isAdmin;
-
-  const handlePurchase = async () => {
-    if (!user || !id) return;
-    setPurchasing(true);
-    try {
-      const { error } = await supabase.rpc("purchase_share", {
-        p_property_id: id,
-        p_user_id: user.id,
-      });
-      if (error) throw error;
-      toast.success("Cota adquirida com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["property-detail", id] });
-      queryClient.invalidateQueries({ queryKey: ["user-shares", id] });
-    } catch (err: any) {
-      toast.error(err.message || "Erro ao adquirir cota");
-    } finally {
-      setPurchasing(false);
-    }
-  };
 
   const allImages = [
     ...(property.cover_image_url ? [{ id: "cover", image_url: property.cover_image_url }] : []),
@@ -164,12 +112,11 @@ export default function PropertyDetail() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
             { icon: DollarSign, label: "Preço Total", value: `$${purchasePrice.toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
             { icon: TrendingUp, label: "Retorno Est.", value: `${estimatedReturn}%`, iconClass: "text-primary", valueClass: "text-primary" },
-            { icon: Users, label: "Cotas", value: `${soldShares}/${totalShares}`, iconClass: "text-muted-foreground/60" },
-            { icon: DollarSign, label: "Preço/Cota", value: `$${sharePrice.toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
+            { icon: DollarSign, label: "Preço/Cota", value: `$${(Number(property.share_price) || 0).toLocaleString("en-US")}`, iconClass: "text-muted-foreground/60" },
           ].map((stat, i) => (
             <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
               <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
@@ -178,63 +125,6 @@ export default function PropertyDetail() {
             </div>
           ))}
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{soldShares} de {totalShares} cotas preenchidas</span>
-            <span className="font-medium text-foreground">{totalShares > 0 ? Math.round((soldShares / totalShares) * 100) : 0}%</span>
-          </div>
-          <div className="flex gap-1 w-full">
-            {Array.from({ length: totalShares }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-3 flex-1 rounded-sm transition-colors ${
-                  i < soldShares ? "bg-primary" : "bg-secondary"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {userShares && userShares.length > 0 && (
-          <p className="text-sm font-medium text-primary">
-            Você possui {userShares.reduce((sum, s) => sum + s.quantity, 0)} cota{userShares.reduce((sum, s) => sum + s.quantity, 0) !== 1 ? "s" : ""} neste imóvel
-          </p>
-        )}
-
-        {canPurchase && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="lg" className="w-full sm:w-auto text-base font-semibold px-8">
-                Participar
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirmar participação</AlertDialogTitle>
-                <AlertDialogDescription className="space-y-2">
-                  <span className="block">
-                    Ao confirmar, você estará adquirindo <strong>1 cota</strong> do imóvel{" "}
-                    <strong>{property.title}</strong>.
-                  </span>
-                  <span className="block text-lg font-bold text-foreground">
-                    Valor: ${sharePrice.toLocaleString("en-US")}
-                  </span>
-                  <span className="block text-xs text-muted-foreground">
-                    Ao confirmar, você declara estar de acordo com os termos de investimento.
-                  </span>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handlePurchase} disabled={purchasing}>
-                  {purchasing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Confirmar
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
 
         <div
           className="relative w-full rounded-2xl overflow-hidden bg-secondary/30 cursor-pointer group"

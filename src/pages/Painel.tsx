@@ -68,7 +68,7 @@ function AdminDashboardContent() {
       const shareActivities: ActivityItem[] = (sharesRes.data ?? []).map((s) => ({
         id: `share-${s.id}`,
         type: "share_purchase" as const,
-        description: `${nameMap.get(s.user_id) || "Usuário"} adquiriu uma cota — $ ${Number(s.amount_paid).toLocaleString("en-US")}`,
+        description: `${nameMap.get(s.user_id) || "Usuário"} vinculado a imóvel — $ ${Number(s.amount_paid).toLocaleString("en-US")}`,
         timestamp: s.purchased_at,
         icon: ShoppingCart,
       }));
@@ -110,7 +110,7 @@ function AdminDashboardContent() {
   const cards = [
     { label: "Imóveis", value: stats?.totalProperties ?? 0, icon: Building2 },
     { label: "Usuários", value: stats?.totalUsers ?? 0, icon: Users },
-    { label: "Cotas Vendidas", value: stats?.totalSharesSold ?? 0, icon: PieChart },
+    { label: "Vínculos", value: stats?.totalSharesSold ?? 0, icon: PieChart },
     {
       label: "Receita Total",
       value: `$ ${(stats?.totalRevenue ?? 0).toLocaleString("en-US")}`,
