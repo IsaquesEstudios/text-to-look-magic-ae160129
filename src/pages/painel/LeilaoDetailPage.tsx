@@ -1,0 +1,304 @@
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Clock, DollarSign, MapPin, Home, TreePine } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+function CountdownTimer({ targetDate }: { targetDate: string }) {
+  const [timeLeft, setTimeLeft] = useState("");
+  const [isStarted, setIsStarted] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date().getTime();
+      const target = new Date(targetDate).getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setTimeLeft("Leilão iniciado!");
+        setIsStarted(true);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft(
+        days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s`
+          : `${hours}h ${minutes}m ${seconds}s`
+      );
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return (
+    <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-discovery-green/10 text-discovery-green" : "bg-primary/5 text-primary"}`}>
+      <p className="text-xs text-muted-foreground mb-1">
+        {isStarted ? "Status" : "Começa em"}
+      </p>
+      <p className="text-2xl font-bold font-mono tracking-wider">{timeLeft}</p>
+    </div>
+  );
+}
+
+export default function LeilaoDetailPage() {
+  const { id } = useParams();
+  const { user, isAdmin, profile } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [depositAmount, setDepositAmount] = useState("");
+
+  const { data: auction } = useQuery({
+    queryKey: ["auction", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("auctions").select("*").eq("id", id!).single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  const { data: items } = useQuery({
+    queryKey: ["auction-items", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("auction_items").select("*").eq("auction_id", id!);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  const { data: deposits } = useQuery({
+    queryKey: ["auction-deposits", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("auction_deposits").select("*").eq("auction_id", id!).order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Admin: fetch profiles for deposit users
+  const depositUserIds = [...new Set(deposits?.map((d) => d.user_id) ?? [])];
+  const { data: depositProfiles } = useQuery({
+    queryKey: ["deposit-profiles", depositUserIds],
+    queryFn: async () => {
+      if (depositUserIds.length === 0) return [];
+      const { data, error } = await supabase.from("profiles").select("user_id, full_name").in("user_id", depositUserIds);
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin && depositUserIds.length > 0,
+  });
+
+  const depositMutation = useMutation({
+    mutationFn: async () => {
+      const amount = parseFloat(depositAmount);
+      if (isNaN(amount) || amount <= 0) throw new Error("Valor inválido");
+      if (profile && amount > profile.credits) throw new Error("Créditos insuficientes");
+
+      const { error } = await supabase.from("auction_deposits").insert({
+        auction_id: id!,
+        user_id: user!.id,
+        amount,
+      });
+      if (error) throw error;
+
+      // Deduct credits
+      const { error: creditError } = await supabase
+        .from("profiles")
+        .update({ credits: (profile?.credits ?? 0) - amount })
+        .eq("user_id", user!.id);
+      if (creditError) throw creditError;
+
+      // Log the transaction
+      await supabase.from("credit_transactions").insert({
+        user_id: user!.id,
+        amount: -amount,
+        type: "deposit",
+        description: `Depósito no leilão: ${auction?.title}`,
+        created_by: user!.id,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      toast({ title: "Depósito realizado com sucesso!" });
+      setDepositAmount("");
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const profileMap = new Map(depositProfiles?.map((p) => [p.user_id, p.full_name]) ?? []);
+  const totalDeposited = deposits?.reduce((sum, d) => sum + Number(d.amount), 0) ?? 0;
+  const myDeposits = deposits?.filter((d) => d.user_id === user?.id) ?? [];
+  const myTotal = myDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
+
+  const isActive = auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date());
+  const canDeposit = !isAdmin && isActive && auction?.status !== "finished";
+
+  if (!auction) {
+    return <div className="animate-pulse text-muted-foreground">Carregando...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
+          {auction.status === "finished" ? (
+            <Badge variant="secondary">Encerrado</Badge>
+          ) : isActive ? (
+            <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>
+          ) : (
+            <Badge variant="outline">Programado</Badge>
+          )}
+        </div>
+        {auction.description && <p className="text-sm text-muted-foreground">{auction.description}</p>}
+      </div>
+
+      {/* Countdown */}
+      {auction.status !== "finished" && (
+        <CountdownTimer targetDate={auction.scheduled_start} />
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-muted-foreground">Total Depositado</p>
+            <p className="text-xl font-bold text-foreground">${totalDeposited.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-muted-foreground">Depósitos</p>
+            <p className="text-xl font-bold text-foreground">{deposits?.length ?? 0}</p>
+          </CardContent>
+        </Card>
+        {!isAdmin && (
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-xs text-muted-foreground">Meu Total</p>
+              <p className="text-xl font-bold text-primary">${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Deposit form (users only, when active) */}
+      {canDeposit && (
+        <Card className="border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-discovery-green" />
+              Depositar no Leilão
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+            </p>
+            <div className="flex gap-3">
+              <Input
+                type="number"
+                placeholder="Valor em USD"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                min="0"
+                step="0.01"
+              />
+              <Button
+                onClick={() => depositMutation.mutate()}
+                disabled={!depositAmount || depositMutation.isPending}
+                className="bg-discovery-green hover:bg-discovery-green/90 text-primary-foreground flex-shrink-0"
+              >
+                {depositMutation.isPending ? "..." : "Depositar"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Auction items */}
+      {items && items.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    {item.type === "terreno" ? <TreePine className="h-5 w-5 text-primary" /> : <Home className="h-5 w-5 text-primary" />}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{item.title}</p>
+                    {item.location && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <MapPin className="h-3 w-3" /> {item.location}
+                      </p>
+                    )}
+                    {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Deposits list */}
+      {deposits && deposits.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Depósitos ({deposits.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">#</TableHead>
+                  {isAdmin && <TableHead>Investidor</TableHead>}
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Data</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {deposits.map((dep, idx) => (
+                  <TableRow key={dep.id}>
+                    <TableCell className="font-mono text-muted-foreground">{idx + 1}</TableCell>
+                    {isAdmin && (
+                      <TableCell className="font-medium">{profileMap.get(dep.user_id) || "Usuário"}</TableCell>
+                    )}
+                    <TableCell className="font-semibold">${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {format(new Date(dep.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

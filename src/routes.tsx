@@ -30,6 +30,9 @@ const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
 const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
+const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
+const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
+const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
 
 // PainelLayout is the persistent layout for all /painel/* routes
 const PainelLayoutModule = lazy(() =>
@@ -95,6 +98,9 @@ const panelChildren: RouteRecord[] = [
   { path: "usuarios/:userId", element: <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper> },
   { path: "atividades", element: <SuspenseWrapper><AdminAtividadesPage /></SuspenseWrapper> },
   { path: "configuracoes", element: <SuspenseWrapper><AdminConfigPage /></SuspenseWrapper> },
+  { path: "leiloes", element: <SuspenseWrapper><AdminLeiloesPage /></SuspenseWrapper> },
+  { path: "leiloes-user", element: <SuspenseWrapper><UserLeiloesPage /></SuspenseWrapper> },
+  { path: "leilao/:id", element: <SuspenseWrapper><LeilaoDetailPage /></SuspenseWrapper> },
 ];
 
 export const routes: RouteRecord[] = [
