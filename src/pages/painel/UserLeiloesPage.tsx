@@ -1,13 +1,16 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, DollarSign, Wallet } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import {
   Accordion,
   AccordionContent,
@@ -163,9 +166,82 @@ function AuctionItemCard({ item }: { item: any }) {
 }
 
 export default function UserLeiloesPage() {
-  const { user } = useAuth();
+  const { user, isAdmin, profile } = useAuth();
   const queryClient = useQueryClient();
-  
+  const { toast } = useToast();
+function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTitle: string }) {
+  const { user, profile } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [amount, setAmount] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const val = parseFloat(amount);
+      if (isNaN(val) || val <= 0) throw new Error("Valor inválido");
+      if (profile && val > profile.credits) throw new Error("Créditos insuficientes");
+
+      const { error } = await supabase.from("auction_deposits").insert({
+        auction_id: auctionId,
+        user_id: user!.id,
+        amount: val,
+      });
+      if (error) throw error;
+
+      const { error: creditError } = await supabase
+        .from("profiles")
+        .update({ credits: (profile?.credits ?? 0) - val })
+        .eq("user_id", user!.id);
+      if (creditError) throw creditError;
+
+      await supabase.from("credit_transactions").insert({
+        user_id: user!.id,
+        amount: -val,
+        type: "deposit",
+        description: `Depósito no leilão: ${auctionTitle}`,
+        created_by: user!.id,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      toast({ title: "Depósito realizado com sucesso!" });
+      setAmount("");
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  return (
+    <div className="rounded-xl border border-discovery-green/20 bg-discovery-green/5 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <Wallet className="h-4 w-4 text-discovery-green" />
+        <span className="text-sm font-semibold text-foreground">Depositar Créditos</span>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+      </p>
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          placeholder="Valor em USD"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          min="0"
+          step="0.01"
+          className="flex-1"
+        />
+        <Button
+          onClick={() => mutation.mutate()}
+          disabled={!amount || mutation.isPending}
+          variant="cta"
+          size="sm"
+        >
+          {mutation.isPending ? "..." : "Depositar"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions"],
@@ -246,10 +322,16 @@ export default function UserLeiloesPage() {
           </div>
         </AccordionTrigger>
 
-        <AccordionContent className="px-4 sm:px-5 pb-5">
+        <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
           {auction.description && (
-            <p className="text-sm text-muted-foreground mb-4">{auction.description}</p>
+            <p className="text-sm text-muted-foreground">{auction.description}</p>
           )}
+
+          {/* Deposit form for active auctions */}
+          {!isAdmin && auction.status !== "finished" && (isStarted || auction.status === "active") && (
+            <DepositForm auctionId={auction.id} auctionTitle={auction.title} />
+          )}
+
           {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((item) => (
