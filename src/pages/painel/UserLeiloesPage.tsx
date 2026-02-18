@@ -43,9 +43,9 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
 
   if (status === "finished") {
     return (
-      <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="flex items-center gap-2 text-destructive">
         <Clock className="h-4 w-4" />
-        <span className="text-sm font-medium">Encerrado</span>
+        <span className="text-sm font-bold">Terminado</span>
       </div>
     );
   }
