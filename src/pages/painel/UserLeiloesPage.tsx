@@ -36,10 +36,12 @@ export default function UserLeiloesPage() {
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions"],
     queryFn: async () => {
+      console.log("[UserLeiloesPage] Fetching auctions...");
       const { data, error } = await supabase
         .from("auctions")
         .select("*")
         .order("scheduled_start", { ascending: false });
+      console.log("[UserLeiloesPage] Result:", { data, error, count: data?.length });
       if (error) throw error;
       return data;
     },
