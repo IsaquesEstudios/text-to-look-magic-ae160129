@@ -54,6 +54,7 @@ export type Database = {
           id: string
           image_url: string | null
           location: string | null
+          property_id: string | null
           title: string
           type: string
         }
@@ -64,6 +65,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string | null
+          property_id?: string | null
           title: string
           type?: string
         }
@@ -74,6 +76,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string | null
+          property_id?: string | null
           title?: string
           type?: string
         }
@@ -83,6 +86,13 @@ export type Database = {
             columns: ["auction_id"]
             isOneToOne: false
             referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_items_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
