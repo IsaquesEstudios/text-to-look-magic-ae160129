@@ -347,7 +347,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
     return (
       <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
         <AccordionTrigger className="hover:no-underline px-4 sm:px-5 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pr-3 gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between w-full pr-3 gap-3">
             {/* Left: Title + badge */}
             <div className="flex items-center gap-3 min-w-0">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
