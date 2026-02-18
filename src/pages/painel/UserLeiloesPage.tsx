@@ -211,12 +211,15 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         .eq("user_id", user!.id);
       if (creditError) throw creditError;
 
-      await supabase.from("credit_transactions").insert({
+      // Log transaction (non-blocking - don't fail deposit if this errors)
+      supabase.from("credit_transactions").insert({
         user_id: user!.id,
         amount: -val,
         type: "deposit",
         description: `Depósito no leilão: ${auctionTitle}`,
         created_by: user!.id,
+      }).then(({ error: txError }) => {
+        if (txError) console.warn("Transaction log failed:", txError.message);
       });
 
       return newCredits;
