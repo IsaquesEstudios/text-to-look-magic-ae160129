@@ -78,6 +78,7 @@ export default function AdminLeiloesPage() {
             estimated_auction_value: parseFloat(pForm.estimated_auction_value) || 0,
             estimated_renovation_cost: parseFloat(pForm.estimated_renovation_cost) || 0,
             estimated_return_pct: parseFloat(pForm.estimated_return_pct) || 0,
+            estimated_sale_value: parseFloat(pForm.estimated_sale_value) || 0,
             total_shares: parseInt(pForm.total_shares) || 1,
             share_price: parseFloat(pForm.share_price) || 0,
             available_shares: parseInt(pForm.total_shares) || 1,

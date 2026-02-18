@@ -262,6 +262,7 @@ export type Database = {
           estimated_auction_value: number | null
           estimated_renovation_cost: number | null
           estimated_return_pct: number
+          estimated_sale_value: number | null
           estimated_timeline: string | null
           id: string
           location: string
@@ -282,6 +283,7 @@ export type Database = {
           estimated_auction_value?: number | null
           estimated_renovation_cost?: number | null
           estimated_return_pct?: number
+          estimated_sale_value?: number | null
           estimated_timeline?: string | null
           id?: string
           location: string
@@ -302,6 +304,7 @@ export type Database = {
           estimated_auction_value?: number | null
           estimated_renovation_cost?: number | null
           estimated_return_pct?: number
+          estimated_sale_value?: number | null
           estimated_timeline?: string | null
           id?: string
           location?: string

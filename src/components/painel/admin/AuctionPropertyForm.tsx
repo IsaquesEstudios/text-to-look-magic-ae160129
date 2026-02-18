@@ -16,6 +16,7 @@ export interface AuctionPropertyData {
   estimated_auction_value: string;
   estimated_renovation_cost: string;
   estimated_return_pct: string;
+  estimated_sale_value: string;
   estimated_timeline: string;
   total_shares: string;
   share_price: string;
@@ -32,6 +33,7 @@ export const emptyPropertyData: AuctionPropertyData = {
   estimated_auction_value: "",
   estimated_renovation_cost: "",
   estimated_return_pct: "",
+  estimated_sale_value: "",
   estimated_timeline: "",
   total_shares: "1",
   share_price: "",
@@ -205,7 +207,11 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
           </div>
         </div>
 
-
+        {/* Sale Value */}
+        <div className="space-y-2">
+          <Label>Valor de Venda ($)</Label>
+          <Input type="number" step="0.01" min="0" value={data.estimated_sale_value} onChange={(e) => set("estimated_sale_value", e.target.value)} placeholder="Ex: 350000" />
+        </div>
 
 
         {/* Timeline */}
