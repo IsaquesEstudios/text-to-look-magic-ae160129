@@ -173,12 +173,24 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [amount, setAmount] = useState("");
+  const [rawAmount, setRawAmount] = useState(0);
+  const [displayAmount, setDisplayAmount] = useState("");
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/[^0-9]/g, "");
+    const cents = parseInt(input || "0", 10);
+    setRawAmount(cents);
+    if (cents === 0) {
+      setDisplayAmount("");
+    } else {
+      setDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const val = parseFloat(amount);
-      if (isNaN(val) || val <= 0) throw new Error("Valor inválido");
+      const val = rawAmount / 100;
+      if (val <= 0) throw new Error("Valor inválido");
       if (profile && val > profile.credits) throw new Error("Créditos insuficientes");
 
       const { error } = await supabase.from("auction_deposits").insert({
@@ -205,7 +217,8 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast({ title: "Depósito realizado com sucesso!" });
-      setAmount("");
+      setRawAmount(0);
+      setDisplayAmount("");
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -220,18 +233,20 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
       </p>
       <div className="flex gap-2">
-        <Input
-          type="number"
-          placeholder="Valor em USD"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          min="0"
-          step="0.01"
-          className="flex-1"
-        />
+        <div className="relative flex-1">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+          <Input
+            type="text"
+            inputMode="numeric"
+            placeholder="0.00"
+            value={displayAmount}
+            onChange={handleAmountChange}
+            className="pl-7"
+          />
+        </div>
         <Button
           onClick={() => mutation.mutate()}
-          disabled={!amount || mutation.isPending}
+          disabled={rawAmount === 0 || mutation.isPending}
           variant="cta"
           size="sm"
         >
