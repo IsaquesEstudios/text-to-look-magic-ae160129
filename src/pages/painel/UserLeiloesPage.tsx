@@ -136,9 +136,16 @@ function AuctionItemCard({ item }: { item: any }) {
                 <p className="font-semibold text-foreground">${(Number(prop.purchase_price) * (1 + Number(prop.estimated_return_pct) / 100)).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
               </div>
             </div>
-            <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
-              {Number(prop.estimated_return_pct)}% retorno estimado
-            </Badge>
+            {(() => {
+              const total = Number(prop.purchase_price) || 0;
+              const market = total * (1 + (Number(prop.estimated_return_pct) || 0) / 100);
+              const ret = total > 0 ? ((market - total) / total) * 100 : 0;
+              return (
+                <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
+                  {ret.toFixed(1)}% retorno estimado
+                </Badge>
+              );
+            })()}
           </>
         )}
 
