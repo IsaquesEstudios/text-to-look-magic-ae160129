@@ -349,7 +349,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
         <AccordionTrigger className="hover:no-underline px-4 sm:px-5 py-4">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between w-full pr-3 gap-3">
             {/* Left: Title + badge */}
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-start gap-3 min-w-0">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Gavel className="h-5 w-5 text-primary" />
               </div>
