@@ -14,6 +14,112 @@ export type Database = {
   }
   public: {
     Tables: {
+      auction_deposits: {
+        Row: {
+          amount: number
+          auction_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_deposits_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_items: {
+        Row: {
+          auction_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          auction_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          title: string
+          type?: string
+        }
+        Update: {
+          auction_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_items_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auctions: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          scheduled_start: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          scheduled_start: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          scheduled_start?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string | null
