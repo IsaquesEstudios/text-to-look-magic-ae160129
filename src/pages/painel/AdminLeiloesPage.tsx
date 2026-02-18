@@ -9,20 +9,146 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus, X } from "lucide-react";
+import { PlusCircle, Trash2, Clock, CheckCircle, Eye, X, Search, MapPin, Home, TreePine, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 
-interface AuctionItem {
-  title: string;
-  type: string;
-  location: string;
-  description: string;
+/* ─── Property Picker Component ─── */
+function PropertyPicker({
+  selectedIds,
+  onAdd,
+  onRemove,
+}: {
+  selectedIds: string[];
+  onAdd: (property: any) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+
+  const { data: properties } = useQuery({
+    queryKey: ["all-properties-for-auction"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const available = properties?.filter(
+    (p) =>
+      !selectedIds.includes(p.id) &&
+      (search === "" ||
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.location.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const selected = properties?.filter((p) => selectedIds.includes(p.id)) ?? [];
+
+  const fmt = (v: number) =>
+    v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+  return (
+    <div className="space-y-4">
+      {/* Selected properties */}
+      {selected.length > 0 && (
+        <div className="space-y-2">
+          {selected.map((p) => {
+            const total = (p.estimated_auction_value ?? 0) + (p.estimated_renovation_cost ?? 0);
+            return (
+              <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                {p.cover_image_url ? (
+                  <img src={p.cover_image_url} alt="" className="h-14 w-14 rounded-lg object-cover flex-shrink-0" />
+                ) : (
+                  <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                    {p.type === "house" ? <Home className="h-5 w-5 text-muted-foreground" /> : <TreePine className="h-5 w-5 text-muted-foreground" />}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm truncate">{p.title}</span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                      {p.type === "house" ? "Casa" : "Terreno"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {p.location}{p.state_code ? `, ${p.state_code}` : ""}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <DollarSign className="h-3 w-3" />
+                      {fmt(total)}
+                    </span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => onRemove(p.id)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Search & add */}
+      <div className="p-4 border border-dashed border-border rounded-xl space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar imóvel por nome ou cidade..."
+            className="pl-9"
+          />
+        </div>
+
+        {available && available.length > 0 ? (
+          <div className="max-h-60 overflow-y-auto space-y-1">
+            {available.map((p) => {
+              const total = (p.estimated_auction_value ?? 0) + (p.estimated_renovation_cost ?? 0);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => onAdd(p)}
+                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-secondary/50 transition-colors text-left"
+                >
+                  {p.cover_image_url ? (
+                    <img src={p.cover_image_url} alt="" className="h-10 w-10 rounded-lg object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                      {p.type === "house" ? <Home className="h-4 w-4 text-muted-foreground" /> : <TreePine className="h-4 w-4 text-muted-foreground" />}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium truncate block">{p.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {p.location}{p.state_code ? `, ${p.state_code}` : ""} • {fmt(total)}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] flex-shrink-0">
+                    {p.type === "house" ? "Casa" : "Terreno"}
+                  </Badge>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground text-center py-4">
+            {search ? "Nenhum imóvel encontrado" : "Todos os imóveis já foram adicionados"}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
+/* ─── Main Page ─── */
 export default function AdminLeiloesPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -33,8 +159,7 @@ export default function AdminLeiloesPage() {
     description: "",
     scheduled_start: "",
   });
-  const [items, setItems] = useState<AuctionItem[]>([]);
-  const [newItem, setNewItem] = useState<AuctionItem>({ title: "", type: "casa", location: "", description: "" });
+  const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["admin-auctions"],
@@ -48,7 +173,6 @@ export default function AdminLeiloesPage() {
     },
   });
 
-  // Mark auctions as read when visiting
   useEffect(() => {
     if (user && auctions) {
       markAuctionsRead(user.id).then(() => {
@@ -71,17 +195,27 @@ export default function AdminLeiloesPage() {
         .single();
       if (error) throw error;
 
-      if (items.length > 0) {
-        const { error: itemsError } = await supabase.from("auction_items").insert(
-          items.map((item) => ({
-            auction_id: auction.id,
-            title: item.title,
-            type: item.type,
-            location: item.location || null,
-            description: item.description || null,
-          }))
-        );
-        if (itemsError) throw itemsError;
+      if (selectedPropertyIds.length > 0) {
+        // Fetch property data to populate auction_items
+        const { data: props } = await supabase
+          .from("properties")
+          .select("*")
+          .in("id", selectedPropertyIds);
+
+        if (props && props.length > 0) {
+          const { error: itemsError } = await supabase.from("auction_items").insert(
+            props.map((p) => ({
+              auction_id: auction.id,
+              property_id: p.id,
+              title: p.title,
+              type: p.type === "house" ? "casa" : "terreno",
+              location: `${p.location}${p.state_code ? `, ${p.state_code}` : ""}`,
+              description: p.estimated_timeline || null,
+              image_url: p.cover_image_url || null,
+            }))
+          );
+          if (itemsError) throw itemsError;
+        }
       }
     },
     onSuccess: () => {
@@ -89,7 +223,7 @@ export default function AdminLeiloesPage() {
       toast({ title: "Leilão criado com sucesso!" });
       setShowForm(false);
       setForm({ title: "", description: "", scheduled_start: "" });
-      setItems([]);
+      setSelectedPropertyIds([]);
     },
     onError: (e: Error) => toast({ title: "Erro ao criar leilão", description: e.message, variant: "destructive" }),
   });
@@ -115,14 +249,6 @@ export default function AdminLeiloesPage() {
       toast({ title: "Status atualizado" });
     },
   });
-
-  const addItem = () => {
-    if (!newItem.title.trim()) return;
-    setItems([...items, { ...newItem }]);
-    setNewItem({ title: "", type: "casa", location: "", description: "" });
-  };
-
-  const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx));
 
   const getStatusBadge = (status: string, scheduledStart: string) => {
     const now = new Date();
@@ -163,52 +289,15 @@ export default function AdminLeiloesPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Imóveis / Terrenos do Leilão</CardTitle>
+            <CardTitle className="text-lg">Imóveis do Leilão</CardTitle>
+            <p className="text-sm text-muted-foreground">Selecione os imóveis cadastrados que farão parte deste leilão</p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {items.map((item, idx) => (
-              <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                <div className="flex-1">
-                  <span className="font-medium text-sm">{item.title}</span>
-                  <span className="text-xs text-muted-foreground ml-2">({item.type})</span>
-                  {item.location && <span className="text-xs text-muted-foreground ml-2">• {item.location}</span>}
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeItem(idx)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 border border-dashed border-border rounded-xl">
-              <div>
-                <Label className="text-xs">Nome do Imóvel *</Label>
-                <Input value={newItem.title} onChange={(e) => setNewItem({ ...newItem, title: e.target.value })} placeholder="Ex: Casa em Miami" />
-              </div>
-              <div>
-                <Label className="text-xs">Tipo</Label>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={newItem.type}
-                  onChange={(e) => setNewItem({ ...newItem, type: e.target.value })}
-                >
-                  <option value="casa">Casa</option>
-                  <option value="terreno">Terreno</option>
-                </select>
-              </div>
-              <div>
-                <Label className="text-xs">Localização</Label>
-                <Input value={newItem.location} onChange={(e) => setNewItem({ ...newItem, location: e.target.value })} placeholder="Ex: Miami, FL" />
-              </div>
-              <div>
-                <Label className="text-xs">Descrição</Label>
-                <Input value={newItem.description} onChange={(e) => setNewItem({ ...newItem, description: e.target.value })} placeholder="Detalhes..." />
-              </div>
-              <div className="sm:col-span-2">
-                <Button variant="outline" size="sm" onClick={addItem} className="gap-2">
-                  <Plus className="h-4 w-4" /> Adicionar Imóvel
-                </Button>
-              </div>
-            </div>
+          <CardContent>
+            <PropertyPicker
+              selectedIds={selectedPropertyIds}
+              onAdd={(p) => setSelectedPropertyIds((prev) => [...prev, p.id])}
+              onRemove={(id) => setSelectedPropertyIds((prev) => prev.filter((pid) => pid !== id))}
+            />
           </CardContent>
         </Card>
 
