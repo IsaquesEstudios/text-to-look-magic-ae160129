@@ -327,8 +327,8 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
             <p className="text-sm text-muted-foreground">{auction.description}</p>
           )}
 
-          {/* Deposit form for active auctions */}
-          {!isAdmin && auction.status !== "finished" && (isStarted || auction.status === "active") && (
+          {/* Deposit form for non-finished auctions */}
+          {!isAdmin && auction.status !== "finished" && (
             <DepositForm auctionId={auction.id} auctionTitle={auction.title} />
           )}
 
