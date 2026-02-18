@@ -14,6 +14,7 @@ export interface AuthState {
   isLoading: boolean;
   profile: { full_name: string | null; credits: number } | null;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const defaultState: AuthState = {
@@ -24,6 +25,7 @@ const defaultState: AuthState = {
   isLoading: true,
   profile: null,
   signOut: async () => {},
+  refreshProfile: async () => {},
 };
 
 export const AuthContext = createContext<AuthState>(defaultState);
@@ -115,9 +117,17 @@ export function useAuthInternal(): AuthState {
     await supabase.auth.signOut();
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase.from("profiles").select("full_name, credits").eq("user_id", user.id).maybeSingle();
+    if (data) {
+      setProfile({ full_name: data.full_name, credits: Number(data.credits) });
+    }
+  }, [user]);
+
   return useMemo(
-    () => ({ user, session, roles, isAdmin, isLoading, profile, signOut }),
-    [user, session, roles, isAdmin, isLoading, profile, signOut]
+    () => ({ user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile }),
+    [user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile]
   );
 }
 
