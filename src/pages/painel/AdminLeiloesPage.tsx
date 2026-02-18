@@ -7,146 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Trash2, Clock, CheckCircle, Eye, X, Search, MapPin, Home, TreePine, DollarSign } from "lucide-react";
+import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
-
-/* ─── Property Picker Component ─── */
-function PropertyPicker({
-  selectedIds,
-  onAdd,
-  onRemove,
-}: {
-  selectedIds: string[];
-  onAdd: (property: any) => void;
-  onRemove: (id: string) => void;
-}) {
-  const [search, setSearch] = useState("");
-
-  const { data: properties } = useQuery({
-    queryKey: ["all-properties-for-auction"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const available = properties?.filter(
-    (p) =>
-      !selectedIds.includes(p.id) &&
-      (search === "" ||
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.location.toLowerCase().includes(search.toLowerCase()))
-  );
-
-  const selected = properties?.filter((p) => selectedIds.includes(p.id)) ?? [];
-
-  const fmt = (v: number) =>
-    v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-
-  return (
-    <div className="space-y-4">
-      {/* Selected properties */}
-      {selected.length > 0 && (
-        <div className="space-y-2">
-          {selected.map((p) => {
-            const total = (p.estimated_auction_value ?? 0) + (p.estimated_renovation_cost ?? 0);
-            return (
-              <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                {p.cover_image_url ? (
-                  <img src={p.cover_image_url} alt="" className="h-14 w-14 rounded-lg object-cover flex-shrink-0" />
-                ) : (
-                  <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                    {p.type === "house" ? <Home className="h-5 w-5 text-muted-foreground" /> : <TreePine className="h-5 w-5 text-muted-foreground" />}
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm truncate">{p.title}</span>
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                      {p.type === "house" ? "Casa" : "Terreno"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {p.location}{p.state_code ? `, ${p.state_code}` : ""}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
-                      {fmt(total)}
-                    </span>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => onRemove(p.id)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Search & add */}
-      <div className="p-4 border border-dashed border-border rounded-xl space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar imóvel por nome ou cidade..."
-            className="pl-9"
-          />
-        </div>
-
-        {available && available.length > 0 ? (
-          <div className="max-h-60 overflow-y-auto space-y-1">
-            {available.map((p) => {
-              const total = (p.estimated_auction_value ?? 0) + (p.estimated_renovation_cost ?? 0);
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => onAdd(p)}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-secondary/50 transition-colors text-left"
-                >
-                  {p.cover_image_url ? (
-                    <img src={p.cover_image_url} alt="" className="h-10 w-10 rounded-lg object-cover flex-shrink-0" />
-                  ) : (
-                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                      {p.type === "house" ? <Home className="h-4 w-4 text-muted-foreground" /> : <TreePine className="h-4 w-4 text-muted-foreground" />}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium truncate block">{p.title}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {p.location}{p.state_code ? `, ${p.state_code}` : ""} • {fmt(total)}
-                    </span>
-                  </div>
-                  <Badge variant="outline" className="text-[10px] flex-shrink-0">
-                    {p.type === "house" ? "Casa" : "Terreno"}
-                  </Badge>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground text-center py-4">
-            {search ? "Nenhum imóvel encontrado" : "Todos os imóveis já foram adicionados"}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
+import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 
 /* ─── Main Page ─── */
 export default function AdminLeiloesPage() {
@@ -159,7 +27,7 @@ export default function AdminLeiloesPage() {
     description: "",
     scheduled_start: "",
   });
-  const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
+  const [propertyForms, setPropertyForms] = useState<AuctionPropertyData[]>([]);
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["admin-auctions"],
@@ -195,35 +63,64 @@ export default function AdminLeiloesPage() {
         .single();
       if (error) throw error;
 
-      if (selectedPropertyIds.length > 0) {
-        // Fetch property data to populate auction_items
-        const { data: props } = await supabase
-          .from("properties")
-          .select("*")
-          .in("id", selectedPropertyIds);
+      // Create each property + link to auction
+      for (const pForm of propertyForms) {
+        const totalProjeto = (parseFloat(pForm.estimated_auction_value) || 0) + (parseFloat(pForm.estimated_renovation_cost) || 0);
 
-        if (props && props.length > 0) {
-          const { error: itemsError } = await supabase.from("auction_items").insert(
-            props.map((p) => ({
-              auction_id: auction.id,
-              property_id: p.id,
-              title: p.title,
-              type: p.type === "house" ? "casa" : "terreno",
-              location: `${p.location}${p.state_code ? `, ${p.state_code}` : ""}`,
-              description: p.estimated_timeline || null,
-              image_url: p.cover_image_url || null,
+        const { data: prop, error: propError } = await supabase
+          .from("properties")
+          .insert({
+            type: pForm.type,
+            title: pForm.title.trim(),
+            location: pForm.location.trim(),
+            state_code: pForm.state_code || null,
+            purchase_price: totalProjeto,
+            estimated_auction_value: parseFloat(pForm.estimated_auction_value) || 0,
+            estimated_renovation_cost: parseFloat(pForm.estimated_renovation_cost) || 0,
+            estimated_return_pct: parseFloat(pForm.estimated_return_pct) || 0,
+            total_shares: parseInt(pForm.total_shares) || 1,
+            share_price: parseFloat(pForm.share_price) || 0,
+            available_shares: parseInt(pForm.total_shares) || 1,
+            status: pForm.status,
+            cover_image_url: pForm.coverImage,
+            estimated_timeline: pForm.estimated_timeline.trim(),
+            created_by: user!.id,
+          })
+          .select("id")
+          .single();
+        if (propError) throw propError;
+
+        // Gallery images
+        if (pForm.galleryImages.length > 0) {
+          await supabase.from("property_images").insert(
+            pForm.galleryImages.map((url, i) => ({
+              property_id: prop.id,
+              image_url: url,
+              sort_order: i,
             }))
           );
-          if (itemsError) throw itemsError;
         }
+
+        // Link to auction
+        const { error: itemError } = await supabase.from("auction_items").insert({
+          auction_id: auction.id,
+          property_id: prop.id,
+          title: pForm.title.trim(),
+          type: pForm.type === "house" ? "casa" : "terreno",
+          location: `${pForm.location.trim()}${pForm.state_code ? `, ${pForm.state_code}` : ""}`,
+          description: pForm.estimated_timeline.trim() || null,
+          image_url: pForm.coverImage,
+        });
+        if (itemError) throw itemError;
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       toast({ title: "Leilão criado com sucesso!" });
       setShowForm(false);
       setForm({ title: "", description: "", scheduled_start: "" });
-      setSelectedPropertyIds([]);
+      setPropertyForms([]);
     },
     onError: (e: Error) => toast({ title: "Erro ao criar leilão", description: e.message, variant: "destructive" }),
   });
@@ -287,27 +184,53 @@ export default function AdminLeiloesPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Imóveis do Leilão</CardTitle>
-            <p className="text-sm text-muted-foreground">Selecione os imóveis cadastrados que farão parte deste leilão</p>
-          </CardHeader>
-          <CardContent>
-            <PropertyPicker
-              selectedIds={selectedPropertyIds}
-              onAdd={(p) => setSelectedPropertyIds((prev) => [...prev, p.id])}
-              onRemove={(id) => setSelectedPropertyIds((prev) => prev.filter((pid) => pid !== id))}
-            />
-          </CardContent>
-        </Card>
+        {/* Property forms */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Imóveis / Terrenos</h2>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setPropertyForms((prev) => [...prev, { ...emptyPropertyData }])}
+            >
+              <Plus className="h-4 w-4" /> Adicionar Imóvel
+            </Button>
+          </div>
 
-        <Button onClick={() => createMutation.mutate()} disabled={!form.title || !form.scheduled_start || createMutation.isPending} className="w-full sm:w-auto">
+          {propertyForms.length === 0 && (
+            <div className="text-center py-10 border border-dashed border-border rounded-xl text-muted-foreground">
+              <p className="text-sm">Nenhum imóvel adicionado</p>
+              <p className="text-xs mt-1">Clique em "Adicionar Imóvel" para incluir propriedades ao leilão</p>
+            </div>
+          )}
+
+          {propertyForms.map((pData, idx) => (
+            <AuctionPropertyForm
+              key={idx}
+              index={idx}
+              data={pData}
+              onChange={(updated) => {
+                const copy = [...propertyForms];
+                copy[idx] = updated;
+                setPropertyForms(copy);
+              }}
+              onRemove={() => setPropertyForms((prev) => prev.filter((_, i) => i !== idx))}
+            />
+          ))}
+        </div>
+
+        <Button
+          onClick={() => createMutation.mutate()}
+          disabled={!form.title || !form.scheduled_start || createMutation.isPending}
+          className="w-full sm:w-auto"
+        >
           {createMutation.isPending ? "Criando..." : "Criar Leilão"}
         </Button>
       </div>
     );
   }
-
   return (
     <div className="space-y-8">
       <div className="flex items-end justify-between">
