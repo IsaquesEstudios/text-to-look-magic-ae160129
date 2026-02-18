@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
+import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
 import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
@@ -34,6 +35,7 @@ export function PainelLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const totalUnread = useUnreadNews();
+  const unreadAuctions = useUnreadAuctions();
 
   // Auth guard — redirect if not authenticated
   useEffect(() => {
@@ -95,7 +97,10 @@ export function PainelLayout() {
           <nav className="flex-1 p-3 space-y-1 mt-2">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
-              const showBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
+              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
+              const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
+              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
               return (
                 <Link
                   key={item.path}
@@ -109,9 +114,9 @@ export function PainelLayout() {
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
                   {item.label}
-                  {showBadge && (
+                  {badgeCount > 0 && (
                     <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
-                      {totalUnread > 9 ? "+9" : totalUnread}
+                      {badgeCount > 9 ? "+9" : badgeCount}
                     </span>
                   )}
                 </Link>
@@ -125,7 +130,10 @@ export function PainelLayout() {
           <nav className="flex items-center justify-around h-14 px-2">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
-              const showBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
+              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
+              const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
+              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
               return (
                 <Link
                   key={item.path}
@@ -139,9 +147,9 @@ export function PainelLayout() {
                 >
                   <item.icon className="h-5 w-5" />
                   {item.label}
-                  {showBadge && (
+                  {badgeCount > 0 && (
                     <span className="absolute -top-1 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
-                      {totalUnread > 9 ? "+9" : totalUnread}
+                      {badgeCount > 9 ? "+9" : badgeCount}
                     </span>
                   )}
                 </Link>

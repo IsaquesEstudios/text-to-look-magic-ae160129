@@ -87,6 +87,24 @@ export type Database = {
           },
         ]
       }
+      auction_reads: {
+        Row: {
+          id: string
+          last_read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_read_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       auctions: {
         Row: {
           created_at: string

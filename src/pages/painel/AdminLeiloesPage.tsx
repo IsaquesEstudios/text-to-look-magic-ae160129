@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,15 @@ export default function AdminLeiloesPage() {
       return data;
     },
   });
+
+  // Mark auctions as read when visiting
+  useEffect(() => {
+    if (user && auctions) {
+      markAuctionsRead(user.id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["unread-auctions"] });
+      });
+    }
+  }, [user, auctions, queryClient]);
 
   const createMutation = useMutation({
     mutationFn: async () => {

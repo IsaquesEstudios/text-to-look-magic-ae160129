@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Gavel } from "lucide-react";
@@ -29,6 +31,8 @@ function MiniCountdown({ targetDate }: { targetDate: string }) {
 }
 
 export default function UserLeiloesPage() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions"],
     queryFn: async () => {
@@ -40,6 +44,15 @@ export default function UserLeiloesPage() {
       return data;
     },
   });
+
+  // Mark auctions as read when visiting this page
+  useEffect(() => {
+    if (user && auctions) {
+      markAuctionsRead(user.id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["unread-auctions"] });
+      });
+    }
+  }, [user, auctions, queryClient]);
 
   const active = auctions?.filter((a) => a.status !== "finished") ?? [];
   const finished = auctions?.filter((a) => a.status === "finished") ?? [];
