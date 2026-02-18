@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN estimated_sale_value numeric DEFAULT 0;
