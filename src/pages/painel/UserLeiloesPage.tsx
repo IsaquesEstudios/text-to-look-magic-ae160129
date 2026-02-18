@@ -84,42 +84,42 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
 
 function AuctionItemCard({ item }: { item: any }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-card border border-border shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30">
-      {/* Image or placeholder */}
-      {item.image_url ? (
-        <div className="relative aspect-[16/10] overflow-hidden">
+    <div className="group relative flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
+      {/* Image */}
+      <div className="aspect-[16/10] bg-secondary/50 overflow-hidden relative">
+        {item.image_url ? (
           <img
             src={item.image_url}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">
-            {item.type === "terreno" ? "Terreno" : "Casa"}
-          </Badge>
-        </div>
-      ) : (
-        <div className="relative aspect-[16/10] overflow-hidden bg-secondary/50 flex items-center justify-center">
-          {item.type === "terreno" ? (
-            <TreePine className="h-10 w-10 text-muted-foreground/30" />
-          ) : (
-            <Home className="h-10 w-10 text-muted-foreground/30" />
-          )}
-          <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">
-            {item.type === "terreno" ? "Terreno" : "Casa"}
-          </Badge>
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            {item.type === "terreno" ? (
+              <TreePine className="h-8 w-8 text-muted-foreground/20" />
+            ) : (
+              <Home className="h-8 w-8 text-muted-foreground/20" />
+            )}
+          </div>
+        )}
+        <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">
+          {item.type === "terreno" ? "Terreno" : "Casa"}
+        </Badge>
+      </div>
 
       {/* Content */}
-      <div className="p-4">
-        <p className="font-semibold text-sm text-foreground truncate">{item.title}</p>
-        {item.location && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1.5">
-            <MapPin className="h-3 w-3 text-primary flex-shrink-0" /> {item.location}
-          </p>
-        )}
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <div>
+          <h3 className="font-semibold text-foreground leading-tight">{item.title}</h3>
+          {item.location && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+              <MapPin className="h-3 w-3" />
+              {item.location}
+            </p>
+          )}
+        </div>
         {item.description && (
-          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{item.description}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>
         )}
       </div>
     </div>
