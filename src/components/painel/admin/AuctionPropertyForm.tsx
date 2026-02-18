@@ -176,7 +176,7 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
         {/* Auction & Renovation Values */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Valor Est. de Arremate ($)</Label>
+            <Label>Valor de Arremate ($)</Label>
             <Input type="number" step="0.01" min="0" value={data.estimated_auction_value} onChange={(e) => set("estimated_auction_value", e.target.value)} />
           </div>
           <div className="space-y-2">
@@ -205,17 +205,8 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
           </div>
         </div>
 
-        {/* Shares */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Quantidade de Cotas</Label>
-            <Input type="number" min="1" value={data.total_shares} onChange={(e) => set("total_shares", e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Preço por Cota ($)</Label>
-            <Input type="number" step="0.01" min="0" value={data.share_price} onChange={(e) => set("share_price", e.target.value)} />
-          </div>
-        </div>
+
+
 
         {/* Timeline */}
         <div className="space-y-2">
