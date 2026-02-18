@@ -112,19 +112,23 @@ export default function PropertyDetail() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { icon: DollarSign, label: "Total do Projeto", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-            { icon: TrendingUp, label: "Retorno Est.", value: `${estimatedReturn}%`, iconClass: "text-primary", valueClass: "text-primary" },
-            { icon: DollarSign, label: "Arremate + Reforma", value: `$${(Number(property.estimated_auction_value) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} + $${(Number(property.estimated_renovation_cost) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-            { icon: DollarSign, label: "Valor de Mercado", value: `$${(purchasePrice * (1 + estimatedReturn / 100)).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-          ].map((stat, i) => (
-            <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
-              <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">{stat.label}</p>
-              <p className={`text-xl font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
-            </div>
-          ))}
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-2">Estimativas do Projeto</p>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {[
+              { icon: DollarSign, label: "Arremate", value: `$${(Number(property.estimated_auction_value) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Reforma", value: `$${(Number(property.estimated_renovation_cost) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Total do Projeto", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Valor de Mercado", value: `$${(purchasePrice * (1 + estimatedReturn / 100)).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: TrendingUp, label: "Retorno Est.", value: `${estimatedReturn}%`, iconClass: "text-primary", valueClass: "text-primary" },
+            ].map((stat, i) => (
+              <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
+                <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">{stat.label}</p>
+                <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div
