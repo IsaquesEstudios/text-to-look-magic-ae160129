@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, Fragment } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Plus, Trash2, Loader2, Check } from "lucide-react";
+import { Plus, Trash2, Loader2, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -128,11 +128,34 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
 
   const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const totalSpent = expenses?.reduce((sum, e) => sum + Number(e.price), 0) ?? 0;
-  const categoryTotals: Record<string, number> = {};
-  expenses?.forEach((e) => {
-    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.price);
-  });
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
+
+  const toggleCat = (cat: string) => {
+    setExpandedCats((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
+
+  // Group expenses by category
+  const groupedExpenses = useMemo(() => {
+    if (!expenses) return [];
+    const map = new Map<string, { category: string; total: number; items: typeof expenses }>();
+    expenses.forEach((e) => {
+      const existing = map.get(e.category);
+      if (existing) {
+        existing.total += Number(e.price);
+        existing.items.push(e);
+      } else {
+        map.set(e.category, { category: e.category, total: Number(e.price), items: [e] });
+      }
+    });
+    return Array.from(map.values());
+  }, [expenses]);
+
+  const totalSpent = groupedExpenses.reduce((sum, g) => sum + g.total, 0);
 
   if (isLoading) {
     return (
@@ -237,35 +260,78 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
         </Card>
       )}
 
-      {/* Expenses table */}
-      {expenses && expenses.length > 0 ? (
+      {/* Expenses table - grouped by category */}
+      {groupedExpenses.length > 0 ? (
         <Card className="bg-card/50 border-border/50 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/50">
-                  <th className="text-left p-3 text-muted-foreground font-medium">Mês</th>
                   <th className="text-left p-3 text-muted-foreground font-medium">Categoria</th>
-                  <th className="text-right p-3 text-muted-foreground font-medium">Valor</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
                 </tr>
               </thead>
               <tbody>
-                {expenses.map((expense) => (
-                  <tr key={expense.id} className="border-b border-border/30 hover:bg-secondary/30">
-                    <td className="p-3 text-foreground">{formatMonthLabel(expense.month)}</td>
-                    <td className="p-3 text-foreground">{expense.category}</td>
-                    <td className="p-3 text-right font-medium text-foreground">${fmt(Number(expense.price))}</td>
-                    {isAdmin && (
-                      <td className="p-3">
-                        <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
+                {groupedExpenses.map((group) => {
+                  const isExpanded = expandedCats.has(group.category);
+                  const hasMultiple = group.items.length > 1;
+                  return (
+                    <Fragment key={group.category}>
+                      <tr
+                        className={cn(
+                          "border-b border-border/30 hover:bg-secondary/30",
+                          hasMultiple && "cursor-pointer"
+                        )}
+                        onClick={() => hasMultiple && toggleCat(group.category)}
+                      >
+                        <td className="p-3 text-foreground flex items-center gap-2">
+                          {hasMultiple && (
+                            isExpanded
+                              ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                              : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                          )}
+                          <span>{group.category}</span>
+                          {hasMultiple && (
+                            <span className="text-xs text-muted-foreground">({group.items.length})</span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right font-medium text-foreground">${fmt(group.total)}</td>
+                        {isAdmin && !hasMultiple && (
+                          <td className="p-3">
+                            <button onClick={(e) => { e.stopPropagation(); deleteExpense(group.items[0].id); }} className="text-destructive/60 hover:text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        )}
+                        {isAdmin && hasMultiple && <td />}
+                      </tr>
+                      {isExpanded && group.items.map((expense) => (
+                        <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
+                          <td className="p-2 pl-10 text-muted-foreground text-xs">
+                            {formatMonthLabel(expense.month)}
+                          </td>
+                          <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price))}</td>
+                          {isAdmin && (
+                            <td className="p-2">
+                              <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </Fragment>
+                  );
+                })}
               </tbody>
+              <tfoot>
+                <tr className="border-t border-border/50">
+                  <td className="p-3 font-bold text-foreground">Total</td>
+                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent)}</td>
+                  {isAdmin && <td />}
+                </tr>
+              </tfoot>
             </table>
           </div>
         </Card>
@@ -273,25 +339,6 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="py-8 text-center text-muted-foreground">
             Nenhum gasto registrado.
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Summary */}
-      {expenses && expenses.length > 0 && (
-        <Card className="bg-card/50 border-primary/20">
-          <CardContent className="p-4 space-y-2">
-            <h3 className="font-semibold text-foreground">Resumo de Gastos</h3>
-            {Object.entries(categoryTotals).map(([cat, total]) => (
-              <div key={cat} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{cat}</span>
-                <span className="text-foreground">${fmt(total)}</span>
-              </div>
-            ))}
-            <div className="border-t border-border/50 pt-2 flex justify-between font-bold">
-              <span className="text-foreground">Total</span>
-              <span className="text-primary">${fmt(totalSpent)}</span>
-            </div>
           </CardContent>
         </Card>
       )}
