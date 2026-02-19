@@ -18,15 +18,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-function CountdownBlock({ targetDate, status }: { targetDate: string; status: string }) {
+function CountdownBlock({ targetDate, status, onFinished }: { targetDate: string; status: string; onFinished?: () => void }) {
   const [parts, setParts] = useState({ d: 0, h: 0, m: 0, s: 0 });
-  const [isStarted, setIsStarted] = useState(false);
+  const [isOver, setIsOver] = useState(false);
 
   useEffect(() => {
     const update = () => {
       const diff = new Date(targetDate).getTime() - Date.now();
-      if (diff <= 0 || status === "active") {
-        setIsStarted(true);
+      if (diff <= 0) {
+        setIsOver(true);
+        if (status !== "finished") onFinished?.();
         return;
       }
       setParts({
@@ -39,25 +40,13 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
     update();
     const i = setInterval(update, 1000);
     return () => clearInterval(i);
-  }, [targetDate, status]);
+  }, [targetDate, status, onFinished]);
 
-  if (status === "finished") {
+  if (status === "finished" || isOver) {
     return (
       <div className="flex items-center gap-2 text-destructive">
         <Clock className="h-4 w-4" />
         <span className="text-sm font-bold">Terminado</span>
-      </div>
-    );
-  }
-
-  if (isStarted) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-discovery-green opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-discovery-green" />
-        </span>
-        <span className="text-sm font-bold text-discovery-green">AO VIVO</span>
       </div>
     );
   }
@@ -266,12 +255,16 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
 
 
   const { data: auctions, isLoading } = useQuery({
-    queryKey: ["user-auctions"],
+    queryKey: ["user-auctions", isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("auctions")
         .select("*")
         .order("scheduled_start", { ascending: false });
+      if (!isAdmin) {
+        query = query.eq("visibility", "public");
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -339,7 +332,8 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
 
   const renderAuction = (auction: (typeof auctions)[number]) => {
     const start = new Date(auction.scheduled_start);
-    const isStarted = auction.status === "active" || start <= new Date();
+    const isTimerOver = start <= new Date();
+    const isFinished = auction.status === "finished" || isTimerOver;
     const items = itemsByAuction.get(auction.id) ?? [];
     const myAuctionDeposits = depositsByAuction.get(auction.id) ?? [];
     const myTotal = myAuctionDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
@@ -374,7 +368,16 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
 
             {/* Right: Countdown or status */}
             <div className="flex-shrink-0">
-              <CountdownBlock targetDate={auction.scheduled_start} status={auction.status} />
+              <CountdownBlock
+                targetDate={auction.scheduled_start}
+                status={auction.status}
+                onFinished={async () => {
+                  if (auction.status !== "finished") {
+                    await supabase.from("auctions").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", auction.id);
+                    queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
+                  }
+                }}
+              />
             </div>
           </div>
         </AccordionTrigger>
@@ -408,7 +411,7 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
           )}
 
           {/* Deposit form for non-finished auctions */}
-          {!isAdmin && auction.status !== "finished" && (
+          {!isAdmin && !isFinished && (
             <DepositForm auctionId={auction.id} auctionTitle={auction.title} />
           )}
 

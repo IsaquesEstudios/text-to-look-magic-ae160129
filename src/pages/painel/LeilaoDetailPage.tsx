@@ -16,7 +16,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 
-function CountdownTimer({ targetDate }: { targetDate: string }) {
+function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFinished?: () => void }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isStarted, setIsStarted] = useState(false);
 
@@ -27,8 +27,9 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
       const diff = target - now;
 
       if (diff <= 0) {
-        setTimeLeft("Leilão iniciado!");
+        setTimeLeft("Leilão encerrado!");
         setIsStarted(true);
+        onFinished?.();
         return;
       }
 
@@ -47,10 +48,10 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, [targetDate, onFinished]);
 
   return (
-    <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-discovery-green/10 text-discovery-green" : "bg-primary/5 text-primary"}`}>
+    <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
       <p className="text-xs text-muted-foreground mb-1">
         {isStarted ? "Status" : "Começa em"}
       </p>
@@ -261,8 +262,15 @@ export default function LeilaoDetailPage() {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
-  const isActive = auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date());
-  const canDeposit = !isAdmin && isActive && auction?.status !== "finished";
+  const isFinished = auction?.status === "finished" || (auction && new Date(auction.scheduled_start) <= new Date());
+  const isActive = !isFinished && (auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date()));
+  const canDeposit = !isAdmin && !isFinished;
+
+  const handleAutoFinish = async () => {
+    if (!auction || auction.status === "finished") return;
+    await supabase.from("auctions").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", auction.id);
+    queryClient.invalidateQueries({ queryKey: ["auction", id] });
+  };
 
   if (!auction) {
     return <div className="animate-pulse text-muted-foreground">Carregando...</div>;
@@ -320,7 +328,7 @@ export default function LeilaoDetailPage() {
 
       {/* Countdown */}
       {auction.status !== "finished" && (
-        <CountdownTimer targetDate={auction.scheduled_start} />
+        <CountdownTimer targetDate={auction.scheduled_start} onFinished={handleAutoFinish} />
       )}
 
       {/* Stats */}

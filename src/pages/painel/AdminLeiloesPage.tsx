@@ -9,12 +9,47 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus } from "lucide-react";
+import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus, Lock, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
+
+/* ─── Countdown for admin list ─── */
+function AdminCountdown({ targetDate, status }: { targetDate: string; status: string }) {
+  const [parts, setParts] = useState({ d: 0, h: 0, m: 0, s: 0 });
+  const [isOver, setIsOver] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      const diff = new Date(targetDate).getTime() - Date.now();
+      if (diff <= 0 || status === "finished") {
+        setIsOver(true);
+        return;
+      }
+      setParts({
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    update();
+    const i = setInterval(update, 1000);
+    return () => clearInterval(i);
+  }, [targetDate, status]);
+
+  if (status === "finished" || isOver) {
+    return <span className="text-xs font-bold text-destructive">Encerrado</span>;
+  }
+
+  return (
+    <span className="text-xs font-mono text-muted-foreground tabular-nums">
+      {parts.d > 0 && `${parts.d}d `}{String(parts.h).padStart(2, "0")}:{String(parts.m).padStart(2, "0")}:{String(parts.s).padStart(2, "0")}
+    </span>
+  );
+}
 
 /* ─── Main Page ─── */
 export default function AdminLeiloesPage() {
@@ -26,6 +61,7 @@ export default function AdminLeiloesPage() {
     title: "",
     description: "",
     scheduled_start: "",
+    visibility: "public",
   });
   const [propertyForms, setPropertyForms] = useState<AuctionPropertyData[]>([]);
 
@@ -57,6 +93,7 @@ export default function AdminLeiloesPage() {
           title: form.title,
           description: form.description || null,
           scheduled_start: new Date(form.scheduled_start).toISOString(),
+          visibility: form.visibility,
           created_by: user!.id,
         })
         .select()
@@ -120,7 +157,7 @@ export default function AdminLeiloesPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       toast({ title: "Leilão criado com sucesso!" });
       setShowForm(false);
-      setForm({ title: "", description: "", scheduled_start: "" });
+      setForm({ title: "", description: "", scheduled_start: "", visibility: "public" });
       setPropertyForms([]);
     },
     onError: (e: Error) => toast({ title: "Erro ao criar leilão", description: e.message, variant: "destructive" }),
@@ -145,6 +182,18 @@ export default function AdminLeiloesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
       toast({ title: "Status atualizado" });
+    },
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, visibility }: { id: string; visibility: string }) => {
+      const newVis = visibility === "public" ? "private" : "public";
+      const { error } = await supabase.from("auctions").update({ visibility: newVis, updated_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      toast({ title: "Visibilidade atualizada" });
     },
   });
 
@@ -181,6 +230,17 @@ export default function AdminLeiloesPage() {
             <div>
               <Label>Data e Hora de Início *</Label>
               <Input type="datetime-local" value={form.scheduled_start} onChange={(e) => setForm({ ...form, scheduled_start: e.target.value })} />
+            </div>
+            <div>
+              <Label>Visibilidade</Label>
+              <select
+                value={form.visibility}
+                onChange={(e) => setForm({ ...form, visibility: e.target.value })}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="public">Público</option>
+                <option value="private">Privado</option>
+              </select>
             </div>
           </CardContent>
         </Card>
@@ -253,40 +313,47 @@ export default function AdminLeiloesPage() {
               <h2 className="text-lg font-semibold">Ativos & Programados</h2>
               <div className="grid gap-4">
                 {upcoming.map((auction) => (
-                  <Card key={auction.id}>
-                    <CardContent className="p-5 flex items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-foreground truncate">{auction.title}</span>
-                          {getStatusBadge(auction.status, auction.scheduled_start)}
+                  <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardContent className="p-5 flex items-center justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-foreground truncate">{auction.title}</span>
+                            {getStatusBadge(auction.status, auction.scheduled_start)}
+                            {(auction as any).visibility === "private" && (
+                              <Badge variant="outline" className="text-[10px] gap-1">
+                                <Lock className="h-3 w-3" /> Privado
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 inline mr-1" />
+                            {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 inline mr-1" />
-                          {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <Link to={`/painel/leilao/${auction.id}`}>
-                          <Button variant="outline" size="sm" className="gap-1.5">
-                            <Eye className="h-4 w-4" /> Ver
+                        <div className="flex items-center gap-3 flex-shrink-0" onClick={(e) => e.preventDefault()}>
+                          <AdminCountdown targetDate={auction.scheduled_start} status={auction.status} />
+                          {(auction as any).visibility === "private" && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toggleVisibilityMutation.mutate({ id: auction.id, visibility: (auction as any).visibility });
+                              }}
+                              title="Alternar visibilidade"
+                            >
+                              <Globe className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={(e) => { e.preventDefault(); deleteMutation.mutate(auction.id); }}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                        </Link>
-                        {auction.status === "upcoming" && (
-                          <Button size="sm" variant="outline" onClick={() => updateStatusMutation.mutate({ id: auction.id, status: "active" })}>
-                            Iniciar
-                          </Button>
-                        )}
-                        {auction.status === "active" && (
-                          <Button size="sm" variant="outline" onClick={() => updateStatusMutation.mutate({ id: auction.id, status: "finished" })}>
-                            <CheckCircle className="h-4 w-4 mr-1" /> Encerrar
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMutation.mutate(auction.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -297,26 +364,23 @@ export default function AdminLeiloesPage() {
               <h2 className="text-lg font-semibold text-muted-foreground">Encerrados</h2>
               <div className="grid gap-3">
                 {finished.map((auction) => (
-                  <Card key={auction.id} className="opacity-70">
-                    <CardContent className="p-4 flex items-center justify-between gap-4">
-                      <div>
-                        <span className="font-medium text-sm">{auction.title}</span>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(auction.scheduled_start), "dd MMM yyyy", { locale: ptBR })}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Link to={`/painel/leilao/${auction.id}`}>
-                          <Button variant="ghost" size="sm" className="gap-1.5">
-                            <Eye className="h-4 w-4" /> Detalhes
+                  <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
+                    <Card className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                      <CardContent className="p-4 flex items-center justify-between gap-4">
+                        <div>
+                          <span className="font-medium text-sm">{auction.title}</span>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(auction.scheduled_start), "dd MMM yyyy", { locale: ptBR })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={(e) => { e.preventDefault(); deleteMutation.mutate(auction.id); }}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                        </Link>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMutation.mutate(auction.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
