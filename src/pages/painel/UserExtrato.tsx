@@ -56,7 +56,7 @@ export default function UserExtrato() {
       id: s.id,
       date: s.purchased_at,
       type: "share_purchase",
-      description: `Compra de ${s.quantity} cota${s.quantity > 1 ? "s" : ""} - ${(s.properties as any)?.title || "Imóvel"}`,
+      description: `Vinculado ao imóvel - ${(s.properties as any)?.title || "Imóvel"}`,
       amount: -Number(s.amount_paid),
       isCredit: false,
     })) ?? []),
@@ -74,7 +74,7 @@ export default function UserExtrato() {
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Saldo atual</p>
-            <p className="text-lg font-bold text-primary">${credits.toLocaleString("en-US")}</p>
+            <p className="text-lg font-bold text-primary">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
           <Button
             variant="outline"
@@ -134,7 +134,7 @@ export default function UserExtrato() {
               <p className={`text-sm font-semibold flex-shrink-0 ${
                 item.isCredit ? "text-primary" : "text-foreground"
               }`}>
-                {item.isCredit ? "+" : ""}${Math.abs(item.amount).toLocaleString("pt-BR")}
+                {item.isCredit ? "+" : ""}${Math.abs(item.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </p>
             </div>
           ))}

@@ -39,7 +39,7 @@ export function UserDashboard() {
           id: c.id,
           date: c.created_at,
           title: c.type === "deposit" ? "Depósito" : c.type === "withdrawal" ? "Saque" : c.type,
-          detail: c.description || `$${Number(c.amount).toLocaleString("pt-BR")}`,
+          detail: c.description || `$${Number(c.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         });
       });
 
@@ -157,7 +157,7 @@ export function UserDashboard() {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Créditos</p>
-            <p className="text-lg font-bold text-foreground">${credits.toLocaleString("pt-BR")}</p>
+            <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
 
