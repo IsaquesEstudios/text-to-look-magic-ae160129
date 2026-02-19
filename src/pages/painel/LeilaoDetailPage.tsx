@@ -344,38 +344,77 @@ export default function LeilaoDetailPage() {
       </div>
 
       {/* Deposit form (users only, when active) */}
-      {canDeposit && (
-        <Card className="border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-discovery-green" />
-              Depositar no Leilão
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-xs text-muted-foreground">
-              Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-            </p>
-            <div className="flex gap-3">
-              <Input
-                type="number"
-                placeholder="Valor em USD"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                min="0"
-                step="0.01"
-              />
+      {canDeposit && (() => {
+        const amt = parseFloat(depositAmount) || 0;
+        const isTerreno = amt >= 800 && amt <= 11000;
+        const isCasa = amt > 11000;
+        const taxa = isCasa ? 5000 : isTerreno ? 500 : 0;
+        const categoria = isCasa ? "Casa" : isTerreno ? "Terreno" : null;
+        const isValid = amt >= 800;
+
+        return (
+          <Card className="border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-discovery-green" />
+                Participar do Leilão
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-muted-foreground">
+                Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+              </p>
+
+              <div className="rounded-lg bg-secondary/40 p-3 space-y-1.5 text-xs text-muted-foreground">
+                <p className="font-semibold text-foreground text-sm">Como funciona</p>
+                <p>• Valor mínimo: <span className="font-semibold text-foreground">$800</span></p>
+                <p>• <span className="font-semibold text-foreground">$800 – $11.000</span> → Terreno <span className="text-muted-foreground">(inclui $500 de taxa)</span></p>
+                <p>• <span className="font-semibold text-foreground">Acima de $11.000</span> → Casa <span className="text-muted-foreground">(inclui $5.000 de taxa)</span></p>
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  type="number"
+                  placeholder="Valor em USD (mín. $800)"
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  min="800"
+                  step="0.01"
+                />
+
+                {amt > 0 && !isValid && (
+                  <p className="text-xs text-destructive">O valor mínimo para participar é $800.</p>
+                )}
+
+                {isValid && categoria && (
+                  <div className="rounded-lg border border-border p-3 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Categoria</span>
+                      <Badge variant="outline" className="text-xs">{categoria === "Casa" ? <><Home className="h-3 w-3 mr-1" /> Casa</> : <><TreePine className="h-3 w-3 mr-1" /> Terreno</>}</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Taxa inclusa</span>
+                      <span className="font-semibold">${taxa.toLocaleString("en-US")}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Valor líquido</span>
+                      <span className="font-semibold text-foreground">${(amt - taxa).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Button
                 onClick={() => depositMutation.mutate()}
-                disabled={!depositAmount || depositMutation.isPending}
-                className="bg-discovery-green hover:bg-discovery-green/90 text-primary-foreground flex-shrink-0"
+                disabled={!isValid || depositMutation.isPending}
+                className="w-full bg-discovery-green hover:bg-discovery-green/90 text-primary-foreground"
               >
-                {depositMutation.isPending ? "..." : "Depositar"}
+                {depositMutation.isPending ? "Processando..." : `Depositar $${isValid ? amt.toLocaleString("en-US", { minimumFractionDigits: 2 }) : "0.00"}`}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Auction items */}
       <Card>
