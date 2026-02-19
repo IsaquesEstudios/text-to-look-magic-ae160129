@@ -203,7 +203,7 @@ export default function AdminLeiloesPage() {
     if (status === "finished") return <Badge variant="secondary">Encerrado</Badge>;
     if (status === "active" || (status === "upcoming" && start <= now))
       return <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>;
-    return <Badge variant="outline">Programado</Badge>;
+    return <Badge variant="outline">Publicado</Badge>;
   };
 
   const upcoming = auctions?.filter((a) => a.status !== "finished") ?? [];
@@ -297,7 +297,7 @@ export default function AdminLeiloesPage() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leilões</h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerencie os leilões programados</p>
+          <p className="text-sm text-muted-foreground mt-1">Gerencie os leilões publicados</p>
         </div>
         <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl h-10 px-5 font-medium">
           <PlusCircle className="h-4 w-4" /> Novo Leilão
@@ -310,7 +310,7 @@ export default function AdminLeiloesPage() {
         <>
           {upcoming.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold">Ativos & Programados</h2>
+              <h2 className="text-lg font-semibold">Ativos & Publicados</h2>
               <div className="grid gap-4">
                 {upcoming.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
