@@ -10,10 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X } from "lucide-react";
+import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 
 function CountdownTimer({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -66,6 +67,8 @@ export default function LeilaoDetailPage() {
   const [depositAmount, setDepositAmount] = useState("");
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", scheduled_start: "" });
+  const [newPropertyForms, setNewPropertyForms] = useState<AuctionPropertyData[]>([]);
+  const [showAddProperty, setShowAddProperty] = useState(false);
 
   const { data: auction } = useQuery({
     queryKey: ["auction", id],
@@ -184,6 +187,79 @@ export default function LeilaoDetailPage() {
     });
     setEditing(true);
   };
+
+  const removeItemMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const { error } = await supabase.from("auction_items").delete().eq("id", itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      toast({ title: "Imóvel removido do leilão" });
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const addPropertyMutation = useMutation({
+    mutationFn: async () => {
+      for (const pForm of newPropertyForms) {
+        const totalProjeto = (parseFloat(pForm.estimated_auction_value) || 0) + (parseFloat(pForm.estimated_renovation_cost) || 0);
+
+        const { data: prop, error: propError } = await supabase
+          .from("properties")
+          .insert({
+            type: pForm.type,
+            title: pForm.title.trim(),
+            location: pForm.location.trim(),
+            state_code: pForm.state_code || null,
+            purchase_price: totalProjeto,
+            estimated_auction_value: parseFloat(pForm.estimated_auction_value) || 0,
+            estimated_renovation_cost: parseFloat(pForm.estimated_renovation_cost) || 0,
+            estimated_return_pct: parseFloat(pForm.estimated_return_pct) || 0,
+            estimated_sale_value: parseFloat(pForm.estimated_sale_value) || 0,
+            total_shares: parseInt(pForm.total_shares) || 1,
+            share_price: parseFloat(pForm.share_price) || 0,
+            available_shares: parseInt(pForm.total_shares) || 1,
+            status: pForm.status,
+            cover_image_url: pForm.coverImage,
+            estimated_timeline: pForm.estimated_timeline.trim(),
+            created_by: user!.id,
+          })
+          .select("id")
+          .single();
+        if (propError) throw propError;
+
+        if (pForm.galleryImages.length > 0) {
+          await supabase.from("property_images").insert(
+            pForm.galleryImages.map((url, i) => ({
+              property_id: prop.id,
+              image_url: url,
+              sort_order: i,
+            }))
+          );
+        }
+
+        const { error: itemError } = await supabase.from("auction_items").insert({
+          auction_id: id!,
+          property_id: prop.id,
+          title: pForm.title.trim(),
+          type: pForm.type === "house" ? "casa" : "terreno",
+          location: `${pForm.location.trim()}${pForm.state_code ? `, ${pForm.state_code}` : ""}`,
+          description: pForm.estimated_timeline.trim() || null,
+          image_url: pForm.coverImage,
+        });
+        if (itemError) throw itemError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      toast({ title: "Imóveis adicionados com sucesso!" });
+      setNewPropertyForms([]);
+      setShowAddProperty(false);
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
 
   const isActive = auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date());
   const canDeposit = !isAdmin && isActive && auction?.status !== "finished";
@@ -306,19 +382,27 @@ export default function LeilaoDetailPage() {
       )}
 
       {/* Auction items */}
-      {items && items.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
+          {isAdmin && !showAddProperty && (
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowAddProperty(true)}>
+              <Plus className="h-4 w-4" /> Adicionar
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {(!items || items.length === 0) && !showAddProperty && (
+            <p className="text-sm text-muted-foreground text-center py-4">Nenhum imóvel vinculado</p>
+          )}
+          {items && items.length > 0 && (
             <div className="grid gap-3">
               {items.map((item) => (
                 <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30">
                   <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     {item.type === "terreno" ? <TreePine className="h-5 w-5 text-primary" /> : <Home className="h-5 w-5 text-primary" />}
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{item.title}</p>
                     {item.location && (
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -327,12 +411,70 @@ export default function LeilaoDetailPage() {
                     )}
                     {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
                   </div>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive flex-shrink-0"
+                      onClick={() => removeItemMutation.mutate(item.id)}
+                      disabled={removeItemMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+
+          {/* Add property forms */}
+          {showAddProperty && (
+            <div className="space-y-4 mt-4 pt-4 border-t border-border/50">
+              {newPropertyForms.map((pData, idx) => (
+                <AuctionPropertyForm
+                  key={idx}
+                  index={idx}
+                  data={pData}
+                  onChange={(updated) => {
+                    const copy = [...newPropertyForms];
+                    copy[idx] = updated;
+                    setNewPropertyForms(copy);
+                  }}
+                  onRemove={() => setNewPropertyForms((prev) => prev.filter((_, i) => i !== idx))}
+                />
+              ))}
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => setNewPropertyForms((prev) => [...prev, { ...emptyPropertyData }])}
+                >
+                  <Plus className="h-4 w-4" /> Novo Imóvel
+                </Button>
+
+                {newPropertyForms.length > 0 && (
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => addPropertyMutation.mutate()}
+                    disabled={addPropertyMutation.isPending}
+                  >
+                    <Save className="h-4 w-4" />
+                    {addPropertyMutation.isPending ? "Salvando..." : `Salvar ${newPropertyForms.length} imóvel(is)`}
+                  </Button>
+                )}
+
+                <Button variant="ghost" size="sm" onClick={() => { setShowAddProperty(false); setNewPropertyForms([]); }}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Deposits list */}
       {deposits && deposits.length > 0 && (
