@@ -17,7 +17,7 @@ import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 import AuctionInvestorLinking from "@/components/painel/admin/AuctionInvestorLinking";
 
-function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFinished?: () => void }) {
+function CountdownTimer({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isStarted, setIsStarted] = useState(false);
 
@@ -30,7 +30,6 @@ function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFini
       if (diff <= 0) {
         setTimeLeft("Leilão encerrado!");
         setIsStarted(true);
-        onFinished?.();
         return;
       }
 
@@ -49,7 +48,7 @@ function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFini
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [targetDate, onFinished]);
+  }, [targetDate]);
 
   return (
     <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
@@ -64,7 +63,7 @@ function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFini
 export default function LeilaoDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAdmin, profile } = useAuth();
+  const { user, isAdmin, profile, refreshProfile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [depositAmount, setDepositAmount] = useState("");
@@ -130,9 +129,9 @@ export default function LeilaoDetailPage() {
       });
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshProfile();
       queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast({ title: "Depósito realizado com sucesso!" });
       setDepositAmount("");
     },
@@ -253,11 +252,6 @@ export default function LeilaoDetailPage() {
   const isActive = !isFinished && (auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date()));
   const canDeposit = !isAdmin && !isFinished;
 
-  const handleAutoFinish = async () => {
-    if (!auction || auction.status === "finished") return;
-    await supabase.from("auctions").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", auction.id);
-    queryClient.invalidateQueries({ queryKey: ["auction", id] });
-  };
 
   if (!auction) {
     return <div className="animate-pulse text-muted-foreground">Carregando...</div>;
@@ -322,7 +316,7 @@ export default function LeilaoDetailPage() {
 
       {/* Countdown */}
       {auction.status !== "finished" && (
-        <CountdownTimer targetDate={auction.scheduled_start} onFinished={handleAutoFinish} />
+        <CountdownTimer targetDate={auction.scheduled_start} />
       )}
 
       {/* Stats */}

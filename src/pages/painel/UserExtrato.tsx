@@ -21,19 +21,6 @@ export default function UserExtrato() {
     enabled: !!user,
   });
 
-  const { data: shares } = useQuery({
-    queryKey: ["user-shares-history", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("shares")
-        .select("*, properties(title)")
-        .eq("user_id", user!.id)
-        .order("purchased_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
 
   if (isLoading) {
     return (
@@ -50,15 +37,7 @@ export default function UserExtrato() {
       type: t.type as string,
       description: t.description || (t.type === "deposit" ? "Depósito de créditos" : "Movimentação"),
       amount: Number(t.amount),
-      isCredit: t.type === "deposit",
-    })) ?? []),
-    ...(shares?.map((s) => ({
-      id: s.id,
-      date: s.purchased_at,
-      type: "share_purchase",
-      description: `Vinculado ao imóvel - ${(s.properties as any)?.title || "Imóvel"}`,
-      amount: -Number(s.amount_paid),
-      isCredit: false,
+      isCredit: t.type === "deposit" || Number(t.amount) > 0,
     })) ?? []),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
