@@ -1,0 +1,1 @@
+ALTER TABLE public.property_expenses ADD COLUMN month text;

@@ -356,6 +356,7 @@ export type Database = {
           category: string
           created_at: string
           id: string
+          month: string | null
           price: number
           product: string
           property_id: string
@@ -367,6 +368,7 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
+          month?: string | null
           price: number
           product: string
           property_id: string
@@ -378,6 +380,7 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          month?: string | null
           price?: number
           product?: string
           property_id?: string
