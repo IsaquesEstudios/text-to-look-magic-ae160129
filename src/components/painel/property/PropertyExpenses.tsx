@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,11 +7,57 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Plus, Trash2, Loader2, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   propertyId: string;
   propertyStateCode?: string;
+}
+
+const MONTHS = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+];
+
+function getMonthOptions() {
+  const now = new Date();
+  const options: { value: string; label: string }[] = [];
+  for (let i = -6; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const label = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    options.push({ value: val, label });
+  }
+  return options;
+}
+
+function formatMonthLabel(monthStr: string | null) {
+  if (!monthStr) return "—";
+  const [y, m] = monthStr.split("-");
+  const idx = parseInt(m, 10) - 1;
+  return `${MONTHS[idx] ?? m} ${y}`;
+}
+
+function formatCurrency(raw: string): string {
+  const digits = raw.replace(/[^0-9.]/g, "");
+  const parts = digits.split(".");
+  const intPart = parts[0] || "";
+  const decimalPart = parts[1];
+  if (!intPart && !decimalPart) return "";
+  const num = parseInt(intPart || "0", 10);
+  const formatted = num.toLocaleString("en-US");
+  const hasDecimal = raw.includes(".");
+  if (hasDecimal) {
+    return `$${formatted}.${(decimalPart ?? "").slice(0, 2)}`;
+  }
+  return `$${formatted}`;
+}
+
+function parseCurrency(val: string): number {
+  return parseFloat(val.replace(/[^0-9.]/g, "")) || 0;
 }
 
 export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
@@ -19,16 +65,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ category: "", product: "", quantity: "1", price: "", state_code: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "", state_code: "" });
+  const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
+
+  const monthOptions = useMemo(getMonthOptions, []);
 
   const { data: stateTaxes } = useQuery({
     queryKey: ["us-state-taxes"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("us_state_taxes")
-        .select("*")
-        .order("state_name");
+      const { data, error } = await supabase.from("us_state_taxes").select("*").order("state_name");
       if (error) throw error;
       return data;
     },
@@ -49,39 +95,51 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
-  // Set default state_code: last expense's state, or property's state
+  // Existing categories for autocomplete
+  const existingCategories = useMemo(() => {
+    if (!expenses) return [];
+    const cats = new Set(expenses.map((e) => e.category));
+    return Array.from(cats).sort();
+  }, [expenses]);
+
+  // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (!stateTaxes) return;
-    if (expenses === undefined) return;
-    
-    const lastExpenseState = expenses?.length
-      ? expenses[expenses.length - 1].state_code
-      : null;
-    const defaultState = lastExpenseState || propertyStateCode || "";
-    if (defaultState && stateTaxes.some((s) => s.state_code === defaultState)) {
-      setForm((f) => ({ ...f, state_code: defaultState }));
-    }
+    if (!stateTaxes || expenses === undefined) return;
+
+    const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
+    const defaultState = lastExpense?.state_code || propertyStateCode || "";
+    const now = new Date();
+    const defaultMonth = lastExpense?.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    setForm((f) => ({
+      ...f,
+      state_code: stateTaxes.some((s) => s.state_code === defaultState) ? defaultState : "",
+      month: defaultMonth,
+    }));
     defaultInitialized.current = true;
   }, [stateTaxes, expenses, propertyStateCode]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
+    const price = parseCurrency(form.price);
+    if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
     const taxRate = selectedTax?.tax_rate ?? 0;
     const { error } = await supabase.from("property_expenses").insert({
       property_id: propertyId,
       category: form.category.trim(),
-      product: form.product.trim(),
-      quantity: parseInt(form.quantity),
-      price: parseFloat(form.price),
+      product: form.category.trim(), // keep product column populated
+      quantity: 1,
+      price,
       state_code: form.state_code || null,
       tax_rate: taxRate,
+      month: form.month,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      setForm((prev) => ({ category: "", product: "", quantity: "1", price: "", state_code: prev.state_code }));
+      setForm((prev) => ({ ...prev, category: "", price: "" }));
       queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
     }
     setAdding(false);
@@ -94,7 +152,6 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
 
   const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Summary calculations
   const calcTotal = (e: { price: number; quantity: number; tax_rate?: number | null }) => {
     const base = Number(e.price) * e.quantity;
     const tax = base * (Number(e.tax_rate ?? 0) / 100);
@@ -104,8 +161,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const totalSpent = expenses?.reduce((sum, e) => sum + calcTotal(e), 0) ?? 0;
   const categoryTotals: Record<string, number> = {};
   expenses?.forEach((e) => {
-    const cat = e.category;
-    categoryTotals[cat] = (categoryTotals[cat] || 0) + calcTotal(e);
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + calcTotal(e);
   });
 
   if (isLoading) {
@@ -123,47 +179,85 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="p-4">
             <form onSubmit={addExpense} className="flex flex-wrap gap-2 items-end">
-              <div className="flex-1 min-w-[120px]">
+              <div className="w-44">
+                <label className="text-xs text-muted-foreground">Mês</label>
+                <Select value={form.month} onValueChange={(v) => setForm({ ...form, month: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Mês" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {monthOptions.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1 min-w-[160px]">
                 <label className="text-xs text-muted-foreground">Categoria</label>
-                <Input
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  placeholder="Pintura"
-                  required
-                  maxLength={100}
-                />
+                <Popover open={catOpen} onOpenChange={setCatOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={catOpen}
+                      className="w-full justify-start font-normal h-10"
+                    >
+                      {form.category || <span className="text-muted-foreground">Ex: Eletricidade</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[250px] p-0" align="start">
+                    <Command>
+                      <CommandInput
+                        placeholder="Buscar ou criar..."
+                        value={form.category}
+                        onValueChange={(v) => setForm({ ...form, category: v })}
+                      />
+                      <CommandList>
+                        <CommandEmpty>
+                          <button
+                            type="button"
+                            className="text-sm text-primary cursor-pointer"
+                            onClick={() => setCatOpen(false)}
+                          >
+                            Usar "{form.category}"
+                          </button>
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {existingCategories
+                            .filter((c) => c.toLowerCase().includes(form.category.toLowerCase()))
+                            .map((cat) => (
+                              <CommandItem
+                                key={cat}
+                                value={cat}
+                                onSelect={() => {
+                                  setForm({ ...form, category: cat });
+                                  setCatOpen(false);
+                                }}
+                              >
+                                <Check className={cn("mr-2 h-4 w-4", form.category === cat ? "opacity-100" : "opacity-0")} />
+                                {cat}
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
-              <div className="flex-1 min-w-[120px]">
-                <label className="text-xs text-muted-foreground">Produto</label>
+
+              <div className="w-32">
+                <label className="text-xs text-muted-foreground">Valor ($)</label>
                 <Input
-                  value={form.product}
-                  onChange={(e) => setForm({ ...form, product: e.target.value })}
-                  placeholder="Tinta XY"
-                  required
-                  maxLength={200}
-                />
-              </div>
-              <div className="w-20">
-                <label className="text-xs text-muted-foreground">Qtd</label>
-                <Input
-                  type="number"
-                  min="1"
-                  value={form.quantity}
-                  onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="w-28">
-                <label className="text-xs text-muted-foreground">Preço ($)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  onChange={(e) => setForm({ ...form, price: formatCurrency(e.target.value) })}
+                  placeholder="$0.00"
                   required
                 />
               </div>
+
               <div className="w-36">
                 <label className="text-xs text-muted-foreground">Tarifa (Estado)</label>
                 <Select value={form.state_code} onValueChange={(v) => setForm({ ...form, state_code: v })}>
@@ -179,12 +273,14 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                   </SelectContent>
                 </Select>
               </div>
+
               {selectedTax && form.price && (
                 <div className="text-xs text-muted-foreground self-end pb-2">
-                  +${((parseFloat(form.price || "0") * selectedTax.tax_rate) / 100).toFixed(2)} tax
+                  +${((parseCurrency(form.price) * selectedTax.tax_rate) / 100).toFixed(2)} tax
                 </div>
               )}
-              <Button type="submit" variant="cta" size="sm" disabled={adding}>
+
+              <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               </Button>
             </form>
@@ -199,10 +295,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/50">
+                  <th className="text-left p-3 text-muted-foreground font-medium">Mês</th>
                   <th className="text-left p-3 text-muted-foreground font-medium">Categoria</th>
-                  <th className="text-left p-3 text-muted-foreground font-medium">Produto</th>
-                  <th className="text-center p-3 text-muted-foreground font-medium">Qtd</th>
-                  <th className="text-right p-3 text-muted-foreground font-medium">Preço</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Valor</th>
                   <th className="text-center p-3 text-muted-foreground font-medium">Tarifa</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
@@ -211,24 +306,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
               <tbody>
                 {expenses.map((expense) => (
                   <tr key={expense.id} className="border-b border-border/30 hover:bg-secondary/30">
+                    <td className="p-3 text-foreground">{formatMonthLabel(expense.month)}</td>
                     <td className="p-3 text-foreground">{expense.category}</td>
-                    <td className="p-3 text-foreground">{expense.product}</td>
-                    <td className="p-3 text-center text-foreground">{expense.quantity}</td>
-                    <td className="p-3 text-right text-foreground">
-                      ${fmt(Number(expense.price))}
-                    </td>
+                    <td className="p-3 text-right text-foreground">${fmt(Number(expense.price))}</td>
                     <td className="p-3 text-center text-muted-foreground text-xs">
                       {expense.state_code ? `${expense.state_code} (${expense.tax_rate}%)` : "—"}
                     </td>
-                    <td className="p-3 text-right font-medium text-foreground">
-                      ${fmt(calcTotal(expense))}
-                    </td>
+                    <td className="p-3 text-right font-medium text-foreground">${fmt(calcTotal(expense))}</td>
                     {isAdmin && (
                       <td className="p-3">
-                        <button
-                          onClick={() => deleteExpense(expense.id)}
-                          className="text-destructive/60 hover:text-destructive"
-                        >
+                        <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
