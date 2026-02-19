@@ -314,7 +314,7 @@ export default function LeilaoDetailPage() {
             ) : isActive ? (
               <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>
             ) : (
-              <Badge variant="outline">Programado</Badge>
+              <Badge variant="outline">Publicado</Badge>
             )}
             {isAdmin && (
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={startEditing}>
