@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
+import AuctionInvestorLinking from "@/components/painel/admin/AuctionInvestorLinking";
 
 function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFinished?: () => void }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -497,6 +498,16 @@ export default function LeilaoDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Investor linking (admin, finished auctions) */}
+      {isAdmin && auction.status === "finished" && items && deposits && deposits.length > 0 && (
+        <AuctionInvestorLinking
+          auctionId={auction.id}
+          items={items}
+          deposits={deposits}
+          profileMap={profileMap}
+        />
+      )}
 
       {/* Deposits list */}
       {deposits && deposits.length > 0 && (
