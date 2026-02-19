@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2 } from "lucide-react";
+import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -62,6 +62,7 @@ function CountdownTimer({ targetDate, onFinished }: { targetDate: string; onFini
 
 export default function LeilaoDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user, isAdmin, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -307,6 +308,13 @@ export default function LeilaoDetailPage() {
         </Card>
       ) : (
         <div>
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </button>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
             {auction.status === "finished" ? (
