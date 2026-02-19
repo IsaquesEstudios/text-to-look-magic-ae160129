@@ -96,7 +96,9 @@ export function PainelLayout() {
         <aside className="hidden md:flex w-56 flex-shrink-0 border-r border-border/20 bg-card/30 flex-col min-h-[calc(100vh-3.5rem)] sticky top-14">
           <nav className="flex-1 p-3 space-y-1 mt-2">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = item.path === "/painel"
+                ? location.pathname === "/painel"
+                : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-imoveis" && location.pathname.startsWith("/painel/imovel/"));
               const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
@@ -129,7 +131,9 @@ export function PainelLayout() {
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
           <nav className="flex items-center justify-around h-14 px-2">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = item.path === "/painel"
+                ? location.pathname === "/painel"
+                : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-imoveis" && location.pathname.startsWith("/painel/imovel/"));
               const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;

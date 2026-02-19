@@ -18,7 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-function CountdownBlock({ targetDate, status, onFinished }: { targetDate: string; status: string; onFinished?: () => void }) {
+function CountdownBlock({ targetDate, status }: { targetDate: string; status: string }) {
   const [parts, setParts] = useState({ d: 0, h: 0, m: 0, s: 0 });
   const [isOver, setIsOver] = useState(false);
 
@@ -27,7 +27,6 @@ function CountdownBlock({ targetDate, status, onFinished }: { targetDate: string
       const diff = new Date(targetDate).getTime() - Date.now();
       if (diff <= 0) {
         setIsOver(true);
-        if (status !== "finished") onFinished?.();
         return;
       }
       setParts({
@@ -40,7 +39,7 @@ function CountdownBlock({ targetDate, status, onFinished }: { targetDate: string
     update();
     const i = setInterval(update, 1000);
     return () => clearInterval(i);
-  }, [targetDate, status, onFinished]);
+  }, [targetDate, status]);
 
   if (status === "finished" || isOver) {
     return (
@@ -353,12 +352,6 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
               <CountdownBlock
                 targetDate={auction.scheduled_start}
                 status={auction.status}
-                onFinished={async () => {
-                  if (auction.status !== "finished") {
-                    await supabase.from("auctions").update({ status: "finished", updated_at: new Date().toISOString() }).eq("id", auction.id);
-                    queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
-                  }
-                }}
               />
             </div>
           </div>

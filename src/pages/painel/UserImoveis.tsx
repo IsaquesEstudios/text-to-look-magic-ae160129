@@ -73,8 +73,11 @@ export default function UserCotas() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sorted.map(({ prop, totalQuantity, totalPaid }) => {
+            const totalProject = Number(prop.purchase_price) || 0;
             const returnPct = Number(prop.estimated_return_pct);
-            const estimatedValue = totalPaid * (1 + returnPct / 100);
+            const marketValue = totalProject * (1 + returnPct / 100);
+            const participation = totalProject > 0 ? totalPaid / totalProject : 0;
+            const estimatedValue = participation * marketValue;
             const counts = unreadMap?.get(prop.id);
             const totalUnread = (counts?.novidades ?? 0) + (counts?.gastos ?? 0);
 
