@@ -1,5 +1,6 @@
 import { Suspense, lazy } from "react";
 import type { RouteRecord } from "vite-react-ssg";
+import { AdminGuard } from "@/components/painel/AdminGuard";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
 import App from "./App";
@@ -91,12 +92,12 @@ const panelChildren: RouteRecord[] = [
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
   { path: "imovel/:id/gastos", element: <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper> },
-  { path: "imoveis", element: <SuspenseWrapper><AdminImoveisPage /></SuspenseWrapper> },
-  { path: "usuarios", element: <SuspenseWrapper><AdminUsersPage /></SuspenseWrapper> },
-  { path: "usuarios/:userId", element: <SuspenseWrapper><AdminUserProfilePage /></SuspenseWrapper> },
-  { path: "atividades", element: <SuspenseWrapper><AdminAtividadesPage /></SuspenseWrapper> },
-  { path: "configuracoes", element: <SuspenseWrapper><AdminConfigPage /></SuspenseWrapper> },
-  { path: "leiloes", element: <SuspenseWrapper><AdminLeiloesPage /></SuspenseWrapper> },
+  { path: "imoveis", element: <SuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></SuspenseWrapper> },
+  { path: "usuarios", element: <SuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></SuspenseWrapper> },
+  { path: "usuarios/:userId", element: <SuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></SuspenseWrapper> },
+  { path: "atividades", element: <SuspenseWrapper><AdminGuard><AdminAtividadesPage /></AdminGuard></SuspenseWrapper> },
+  { path: "configuracoes", element: <SuspenseWrapper><AdminGuard><AdminConfigPage /></AdminGuard></SuspenseWrapper> },
+  { path: "leiloes", element: <SuspenseWrapper><AdminGuard><AdminLeiloesPage /></AdminGuard></SuspenseWrapper> },
   { path: "leiloes-user", element: <SuspenseWrapper><UserLeiloesPage /></SuspenseWrapper> },
   { path: "leilao/:id", element: <SuspenseWrapper><LeilaoDetailPage /></SuspenseWrapper> },
 ];

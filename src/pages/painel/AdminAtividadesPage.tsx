@@ -49,7 +49,7 @@ export default function AdminAtividadesPage() {
       const shareActivities: ActivityItem[] = (sharesRes.data ?? []).map((s) => ({
         id: `share-${s.id}`,
         type: "share_purchase" as const,
-        description: `${nameMap.get(s.user_id) || "Usuário"} adquiriu uma cota — $ ${Number(s.amount_paid).toLocaleString("en-US")}`,
+        description: `${nameMap.get(s.user_id) || "Usuário"} foi vinculado a um imóvel — $${Number(s.amount_paid).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         timestamp: s.purchased_at,
         icon: ShoppingCart,
       }));

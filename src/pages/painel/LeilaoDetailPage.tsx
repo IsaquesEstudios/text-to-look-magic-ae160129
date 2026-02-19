@@ -122,28 +122,13 @@ export default function LeilaoDetailPage() {
       if (isNaN(amount) || amount <= 0) throw new Error("Valor inválido");
       if (profile && amount > profile.credits) throw new Error("Créditos insuficientes");
 
-      const { error } = await supabase.from("auction_deposits").insert({
-        auction_id: id!,
-        user_id: user!.id,
-        amount,
+      const { error } = await supabase.rpc("process_auction_deposit", {
+        p_auction_id: id!,
+        p_user_id: user!.id,
+        p_amount: amount,
+        p_auction_title: auction?.title || "",
       });
-      if (error) throw error;
-
-      // Deduct credits
-      const { error: creditError } = await supabase
-        .from("profiles")
-        .update({ credits: (profile?.credits ?? 0) - amount })
-        .eq("user_id", user!.id);
-      if (creditError) throw creditError;
-
-      // Log the transaction
-      await supabase.from("credit_transactions").insert({
-        user_id: user!.id,
-        amount: -amount,
-        type: "deposit",
-        description: `Depósito no leilão: ${auction?.title}`,
-        created_by: user!.id,
-      });
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
@@ -523,6 +508,7 @@ export default function LeilaoDetailPage() {
                   {isAdmin && <TableHead>Investidor</TableHead>}
                   <TableHead>Valor</TableHead>
                   <TableHead>Data</TableHead>
+                  {isAdmin && <TableHead className="w-20"></TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -536,6 +522,27 @@ export default function LeilaoDetailPage() {
                     <TableCell className="text-muted-foreground text-sm">
                       {format(new Date(dep.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-destructive hover:text-destructive"
+                          onClick={async () => {
+                            if (!confirm(`Estornar $${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })} para ${profileMap.get(dep.user_id) || "este investidor"}?`)) return;
+                            const { error } = await supabase.rpc("refund_auction_deposit", { p_deposit_id: dep.id });
+                            if (error) {
+                              toast({ title: "Erro ao estornar", description: error.message, variant: "destructive" });
+                            } else {
+                              toast({ title: "Depósito estornado com sucesso!" });
+                              queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
+                            }
+                          }}
+                        >
+                          Estornar
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
