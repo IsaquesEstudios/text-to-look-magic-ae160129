@@ -183,31 +183,13 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
       if (val <= 0) throw new Error("Valor inválido");
       if (val > credits) throw new Error("Créditos insuficientes");
 
-      const newCredits = credits - val;
-
-      const { error } = await supabase.from("auction_deposits").insert({
-        auction_id: auctionId,
-        user_id: user!.id,
-        amount: val,
+      const { error } = await supabase.rpc("process_auction_deposit", {
+        p_auction_id: auctionId,
+        p_user_id: user!.id,
+        p_amount: val,
+        p_auction_title: auctionTitle,
       });
-      if (error) throw error;
-
-      const { error: creditError } = await supabase
-        .from("profiles")
-        .update({ credits: newCredits })
-        .eq("user_id", user!.id);
-      if (creditError) throw creditError;
-
-      // Log transaction (non-blocking)
-      supabase.from("credit_transactions").insert({
-        user_id: user!.id,
-        amount: -val,
-        type: "deposit",
-        description: `Depósito no leilão: ${auctionTitle}`,
-        created_by: user!.id,
-      }).then(({ error: txError }) => {
-        if (txError) console.warn("Transaction log failed:", txError.message);
-      });
+      if (error) throw new Error(error.message);
     },
     onSuccess: async () => {
       await refreshProfile();

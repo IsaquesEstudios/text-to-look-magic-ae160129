@@ -42,10 +42,10 @@ export default function AdminDashboardPage() {
   const cards = [
     { label: "Imóveis", value: stats?.totalProperties ?? 0, icon: Building2 },
     { label: "Usuários", value: stats?.totalUsers ?? 0, icon: Users },
-    { label: "Cotas Vendidas", value: stats?.totalSharesSold ?? 0, icon: PieChart },
+    { label: "Vínculos", value: stats?.totalSharesSold ?? 0, icon: PieChart },
     {
-      label: "Receita Total",
-      value: `R$ ${(stats?.totalRevenue ?? 0).toLocaleString("pt-BR")}`,
+      label: "Total Investido",
+      value: `$${(stats?.totalRevenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
       icon: TrendingUp,
     },
   ];

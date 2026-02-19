@@ -613,8 +613,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_auction_deposit: {
+        Args: {
+          p_amount: number
+          p_auction_id: string
+          p_auction_title: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       purchase_share: {
         Args: { p_property_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      refund_auction_deposit: {
+        Args: { p_deposit_id: string }
         Returns: undefined
       }
     }
