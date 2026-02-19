@@ -317,13 +317,27 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                           Valor a vincular (máx: ${remaining.toLocaleString("en-US", { minimumFractionDigits: 2 })})
                         </label>
                         <Input
-                          type="number"
-                          placeholder="Valor em USD"
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="$0.00"
                           value={linkAmount}
-                          onChange={(e) => setLinkAmount(e.target.value)}
-                          min="0"
-                          step="0.01"
-                          max={remaining}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/[^0-9.]/g, "");
+                            const parts = raw.split(".");
+                            const cleaned = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
+                            if (cleaned === "" || cleaned === ".") {
+                              setLinkAmount("");
+                              return;
+                            }
+                            const num = parseFloat(cleaned);
+                            if (!isNaN(num)) {
+                              // Format with commas while typing, preserve decimal input
+                              const hasDecimal = cleaned.includes(".");
+                              const decimalPart = hasDecimal ? cleaned.split(".")[1] : "";
+                              const intPart = Math.floor(num).toLocaleString("en-US");
+                              setLinkAmount(hasDecimal ? `$${intPart}.${decimalPart}` : `$${intPart}`);
+                            }
+                          }}
                         />
                       </div>
                       <div className="flex gap-2">
@@ -332,7 +346,7 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                           className="gap-2"
                           disabled={!selectedUserId || !linkAmount || linkMutation.isPending}
                           onClick={() => {
-                            const amount = parseFloat(linkAmount);
+                            const amount = parseFloat(linkAmount.replace(/[^0-9.]/g, ""));
                             if (isNaN(amount) || amount <= 0) return;
                             linkMutation.mutate({
                               propertyId: item.property_id!,
