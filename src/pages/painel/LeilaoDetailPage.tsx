@@ -402,7 +402,7 @@ export default function LeilaoDetailPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
-          {isAdmin && !showAddProperty && (
+          {isAdmin && !showAddProperty && auction.status !== "finished" && (
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowAddProperty(true)}>
               <Plus className="h-4 w-4" /> Adicionar
             </Button>
@@ -434,7 +434,7 @@ export default function LeilaoDetailPage() {
                     )}
                     {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
                   </div>
-                  {isAdmin && (
+                  {isAdmin && auction.status !== "finished" && (
                     <Button
                       variant="ghost"
                       size="icon"
