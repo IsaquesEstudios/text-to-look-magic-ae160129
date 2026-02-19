@@ -5,10 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, DollarSign, MapPin, Home, TreePine } from "lucide-react";
+import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -62,6 +64,8 @@ export default function LeilaoDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [depositAmount, setDepositAmount] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ title: "", description: "", scheduled_start: "" });
 
   const { data: auction } = useQuery({
     queryKey: ["auction", id],
@@ -149,6 +153,38 @@ export default function LeilaoDetailPage() {
   const myDeposits = deposits?.filter((d) => d.user_id === user?.id) ?? [];
   const myTotal = myDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
 
+  const updateAuctionMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("auctions")
+        .update({
+          title: editForm.title,
+          description: editForm.description || null,
+          scheduled_start: new Date(editForm.scheduled_start).toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      toast({ title: "Leilão atualizado!" });
+      setEditing(false);
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const startEditing = () => {
+    if (!auction) return;
+    setEditForm({
+      title: auction.title,
+      description: auction.description || "",
+      scheduled_start: auction.scheduled_start.slice(0, 16),
+    });
+    setEditing(true);
+  };
+
   const isActive = auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date());
   const canDeposit = !isAdmin && isActive && auction?.status !== "finished";
 
@@ -159,19 +195,52 @@ export default function LeilaoDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
-          {auction.status === "finished" ? (
-            <Badge variant="secondary">Encerrado</Badge>
-          ) : isActive ? (
-            <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>
-          ) : (
-            <Badge variant="outline">Programado</Badge>
-          )}
+      {editing ? (
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div>
+              <Label>Título *</Label>
+              <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} />
+            </div>
+            <div>
+              <Label>Descrição</Label>
+              <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+            </div>
+            <div>
+              <Label>Data e Hora de Início *</Label>
+              <Input type="datetime-local" value={editForm.scheduled_start} onChange={(e) => setEditForm({ ...editForm, scheduled_start: e.target.value })} />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => updateAuctionMutation.mutate()} disabled={!editForm.title || !editForm.scheduled_start || updateAuctionMutation.isPending} className="gap-2">
+                <Save className="h-4 w-4" />
+                {updateAuctionMutation.isPending ? "Salvando..." : "Salvar"}
+              </Button>
+              <Button variant="ghost" onClick={() => setEditing(false)} className="gap-2">
+                <X className="h-4 w-4" /> Cancelar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
+            {auction.status === "finished" ? (
+              <Badge variant="secondary">Encerrado</Badge>
+            ) : isActive ? (
+              <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>
+            ) : (
+              <Badge variant="outline">Programado</Badge>
+            )}
+            {isAdmin && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={startEditing}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          {auction.description && <p className="text-sm text-muted-foreground">{auction.description}</p>}
         </div>
-        {auction.description && <p className="text-sm text-muted-foreground">{auction.description}</p>}
-      </div>
+      )}
 
       {/* Countdown */}
       {auction.status !== "finished" && (
