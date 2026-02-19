@@ -29,6 +29,8 @@ interface ParticipantSummary {
   user_id: string;
   name: string;
   totalInvested: number;
+  totalLinkedAll: number;
+  available: number;
   highestDepositDate: string;
 }
 
@@ -100,6 +102,12 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
     ...(shareProfiles?.map((p) => [p.user_id, p.full_name] as [string, string | null]) ?? []),
   ]);
 
+  // Calculate total linked per user across all auction properties
+  const userLinkedTotals = new Map<string, number>();
+  for (const share of existingShares ?? []) {
+    userLinkedTotals.set(share.user_id, (userLinkedTotals.get(share.user_id) ?? 0) + Number(share.amount_paid));
+  }
+
   // Build participant summaries: group deposits by user, sort by highest deposit date
   const participants: ParticipantSummary[] = (() => {
     const map = new Map<string, { total: number; highestAmount: number; highestDate: string }>();
@@ -117,12 +125,17 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
       }
     }
     return Array.from(map.entries())
-      .map(([user_id, info]) => ({
-        user_id,
-        name: allProfileMap.get(user_id) || "Usuário",
-        totalInvested: info.total,
-        highestDepositDate: info.highestDate,
-      }))
+      .map(([user_id, info]) => {
+        const totalLinkedAll = userLinkedTotals.get(user_id) ?? 0;
+        return {
+          user_id,
+          name: allProfileMap.get(user_id) || "Usuário",
+          totalInvested: info.total,
+          totalLinkedAll,
+          available: Math.max(info.total - totalLinkedAll, 0),
+          highestDepositDate: info.highestDate,
+        };
+      })
       .sort((a, b) => new Date(a.highestDepositDate).getTime() - new Date(b.highestDepositDate).getTime());
   })();
 
@@ -179,9 +192,28 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
               {participants.map((p) => (
                 <div key={p.user_id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-sm">
                   <span className="font-medium">{p.name}</span>
-                  <span className="font-semibold text-foreground">
-                    ${p.totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </span>
+                  <div className="flex items-center gap-3 text-right">
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        ${p.totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">Depositado</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-discovery-green">
+                        ${p.available.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">Disponível</p>
+                    </div>
+                    {p.totalLinkedAll > 0 && (
+                      <div>
+                        <p className="font-semibold text-primary">
+                          ${p.totalLinkedAll.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">Vinculado</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -200,8 +232,13 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
 
           // Users already linked to this property
           const linkedUserIds = new Set(linkedShares.map((s) => s.user_id));
-          // Available participants (not yet linked to this property)
-          const availableParticipants = participants.filter((p) => !linkedUserIds.has(p.user_id));
+          // Available participants (not yet linked to this property AND have available balance)
+          const availableParticipants = participants.filter((p) => !linkedUserIds.has(p.user_id) && p.available > 0);
+
+          // Selected user's max linkable amount
+          const selectedParticipant = participants.find((p) => p.user_id === selectedUserId);
+          const userMaxAvailable = selectedParticipant?.available ?? 0;
+          const maxLinkable = Math.min(remaining, userMaxAvailable);
 
           return (
             <div key={item.id} className="border border-border rounded-xl p-4 space-y-3">
@@ -307,14 +344,14 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                           <option value="">Selecione um participante</option>
                           {availableParticipants.map((p) => (
                             <option key={p.user_id} value={p.user_id}>
-                              {p.name} — Total: ${p.totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                              {p.name} — Disponível: ${p.available.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                             </option>
                           ))}
                         </select>
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                          Valor a vincular (máx: ${remaining.toLocaleString("en-US", { minimumFractionDigits: 2 })})
+                          Valor a vincular (máx: ${maxLinkable.toLocaleString("en-US", { minimumFractionDigits: 2 })})
                         </label>
                         <Input
                           type="text"
@@ -348,6 +385,10 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                           onClick={() => {
                             const amount = parseFloat(linkAmount.replace(/[^0-9.]/g, ""));
                             if (isNaN(amount) || amount <= 0) return;
+                            if (amount > maxLinkable) {
+                              toast({ title: "Valor excede o máximo permitido", description: `Máximo: $${maxLinkable.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, variant: "destructive" });
+                              return;
+                            }
                             linkMutation.mutate({
                               propertyId: item.property_id!,
                               userId: selectedUserId,
