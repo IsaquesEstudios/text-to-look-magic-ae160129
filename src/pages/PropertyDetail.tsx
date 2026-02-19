@@ -93,9 +93,8 @@ export default function PropertyDetail() {
   const auctionValue = Number(property.estimated_auction_value) || 0;
   const renovationCost = Number(property.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
-  const returnPct = Number(property.estimated_return_pct) || 0;
-  const marketValue = purchasePrice * (1 + returnPct / 100);
-  const calculatedReturn = purchasePrice > 0 ? ((marketValue - purchasePrice) / purchasePrice) * 100 : 0;
+  const saleValue = Number(property.estimated_sale_value) || 0;
+  const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
 
   const allImages = [
     ...(property.cover_image_url ? [{ id: "cover", image_url: property.cover_image_url }] : []),
@@ -123,7 +122,7 @@ export default function PropertyDetail() {
               { icon: DollarSign, label: "Arremate", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: DollarSign, label: "Reforma", value: `$${renovationCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: DollarSign, label: "Total do Projeto", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-              { icon: DollarSign, label: "Valor de Mercado", value: `$${marketValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Valor de Venda", value: `$${saleValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
               { icon: TrendingUp, label: "Retorno Est.", value: `${calculatedReturn.toFixed(1)}%`, iconClass: "text-primary", valueClass: "text-primary" },
             ].map((stat, i) => (
               <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
