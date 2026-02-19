@@ -61,7 +61,7 @@ export default function PropertyDetail() {
     enabled: !!id && !!user,
   });
 
-  const { data: userShares } = useQuery({
+  const { data: userShares, isLoading: isSharesLoading } = useQuery({
     queryKey: ["user-shares", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -77,7 +77,7 @@ export default function PropertyDetail() {
 
   const authLoading = !user;
 
-  if (isLoading || authLoading) {
+  if (isLoading || isSharesLoading || authLoading) {
     return (
       <div className="flex justify-center py-16">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
