@@ -18,27 +18,24 @@ interface Props {
 }
 
 const MONTHS = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  { value: "01", label: "Janeiro" },
+  { value: "02", label: "Fevereiro" },
+  { value: "03", label: "Março" },
+  { value: "04", label: "Abril" },
+  { value: "05", label: "Maio" },
+  { value: "06", label: "Junho" },
+  { value: "07", label: "Julho" },
+  { value: "08", label: "Agosto" },
+  { value: "09", label: "Setembro" },
+  { value: "10", label: "Outubro" },
+  { value: "11", label: "Novembro" },
+  { value: "12", label: "Dezembro" },
 ];
-
-function getMonthOptions() {
-  const now = new Date();
-  const options: { value: string; label: string }[] = [];
-  for (let i = -6; i <= 6; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-    options.push({ value: val, label });
-  }
-  return options;
-}
 
 function formatMonthLabel(monthStr: string | null) {
   if (!monthStr) return "—";
-  const [y, m] = monthStr.split("-");
-  const idx = parseInt(m, 10) - 1;
-  return `${MONTHS[idx] ?? m} ${y}`;
+  const found = MONTHS.find((m) => m.value === monthStr);
+  return found?.label ?? monthStr;
 }
 
 function formatCurrency(raw: string): string {
@@ -65,22 +62,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ month: "", category: "", price: "", state_code: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "" });
   const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
-
-  const monthOptions = useMemo(getMonthOptions, []);
-
-  const { data: stateTaxes } = useQuery({
-    queryKey: ["us-state-taxes"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("us_state_taxes").select("*").order("state_name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const selectedTax = stateTaxes?.find((s) => s.state_code === form.state_code);
 
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["property-expenses", propertyId],
@@ -105,35 +89,27 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (!stateTaxes || expenses === undefined) return;
+    if (expenses === undefined) return;
 
     const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
-    const defaultState = lastExpense?.state_code || propertyStateCode || "";
     const now = new Date();
-    const defaultMonth = lastExpense?.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const defaultMonth = lastExpense?.month || String(now.getMonth() + 1).padStart(2, "0");
 
-    setForm((f) => ({
-      ...f,
-      state_code: stateTaxes.some((s) => s.state_code === defaultState) ? defaultState : "",
-      month: defaultMonth,
-    }));
+    setForm((f) => ({ ...f, month: defaultMonth }));
     defaultInitialized.current = true;
-  }, [stateTaxes, expenses, propertyStateCode]);
+  }, [expenses]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseCurrency(form.price);
     if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
-    const taxRate = selectedTax?.tax_rate ?? 0;
     const { error } = await supabase.from("property_expenses").insert({
       property_id: propertyId,
       category: form.category.trim(),
-      product: form.category.trim(), // keep product column populated
+      product: form.category.trim(),
       quantity: 1,
       price,
-      state_code: form.state_code || null,
-      tax_rate: taxRate,
       month: form.month,
     });
     if (error) {
@@ -152,16 +128,10 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
 
   const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const calcTotal = (e: { price: number; quantity: number; tax_rate?: number | null }) => {
-    const base = Number(e.price) * e.quantity;
-    const tax = base * (Number(e.tax_rate ?? 0) / 100);
-    return base + tax;
-  };
-
-  const totalSpent = expenses?.reduce((sum, e) => sum + calcTotal(e), 0) ?? 0;
+  const totalSpent = expenses?.reduce((sum, e) => sum + Number(e.price), 0) ?? 0;
   const categoryTotals: Record<string, number> = {};
   expenses?.forEach((e) => {
-    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + calcTotal(e);
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.price);
   });
 
   if (isLoading) {
@@ -186,7 +156,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                     <SelectValue placeholder="Mês" />
                   </SelectTrigger>
                   <SelectContent>
-                    {monthOptions.map((o) => (
+                    {MONTHS.map((o) => (
                       <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                     ))}
                   </SelectContent>
@@ -258,27 +228,6 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
-              <div className="w-36">
-                <label className="text-xs text-muted-foreground">Tarifa (Estado)</label>
-                <Select value={form.state_code} onValueChange={(v) => setForm({ ...form, state_code: v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stateTaxes?.map((s) => (
-                      <SelectItem key={s.state_code} value={s.state_code}>
-                        {s.state_code} ({s.tax_rate}%)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedTax && form.price && (
-                <div className="text-xs text-muted-foreground self-end pb-2">
-                  +${((parseCurrency(form.price) * selectedTax.tax_rate) / 100).toFixed(2)} tax
-                </div>
-              )}
 
               <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -298,8 +247,6 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                   <th className="text-left p-3 text-muted-foreground font-medium">Mês</th>
                   <th className="text-left p-3 text-muted-foreground font-medium">Categoria</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Valor</th>
-                  <th className="text-center p-3 text-muted-foreground font-medium">Tarifa</th>
-                  <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
                 </tr>
               </thead>
@@ -308,11 +255,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                   <tr key={expense.id} className="border-b border-border/30 hover:bg-secondary/30">
                     <td className="p-3 text-foreground">{formatMonthLabel(expense.month)}</td>
                     <td className="p-3 text-foreground">{expense.category}</td>
-                    <td className="p-3 text-right text-foreground">${fmt(Number(expense.price))}</td>
-                    <td className="p-3 text-center text-muted-foreground text-xs">
-                      {expense.state_code ? `${expense.state_code} (${expense.tax_rate}%)` : "—"}
-                    </td>
-                    <td className="p-3 text-right font-medium text-foreground">${fmt(calcTotal(expense))}</td>
+                    <td className="p-3 text-right font-medium text-foreground">${fmt(Number(expense.price))}</td>
                     {isAdmin && (
                       <td className="p-3">
                         <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
