@@ -17,7 +17,10 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Trash2,
+  Gavel,
 } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function AdminUserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
@@ -53,6 +56,43 @@ export default function AdminUserProfilePage() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+    enabled: !!userId && !!user && isAdmin,
+  });
+
+  const { data: auctionInvestments } = useQuery({
+    queryKey: ["admin-user-auctions", userId],
+    queryFn: async () => {
+      const { data: deposits, error } = await supabase
+        .from("auction_deposits")
+        .select("id, amount, created_at, auction_id")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      if (!deposits || deposits.length === 0) return [];
+
+      const auctionIds = [...new Set(deposits.map((d) => d.auction_id))];
+      const { data: auctions } = await supabase
+        .from("auctions")
+        .select("id, title, status, scheduled_start")
+        .in("id", auctionIds);
+
+      const auctionMap = new Map((auctions ?? []).map((a) => [a.id, a]));
+
+      const grouped = new Map<string, { auction: any; deposits: typeof deposits; total: number }>();
+      for (const d of deposits) {
+        if (!grouped.has(d.auction_id)) {
+          grouped.set(d.auction_id, {
+            auction: auctionMap.get(d.auction_id),
+            deposits: [],
+            total: 0,
+          });
+        }
+        const g = grouped.get(d.auction_id)!;
+        g.deposits.push(d);
+        g.total += Number(d.amount);
+      }
+      return Array.from(grouped.values());
     },
     enabled: !!userId && !!user && isAdmin,
   });
@@ -209,6 +249,57 @@ export default function AdminUserProfilePage() {
               Adicionar
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Gavel className="h-4 w-4 text-primary" />
+            Leilões Investidos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!auctionInvestments || auctionInvestments.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              Nenhum investimento em leilões
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {auctionInvestments.map((item) => (
+                <div key={item.auction?.id || Math.random()} className="border border-border/50 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-foreground">{item.auction?.title || "Leilão"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.auction?.scheduled_start
+                          ? format(new Date(item.auction.scheduled_start), "dd MMM yyyy", { locale: ptBR })
+                          : "—"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant="outline" className="border-primary/30 text-primary">
+                        Total: ${item.total.toLocaleString("en-US")}
+                      </Badge>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {item.deposits.length} depósito{item.deposits.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {item.deposits.map((d: any) => (
+                      <div key={d.id} className="flex items-center justify-between text-sm py-1 px-2 rounded hover:bg-muted/50">
+                        <span className="text-muted-foreground">
+                          {format(new Date(d.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                        </span>
+                        <span className="font-medium text-foreground">${Number(d.amount).toLocaleString("en-US")}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
