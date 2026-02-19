@@ -398,12 +398,18 @@ export default function LeilaoDetailPage() {
           {items && items.length > 0 && (
             <div className="grid gap-3">
               {items.map((item) => (
-                <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    {item.type === "terreno" ? <TreePine className="h-5 w-5 text-primary" /> : <Home className="h-5 w-5 text-primary" />}
-                  </div>
+                <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30">
+                  {item.image_url ? (
+                    <div className="h-16 w-24 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                      <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-16 w-24 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      {item.type === "terreno" ? <TreePine className="h-6 w-6 text-primary" /> : <Home className="h-6 w-6 text-primary" />}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{item.title}</p>
+                    <p className="font-semibold text-sm">{item.title}</p>
                     {item.location && (
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                         <MapPin className="h-3 w-3" /> {item.location}
