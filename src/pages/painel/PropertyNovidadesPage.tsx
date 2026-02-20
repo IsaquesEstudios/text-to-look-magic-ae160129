@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
-import { Loader2 } from "lucide-react";
+import { PropertyPageSkeleton } from "@/components/painel/property/PropertyPageSkeleton";
 
 export default function PropertyNovidadesPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,11 +64,7 @@ export default function PropertyNovidadesPage() {
   });
 
   if (isLoading || isSharesLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PropertyPageSkeleton />;
   }
 
   const hasAccess = isAdmin || (userShares && userShares.length > 0);
