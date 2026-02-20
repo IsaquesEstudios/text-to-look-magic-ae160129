@@ -1,20 +1,34 @@
-# Plano Concluído ✅
 
-Todas as fases foram implementadas:
 
-## Fase 1 - Segurança Crítica ✅
-- Todas as políticas RLS recriadas como PERMISSIVE
-- Lógica de auto-finish removida do frontend (UserLeiloesPage + LeilaoDetailPage)
-- Função `purchase_share` removida do banco
+## Comprovantes no Painel do Usuário
 
-## Fase 2 - Correções Funcionais ✅
-- Cálculo de retorno estimado corrigido (participação proporcional)
-- `refreshProfile()` adicionado ao depósito no LeilaoDetailPage
-- Sidebar destaca sub-rotas corretamente (incluindo /painel/imovel/*)
+Adicionar uma nova página "Comprovantes" no painel do investidor para que ele possa visualizar os comprovantes de pagamento (recebidos e enviados) que o admin cadastrou no perfil dele.
 
-## Fase 3 - Limpeza ✅
-- Shares removidos do extrato (apenas credit_transactions)
-- Query de shares removida do UserExtrato
+### O que será feito
 
-## Pendente (requer ação manual)
-- Leaked Password Protection: habilitar nas configurações de autenticação
+1. **Nova página `UserComprovantesPage`** -- Exibe as imagens de `user_payment_images` do usuário logado, separadas em duas seções:
+   - "Pagamentos Recebidos" (type = `received`)
+   - "Pagamentos Enviados" (type = `sent`)
+   - Cada imagem mostra a foto e a data, em grid responsivo
+   - Somente leitura (sem upload/delete -- isso fica no admin)
+
+2. **Novo item no menu do usuário** -- Adicionar "Comprovantes" com icone `Receipt` (ou `FileImage`) na sidebar do investidor em `PainelLayout.tsx`, entre "Extrato" e os demais
+
+3. **Rota** -- Registrar `/painel/comprovantes` em `routes.tsx`
+
+4. **RLS** -- Ja existe policy `Users can view own payment images` na tabela `user_payment_images`, entao nao precisa de alteracao no banco
+
+### Detalhes Técnicos
+
+- **Arquivo novo**: `src/pages/painel/UserComprovantesPage.tsx`
+  - Query em `user_payment_images` filtrando `user_id = auth.uid()` via RLS
+  - Separar por `type` ("received" / "sent")
+  - Grid de imagens com data, clicavel para abrir em tamanho maior (dialog)
+
+- **Editar**: `src/components/painel/PainelLayout.tsx`
+  - Adicionar `{ label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" }` ao `userNavItems`
+
+- **Editar**: `src/routes.tsx`
+  - Lazy import de `UserComprovantesPage`
+  - Adicionar `{ path: "comprovantes", element: ... }` em `panelChildren`
+
