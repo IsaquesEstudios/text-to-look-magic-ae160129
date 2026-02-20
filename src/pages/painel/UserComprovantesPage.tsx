@@ -2,16 +2,17 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { FileImage, Loader2 } from "lucide-react";
+import { FileImage, Loader2, ArrowDownLeft, ArrowUpRight, CreditCard, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function UserComprovantesPage() {
   const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const { data: images = [], isLoading } = useQuery({
+  const { data: images = [], isLoading: loadingImages } = useQuery({
     queryKey: ["user-payment-images", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -24,8 +25,24 @@ export default function UserComprovantesPage() {
     enabled: !!user,
   });
 
+  const { data: recharges = [], isLoading: loadingRecharges } = useQuery({
+    queryKey: ["user-recharges", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("credit_transactions")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("type", "deposit")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const received = images.filter((img) => img.type === "received");
   const sent = images.filter((img) => img.type === "sent");
+  const isLoading = loadingImages || loadingRecharges;
 
   if (isLoading) {
     return (
@@ -36,23 +53,76 @@ export default function UserComprovantesPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Comprovantes</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Comprovantes de pagamentos recebidos e enviados
+          Comprovantes de pagamentos e histórico de recargas
         </p>
       </div>
 
-      <ImageSection title="Pagamentos Recebidos" items={received} onSelect={setSelectedImage} />
-      <ImageSection title="Pagamentos Enviados" items={sent} onSelect={setSelectedImage} />
+      <Tabs defaultValue="received" className="w-full">
+        <TabsList className="w-full grid grid-cols-3">
+          <TabsTrigger value="received" className="gap-1.5 text-xs sm:text-sm">
+            <ArrowDownLeft className="h-3.5 w-3.5" />
+            Recebidos{received.length > 0 && ` (${received.length})`}
+          </TabsTrigger>
+          <TabsTrigger value="sent" className="gap-1.5 text-xs sm:text-sm">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+            Enviados{sent.length > 0 && ` (${sent.length})`}
+          </TabsTrigger>
+          <TabsTrigger value="recharges" className="gap-1.5 text-xs sm:text-sm">
+            <CreditCard className="h-3.5 w-3.5" />
+            Recargas{recharges.length > 0 && ` (${recharges.length})`}
+          </TabsTrigger>
+        </TabsList>
 
-      {images.length === 0 && (
-        <div className="text-center py-16 text-muted-foreground">
-          <FileImage className="h-10 w-10 mx-auto mb-3 opacity-40" />
-          <p>Nenhum comprovante cadastrado ainda.</p>
-        </div>
-      )}
+        <TabsContent value="received" className="mt-6">
+          {received.length === 0 ? (
+            <EmptyState text="Nenhum comprovante de recebimento" />
+          ) : (
+            <ImageGrid items={received} onSelect={setSelectedImage} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="sent" className="mt-6">
+          {sent.length === 0 ? (
+            <EmptyState text="Nenhum comprovante de envio" />
+          ) : (
+            <ImageGrid items={sent} onSelect={setSelectedImage} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="recharges" className="mt-6">
+          {recharges.length === 0 ? (
+            <EmptyState text="Nenhuma recarga realizada" icon={<CreditCard className="h-10 w-10 mx-auto mb-3 opacity-40" />} />
+          ) : (
+            <div className="space-y-2">
+              {recharges.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center gap-4 rounded-xl border border-border/20 bg-card/30 px-4 py-3"
+                >
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <ArrowDownLeft className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">
+                      {r.description || "Depósito de créditos"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground/60">
+                      {format(new Date(r.created_at), "dd MMM yyyy, HH:mm", { locale: ptBR })}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold text-primary flex-shrink-0">
+                    +${Math.abs(Number(r.amount)).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-3xl p-2">
@@ -65,41 +135,43 @@ export default function UserComprovantesPage() {
   );
 }
 
-function ImageSection({
-  title,
+function EmptyState({ text, icon }: { text: string; icon?: React.ReactNode }) {
+  return (
+    <div className="text-center py-16 text-muted-foreground rounded-2xl border border-dashed border-border/40">
+      {icon || <FileImage className="h-10 w-10 mx-auto mb-3 opacity-40" />}
+      <p className="text-sm">{text}</p>
+    </div>
+  );
+}
+
+function ImageGrid({
   items,
   onSelect,
 }: {
-  title: string;
   items: { id: string; image_url: string; created_at: string; description: string | null }[];
   onSelect: (url: string) => void;
 }) {
-  if (items.length === 0) return null;
-
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onSelect(item.image_url)}
-            className="group relative rounded-xl overflow-hidden border border-border/40 bg-card hover:ring-2 hover:ring-primary/30 transition-all"
-          >
-            <img
-              src={item.image_url}
-              alt={item.description || "Comprovante"}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-              <span className="text-[11px] text-white/90">
-                {format(new Date(item.created_at), "dd/MM/yyyy", { locale: ptBR })}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => onSelect(item.image_url)}
+          className="group relative rounded-xl overflow-hidden border border-border/40 bg-card hover:ring-2 hover:ring-primary/30 transition-all"
+        >
+          <img
+            src={item.image_url}
+            alt={item.description || "Comprovante"}
+            className="w-full aspect-square object-cover"
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+            <span className="text-[11px] text-white/90">
+              {format(new Date(item.created_at), "dd/MM/yyyy", { locale: ptBR })}
+            </span>
+          </div>
+        </button>
+      ))}
     </div>
   );
 }
