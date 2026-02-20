@@ -24,9 +24,19 @@ export function AdminPropertiesList({ onEdit }: Props) {
   const { data: properties, isLoading } = useQuery({
     queryKey: ["admin-properties"],
     queryFn: async () => {
+      // Get property IDs that have linked investors (shares)
+      const { data: shareRows, error: sharesError } = await supabase
+        .from("shares")
+        .select("property_id");
+      if (sharesError) throw sharesError;
+
+      const linkedIds = [...new Set(shareRows.map((s) => s.property_id))];
+      if (linkedIds.length === 0) return [];
+
       const { data, error } = await supabase
         .from("properties")
         .select("*")
+        .in("id", linkedIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -103,27 +113,27 @@ export function AdminPropertiesList({ onEdit }: Props) {
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Preço</p>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
                   <p className="font-semibold text-foreground">
-                    ${Number(property.purchase_price).toLocaleString("pt-BR")}
+                    ${Number(property.estimated_auction_value || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
+                  <p className="font-semibold text-foreground">
+                    ${Number(property.estimated_renovation_cost || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total</p>
+                  <p className="font-semibold text-foreground">
+                    ${Number(property.purchase_price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
                   <p className="font-semibold text-primary">
                     {Number(property.estimated_return_pct)}%
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Cotas</p>
-                  <p className="font-semibold text-foreground">
-                    {property.available_shares}/{property.total_shares}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Preço/Cota</p>
-                  <p className="font-semibold text-foreground">
-                    ${Number(property.share_price).toLocaleString("pt-BR")}
                   </p>
                 </div>
               </div>
