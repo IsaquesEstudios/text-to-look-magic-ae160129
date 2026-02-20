@@ -20,10 +20,14 @@ export function UserDashboard() {
       return data;
     },
     enabled: !!user,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 
   const { data: recentActivity } = useQuery({
     queryKey: ["user-recent-activity", user?.id],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () => {
       const creditsRes = await supabase
         .from("credit_transactions")
