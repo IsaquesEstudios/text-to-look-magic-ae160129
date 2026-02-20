@@ -118,7 +118,7 @@ export default function LeilaoDetailPage() {
   const depositMutation = useMutation({
     mutationFn: async () => {
       const amount = parseFloat(depositAmount);
-      if (isNaN(amount) || amount <= 0) throw new Error("Valor inválido");
+      if (isNaN(amount) || amount < 800) throw new Error("O valor mínimo para participar é $800");
       if (profile && amount > profile.credits) throw new Error("Créditos insuficientes");
 
       const { error } = await supabase.rpc("process_auction_deposit", {
