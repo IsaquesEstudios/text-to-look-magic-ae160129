@@ -11,11 +11,11 @@ import {
   DollarSign,
   TrendingUp,
   Users,
-  Loader2,
   ChevronLeft,
   ChevronRight,
   X,
 } from "lucide-react";
+import { PropertyPageSkeleton } from "@/components/painel/property/PropertyPageSkeleton";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   available: { label: "Disponível", color: "bg-primary/90 text-primary-foreground" },
@@ -78,11 +78,7 @@ export default function PropertyDetail() {
   const authLoading = !user;
 
   if (isLoading || isSharesLoading || authLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PropertyPageSkeleton />;
   }
 
   if (!property) {
