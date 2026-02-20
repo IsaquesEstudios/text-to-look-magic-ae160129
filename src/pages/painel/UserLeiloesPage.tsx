@@ -161,6 +161,10 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
   const [displayAmount, setDisplayAmount] = useState("");
 
   const credits = profile?.credits ?? 0;
+  const depositValue = rawAmount / 100;
+  const category = depositValue >= 11000 ? "casa" : depositValue >= 800 ? "terreno" : null;
+  const fee = category === "casa" ? 5000 : category === "terreno" ? 500 : 0;
+  const netInvestment = depositValue - fee;
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/[^0-9]/g, "");
@@ -206,6 +210,21 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
       <p className="text-xs text-muted-foreground">
         Saldo disponível: <span className="font-semibold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
       </p>
+
+      {/* Fee rules info */}
+      <div className="rounded-lg border border-border/50 bg-secondary/30 p-3 space-y-1.5 text-xs text-muted-foreground">
+        <p className="font-semibold text-foreground text-[11px] uppercase tracking-wider">Regras de Participação</p>
+        <div className="flex items-start gap-1.5">
+          <TreePine className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <span><strong className="text-foreground">$800 – $10.999</strong> → Terreno (taxa de serviço: <strong className="text-foreground">$500</strong>)</span>
+        </div>
+        <div className="flex items-start gap-1.5">
+          <Home className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <span><strong className="text-foreground">$11.000+</strong> → Casa (taxa de serviço: <strong className="text-foreground">$5.000</strong>)</span>
+        </div>
+        <p className="text-muted-foreground/70 text-[10px]">Valor mínimo: $800. A taxa é descontada do depósito.</p>
+      </div>
+
       <div className="flex gap-2">
         <div className="relative flex-1">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -227,6 +246,24 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
           {mutation.isPending ? "..." : "Depositar"}
         </Button>
       </div>
+
+      {/* Dynamic category feedback */}
+      {category && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1 text-xs">
+          <div className="flex items-center gap-2">
+            {category === "casa" ? <Home className="h-3.5 w-3.5 text-primary" /> : <TreePine className="h-3.5 w-3.5 text-primary" />}
+            <span className="font-semibold text-foreground">
+              {category === "casa" ? "Casa" : "Terreno"} — Taxa: ${fee.toLocaleString("en-US")}
+            </span>
+          </div>
+          <p className="text-muted-foreground">
+            Investimento líquido: <strong className="text-foreground">${netInvestment.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong>
+          </p>
+        </div>
+      )}
+      {depositValue > 0 && depositValue < 800 && (
+        <p className="text-xs text-destructive">O valor mínimo para participar é $800.</p>
+      )}
     </div>
   );
 }
