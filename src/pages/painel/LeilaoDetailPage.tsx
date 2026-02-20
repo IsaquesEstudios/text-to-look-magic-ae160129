@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2, ArrowLeft, ChevronDown, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -57,6 +57,157 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
       </p>
       <p className="text-2xl font-bold font-mono tracking-wider">{timeLeft}</p>
     </div>
+  );
+}
+
+function DepositsAccordion({
+  deposits,
+  profileMap,
+  isAdmin,
+  auctionId,
+  queryClient,
+  toast,
+  userId,
+}: {
+  deposits: any[];
+  profileMap: Map<string, string | null>;
+  isAdmin: boolean;
+  auctionId: string;
+  queryClient: any;
+  toast: any;
+  userId?: string;
+}) {
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
+
+  // Group deposits by user
+  const grouped = useMemo(() => {
+    const map = new Map<string, typeof deposits>();
+    deposits.forEach((d) => {
+      const list = map.get(d.user_id) ?? [];
+      list.push(d);
+      map.set(d.user_id, list);
+    });
+    // Sort by total deposited desc
+    return [...map.entries()]
+      .map(([uid, deps]) => ({
+        userId: uid,
+        name: profileMap.get(uid) || "Usuário",
+        deposits: deps,
+        total: deps.reduce((s: number, d: any) => s + Number(d.amount), 0),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [deposits, profileMap]);
+
+  const handleRefund = async (depId: string, amount: number, userName: string) => {
+    if (!confirm(`Estornar $${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} para ${userName}?`)) return;
+    const { error } = await supabase.rpc("refund_auction_deposit", { p_deposit_id: depId });
+    if (error) {
+      toast({ title: "Erro ao estornar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Depósito estornado com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ["auction-deposits", auctionId] });
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Depósitos ({deposits.length})</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {grouped.map((group) => {
+          const isExpanded = expandedUser === group.userId;
+          const hasMultiple = group.deposits.length > 1;
+
+          return (
+            <div key={group.userId} className="rounded-xl border border-border/50 overflow-hidden">
+              {/* User header row */}
+              <button
+                type="button"
+                onClick={() => hasMultiple && setExpandedUser(isExpanded ? null : group.userId)}
+                className={`w-full flex items-center gap-3 p-3 sm:p-4 text-left transition-colors ${hasMultiple ? "hover:bg-secondary/40 cursor-pointer" : "cursor-default"}`}
+              >
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-foreground truncate">
+                    {isAdmin ? group.name : (group.userId === userId ? "Você" : group.name)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {group.deposits.length} depósito{group.deposits.length > 1 ? "s" : ""}
+                  </p>
+                </div>
+                <span className="font-bold text-sm text-foreground">
+                  ${group.total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </span>
+                {hasMultiple && (
+                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                )}
+              </button>
+
+              {/* Expanded deposits */}
+              {isExpanded && hasMultiple && (
+                <div className="border-t border-border/30 bg-secondary/20">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-10 text-xs">#</TableHead>
+                        <TableHead className="text-xs">Valor</TableHead>
+                        <TableHead className="text-xs">Data</TableHead>
+                        {isAdmin && <TableHead className="w-20 text-xs"></TableHead>}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {group.deposits.map((dep: any, idx: number) => (
+                        <TableRow key={dep.id}>
+                          <TableCell className="font-mono text-muted-foreground text-xs">{idx + 1}</TableCell>
+                          <TableCell className="font-semibold text-sm">${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {format(new Date(dep.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          </TableCell>
+                          {isAdmin && (
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs text-destructive hover:text-destructive"
+                                onClick={() => handleRefund(dep.id, Number(dep.amount), group.name)}
+                              >
+                                Estornar
+                              </Button>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {/* Single deposit - show inline without accordion */}
+              {!hasMultiple && (
+                <div className="border-t border-border/30 bg-secondary/20 px-4 py-2 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">
+                    {format(new Date(group.deposits[0].created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                  </span>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs text-destructive hover:text-destructive"
+                      onClick={() => handleRefund(group.deposits[0].id, Number(group.deposits[0].amount), group.name)}
+                    >
+                      Estornar
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -527,61 +678,17 @@ export default function LeilaoDetailPage() {
         />
       )}
 
-      {/* Deposits list */}
+      {/* Deposits list - grouped by user with accordion */}
       {deposits && deposits.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Depósitos ({deposits.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">#</TableHead>
-                  {isAdmin && <TableHead>Investidor</TableHead>}
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Data</TableHead>
-                  {isAdmin && <TableHead className="w-20"></TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {deposits.map((dep, idx) => (
-                  <TableRow key={dep.id}>
-                    <TableCell className="font-mono text-muted-foreground">{idx + 1}</TableCell>
-                    {isAdmin && (
-                      <TableCell className="font-medium">{profileMap.get(dep.user_id) || "Usuário"}</TableCell>
-                    )}
-                    <TableCell className="font-semibold">${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {format(new Date(dep.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs text-destructive hover:text-destructive"
-                          onClick={async () => {
-                            if (!confirm(`Estornar $${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })} para ${profileMap.get(dep.user_id) || "este investidor"}?`)) return;
-                            const { error } = await supabase.rpc("refund_auction_deposit", { p_deposit_id: dep.id });
-                            if (error) {
-                              toast({ title: "Erro ao estornar", description: error.message, variant: "destructive" });
-                            } else {
-                              toast({ title: "Depósito estornado com sucesso!" });
-                              queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
-                            }
-                          }}
-                        >
-                          Estornar
-                        </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <DepositsAccordion
+          deposits={deposits}
+          profileMap={profileMap}
+          isAdmin={isAdmin}
+          auctionId={id!}
+          queryClient={queryClient}
+          toast={toast}
+          userId={user?.id}
+        />
       )}
     </div>
   );
