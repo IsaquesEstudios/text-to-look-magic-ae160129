@@ -153,13 +153,10 @@ function AuctionItemCard({ item }: { item: any }) {
   return content;
 }
 
-export default function UserLeiloesPage() {
-  const { user, isAdmin, profile } = useAuth();
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
 function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTitle: string }) {
   const { user, profile, refreshProfile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [rawAmount, setRawAmount] = useState(0);
   const [displayAmount, setDisplayAmount] = useState("");
 
@@ -234,6 +231,10 @@ function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTi
   );
 }
 
+export default function UserLeiloesPage() {
+  const { user, isAdmin, profile } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions", isAdmin],
