@@ -19,6 +19,8 @@ type ActivityItem = {
 function AdminDashboardContent() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-stats"],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () => {
       const [propertiesRes, profilesRes, sharesRes] = await Promise.all([
         supabase.from("properties").select("id, status, purchase_price, total_shares, available_shares"),
@@ -39,6 +41,8 @@ function AdminDashboardContent() {
 
   const { data: activities } = useQuery({
     queryKey: ["admin-activity-recent"],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () => {
       const [sharesRes, profilesRes] = await Promise.all([
         supabase
@@ -89,6 +93,8 @@ function AdminDashboardContent() {
 
   const { data: recentClients } = useQuery({
     queryKey: ["admin-recent-clients"],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
