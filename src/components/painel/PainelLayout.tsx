@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel } from "lucide-react";
+import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel, FileImage } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
@@ -23,6 +23,7 @@ const userNavItems = [
   { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
   { label: "Meus Imóveis", icon: Building2, path: "/painel/meus-imoveis" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
+  { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
 ];
 
 /**
