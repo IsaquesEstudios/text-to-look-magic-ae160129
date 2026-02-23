@@ -584,7 +584,13 @@ export default function LeilaoDetailPage() {
           {items && items.length > 0 && (
             <div className="grid gap-3">
               {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30">
+                <div
+                  key={item.id}
+                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${isAdmin && item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
+                  onClick={() => {
+                    if (isAdmin && item.property_id) navigate(`/painel/imovel/${item.property_id}`);
+                  }}
+                >
                   {item.image_url ? (
                     <div className="h-16 w-24 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
                       <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
@@ -608,7 +614,7 @@ export default function LeilaoDetailPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive flex-shrink-0"
-                      onClick={() => removeItemMutation.mutate(item.id)}
+                      onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
                       disabled={removeItemMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4" />
