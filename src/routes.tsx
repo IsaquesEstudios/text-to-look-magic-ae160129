@@ -34,6 +34,7 @@ const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
 const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
+const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
 
 // PainelLayout is the persistent layout for all /painel/* routes
 const PainelLayoutModule = lazy(() =>
@@ -102,6 +103,7 @@ const panelChildren: RouteRecord[] = [
   { path: "leiloes-user", element: <SuspenseWrapper><UserLeiloesPage /></SuspenseWrapper> },
   { path: "leilao/:id", element: <SuspenseWrapper><LeilaoDetailPage /></SuspenseWrapper> },
   { path: "comprovantes", element: <SuspenseWrapper><UserComprovantesPage /></SuspenseWrapper> },
+  { path: "perfil", element: <SuspenseWrapper><UserProfilePage /></SuspenseWrapper> },
 ];
 
 export const routes: RouteRecord[] = [
