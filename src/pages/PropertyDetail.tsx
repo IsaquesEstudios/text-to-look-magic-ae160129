@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
+import { PropertyEditForm } from "@/components/painel/property/PropertyEditForm";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +33,7 @@ export default function PropertyDetail() {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -100,7 +102,23 @@ export default function PropertyDetail() {
   return (
     <>
       <div className="space-y-6">
-        <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="overview" hasShares={!!(userShares && userShares.length > 0)} />
+        <PropertySubNav
+          propertyId={property.id}
+          propertyTitle={property.title}
+          active="overview"
+          hasShares={!!(userShares && userShares.length > 0)}
+          onEdit={() => setIsEditing(!isEditing)}
+          isEditing={isEditing}
+        />
+
+        {isEditing ? (
+          <PropertyEditForm
+            property={property}
+            images={images ?? []}
+            onDone={() => setIsEditing(false)}
+          />
+        ) : (
+          <>
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1.5">
             <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
@@ -167,6 +185,8 @@ export default function PropertyDetail() {
               ))}
             </div>
           </section>
+        )}
+        </>
         )}
       </div>
 

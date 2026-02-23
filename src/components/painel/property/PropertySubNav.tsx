@@ -8,6 +8,8 @@ interface Props {
   propertyTitle: string;
   active: "overview" | "novidades" | "gastos";
   hasShares?: boolean;
+  onEdit?: () => void;
+  isEditing?: boolean;
 }
 
 const navItems = [
@@ -16,7 +18,7 @@ const navItems = [
   { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos", restricted: true, badgeKey: "gastos" as const },
 ];
 
-export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }: Props) {
+export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, onEdit, isEditing }: Props) {
   const basePath = `/painel/imovel/${propertyId}`;
   const { data: unread } = usePropertyUnreadCounts(propertyId);
   const { isAdmin } = useAuth();
@@ -37,13 +39,23 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares }:
 
   return (
     <div className="space-y-4">
-      <button
-        onClick={handleBack}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Voltar
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={handleBack}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </button>
+        {isAdmin && onEdit && active === "overview" && (
+          <button
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {isEditing ? "Cancelar" : "Editar"}
+          </button>
+        )}
+      </div>
 
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
         {propertyTitle}
