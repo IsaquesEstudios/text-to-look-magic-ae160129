@@ -189,7 +189,7 @@ export default function Auth() {
                   <Label htmlFor="s2-phone">Telefone / Phone</Label>
                   <div className="flex gap-2">
                     <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={setPhonePrefix} />
-                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={30} />
+                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={20} minLength={4} />
                   </div>
                 </div>
 
@@ -204,7 +204,7 @@ export default function Auth() {
                     <Label htmlFor="s2-whatsapp">WhatsApp</Label>
                     <div className="flex gap-2">
                       <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={setWhatsappPrefix} />
-                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={30} />
+                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={20} minLength={4} />
                     </div>
                   </div>
                 )}
@@ -239,7 +239,7 @@ export default function Auth() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-2">
                     <Label>{labels.postal}</Label>
-                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={labels.postalPlaceholder} maxLength={20} />
+                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={labels.postalPlaceholder} maxLength={15} minLength={3} />
                   </div>
                   <div className="space-y-2">
                     <Label>Cidade / City</Label>
