@@ -1,34 +1,44 @@
 
+# Reformulacao dos KPIs do Dashboard Admin
 
-## Comprovantes no Painel do Usuário
+## Objetivo
+Substituir os cards atuais (Imoveis, Usuarios, Vinculos, Receita Total) por 5 novos KPIs financeiros que refletem a saude real do negocio, com titulos auto-descritivos.
 
-Adicionar uma nova página "Comprovantes" no painel do investidor para que ele possa visualizar os comprovantes de pagamento (recebidos e enviados) que o admin cadastrou no perfil dele.
+## Novos KPIs (Cards)
 
-### O que será feito
+| # | Titulo | Descricao | Fonte dos dados |
+|---|--------|-----------|-----------------|
+| 1 | **Receita Discovery (Taxas)** | Total ganho pelo admin em taxas de servico | Nova coluna `service_fee` na tabela `auction_deposits` |
+| 2 | **Arrecadado em Leiloes** | Soma de todos os depositos de participacao em leiloes | `SUM(auction_deposits.amount)` |
+| 3 | **Gasto com Arremates** | Quanto ja foi gasto arrematando imoveis | `SUM(properties.estimated_auction_value)` |
+| 4 | **Custo de Reformas** | Total previsto em reformas de todos os imoveis | `SUM(properties.estimated_renovation_cost)` |
+| 5 | **Receita Estimada de Vendas** | Quanto sera arrecadado ao vender todos os imoveis | `SUM(properties.estimated_sale_value)` |
 
-1. **Nova página `UserComprovantesPage`** -- Exibe as imagens de `user_payment_images` do usuário logado, separadas em duas seções:
-   - "Pagamentos Recebidos" (type = `received`)
-   - "Pagamentos Enviados" (type = `sent`)
-   - Cada imagem mostra a foto e a data, em grid responsivo
-   - Somente leitura (sem upload/delete -- isso fica no admin)
+## Detalhes Tecnicos
 
-2. **Novo item no menu do usuário** -- Adicionar "Comprovantes" com icone `Receipt` (ou `FileImage`) na sidebar do investidor em `PainelLayout.tsx`, entre "Extrato" e os demais
+### 1. Migracao no banco de dados
 
-3. **Rota** -- Registrar `/painel/comprovantes` em `routes.tsx`
+Adicionar coluna `service_fee` na tabela `auction_deposits` para registrar a taxa cobrada em cada deposito:
 
-4. **RLS** -- Ja existe policy `Users can view own payment images` na tabela `user_payment_images`, entao nao precisa de alteracao no banco
+```sql
+ALTER TABLE auction_deposits ADD COLUMN service_fee numeric NOT NULL DEFAULT 0;
+```
 
-### Detalhes Técnicos
+Atualizar a funcao `process_auction_deposit` para calcular e salvar a taxa automaticamente:
+- Deposito de $800 a $10.999 -> taxa de $500 (Terreno)
+- Deposito de $11.000+ -> taxa de $5.000 (Casa)
 
-- **Arquivo novo**: `src/pages/painel/UserComprovantesPage.tsx`
-  - Query em `user_payment_images` filtrando `user_id = auth.uid()` via RLS
-  - Separar por `type` ("received" / "sent")
-  - Grid de imagens com data, clicavel para abrir em tamanho maior (dialog)
+Preencher retroativamente os depositos existentes com as taxas corretas.
 
-- **Editar**: `src/components/painel/PainelLayout.tsx`
-  - Adicionar `{ label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" }` ao `userNavItems`
+### 2. Atualizar `src/pages/Painel.tsx`
 
-- **Editar**: `src/routes.tsx`
-  - Lazy import de `UserComprovantesPage`
-  - Adicionar `{ path: "comprovantes", element: ... }` em `panelChildren`
+- Substituir a query `admin-stats` para buscar:
+  - `auction_deposits` (amount + service_fee)
+  - `properties` (estimated_auction_value, estimated_renovation_cost, estimated_sale_value)
+- Substituir os 4 cards atuais pelos 5 novos KPIs
+- Usar icones distintos para cada card (DollarSign, Gavel, Hammer, Wrench, TrendingUp)
+- Manter os cards de "Atividade Recente" e "Ultimos Clientes" inalterados
 
+### 3. Atualizar `src/pages/painel/AdminDashboardPage.tsx`
+
+Aplicar as mesmas mudancas de KPIs para manter consistencia (este arquivo tambem tem um dashboard admin).
