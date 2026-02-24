@@ -189,8 +189,7 @@ export default function UserProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label className="flex items-center gap-1.5">
-              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+            <Label>
               País / Country
             </Label>
             <Select value={form.country} onValueChange={(v) => update("country", v)}>
