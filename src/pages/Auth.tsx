@@ -211,14 +211,7 @@ export default function Auth() {
 
                 <div className="space-y-2">
                   <Label>País / Country</Label>
-                  <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger><SelectValue placeholder="Selecione o país" /></SelectTrigger>
-                    <SelectContent>
-                      {countries.map((c) => (
-                        <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Brasil, United States..." maxLength={60} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
