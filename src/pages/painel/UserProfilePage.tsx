@@ -42,6 +42,7 @@ export default function UserProfilePage() {
     enabled: !!user,
     refetchOnMount: "always",
     staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const [form, setForm] = useState({

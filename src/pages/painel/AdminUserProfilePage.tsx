@@ -44,6 +44,9 @@ export default function AdminUserProfilePage() {
       return data;
     },
     enabled: !!userId && !!user && isAdmin,
+    refetchOnMount: "always",
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const { data: paymentImages, refetch: refetchImages } = useQuery({
