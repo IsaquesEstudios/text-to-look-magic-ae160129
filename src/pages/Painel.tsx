@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { UserDashboard } from "@/components/painel/UserDashboard";
 import { Link } from "react-router-dom";
-import { Loader2, Building2, Users, PieChart, TrendingUp, UserPlus, ShoppingCart, Clock } from "lucide-react";
+import { Loader2, DollarSign, Gavel, Hammer, Wrench, TrendingUp, Users, UserPlus, ShoppingCart, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,19 +22,18 @@ function AdminDashboardContent() {
     refetchOnMount: "always",
     staleTime: 0,
     queryFn: async () => {
-      const [propertiesRes, profilesRes, sharesRes] = await Promise.all([
-        supabase.from("properties").select("id, status, purchase_price, total_shares, available_shares"),
-        supabase.from("profiles").select("id"),
-        supabase.from("shares").select("id, quantity, amount_paid"),
+      const [depositsRes, propertiesRes] = await Promise.all([
+        supabase.from("auction_deposits").select("id, amount, service_fee"),
+        supabase.from("properties").select("id, estimated_auction_value, estimated_renovation_cost, estimated_sale_value"),
       ]);
+      const deposits = depositsRes.data ?? [];
       const properties = propertiesRes.data ?? [];
-      const profiles = profilesRes.data ?? [];
-      const shares = sharesRes.data ?? [];
       return {
-        totalProperties: properties.length,
-        totalUsers: profiles.length,
-        totalSharesSold: shares.reduce((acc, s) => acc + s.quantity, 0),
-        totalRevenue: shares.reduce((acc, s) => acc + Number(s.amount_paid), 0),
+        adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
+        totalRaised: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
+        totalAuction: properties.reduce((acc, p) => acc + Number(p.estimated_auction_value ?? 0), 0),
+        totalRenovation: properties.reduce((acc, p) => acc + Number(p.estimated_renovation_cost ?? 0), 0),
+        totalSale: properties.reduce((acc, p) => acc + Number(p.estimated_sale_value ?? 0), 0),
       };
     },
   });
@@ -114,14 +113,11 @@ function AdminDashboardContent() {
   }
 
   const cards = [
-    { label: "Imóveis", value: stats?.totalProperties ?? 0, icon: Building2 },
-    { label: "Usuários", value: stats?.totalUsers ?? 0, icon: Users },
-    { label: "Vínculos", value: stats?.totalSharesSold ?? 0, icon: PieChart },
-    {
-      label: "Receita Total",
-      value: `$ ${(stats?.totalRevenue ?? 0).toLocaleString("en-US")}`,
-      icon: TrendingUp,
-    },
+    { label: "Receita Discovery (Taxas)", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Arrecadado em Leilões", value: `$ ${(stats?.totalRaised ?? 0).toLocaleString("en-US")}`, icon: Gavel },
+    { label: "Gasto com Arremates", value: `$ ${(stats?.totalAuction ?? 0).toLocaleString("en-US")}`, icon: Hammer },
+    { label: "Custo de Reformas", value: `$ ${(stats?.totalRenovation ?? 0).toLocaleString("en-US")}`, icon: Wrench },
+    { label: "Receita Estimada de Vendas", value: `$ ${(stats?.totalSale ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
   ];
 
   return (
@@ -130,7 +126,7 @@ function AdminDashboardContent() {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {cards.map((card) => (
           <Card key={card.label} className="bg-card/50 border-border/50">
             <CardContent className="p-5">
