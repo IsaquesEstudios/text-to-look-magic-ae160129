@@ -222,16 +222,7 @@ export default function UserProfilePage() {
             <Label>
               País / Country
             </Label>
-            <Select value={form.country} onValueChange={(v) => update("country", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o país" />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="Brasil, United States..." />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
