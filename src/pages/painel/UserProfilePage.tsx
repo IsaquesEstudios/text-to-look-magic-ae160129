@@ -160,7 +160,7 @@ export default function UserProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="fullName">Nome Completo</Label>
-            <Input id="fullName" value={form.full_name} onChange={(e) => update("full_name", e.target.value)} placeholder="Seu nome completo" />
+            <Input id="fullName" value={form.full_name} onChange={(e) => update("full_name", e.target.value)} placeholder="Seu nome completo" maxLength={120} minLength={2} />
           </div>
           <div className="space-y-2">
             <Label className="flex items-center gap-1.5">
@@ -185,7 +185,7 @@ export default function UserProfilePage() {
             <Label htmlFor="phone">Telefone / Phone</Label>
             <div className="flex gap-2">
               <PhonePrefixSelect id="phone-prefix" value={form.phone_prefix} onValueChange={(v) => update("phone_prefix", v)} />
-              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder={getPhoneFormat(form.phone_prefix)} />
+              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder={getPhoneFormat(form.phone_prefix)} maxLength={20} minLength={4} />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export default function UserProfilePage() {
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="flex gap-2">
                 <PhonePrefixSelect id="whatsapp-prefix" value={form.whatsapp_prefix} onValueChange={(v) => update("whatsapp_prefix", v)} />
-                <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder={getPhoneFormat(form.whatsapp_prefix)} />
+                <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder={getPhoneFormat(form.whatsapp_prefix)} maxLength={20} minLength={4} />
               </div>
             </div>
           )}
@@ -222,43 +222,43 @@ export default function UserProfilePage() {
             <Label>
               País / Country
             </Label>
-            <Input value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="Brasil, United States..." />
+            <Input value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="Brasil, United States..." maxLength={60} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2 space-y-2">
               <Label>Rua / Street</Label>
-              <Input value={form.address_street} onChange={(e) => update("address_street", e.target.value)} placeholder="Street name" />
+              <Input value={form.address_street} onChange={(e) => update("address_street", e.target.value)} placeholder="Street name" maxLength={200} />
             </div>
             <div className="space-y-2">
               <Label>Nº / Number</Label>
-              <Input value={form.address_number} onChange={(e) => update("address_number", e.target.value)} placeholder="Nº" />
+              <Input value={form.address_number} onChange={(e) => update("address_number", e.target.value)} placeholder="Nº" maxLength={20} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Complemento / Unit</Label>
-              <Input value={form.address_complement} onChange={(e) => update("address_complement", e.target.value)} placeholder="Apt, suite..." />
+              <Input value={form.address_complement} onChange={(e) => update("address_complement", e.target.value)} placeholder="Apt, suite..." maxLength={100} />
             </div>
             <div className="space-y-2">
               <Label>Bairro / Neighborhood</Label>
-              <Input value={form.address_neighborhood} onChange={(e) => update("address_neighborhood", e.target.value)} placeholder="Neighborhood" />
+              <Input value={form.address_neighborhood} onChange={(e) => update("address_neighborhood", e.target.value)} placeholder="Neighborhood" maxLength={100} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>{labels.postal}</Label>
-              <Input value={form.postal_code} onChange={(e) => update("postal_code", e.target.value)} placeholder={labels.postalPlaceholder} />
+              <Input value={form.postal_code} onChange={(e) => update("postal_code", e.target.value)} placeholder={labels.postalPlaceholder} maxLength={15} minLength={3} />
             </div>
             <div className="space-y-2">
               <Label>Cidade / City</Label>
-              <Input value={form.address_city} onChange={(e) => update("address_city", e.target.value)} placeholder="City" />
+              <Input value={form.address_city} onChange={(e) => update("address_city", e.target.value)} placeholder="City" maxLength={100} />
             </div>
             <div className="space-y-2">
               <Label>{labels.state}</Label>
-              <Input value={form.address_state} onChange={(e) => update("address_state", e.target.value)} placeholder={labels.statePlaceholder} />
+              <Input value={form.address_state} onChange={(e) => update("address_state", e.target.value)} placeholder={labels.statePlaceholder} maxLength={50} />
             </div>
           </div>
         </CardContent>
