@@ -124,7 +124,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground tracking-tight">Meu Perfil</h1>
+      <h1 className="text-2xl font-bold text-foreground tracking-tight">Minhas Informações</h1>
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
