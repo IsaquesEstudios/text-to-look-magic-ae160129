@@ -45,7 +45,9 @@ export default function UserProfilePage() {
 
   const [form, setForm] = useState({
     full_name: "",
+    phone_prefix: "",
     phone: "",
+    whatsapp_prefix: "",
     whatsapp: "",
     country: "",
     address_street: "",
@@ -58,15 +60,30 @@ export default function UserProfilePage() {
   });
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
+  function splitPhone(val: string) {
+    const trimmed = (val ?? "").trim();
+    const match = trimmed.match(/^(\+\d{1,4})\s*(.*)$/);
+    if (match) return { prefix: match[1], number: match[2] };
+    return { prefix: "", number: trimmed };
+  }
+  function joinPhone(prefix: string, number: string) {
+    const p = prefix.trim();
+    const n = number.trim();
+    if (!p && !n) return "";
+    return p ? `${p} ${n}`.trim() : n;
+  }
+
   useEffect(() => {
     if (profile) {
       const p = profile as any;
-      const phone = p.phone ?? "";
-      const whatsapp = p.whatsapp ?? "";
+      const phoneParts = splitPhone(p.phone ?? "");
+      const whatsappParts = splitPhone(p.whatsapp ?? "");
       setForm({
         full_name: profile.full_name ?? "",
-        phone,
-        whatsapp,
+        phone_prefix: phoneParts.prefix,
+        phone: phoneParts.number,
+        whatsapp_prefix: whatsappParts.prefix,
+        whatsapp: whatsappParts.number,
         country: p.country ?? "",
         address_street: p.address_street ?? "",
         address_number: p.address_number ?? "",
@@ -76,18 +93,24 @@ export default function UserProfilePage() {
         address_state: p.address_state ?? "",
         postal_code: p.postal_code ?? "",
       });
-      setDifferentWhatsapp(!!whatsapp && whatsapp !== phone);
+      const rawPhone = (p.phone ?? "").trim();
+      const rawWhatsapp = (p.whatsapp ?? "").trim();
+      setDifferentWhatsapp(!!rawWhatsapp && rawWhatsapp !== rawPhone);
     }
   }, [profile]);
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const fullPhone = joinPhone(form.phone_prefix, form.phone);
+      const fullWhatsapp = differentWhatsapp
+        ? joinPhone(form.whatsapp_prefix, form.whatsapp)
+        : fullPhone;
       const { error } = await supabase
         .from("profiles")
         .update({
           full_name: form.full_name.trim() || null,
-          phone: form.phone.trim() || null,
-          whatsapp: differentWhatsapp ? (form.whatsapp.trim() || null) : (form.phone.trim() || null),
+          phone: fullPhone || null,
+          whatsapp: fullWhatsapp || null,
           country: form.country || null,
           address_street: form.address_street.trim() || null,
           address_number: form.address_number.trim() || null,
@@ -159,7 +182,10 @@ export default function UserProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="phone">Telefone / Phone</Label>
-            <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+1 (000) 000-0000" />
+            <div className="flex gap-2">
+              <Input id="phone-prefix" value={form.phone_prefix} onChange={(e) => update("phone_prefix", e.target.value)} placeholder="+55" className="w-20 shrink-0" />
+              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="(00) 00000-0000" />
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Switch
@@ -174,7 +200,10 @@ export default function UserProfilePage() {
           {differentWhatsapp && (
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
-              <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder="+1 (000) 000-0000" />
+              <div className="flex gap-2">
+                <Input id="whatsapp-prefix" value={form.whatsapp_prefix} onChange={(e) => update("whatsapp_prefix", e.target.value)} placeholder="+55" className="w-20 shrink-0" />
+                <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder="(00) 00000-0000" />
+              </div>
             </div>
           )}
         </CardContent>

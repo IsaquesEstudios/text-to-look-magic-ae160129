@@ -32,8 +32,10 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
 
   // Step 2 fields
+  const [phonePrefix, setPhonePrefix] = useState("");
   const [phone, setPhone] = useState("");
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
+  const [whatsappPrefix, setWhatsappPrefix] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [country, setCountry] = useState("");
   const [addressStreet, setAddressStreet] = useState("");
@@ -86,10 +88,13 @@ export default function Auth() {
 
       // Save profile data if user was created
       if (data.user) {
-        const whatsappValue = differentWhatsapp ? (whatsapp.trim() || null) : (phone.trim() || null);
+        const fullPhone = [phonePrefix.trim(), phone.trim()].filter(Boolean).join(" ");
+        const fullWhatsapp = differentWhatsapp
+          ? [whatsappPrefix.trim(), whatsapp.trim()].filter(Boolean).join(" ")
+          : fullPhone;
         await supabase.from("profiles").update({
-          phone: phone.trim() || null,
-          whatsapp: whatsappValue,
+          phone: fullPhone || null,
+          whatsapp: fullWhatsapp || null,
           country: country || null,
           address_street: addressStreet.trim() || null,
           address_number: addressNumber.trim() || null,
@@ -181,7 +186,10 @@ export default function Auth() {
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="s2-phone">Telefone / Phone</Label>
-                  <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" required maxLength={30} />
+                  <div className="flex gap-2">
+                    <Input id="s2-phone-prefix" value={phonePrefix} onChange={(e) => setPhonePrefix(e.target.value)} placeholder="+55" className="w-20 shrink-0" maxLength={5} />
+                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(00) 00000-0000" required maxLength={30} />
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -193,7 +201,10 @@ export default function Auth() {
                 {differentWhatsapp && (
                   <div className="space-y-2">
                     <Label htmlFor="s2-whatsapp">WhatsApp</Label>
-                    <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+1 (000) 000-0000" required maxLength={30} />
+                    <div className="flex gap-2">
+                      <Input id="s2-whatsapp-prefix" value={whatsappPrefix} onChange={(e) => setWhatsappPrefix(e.target.value)} placeholder="+55" className="w-20 shrink-0" maxLength={5} />
+                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" required maxLength={30} />
+                    </div>
                   </div>
                 )}
 
