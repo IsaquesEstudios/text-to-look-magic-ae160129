@@ -24,7 +24,7 @@ const userNavItems = [
   { label: "Meus Imóveis", icon: Building2, path: "/painel/meus-imoveis" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
   { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
-  { label: "Meu Perfil", icon: UserCircle, path: "/painel/perfil" },
+  { label: "Minhas Informações", icon: UserCircle, path: "/painel/perfil" },
 ];
 
 /**
