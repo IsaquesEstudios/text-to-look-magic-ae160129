@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Mail, Phone, MapPin, Save, Globe } from "lucide-react";
@@ -55,14 +56,17 @@ export default function UserProfilePage() {
     address_state: "",
     postal_code: "",
   });
+  const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
   useEffect(() => {
     if (profile) {
       const p = profile as any;
+      const phone = p.phone ?? "";
+      const whatsapp = p.whatsapp ?? "";
       setForm({
         full_name: profile.full_name ?? "",
-        phone: p.phone ?? "",
-        whatsapp: p.whatsapp ?? "",
+        phone,
+        whatsapp,
         country: p.country ?? "",
         address_street: p.address_street ?? "",
         address_number: p.address_number ?? "",
@@ -72,6 +76,7 @@ export default function UserProfilePage() {
         address_state: p.address_state ?? "",
         postal_code: p.postal_code ?? "",
       });
+      setDifferentWhatsapp(!!whatsapp && whatsapp !== phone);
     }
   }, [profile]);
 
@@ -82,7 +87,7 @@ export default function UserProfilePage() {
         .update({
           full_name: form.full_name.trim() || null,
           phone: form.phone.trim() || null,
-          whatsapp: form.whatsapp.trim() || null,
+          whatsapp: differentWhatsapp ? (form.whatsapp.trim() || null) : (form.phone.trim() || null),
           country: form.country || null,
           address_street: form.address_street.trim() || null,
           address_number: form.address_number.trim() || null,
@@ -151,17 +156,27 @@ export default function UserProfilePage() {
             Contato
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+1 (000) 000-0000" />
-            </div>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="phone">Telefone / Phone</Label>
+            <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+1 (000) 000-0000" />
+          </div>
+          <div className="flex items-center gap-3">
+            <Switch
+              id="diff-whatsapp"
+              checked={differentWhatsapp}
+              onCheckedChange={setDifferentWhatsapp}
+            />
+            <Label htmlFor="diff-whatsapp" className="cursor-pointer text-sm text-muted-foreground">
+              Meu WhatsApp é diferente do telefone
+            </Label>
+          </div>
+          {differentWhatsapp && (
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder="+1 (000) 000-0000" />
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
