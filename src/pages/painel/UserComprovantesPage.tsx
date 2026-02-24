@@ -35,7 +35,13 @@ export default function UserComprovantesPage() {
         .eq("type", "deposit")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      // Show only manual credit recharges, exclude auction deposits and profit returns
+      return (data ?? []).filter(
+        (t) => {
+          const desc = (t.description ?? "").toLowerCase();
+          return !desc.includes("leilão") && !desc.includes("leilao") && !desc.includes("lucro");
+        }
+      );
     },
     enabled: !!user,
   });
