@@ -234,13 +234,14 @@ export type Database = {
           address_number: string | null
           address_state: string | null
           address_street: string | null
-          address_zip: string | null
           avatar_url: string | null
+          country: string | null
           created_at: string
           credits: number
           full_name: string | null
           id: string
           phone: string | null
+          postal_code: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -252,13 +253,14 @@ export type Database = {
           address_number?: string | null
           address_state?: string | null
           address_street?: string | null
-          address_zip?: string | null
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           credits?: number
           full_name?: string | null
           id?: string
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -270,13 +272,14 @@ export type Database = {
           address_number?: string | null
           address_state?: string | null
           address_street?: string | null
-          address_zip?: string | null
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           credits?: number
           full_name?: string | null
           id?: string
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
