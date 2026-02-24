@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
+import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
@@ -187,8 +188,8 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="s2-phone">Telefone / Phone</Label>
                   <div className="flex gap-2">
-                    <Input id="s2-phone-prefix" value={phonePrefix} onChange={(e) => setPhonePrefix(e.target.value)} placeholder="+55" className="w-20 shrink-0" maxLength={5} />
-                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(00) 00000-0000" required maxLength={30} />
+                    <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={setPhonePrefix} />
+                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={30} />
                   </div>
                 </div>
 
@@ -202,8 +203,8 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="s2-whatsapp">WhatsApp</Label>
                     <div className="flex gap-2">
-                      <Input id="s2-whatsapp-prefix" value={whatsappPrefix} onChange={(e) => setWhatsappPrefix(e.target.value)} placeholder="+55" className="w-20 shrink-0" maxLength={5} />
-                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" required maxLength={30} />
+                      <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={setWhatsappPrefix} />
+                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={30} />
                     </div>
                   </div>
                 )}
