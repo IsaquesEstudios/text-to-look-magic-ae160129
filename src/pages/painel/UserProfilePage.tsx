@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Mail, Phone, MapPin, Save, Globe } from "lucide-react";
+import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
@@ -183,8 +184,8 @@ export default function UserProfilePage() {
           <div className="space-y-2">
             <Label htmlFor="phone">Telefone / Phone</Label>
             <div className="flex gap-2">
-              <Input id="phone-prefix" value={form.phone_prefix} onChange={(e) => update("phone_prefix", e.target.value)} placeholder="+55" className="w-20 shrink-0" />
-              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="(00) 00000-0000" />
+              <PhonePrefixSelect id="phone-prefix" value={form.phone_prefix} onValueChange={(v) => update("phone_prefix", v)} />
+              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder={getPhoneFormat(form.phone_prefix)} />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -201,8 +202,8 @@ export default function UserProfilePage() {
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="flex gap-2">
-                <Input id="whatsapp-prefix" value={form.whatsapp_prefix} onChange={(e) => update("whatsapp_prefix", e.target.value)} placeholder="+55" className="w-20 shrink-0" />
-                <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder="(00) 00000-0000" />
+                <PhonePrefixSelect id="whatsapp-prefix" value={form.whatsapp_prefix} onValueChange={(v) => update("whatsapp_prefix", v)} />
+                <Input id="whatsapp" value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder={getPhoneFormat(form.whatsapp_prefix)} />
               </div>
             </div>
           )}
