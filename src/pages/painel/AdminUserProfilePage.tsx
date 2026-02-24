@@ -224,6 +224,40 @@ export default function AdminUserProfilePage() {
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
+          <CardTitle className="text-base">Informações do Perfil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            {[
+              ["Nome completo", profile.full_name],
+              ["Telefone", profile.phone],
+              ["WhatsApp", profile.whatsapp],
+              ["País", profile.country],
+              ["CEP / Postal Code", profile.postal_code],
+              ["Rua", profile.address_street],
+              ["Número", profile.address_number],
+              ["Complemento", profile.address_complement],
+              ["Bairro", profile.address_neighborhood],
+              ["Cidade", profile.address_city],
+              ["Estado", profile.address_state],
+            ].map(([label, value]) => (
+              <div key={label as string} className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">{label}</span>
+                <span className="text-foreground">{(value as string) || "—"}</span>
+              </div>
+            ))}
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-xs">Cadastrado em</span>
+              <span className="text-foreground">
+                {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
           <CardTitle className="text-base">Adicionar Créditos</CardTitle>
         </CardHeader>
         <CardContent>
