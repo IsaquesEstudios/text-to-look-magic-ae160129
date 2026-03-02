@@ -231,13 +231,9 @@ export default function AdminLeiloesPage() {
     },
   });
 
-  const getStatusBadge = (status: string, scheduledStart: string) => {
-    const now = new Date();
-    const start = new Date(scheduledStart);
+  const getStatusBadge = (status: string) => {
     if (status === "finished") return <Badge variant="secondary">Encerrado</Badge>;
-    if (status === "active" || (status === "upcoming" && start <= now))
-      return <Badge className="bg-discovery-green text-primary-foreground">Ativo</Badge>;
-    return <Badge variant="outline">Publicado</Badge>;
+    return <Badge className="bg-discovery-green text-primary-foreground">Publicado</Badge>;
   };
 
   const upcoming = auctions?.filter((a) => a.status !== "finished") ?? [];
@@ -383,7 +379,7 @@ export default function AdminLeiloesPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-foreground truncate">{auction.title}</span>
-                            {getStatusBadge(auction.status, auction.scheduled_start)}
+                            {getStatusBadge(auction.status)}
                             {(auction as any).visibility === "private" && (
                               <Badge variant="outline" className="text-[10px] gap-1">
                                 <Lock className="h-3 w-3" /> Privado
