@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel, FileImage, UserCircle } from "lucide-react";
+import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel, FileImage, UserCircle, MapPin } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
@@ -13,6 +13,7 @@ const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Leilões", icon: Gavel, path: "/painel/leiloes" },
   { label: "Imóveis", icon: Building2, path: "/painel/imoveis" },
+  { label: "Terrenos", icon: MapPin, path: "/painel/terrenos" },
   { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
   { label: "Atividades", icon: History, path: "/painel/atividades" },
   { label: "Configurações", icon: Settings, path: "/painel/configuracoes" },
