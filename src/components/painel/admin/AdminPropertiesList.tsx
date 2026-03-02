@@ -18,9 +18,10 @@ const statusLabels: Record<string, { label: string; variant: "default" | "second
 
 interface Props {
   onEdit: (id: string) => void;
+  filterType?: "house" | "land";
 }
 
-export function AdminPropertiesList({ onEdit }: Props) {
+export function AdminPropertiesList({ onEdit, filterType }: Props) {
   const { data: properties, isLoading } = useQuery({
     queryKey: ["admin-properties"],
     queryFn: async () => {
@@ -33,11 +34,14 @@ export function AdminPropertiesList({ onEdit }: Props) {
       const linkedIds = [...new Set(shareRows.map((s) => s.property_id))];
       if (linkedIds.length === 0) return [];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("properties")
         .select("*")
-        .in("id", linkedIds)
-        .order("created_at", { ascending: false });
+        .in("id", linkedIds);
+      if (filterType) {
+        query = query.eq("type", filterType);
+      }
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
