@@ -306,6 +306,7 @@ export default function LeilaoDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
       queryClient.invalidateQueries({ queryKey: ["users-with-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
       toast({ title: "Investidor vinculado com sucesso!" });
       setSelectedUserId("");
       setLinkRawAmount(0);
