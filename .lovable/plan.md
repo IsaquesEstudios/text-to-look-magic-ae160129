@@ -1,50 +1,44 @@
 
 
-# Correcao e Alinhamento dos KPIs do Dashboard Admin
+# Corrigir bordas brancas nos cards do painel administrativo
 
-## Problema Encontrado
+## Problema
 
-O arquivo `src/pages/Painel.tsx` (dashboard principal do admin acessado em `/painel`) **nao foi atualizado** e ainda exibe os 4 KPIs antigos:
-- Imoveis, Usuarios, Vinculos, Receita Total
+Alguns componentes no painel administrativo usam o `<Card>` sem estilizacao customizada, resultando em bordas visiveis e fundo solido que destoam do restante do painel. O padrao correto usado na maioria das paginas e `bg-card/50 border-border/50`, que cria bordas e fundos mais sutis.
 
-Enquanto `src/pages/painel/AdminDashboardPage.tsx` ja esta correto com os 5 novos KPIs financeiros.
+## Paginas/Componentes afetados
 
-O banco de dados esta correto -- a coluna `service_fee` existe e os dados retroativos foram preenchidos corretamente.
+As seguintes paginas usam `<Card>` sem o padrao visual correto:
 
-## O que sera feito
+### 1. `src/pages/painel/LeilaoDetailPage.tsx`
+- Cards de estatisticas (Total Depositado, Depositos, Meu Total) - linhas 475, 481, 488
+- Card do formulario de edicao - linha 415
+- Card "Participar do Leilao" - ja tem `border-primary/20`, adicionar `bg-card/50`
+- Card "Imoveis / Terrenos" - linha 571
+- Card "Depositos" (DepositsAccordion) - linha 113
 
-### 1. Atualizar `src/pages/Painel.tsx` - AdminDashboardContent
+### 2. `src/pages/painel/AdminLeiloesPage.tsx`
+- Cards de leiloes "upcoming" - linha 317
+- Cards de leiloes "finished" - linha 368
 
-Substituir a query `admin-stats` antiga (que busca properties, profiles, shares) pela nova query que busca:
-- `auction_deposits` (amount + service_fee)  
-- `properties` (estimated_auction_value, estimated_renovation_cost, estimated_sale_value)
+### 3. `src/components/painel/admin/AuctionInvestorLinking.tsx`
+- Card principal - linha 177
 
-Substituir os 4 cards antigos pelos 5 novos KPIs:
+## Alteracoes
 
-| Card | Dados |
-|------|-------|
-| Receita Discovery (Taxas) | SUM(auction_deposits.service_fee) |
-| Arrecadado em Leiloes | SUM(auction_deposits.amount) |
-| Gasto com Arremates | SUM(properties.estimated_auction_value) |
-| Custo de Reformas | SUM(properties.estimated_renovation_cost) |
-| Receita Estimada de Vendas | SUM(properties.estimated_sale_value) |
+Adicionar `bg-card/50 border-border/50` em todos os `<Card>` que estao sem essas classes, mantendo quaisquer classes extras ja existentes (como `hover:shadow-md`, `opacity-70`, `border-primary/20`).
 
-Atualizar os imports de icones (remover Building2, PieChart; adicionar DollarSign, Gavel, Hammer, Wrench).
+Exemplo de antes/depois:
+```text
+Antes:  <Card>
+Depois: <Card className="bg-card/50 border-border/50">
 
-Alterar o grid de `lg:grid-cols-4` para `lg:grid-cols-5`.
+Antes:  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+Depois: <Card className="bg-card/50 border-border/50 hover:shadow-md transition-shadow cursor-pointer">
+```
 
-### 2. Manter inalterados
-
-- Cards de "Atividade Recente" e "Ultimos Clientes" permanecem como estao
-- `AdminDashboardPage.tsx` ja esta correto, nenhuma alteracao necessaria
-
-## Detalhes Tecnicos
-
-Arquivo afetado: `src/pages/Painel.tsx`
-
-Alteracoes:
-1. Linha 4: Atualizar imports de icones -- remover `Building2, Users, PieChart` dos KPIs (manter `Users` pois e usado no card "Ultimos Clientes"), adicionar `DollarSign, Gavel, Hammer, Wrench`
-2. Linhas 24-39: Substituir a query para buscar `auction_deposits` e `properties` com os campos financeiros
-3. Linhas 116-125: Substituir o array de cards pelos 5 novos KPIs com icones corretos
-4. Linha 133: Alterar grid para `lg:grid-cols-5`
+## Arquivos editados
+- `src/pages/painel/LeilaoDetailPage.tsx` (6 Cards)
+- `src/pages/painel/AdminLeiloesPage.tsx` (2 Cards)
+- `src/components/painel/admin/AuctionInvestorLinking.tsx` (1 Card)
 
