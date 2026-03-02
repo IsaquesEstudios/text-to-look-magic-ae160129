@@ -722,8 +722,8 @@ export default function LeilaoDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Investor linking (admin, only after auction expired or finished) */}
-      {isAdmin && (auction.status === "finished" || new Date(auction.scheduled_start) <= new Date()) && items && deposits && deposits.length > 0 && (
+      {/* Investor linking (admin, only after auction is finished) */}
+      {isAdmin && auction.status === "finished" && items && deposits && deposits.length > 0 && (
         <AuctionInvestorLinking
           auctionId={auction.id}
           items={items}
