@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus, Lock, Globe } from "lucide-react";
+import { PlusCircle, Trash2, Clock, CheckCircle, Eye, Plus, Lock, Globe, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -74,6 +74,28 @@ export default function AdminLeiloesPage() {
         .order("scheduled_start", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+
+  // KPI: Total available for investment (all non-admin user credits)
+  const { data: totalAvailable } = useQuery({
+    queryKey: ["total-available-investment"],
+    queryFn: async () => {
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
+
+      const { data: profiles, error } = await supabase
+        .from("profiles")
+        .select("user_id, credits")
+        .gt("credits", 0);
+      if (error) throw error;
+
+      return (profiles ?? [])
+        .filter((p) => !adminIds.has(p.user_id))
+        .reduce((sum, p) => sum + Number(p.credits), 0);
     },
   });
 
@@ -303,6 +325,21 @@ export default function AdminLeiloesPage() {
           <PlusCircle className="h-4 w-4" /> Novo Leilão
         </Button>
       </div>
+
+      {/* KPI: Total available for investment */}
+      <Card className="bg-card/50 border-border/50">
+        <CardContent className="p-5 flex items-center gap-4">
+          <div className="h-10 w-10 rounded-lg bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
+            <Wallet className="h-5 w-5 text-discovery-green" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Total Disponível para Investimento</p>
+            <p className="text-xl font-bold text-foreground">
+              ${(totalAvailable ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {isLoading ? (
         <div className="text-muted-foreground animate-pulse">Carregando...</div>

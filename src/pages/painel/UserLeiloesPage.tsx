@@ -1,16 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, DollarSign, Wallet } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import {
   Accordion,
   AccordionContent,
@@ -153,125 +150,9 @@ function AuctionItemCard({ item }: { item: any }) {
   return content;
 }
 
-function DepositForm({ auctionId, auctionTitle }: { auctionId: string; auctionTitle: string }) {
-  const { user, profile, refreshProfile } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [rawAmount, setRawAmount] = useState(0);
-  const [displayAmount, setDisplayAmount] = useState("");
-
-  const credits = profile?.credits ?? 0;
-  const depositValue = rawAmount / 100;
-  const category = depositValue >= 11000 ? "casa" : depositValue >= 800 ? "terreno" : null;
-  const fee = category === "casa" ? 5000 : category === "terreno" ? 500 : 0;
-  const netInvestment = depositValue - fee;
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.replace(/[^0-9]/g, "");
-    const cents = parseInt(input || "0", 10);
-    setRawAmount(cents);
-    if (cents === 0) {
-      setDisplayAmount("");
-    } else {
-      setDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    }
-  };
-
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const val = rawAmount / 100;
-      if (val <= 0) throw new Error("Valor inválido");
-      if (val > credits) throw new Error("Créditos insuficientes");
-
-      const { error } = await supabase.rpc("process_auction_deposit", {
-        p_auction_id: auctionId,
-        p_user_id: user!.id,
-        p_amount: val,
-        p_auction_title: auctionTitle,
-      });
-      if (error) throw new Error(error.message);
-    },
-    onSuccess: async () => {
-      await refreshProfile();
-      queryClient.invalidateQueries({ queryKey: ["my-auction-deposits"] });
-      toast({ title: "Depósito realizado com sucesso!" });
-      setRawAmount(0);
-      setDisplayAmount("");
-    },
-    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
-  });
-
-  return (
-    <div className="rounded-xl border border-discovery-green/20 bg-discovery-green/5 p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <Wallet className="h-4 w-4 text-discovery-green" />
-        <span className="text-sm font-semibold text-foreground">Depositar Créditos</span>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Saldo disponível: <span className="font-semibold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-      </p>
-
-      {/* Fee rules info */}
-      <div className="rounded-lg border border-border/50 bg-secondary/30 p-3 space-y-1.5 text-xs text-muted-foreground">
-        <p className="font-semibold text-foreground text-[11px] uppercase tracking-wider">Regras de Participação</p>
-        <div className="flex items-start gap-1.5">
-          <TreePine className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <span><strong className="text-foreground">$800 – $10.999</strong> → Terreno (taxa de serviço: <strong className="text-foreground">$500</strong>)</span>
-        </div>
-        <div className="flex items-start gap-1.5">
-          <Home className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <span><strong className="text-foreground">$11.000+</strong> → Casa (taxa de serviço: <strong className="text-foreground">$5.000</strong>)</span>
-        </div>
-        <p className="text-muted-foreground/70 text-[10px]">Valor mínimo: $800. A taxa é descontada do depósito.</p>
-      </div>
-
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder="0.00"
-            value={displayAmount}
-            onChange={handleAmountChange}
-            className="pl-7"
-          />
-        </div>
-        <Button
-          onClick={() => mutation.mutate()}
-          disabled={rawAmount === 0 || mutation.isPending}
-          variant="cta"
-          size="sm"
-        >
-          {mutation.isPending ? "..." : "Depositar"}
-        </Button>
-      </div>
-
-      {/* Dynamic category feedback */}
-      {category && (
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1 text-xs">
-          <div className="flex items-center gap-2">
-            {category === "casa" ? <Home className="h-3.5 w-3.5 text-primary" /> : <TreePine className="h-3.5 w-3.5 text-primary" />}
-            <span className="font-semibold text-foreground">
-              {category === "casa" ? "Casa" : "Terreno"} — Taxa: ${fee.toLocaleString("en-US")}
-            </span>
-          </div>
-          <p className="text-muted-foreground">
-            Investimento líquido: <strong className="text-foreground">${netInvestment.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong>
-          </p>
-        </div>
-      )}
-      {depositValue > 0 && depositValue < 800 && (
-        <p className="text-xs text-destructive">O valor mínimo para participar é $800.</p>
-      )}
-    </div>
-  );
-}
-
 export default function UserLeiloesPage() {
   const { user, isAdmin, profile } = useAuth();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: auctions, isLoading } = useQuery({
     queryKey: ["user-auctions", isAdmin],
@@ -423,11 +304,6 @@ export default function UserLeiloesPage() {
             </div>
           )}
 
-          {/* Deposit form for non-finished auctions */}
-          {!isAdmin && !isFinished && (
-            <DepositForm auctionId={auction.id} auctionTitle={auction.title} />
-          )}
-
           {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((item) => (
@@ -448,7 +324,7 @@ export default function UserLeiloesPage() {
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Gavel className="h-6 w-6 text-primary" /> Leilões
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Participe dos leilões e invista seus créditos</p>
+        <p className="text-sm text-muted-foreground mt-1">Acompanhe seus investimentos em leilões</p>
       </div>
 
       {active.length > 0 && (
