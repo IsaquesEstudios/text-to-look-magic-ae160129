@@ -106,32 +106,36 @@ function AuctionItemCard({ item }: { item: any }) {
         {hasProperty && (
           <>
             <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-medium mb-1">Estimativas</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
-                <p className="font-semibold text-foreground">${(Number(prop.estimated_auction_value) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
-                <p className="font-semibold text-foreground">${(Number(prop.estimated_renovation_cost) || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Total do Projeto</p>
-                <p className="font-semibold text-foreground">${Number(prop.purchase_price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Valor de Mercado</p>
-                <p className="font-semibold text-foreground">${(Number(prop.purchase_price) * (1 + Number(prop.estimated_return_pct) / 100)).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-              </div>
-            </div>
             {(() => {
-              const total = Number(prop.purchase_price) || 0;
-              const market = total * (1 + (Number(prop.estimated_return_pct) || 0) / 100);
-              const ret = total > 0 ? ((market - total) / total) * 100 : 0;
+              const auctionVal = Number(prop.estimated_auction_value) || 0;
+              const renovationVal = Number(prop.estimated_renovation_cost) || 0;
+              const totalProject = auctionVal + renovationVal;
+              const saleVal = Number(prop.estimated_sale_value) || 0;
+              const ret = totalProject > 0 ? ((saleVal - totalProject) / totalProject) * 100 : 0;
               return (
-                <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
-                  {ret.toFixed(1)}% retorno estimado
-                </Badge>
+                <>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
+                      <p className="font-semibold text-foreground">${auctionVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
+                      <p className="font-semibold text-foreground">${renovationVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Total do Projeto</p>
+                      <p className="font-semibold text-foreground">${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Valor de Venda</p>
+                      <p className="font-semibold text-foreground">${saleVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
+                    {ret.toFixed(1)}% retorno estimado
+                  </Badge>
+                </>
               );
             })()}
           </>
