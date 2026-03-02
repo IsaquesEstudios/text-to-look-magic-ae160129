@@ -73,11 +73,13 @@ export default function UserCotas() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sorted.map(({ prop, totalQuantity, totalPaid }) => {
-            const totalProject = Number(prop.purchase_price) || 0;
-            const returnPct = Number(prop.estimated_return_pct);
-            const marketValue = totalProject * (1 + returnPct / 100);
+            const auctionVal = Number(prop.estimated_auction_value) || 0;
+            const renovationVal = Number(prop.estimated_renovation_cost) || 0;
+            const totalProject = auctionVal + renovationVal;
+            const saleVal = Number(prop.estimated_sale_value) || 0;
+            const roiPct = totalProject > 0 ? ((saleVal - totalProject) / totalProject) * 100 : 0;
             const participation = totalProject > 0 ? totalPaid / totalProject : 0;
-            const estimatedValue = participation * marketValue;
+            const estimatedValue = totalPaid + (participation * (saleVal - totalProject));
             const counts = unreadMap?.get(prop.id);
             const totalUnread = (counts?.novidades ?? 0) + (counts?.gastos ?? 0);
 
@@ -129,9 +131,16 @@ export default function UserCotas() {
                     </div>
                   </div>
 
-                  <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
-                    +{returnPct}% margem estimada
-                  </Badge>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
+                      {roiPct.toFixed(1)}% retorno estimado
+                    </Badge>
+                    {participation > 0 && (
+                      <Badge variant="outline" className="text-[10px] border-muted-foreground/30 text-muted-foreground">
+                        {(participation * 100).toFixed(1)}% participação
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </Link>
             );

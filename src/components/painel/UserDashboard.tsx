@@ -36,14 +36,23 @@ export function UserDashboard() {
         .order("created_at", { ascending: false })
         .limit(6);
 
-      const items: { id: string; date: string; title: string; detail: string }[] = [];
+      const items: { id: string; date: string; title: string; detail: string; amount: number; type: string }[] = [];
 
       creditsRes.data?.forEach((c) => {
+        const typeMap: Record<string, string> = {
+          deposit: "Depósito",
+          withdrawal: "Saque",
+          refund: "Estorno",
+          auction_deposit: "Investimento em Leilão",
+          profit: "Retorno de Lucro",
+        };
         items.push({
           id: c.id,
           date: c.created_at,
-          title: c.type === "deposit" ? "Depósito" : c.type === "withdrawal" ? "Saque" : c.type,
+          title: typeMap[c.type] || c.type,
           detail: c.description || `$${Number(c.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+          amount: Number(c.amount),
+          type: c.type,
         });
       });
 
@@ -133,6 +142,34 @@ export function UserDashboard() {
   const credits = profile?.credits ?? 0;
   const totalProperties = new Set(shares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
+  // Portfolio aggregation
+  const { totalInvested, totalEstimatedReturn } = (() => {
+    if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0 };
+    const propMap = new Map<string, { totalPaid: number; prop: any }>();
+    shares.forEach((s) => {
+      const prop = s.properties as any;
+      if (!prop) return;
+      const existing = propMap.get(prop.id);
+      if (existing) {
+        existing.totalPaid += Number(s.amount_paid);
+      } else {
+        propMap.set(prop.id, { totalPaid: Number(s.amount_paid), prop });
+      }
+    });
+    let invested = 0;
+    let estimated = 0;
+    propMap.forEach(({ totalPaid, prop }) => {
+      invested += totalPaid;
+      const auctionVal = Number(prop.estimated_auction_value) || 0;
+      const renovationVal = Number(prop.estimated_renovation_cost) || 0;
+      const totalProject = auctionVal + renovationVal;
+      const saleVal = Number(prop.estimated_sale_value) || 0;
+      const participation = totalProject > 0 ? totalPaid / totalProject : 0;
+      estimated += totalPaid + (participation * (saleVal - totalProject));
+    });
+    return { totalInvested: invested, totalEstimatedReturn: estimated };
+  })();
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
@@ -154,7 +191,7 @@ export function UserDashboard() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <Wallet className="h-5 w-5 text-primary" />
@@ -171,21 +208,29 @@ export function UserDashboard() {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Imóveis</p>
-            <p className="text-lg font-bold text-foreground">
-              {totalProperties}
-            </p>
+            <p className="text-lg font-bold text-foreground">{totalProperties}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <TrendingUp className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total Investido</p>
+            <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
           <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Gavel className="h-5 w-5 text-accent" />
+            <TrendingUp className="h-5 w-5 text-accent" />
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Leilões</p>
-            <Link to="/painel/leiloes-user" className="text-sm text-primary hover:underline font-medium">
-              Ver leilões →
-            </Link>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno Estimado</p>
+            <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
+              ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
           </div>
         </div>
       </div>
@@ -269,12 +314,18 @@ export function UserDashboard() {
             <div className="divide-y divide-border/10">
               {recentActivity.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
-                  <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-accent/10">
-                    <CreditCard className="h-4 w-4 text-accent" />
+                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    item.type === "deposit" || item.type === "profit" ? "bg-primary/10" : item.type === "refund" ? "bg-amber-500/10" : "bg-accent/10"
+                  }`}>
+                    <CreditCard className={`h-4 w-4 ${
+                      item.type === "deposit" || item.type === "profit" ? "text-primary" : item.type === "refund" ? "text-amber-500" : "text-accent"
+                    }`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
+                    <p className={`text-xs truncate ${
+                      item.type === "deposit" || item.type === "profit" ? "text-primary" : item.type === "withdrawal" || item.type === "auction_deposit" ? "text-destructive" : "text-muted-foreground"
+                    }`}>{item.detail}</p>
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
                     <Clock className="h-3 w-3" />
