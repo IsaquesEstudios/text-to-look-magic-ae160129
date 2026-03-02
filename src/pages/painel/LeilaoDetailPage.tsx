@@ -214,10 +214,9 @@ function DepositsAccordion({
 export default function LeilaoDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAdmin, profile, refreshProfile } = useAuth();
+  const { user, isAdmin, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [depositAmount, setDepositAmount] = useState("");
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", scheduled_start: "" });
   const [newPropertyForms, setNewPropertyForms] = useState<AuctionPropertyData[]>([]);
@@ -266,25 +265,51 @@ export default function LeilaoDetailPage() {
     enabled: isAdmin && depositUserIds.length > 0,
   });
 
-  const depositMutation = useMutation({
-    mutationFn: async () => {
-      const amount = parseFloat(depositAmount);
-      if (isNaN(amount) || amount < 800) throw new Error("O valor mínimo para participar é $800");
-      if (profile && amount > profile.credits) throw new Error("Créditos insuficientes");
+  // Admin: fetch all users with credits for linking
+  const { data: usersWithCredits } = useQuery({
+    queryKey: ["users-with-credits"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, credits")
+        .gt("credits", 0)
+        .order("credits", { ascending: false });
+      if (error) throw error;
+      // Filter out admin users
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
+      return data.filter((p) => !adminIds.has(p.user_id));
+    },
+    enabled: isAdmin,
+  });
 
-      const { error } = await supabase.rpc("process_auction_deposit", {
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [linkRawAmount, setLinkRawAmount] = useState(0);
+  const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
+
+  const adminDepositMutation = useMutation({
+    mutationFn: async () => {
+      const amount = linkRawAmount / 100;
+      if (isNaN(amount) || amount < 800) throw new Error("O valor mínimo é $800");
+
+      const { error } = await supabase.rpc("admin_create_auction_deposit", {
         p_auction_id: id!,
-        p_user_id: user!.id,
+        p_user_id: selectedUserId,
         p_amount: amount,
         p_auction_title: auction?.title || "",
       });
       if (error) throw new Error(error.message);
     },
-    onSuccess: async () => {
-      await refreshProfile();
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-deposits", id] });
-      toast({ title: "Depósito realizado com sucesso!" });
-      setDepositAmount("");
+      queryClient.invalidateQueries({ queryKey: ["users-with-credits"] });
+      toast({ title: "Investidor vinculado com sucesso!" });
+      setSelectedUserId("");
+      setLinkRawAmount(0);
+      setLinkDisplayAmount("");
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -401,7 +426,6 @@ export default function LeilaoDetailPage() {
 
   const isFinished = auction?.status === "finished" || (auction && new Date(auction.scheduled_start) <= new Date());
   const isActive = !isFinished && (auction?.status === "active" || (auction?.status === "upcoming" && new Date(auction.scheduled_start) <= new Date()));
-  const canDeposit = !isAdmin && !isFinished;
 
 
   if (!auction) {
@@ -494,78 +518,101 @@ export default function LeilaoDetailPage() {
         )}
       </div>
 
-      {/* Deposit form (users only, when active) */}
-      {canDeposit && (() => {
-        const amt = parseFloat(depositAmount) || 0;
-        const isTerreno = amt >= 800 && amt <= 11000;
-        const isCasa = amt > 11000;
-        const taxa = isCasa ? 5000 : isTerreno ? 500 : 0;
-        const categoria = isCasa ? "Casa" : isTerreno ? "Terreno" : null;
-        const isValid = amt >= 800;
+      {/* Admin: Link investor to auction */}
+      {isAdmin && !isFinished && (
+        <Card className="bg-card/50 border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-discovery-green" />
+              Vincular Investidor
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg bg-secondary/40 p-3 space-y-1.5 text-xs text-muted-foreground">
+              <p className="font-semibold text-foreground text-sm">Regras de Participação</p>
+              <p>• Valor mínimo: <span className="font-semibold text-foreground">$800</span></p>
+              <p>• <span className="font-semibold text-foreground">$800 – $10.999</span> → Terreno (taxa: <span className="font-semibold text-foreground">$500</span>)</p>
+              <p>• <span className="font-semibold text-foreground">$11.000+</span> → Casa (taxa: <span className="font-semibold text-foreground">$5.000</span>)</p>
+            </div>
 
-        return (
-          <Card className="bg-card/50 border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-discovery-green" />
-                Participar do Leilão
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-xs text-muted-foreground">
-                Saldo disponível: <span className="font-semibold text-foreground">${(profile?.credits ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-              </p>
-
-              <div className="rounded-lg bg-secondary/40 p-3 space-y-1.5 text-xs text-muted-foreground">
-                <p className="font-semibold text-foreground text-sm">Como funciona</p>
-                <p>• Valor mínimo: <span className="font-semibold text-foreground">$800</span></p>
-                <p>• <span className="font-semibold text-foreground">$800 – $11.000</span> → Terreno <span className="text-muted-foreground">(inclui $500 de taxa)</span></p>
-                <p>• <span className="font-semibold text-foreground">Acima de $11.000</span> → Casa <span className="text-muted-foreground">(inclui $5.000 de taxa)</span></p>
-              </div>
-
-              <div className="space-y-2">
-                <Input
-                  type="number"
-                  placeholder="Valor em USD (mín. $800)"
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
-                  min="800"
-                  step="0.01"
-                />
-
-                {amt > 0 && !isValid && (
-                  <p className="text-xs text-destructive">O valor mínimo para participar é $800.</p>
-                )}
-
-                {isValid && categoria && (
-                  <div className="rounded-lg border border-border p-3 space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Categoria</span>
-                      <Badge variant="outline" className="text-xs">{categoria === "Casa" ? <><Home className="h-3 w-3 mr-1" /> Casa</> : <><TreePine className="h-3 w-3 mr-1" /> Terreno</>}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Taxa inclusa</span>
-                      <span className="font-semibold">${taxa.toLocaleString("en-US")}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Valor líquido</span>
-                      <span className="font-semibold text-foreground">${(amt - taxa).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <Button
-                onClick={() => depositMutation.mutate()}
-                disabled={!isValid || depositMutation.isPending}
-                className="w-full bg-discovery-green hover:bg-discovery-green/90 text-primary-foreground"
+            <div>
+              <Label className="text-xs font-medium text-muted-foreground mb-1 block">Investidor</Label>
+              <select
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
-                {depositMutation.isPending ? "Processando..." : `Depositar $${isValid ? amt.toLocaleString("en-US", { minimumFractionDigits: 2 }) : "0.00"}`}
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })()}
+                <option value="">Selecione um investidor</option>
+                {usersWithCredits?.map((u) => (
+                  <option key={u.user_id} value={u.user_id}>
+                    {u.full_name || "Usuário"} — Saldo: ${Number(u.credits).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label className="text-xs font-medium text-muted-foreground mb-1 block">Valor do depósito</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0.00"
+                  value={linkDisplayAmount}
+                  onChange={(e) => {
+                    const input = e.target.value.replace(/[^0-9]/g, "");
+                    const cents = parseInt(input || "0", 10);
+                    setLinkRawAmount(cents);
+                    if (cents === 0) {
+                      setLinkDisplayAmount("");
+                    } else {
+                      setLinkDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    }
+                  }}
+                  className="pl-7"
+                />
+              </div>
+            </div>
+
+            {/* Dynamic feedback */}
+            {(() => {
+              const amt = linkRawAmount / 100;
+              if (amt <= 0) return null;
+              if (amt < 800) return <p className="text-xs text-destructive">O valor mínimo é $800.</p>;
+              const isCasa = amt >= 11000;
+              const taxa = isCasa ? 5000 : 500;
+              const categoria = isCasa ? "Casa" : "Terreno";
+              return (
+                <div className="rounded-lg border border-border/50 bg-secondary/30 p-3 space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Categoria</span>
+                    <Badge variant="outline" className="text-xs gap-1">
+                      {isCasa ? <Home className="h-3 w-3" /> : <TreePine className="h-3 w-3" />} {categoria}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Taxa inclusa</span>
+                    <span className="font-semibold">${taxa.toLocaleString("en-US")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Valor líquido</span>
+                    <span className="font-semibold text-foreground">${(amt - taxa).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <Button
+              onClick={() => adminDepositMutation.mutate()}
+              disabled={!selectedUserId || linkRawAmount / 100 < 800 || adminDepositMutation.isPending}
+              className="w-full bg-discovery-green hover:bg-discovery-green/90 text-primary-foreground"
+            >
+              {adminDepositMutation.isPending ? "Processando..." : "Vincular Investidor"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Auction items */}
       <Card className="bg-card/50 border-border/50">

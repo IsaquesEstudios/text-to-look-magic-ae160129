@@ -639,6 +639,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_create_auction_deposit: {
+        Args: {
+          p_amount: number
+          p_auction_id: string
+          p_auction_title: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
