@@ -10,24 +10,24 @@ export default function AdminDashboardPage() {
     queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
-      const [depositsRes, propertiesRes, profilesRes] = await Promise.all([
+      const [depositsRes, propertiesRes, profilesRes, sharesRes] = await Promise.all([
         supabase.from("auction_deposits").select("id, amount, service_fee"),
         supabase.from("properties").select("id, type"),
         supabase.from("profiles").select("id"),
+        supabase.from("shares").select("property_id"),
       ]);
 
       const deposits = depositsRes.data ?? [];
       const properties = propertiesRes.data ?? [];
       const profiles = profilesRes.data ?? [];
-
-      const casas = properties.filter(p => p.type === "house").length;
-      const terrenos = properties.filter(p => p.type === "land").length;
+      const linkedPropertyIds = new Set((sharesRes.data ?? []).map(s => s.property_id));
+      const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
 
       return {
         adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
         totalInvested: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
-        casas,
-        terrenos,
+        casas: linkedProperties.filter(p => p.type === "house").length,
+        terrenos: linkedProperties.filter(p => p.type === "land").length,
         totalUsers: profiles.length,
       };
     },
