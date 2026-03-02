@@ -110,7 +110,7 @@ function DepositsAccordion({
   };
 
   return (
-    <Card>
+    <Card className="bg-card/50 border-border/50">
       <CardHeader>
         <CardTitle className="text-lg">Depósitos ({deposits.length})</CardTitle>
       </CardHeader>
@@ -412,7 +412,7 @@ export default function LeilaoDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       {editing ? (
-        <Card>
+        <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6 space-y-4">
             <div>
               <Label>Título *</Label>
@@ -472,20 +472,20 @@ export default function LeilaoDetailPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <Card>
+        <Card className="bg-card/50 border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-xs text-muted-foreground">Total Depositado</p>
             <p className="text-xl font-bold text-foreground">${totalDeposited.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-card/50 border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-xs text-muted-foreground">Depósitos</p>
             <p className="text-xl font-bold text-foreground">{deposits?.length ?? 0}</p>
           </CardContent>
         </Card>
         {!isAdmin && (
-          <Card>
+          <Card className="bg-card/50 border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-xs text-muted-foreground">Meu Total</p>
               <p className="text-xl font-bold text-primary">${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
@@ -504,7 +504,7 @@ export default function LeilaoDetailPage() {
         const isValid = amt >= 800;
 
         return (
-          <Card className="border-primary/20">
+          <Card className="bg-card/50 border-primary/20">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-discovery-green" />
@@ -568,7 +568,7 @@ export default function LeilaoDetailPage() {
       })()}
 
       {/* Auction items */}
-      <Card>
+      <Card className="bg-card/50 border-border/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
           {isAdmin && !showAddProperty && auction.status !== "finished" && (

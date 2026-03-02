@@ -314,7 +314,7 @@ export default function AdminLeiloesPage() {
               <div className="grid gap-4">
                 {upcoming.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <Card className="bg-card/50 border-border/50 hover:shadow-md transition-shadow cursor-pointer">
                       <CardContent className="p-5 flex items-center justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -365,7 +365,7 @@ export default function AdminLeiloesPage() {
               <div className="grid gap-3">
                 {finished.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
-                    <Card className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                    <Card className="bg-card/50 border-border/50 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
                       <CardContent className="p-4 flex items-center justify-between gap-4">
                         <div>
                           <span className="font-medium text-sm">{auction.title}</span>
