@@ -20,8 +20,8 @@ export default function AdminDashboardPage() {
       const properties = propertiesRes.data ?? [];
       const profiles = profilesRes.data ?? [];
 
-      const casas = properties.filter(p => p.type === "casa").length;
-      const terrenos = properties.filter(p => p.type === "terreno").length;
+      const casas = properties.filter(p => p.type === "house").length;
+      const terrenos = properties.filter(p => p.type === "land").length;
 
       return {
         adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),

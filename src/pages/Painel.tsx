@@ -32,8 +32,8 @@ function AdminDashboardContent() {
       return {
         adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
         totalInvested: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
-        casas: properties.filter(p => p.type === "casa").length,
-        terrenos: properties.filter(p => p.type === "terreno").length,
+        casas: properties.filter(p => p.type === "house").length,
+        terrenos: properties.filter(p => p.type === "land").length,
         totalUsers: profilesCountRes.count ?? 0,
       };
     },
