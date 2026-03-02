@@ -23,7 +23,7 @@ interface Props {
 
 export function AdminPropertiesList({ onEdit, filterType }: Props) {
   const { data: properties, isLoading } = useQuery({
-    queryKey: ["admin-properties"],
+    queryKey: ["admin-properties", filterType ?? "all"],
     queryFn: async () => {
       // Get property IDs that have linked investors (shares)
       const { data: shareRows, error: sharesError } = await supabase
