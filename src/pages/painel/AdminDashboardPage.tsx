@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, DollarSign, Gavel, Hammer, Wrench, TrendingUp } from "lucide-react";
+import { Loader2, DollarSign, Building2, MapPin, Users, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,38 +10,35 @@ export default function AdminDashboardPage() {
     queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
-      const [depositsRes, propertiesRes] = await Promise.all([
+      const [depositsRes, propertiesRes, profilesRes] = await Promise.all([
         supabase.from("auction_deposits").select("id, amount, service_fee"),
-        supabase.from("properties").select("id, estimated_auction_value, estimated_renovation_cost, estimated_sale_value"),
+        supabase.from("properties").select("id, type"),
+        supabase.from("profiles").select("id"),
       ]);
 
       const deposits = depositsRes.data ?? [];
       const properties = propertiesRes.data ?? [];
+      const profiles = profilesRes.data ?? [];
+
+      const casas = properties.filter(p => p.type === "casa").length;
+      const terrenos = properties.filter(p => p.type === "terreno").length;
 
       return {
         adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
-        totalRaised: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
-        totalAuction: properties.reduce((acc, p) => acc + Number(p.estimated_auction_value ?? 0), 0),
-        totalRenovation: properties.reduce((acc, p) => acc + Number(p.estimated_renovation_cost ?? 0), 0),
-        totalSale: properties.reduce((acc, p) => acc + Number(p.estimated_sale_value ?? 0), 0),
+        totalInvested: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
+        casas,
+        terrenos,
+        totalUsers: profiles.length,
       };
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   const cards = [
-    { label: "Receita Discovery (Taxas)", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
-    { label: "Arrecadado em Leilões", value: `$ ${(stats?.totalRaised ?? 0).toLocaleString("en-US")}`, icon: Gavel },
-    { label: "Gasto com Arremates", value: `$ ${(stats?.totalAuction ?? 0).toLocaleString("en-US")}`, icon: Hammer },
-    { label: "Custo de Reformas", value: `$ ${(stats?.totalRenovation ?? 0).toLocaleString("en-US")}`, icon: Wrench },
-    { label: "Receita Estimada de Vendas", value: `$ ${(stats?.totalSale ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
+    { label: "Valor Discovery", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Imóveis em Trabalho", value: String(stats?.casas ?? 0), icon: Building2 },
+    { label: "Terrenos", value: String(stats?.terrenos ?? 0), icon: MapPin },
+    { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
+    { label: "Total Investido", value: `$ ${(stats?.totalInvested ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
   ];
 
   return (
