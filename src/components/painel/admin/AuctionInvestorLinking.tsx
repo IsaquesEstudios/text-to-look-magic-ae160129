@@ -174,7 +174,7 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
   if (propertyItems.length === 0) return null;
 
   return (
-    <Card>
+    <Card className="bg-card/50 border-border/50">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <UserPlus className="h-5 w-5" />
