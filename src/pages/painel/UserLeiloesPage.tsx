@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, DollarSign } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
@@ -176,29 +176,8 @@ export default function UserLeiloesPage() {
 
   const auctionIds = auctions?.map((a) => a.id) ?? [];
 
-  // Fetch user's deposits across all auctions
-  const { data: myDeposits } = useQuery({
-    queryKey: ["my-auction-deposits", auctionIds, user?.id],
-    queryFn: async () => {
-      if (!user || auctionIds.length === 0) return [];
-      const { data, error } = await supabase
-        .from("auction_deposits")
-        .select("auction_id, amount, created_at")
-        .eq("user_id", user.id)
-        .in("auction_id", auctionIds)
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
-    enabled: auctionIds.length > 0 && !!user,
-  });
 
-  const depositsByAuction = new Map<string, typeof myDeposits>();
-  myDeposits?.forEach((d) => {
-    const list = depositsByAuction.get(d.auction_id) ?? [];
-    list.push(d);
-    depositsByAuction.set(d.auction_id, list);
-  });
+
 
   const { data: allItems } = useQuery({
     queryKey: ["auction-items-all", auctionIds],
@@ -239,8 +218,6 @@ export default function UserLeiloesPage() {
     const isTimerOver = start <= new Date();
     const isFinished = auction.status === "finished" || isTimerOver;
     const items = itemsByAuction.get(auction.id) ?? [];
-    const myAuctionDeposits = depositsByAuction.get(auction.id) ?? [];
-    const myTotal = myAuctionDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
 
     return (
       <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
@@ -258,14 +235,6 @@ export default function UserLeiloesPage() {
                   <span className="text-xs text-muted-foreground">
                     {format(start, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                   </span>
-                  {!isAdmin && myTotal > 0 && (
-                    <>
-                      <span className="text-muted-foreground/30">•</span>
-                      <span className="text-xs font-semibold text-discovery-green">
-                        ${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })} investido
-                      </span>
-                    </>
-                  )}
                 </div>
               </div>
             </div>
@@ -283,29 +252,6 @@ export default function UserLeiloesPage() {
         <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
           {auction.description && (
             <p className="text-sm text-muted-foreground">{auction.description}</p>
-          )}
-
-          {/* My deposits summary */}
-          {!isAdmin && myAuctionDeposits.length > 0 && (
-            <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">Meus Depósitos</span>
-                </div>
-                <span className="text-sm font-bold text-primary">
-                  ${myTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div className="space-y-1.5">
-                {myAuctionDeposits.map((dep, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{format(new Date(dep.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
-                    <span className="font-medium text-foreground">${Number(dep.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           )}
 
           {items.length > 0 ? (

@@ -92,18 +92,18 @@ export default function AdminLeiloesPage() {
         .select("user_id, credits");
       if (pErr) throw pErr;
 
-      const { data: allDeposits, error: dErr } = await supabase
-        .from("auction_deposits")
-        .select("user_id, amount");
-      if (dErr) throw dErr;
+      const { data: allShares, error: sErr } = await supabase
+        .from("shares")
+        .select("user_id, amount_paid");
+      if (sErr) throw sErr;
 
       const available = (profiles ?? [])
         .filter((p) => !adminIds.has(p.user_id))
         .reduce((sum, p) => sum + Number(p.credits), 0);
 
-      const invested = (allDeposits ?? [])
-        .filter((d) => !adminIds.has(d.user_id))
-        .reduce((sum, d) => sum + Number(d.amount), 0);
+      const invested = (allShares ?? [])
+        .filter((s) => !adminIds.has(s.user_id))
+        .reduce((sum, s) => sum + Number(s.amount_paid), 0);
 
       return { available, invested };
     },
