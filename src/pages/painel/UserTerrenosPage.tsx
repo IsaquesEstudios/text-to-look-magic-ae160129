@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Loader2, ArrowUpRight, Bell } from "lucide-react";
+import { MapPin, Loader2, ArrowUpRight, Bell, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
@@ -52,12 +52,53 @@ export default function UserTerrenosPage() {
     );
   }
 
+  // Compute KPI totals
+  const { totalInvested, totalEstimatedReturn } = (() => {
+    let invested = 0;
+    let estimated = 0;
+    aggregated.forEach(({ totalPaid, prop }) => {
+      invested += totalPaid;
+      const auctionVal = Number(prop.estimated_auction_value) || 0;
+      const renovationVal = Number(prop.estimated_renovation_cost) || 0;
+      const totalProject = auctionVal + renovationVal;
+      const saleVal = Number(prop.estimated_sale_value) || 0;
+      const participation = totalProject > 0 ? totalPaid / totalProject : 0;
+      estimated += totalPaid + (participation * (saleVal - totalProject));
+    });
+    return { totalInvested: invested, totalEstimatedReturn: estimated };
+  })();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Terrenos</h1>
         <p className="text-sm text-muted-foreground mt-1">Terrenos em que você investe</p>
       </div>
+
+      {sorted.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total Investido</p>
+              <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+            <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno Estimado</p>
+              <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
+                ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!sorted.length ? (
         <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
