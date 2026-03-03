@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, DollarSign, Trash2, Home, TreePine, MapPin, CheckCircle } from "lucide-react";
-
-interface Deposit {
-  id: string;
-  user_id: string;
-  amount: number;
-  created_at: string;
-}
+import { UserPlus, Trash2, Home, TreePine, MapPin, CheckCircle } from "lucide-react";
 
 interface AuctionItem {
   id: string;
@@ -25,31 +17,18 @@ interface AuctionItem {
   image_url: string | null;
 }
 
-interface ParticipantSummary {
-  user_id: string;
-  name: string;
-  totalInvested: number;
-  totalLinkedAll: number;
-  available: number;
-  highestDepositDate: string;
-}
-
 interface Props {
   auctionId: string;
   items: AuctionItem[];
-  deposits: Deposit[];
-  profileMap: Map<string, string | null>;
 }
 
-export default function AuctionInvestorLinking({ auctionId, items, deposits, profileMap }: Props) {
-  const { user } = useAuth();
+export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [linkingPropertyId, setLinkingPropertyId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [linkAmount, setLinkAmount] = useState("");
 
-  // Get properties with property_id from auction items
   const propertyItems = items.filter((item) => item.property_id);
   const propertyIds = propertyItems.map((item) => item.property_id!);
 
@@ -83,23 +62,41 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
     enabled: propertyIds.length > 0,
   });
 
-  // Fetch share user profiles
-  const shareUserIds = [...new Set(existingShares?.map((s) => s.user_id) ?? [])];
-  const allUserIds = [...new Set([...shareUserIds, ...deposits.map((d) => d.user_id)])];
-  const { data: shareProfiles } = useQuery({
-    queryKey: ["share-profiles", allUserIds],
+  // Fetch all non-admin users with credits > 0
+  const { data: investorsWithCredits } = useQuery({
+    queryKey: ["investors-with-credits-linking"],
     queryFn: async () => {
-      if (allUserIds.length === 0) return [];
-      const { data, error } = await supabase.from("profiles").select("user_id, full_name").in("user_id", allUserIds);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, credits")
+        .gt("credits", 0)
+        .order("credits", { ascending: false });
+      if (error) throw error;
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
+      return data.filter((p) => !adminIds.has(p.user_id));
+    },
+  });
+
+  // Fetch share user profiles for display
+  const shareUserIds = [...new Set(existingShares?.map((s) => s.user_id) ?? [])];
+  const { data: shareProfiles } = useQuery({
+    queryKey: ["share-profiles", shareUserIds],
+    queryFn: async () => {
+      if (shareUserIds.length === 0) return [];
+      const { data, error } = await supabase.from("profiles").select("user_id, full_name").in("user_id", shareUserIds);
       if (error) throw error;
       return data;
     },
-    enabled: allUserIds.length > 0,
+    enabled: shareUserIds.length > 0,
   });
 
-  const allProfileMap = new Map([
-    ...profileMap.entries(),
+  const profileMap = new Map([
     ...(shareProfiles?.map((p) => [p.user_id, p.full_name] as [string, string | null]) ?? []),
+    ...(investorsWithCredits?.map((p) => [p.user_id, p.full_name] as [string, string | null]) ?? []),
   ]);
 
   // Calculate total linked per user across all auction properties
@@ -108,36 +105,13 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
     userLinkedTotals.set(share.user_id, (userLinkedTotals.get(share.user_id) ?? 0) + Number(share.amount_paid));
   }
 
-  // Build participant summaries: group deposits by user, sort by highest deposit date
-  const participants: ParticipantSummary[] = (() => {
-    const map = new Map<string, { total: number; highestAmount: number; highestDate: string }>();
-    for (const dep of deposits) {
-      const existing = map.get(dep.user_id);
-      const amt = Number(dep.amount);
-      if (!existing) {
-        map.set(dep.user_id, { total: amt, highestAmount: amt, highestDate: dep.created_at });
-      } else {
-        existing.total += amt;
-        if (amt > existing.highestAmount) {
-          existing.highestAmount = amt;
-          existing.highestDate = dep.created_at;
-        }
-      }
-    }
-    return Array.from(map.entries())
-      .map(([user_id, info]) => {
-        const totalLinkedAll = userLinkedTotals.get(user_id) ?? 0;
-        return {
-          user_id,
-          name: allProfileMap.get(user_id) || "Usuário",
-          totalInvested: info.total,
-          totalLinkedAll,
-          available: Math.max(info.total - totalLinkedAll, 0),
-          highestDepositDate: info.highestDate,
-        };
-      })
-      .sort((a, b) => new Date(a.highestDepositDate).getTime() - new Date(b.highestDepositDate).getTime());
-  })();
+  // Build investor list from users with credits
+  const investors = (investorsWithCredits ?? []).map((inv) => ({
+    user_id: inv.user_id,
+    name: inv.full_name || "Usuário",
+    credits: Number(inv.credits),
+    totalLinked: userLinkedTotals.get(inv.user_id) ?? 0,
+  }));
 
   const linkMutation = useMutation({
     mutationFn: async ({ propertyId, userId, amount }: { propertyId: string; userId: string; amount: number }) => {
@@ -151,6 +125,7 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
+      queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       toast({ title: "Investidor vinculado com sucesso!" });
       setSelectedUserId("");
       setLinkAmount("");
@@ -166,6 +141,7 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
+      queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       toast({ title: "Vínculo removido" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
@@ -182,33 +158,27 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Participants summary */}
-        {participants.length > 0 && (
+        {/* Investors with available credits */}
+        {investors.length > 0 && (
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-              Participantes do Leilão ({participants.length})
+              Investidores com Saldo ({investors.length})
             </p>
             <div className="grid gap-2">
-              {participants.map((p) => (
-                <div key={p.user_id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-sm">
-                  <span className="font-medium">{p.name}</span>
+              {investors.map((inv) => (
+                <div key={inv.user_id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-sm">
+                  <span className="font-medium">{inv.name}</span>
                   <div className="flex items-center gap-3 text-right">
                     <div>
-                      <p className="font-semibold text-foreground">
-                        ${p.totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">Depositado</p>
-                    </div>
-                    <div>
                       <p className="font-semibold text-discovery-green">
-                        ${p.available.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        ${inv.credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </p>
                       <p className="text-[10px] text-muted-foreground">Disponível</p>
                     </div>
-                    {p.totalLinkedAll > 0 && (
+                    {inv.totalLinked > 0 && (
                       <div>
                         <p className="font-semibold text-primary">
-                          ${p.totalLinkedAll.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                          ${inv.totalLinked.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                         </p>
                         <p className="text-[10px] text-muted-foreground">Vinculado</p>
                       </div>
@@ -230,14 +200,11 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
           const isFullyCovered = remaining <= 0;
           const isLinking = linkingPropertyId === item.property_id;
 
-          // Users already linked to this property
           const linkedUserIds = new Set(linkedShares.map((s) => s.user_id));
-          // Available participants (not yet linked to this property AND have available balance)
-          const availableParticipants = participants.filter((p) => !linkedUserIds.has(p.user_id) && p.available > 0);
+          const availableInvestors = investors.filter((inv) => !linkedUserIds.has(inv.user_id) && inv.credits > 0);
 
-          // Selected user's max linkable amount
-          const selectedParticipant = participants.find((p) => p.user_id === selectedUserId);
-          const userMaxAvailable = selectedParticipant?.available ?? 0;
+          const selectedInvestor = investors.find((inv) => inv.user_id === selectedUserId);
+          const userMaxAvailable = selectedInvestor?.credits ?? 0;
           const maxLinkable = Math.min(remaining, userMaxAvailable);
 
           return (
@@ -301,7 +268,7 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                     return (
                       <div key={share.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
                         <div>
-                          <span className="font-medium">{allProfileMap.get(share.user_id) || "Usuário"}</span>
+                          <span className="font-medium">{profileMap.get(share.user_id) || "Usuário"}</span>
                           <span className="text-muted-foreground ml-2">({pct}%)</span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -341,10 +308,10 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                           onChange={(e) => setSelectedUserId(e.target.value)}
                           className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                         >
-                          <option value="">Selecione um participante</option>
-                          {availableParticipants.map((p) => (
-                            <option key={p.user_id} value={p.user_id}>
-                              {p.name} — Disponível: ${p.available.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                          <option value="">Selecione um investidor</option>
+                          {availableInvestors.map((inv) => (
+                            <option key={inv.user_id} value={inv.user_id}>
+                              {inv.name} — Saldo: ${inv.credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                             </option>
                           ))}
                         </select>
@@ -368,7 +335,6 @@ export default function AuctionInvestorLinking({ auctionId, items, deposits, pro
                             }
                             const num = parseFloat(cleaned);
                             if (!isNaN(num)) {
-                              // Format with commas while typing, preserve decimal input
                               const hasDecimal = cleaned.includes(".");
                               const decimalPart = hasDecimal ? cleaned.split(".")[1] : "";
                               const intPart = Math.floor(num).toLocaleString("en-US");
