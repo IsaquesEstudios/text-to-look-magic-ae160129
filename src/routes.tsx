@@ -34,6 +34,7 @@ const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
 const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
 const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
+const UserTerrenosPage = lazy(() => import("./pages/painel/UserTerrenosPage"));
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
 const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
 
@@ -91,6 +92,7 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 const panelChildren: RouteRecord[] = [
   { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
   { path: "meus-imoveis", element: <SuspenseWrapper><UserImoveis /></SuspenseWrapper> },
+  { path: "meus-terrenos", element: <SuspenseWrapper><UserTerrenosPage /></SuspenseWrapper> },
   { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },

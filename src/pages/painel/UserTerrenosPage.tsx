@@ -2,27 +2,26 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Loader2, MapPin, ArrowUpRight, Bell } from "lucide-react";
+import { MapPin, Loader2, ArrowUpRight, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
-export default function UserCotas() {
+export default function UserTerrenosPage() {
   const { user } = useAuth();
 
   const { data: shares, isLoading } = useQuery({
-    queryKey: ["user-shares-houses", user?.id],
+    queryKey: ["user-shares-land", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("shares")
         .select("*, properties(*)")
         .eq("user_id", user!.id);
       if (error) throw error;
-      return data?.filter((s) => (s.properties as any)?.type === "house") ?? [];
+      return data?.filter((s) => (s.properties as any)?.type === "land") ?? [];
     },
     enabled: !!user,
   });
 
-  // Aggregate shares by property
   const propertyMap = new Map<string, { prop: any; totalQuantity: number; totalPaid: number }>();
   shares?.forEach((share) => {
     const prop = share.properties as any;
@@ -32,22 +31,17 @@ export default function UserCotas() {
       existing.totalQuantity += share.quantity;
       existing.totalPaid += Number(share.amount_paid);
     } else {
-      propertyMap.set(prop.id, {
-        prop,
-        totalQuantity: share.quantity,
-        totalPaid: Number(share.amount_paid),
-      });
+      propertyMap.set(prop.id, { prop, totalQuantity: share.quantity, totalPaid: Number(share.amount_paid) });
     }
   });
   const aggregated = Array.from(propertyMap.values());
   const propertyIds = aggregated.map((a) => a.prop.id);
-
   const { data: unreadMap } = useMultiPropertyUnreadCounts(propertyIds);
 
   const sorted = [...aggregated].sort((a, b) => {
-    const aUnread = unreadMap ? (unreadMap.get(a.prop.id)?.novidades ?? 0) + (unreadMap.get(a.prop.id)?.gastos ?? 0) : 0;
-    const bUnread = unreadMap ? (unreadMap.get(b.prop.id)?.novidades ?? 0) + (unreadMap.get(b.prop.id)?.gastos ?? 0) : 0;
-    return bUnread - aUnread;
+    const aU = unreadMap ? (unreadMap.get(a.prop.id)?.novidades ?? 0) + (unreadMap.get(a.prop.id)?.gastos ?? 0) : 0;
+    const bU = unreadMap ? (unreadMap.get(b.prop.id)?.novidades ?? 0) + (unreadMap.get(b.prop.id)?.gastos ?? 0) : 0;
+    return bU - aU;
   });
 
   if (isLoading) {
@@ -61,18 +55,18 @@ export default function UserCotas() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Imóveis</h1>
-        <p className="text-sm text-muted-foreground mt-1">Projetos em que você investe</p>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Meus Terrenos</h1>
+        <p className="text-sm text-muted-foreground mt-1">Terrenos em que você investe</p>
       </div>
 
       {!sorted.length ? (
         <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
-          <Building2 className="h-9 w-9 mb-3 opacity-25" />
-          <p className="text-sm">Você ainda não possui imóveis vinculados</p>
+          <MapPin className="h-9 w-9 mb-3 opacity-25" />
+          <p className="text-sm">Você ainda não possui terrenos vinculados</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sorted.map(({ prop, totalQuantity, totalPaid }) => {
+          {sorted.map(({ prop, totalPaid }) => {
             const auctionVal = Number(prop.estimated_auction_value) || 0;
             const renovationVal = Number(prop.estimated_renovation_cost) || 0;
             const totalProject = auctionVal + renovationVal;
@@ -97,14 +91,10 @@ export default function UserCotas() {
                 )}
                 <div className="aspect-[16/10] bg-secondary/50 overflow-hidden">
                   {prop.cover_image_url ? (
-                    <img
-                      src={prop.cover_image_url}
-                      alt={prop.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    <img src={prop.cover_image_url} alt={prop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Building2 className="h-8 w-8 text-muted-foreground/20" />
+                      <MapPin className="h-8 w-8 text-muted-foreground/20" />
                     </div>
                   )}
                 </div>
@@ -119,7 +109,6 @@ export default function UserCotas() {
                     </div>
                     <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
-
                   <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
@@ -130,7 +119,6 @@ export default function UserCotas() {
                       <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
-
                   <div className="flex flex-wrap gap-1.5">
                     <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
                       {roiPct.toFixed(1)}% retorno estimado
