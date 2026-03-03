@@ -246,7 +246,15 @@ export default function UserLeiloesPage() {
 
   const linkedPropertyIds = new Set(userShares?.map((s) => s.property_id) ?? []);
   const userSharesMap = new Map<string, ShareInfo>();
-  userShares?.forEach((s) => userSharesMap.set(s.property_id, { property_id: s.property_id, amount_paid: Number(s.amount_paid) }));
+  userShares?.forEach((s) => {
+    const existing = userSharesMap.get(s.property_id);
+    const paid = Number(s.amount_paid) || 0;
+    if (existing) {
+      existing.amount_paid += paid;
+    } else {
+      userSharesMap.set(s.property_id, { property_id: s.property_id, amount_paid: paid });
+    }
+  });
   const depositsByAuction = new Map<string, DepositInfo>();
   userDeposits?.forEach((d) => depositsByAuction.set(d.auction_id, { auction_id: d.auction_id, amount: Number(d.amount), service_fee: Number(d.service_fee) }));
 
