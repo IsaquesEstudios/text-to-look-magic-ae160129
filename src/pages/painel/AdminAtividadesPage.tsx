@@ -77,16 +77,16 @@ export default function AdminAtividadesPage() {
         paymentImagesRes,
         propertyImagesRes,
       ] = await Promise.all([
-        supabase.from("shares").select("id, quantity, amount_paid, purchased_at, property_id, user_id").order("purchased_at", { ascending: false }).limit(200),
-        supabase.from("profiles").select("id, user_id, full_name, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("credit_transactions").select("id, user_id, amount, type, description, created_at, created_by").order("created_at", { ascending: false }).limit(200),
-        supabase.from("auction_deposits").select("id, auction_id, user_id, amount, service_fee, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("property_expenses").select("id, property_id, product, category, price, quantity, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("property_messages").select("id, property_id, user_id, content, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("auctions").select("id, title, created_at, status").order("created_at", { ascending: false }).limit(200),
-        supabase.from("properties").select("id, title, type, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("user_payment_images").select("id, user_id, type, description, created_at, uploaded_by").order("created_at", { ascending: false }).limit(200),
-        supabase.from("property_images").select("id, property_id, created_at").order("created_at", { ascending: false }).limit(200),
+        supabase.from("shares").select("id, quantity, amount_paid, purchased_at, property_id, user_id").order("purchased_at", { ascending: false }),
+        supabase.from("profiles").select("id, user_id, full_name, created_at").order("created_at", { ascending: false }),
+        supabase.from("credit_transactions").select("id, user_id, amount, type, description, created_at, created_by").order("created_at", { ascending: false }),
+        supabase.from("auction_deposits").select("id, auction_id, user_id, amount, service_fee, created_at").order("created_at", { ascending: false }),
+        supabase.from("property_expenses").select("id, property_id, product, category, price, quantity, created_at").order("created_at", { ascending: false }),
+        supabase.from("property_messages").select("id, property_id, user_id, content, created_at").order("created_at", { ascending: false }),
+        supabase.from("auctions").select("id, title, created_at, status").order("created_at", { ascending: false }),
+        supabase.from("properties").select("id, title, type, created_at").order("created_at", { ascending: false }),
+        supabase.from("user_payment_images").select("id, user_id, type, description, created_at, uploaded_by").order("created_at", { ascending: false }),
+        supabase.from("property_images").select("id, property_id, created_at").order("created_at", { ascending: false }),
       ]);
 
       // Build name map from profiles
@@ -308,7 +308,7 @@ export default function AdminAtividadesPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
+        <CardContent>
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">Nenhuma atividade encontrada</p>
           ) : (
