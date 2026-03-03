@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
@@ -69,16 +69,17 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
   );
 }
 
-function AuctionItemCard({ item }: { item: any }) {
+function AuctionItemCard({ item, linkedPropertyIds }: { item: any; linkedPropertyIds: Set<string> }) {
   const prop = item.properties;
   const image = prop?.cover_image_url || item.image_url;
   const title = prop?.title || item.title;
   const location = prop?.location || item.location;
   const type = prop?.type === "house" || item.type === "casa" ? "Casa" : "Terreno";
   const hasProperty = !!prop;
+  const isLinked = prop ? linkedPropertyIds.has(prop.id) : false;
 
   const content = (
-    <div className="group relative flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
+    <div className={`group relative flex flex-col rounded-2xl border ${isLinked ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border/30'} bg-card overflow-hidden hover:shadow-lg transition-all duration-300`}>
       <div className="aspect-[16/10] bg-secondary/50 overflow-hidden relative">
         {image ? (
           <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -88,6 +89,11 @@ function AuctionItemCard({ item }: { item: any }) {
           </div>
         )}
         <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">{type}</Badge>
+        {isLinked && (
+          <Badge className="absolute top-3 right-3 bg-green-600 text-white text-[10px] flex items-center gap-1">
+            <UserCheck className="h-3 w-3" /> Vinculado
+          </Badge>
+        )}
       </div>
 
       <div className="p-4 flex flex-col gap-3 flex-1">
@@ -176,7 +182,21 @@ export default function UserLeiloesPage() {
 
   const auctionIds = auctions?.map((a) => a.id) ?? [];
 
+  const { data: userShares } = useQuery({
+    queryKey: ["user-shares-for-auctions", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("shares")
+        .select("property_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
+  const linkedPropertyIds = new Set(userShares?.map((s) => s.property_id) ?? []);
 
 
   const { data: allItems } = useQuery({
@@ -257,7 +277,7 @@ export default function UserLeiloesPage() {
           {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((item) => (
-                <AuctionItemCard key={item.id} item={item} />
+                <AuctionItemCard key={item.id} item={item} linkedPropertyIds={linkedPropertyIds} />
               ))}
             </div>
           ) : (
