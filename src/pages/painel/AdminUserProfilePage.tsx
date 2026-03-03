@@ -28,7 +28,8 @@ export default function AdminUserProfilePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [creditAmount, setCreditAmount] = useState("");
+  const [creditRawAmount, setCreditRawAmount] = useState(0);
+  const [creditDisplayAmount, setCreditDisplayAmount] = useState("");
   const [savingCredits, setSavingCredits] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -104,9 +105,9 @@ export default function AdminUserProfilePage() {
   const sentImages = paymentImages?.filter((img) => img.type === "sent") ?? [];
 
   const handleAddCredits = async () => {
-    if (!userId || !creditAmount || !user) return;
-    const amount = parseFloat(creditAmount);
-    if (isNaN(amount) || amount <= 0) {
+    if (!userId || creditRawAmount === 0 || !user) return;
+    const amount = creditRawAmount / 100;
+    if (amount <= 0) {
       toast({ title: "Valor inválido", variant: "destructive" });
       return;
     }
@@ -130,8 +131,9 @@ export default function AdminUserProfilePage() {
         });
       if (txError) throw txError;
 
-      toast({ title: `$${amount.toLocaleString("en-US")} adicionados com sucesso!` });
-      setCreditAmount("");
+      toast({ title: `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} adicionados com sucesso!` });
+      setCreditRawAmount(0);
+      setCreditDisplayAmount("");
       queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
@@ -267,19 +269,31 @@ export default function AdminUserProfilePage() {
           <div className="flex gap-3 items-end">
             <div className="flex-1 space-y-2">
               <Label htmlFor="credits">Valor ($)</Label>
-              <Input
-                id="credits"
-                type="number"
-                step="0.01"
-                min="0"
-                value={creditAmount}
-                onChange={(e) => setCreditAmount(e.target.value)}
-                placeholder="0.00"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                <Input
+                  id="credits"
+                  type="text"
+                  inputMode="numeric"
+                  value={creditDisplayAmount}
+                  onChange={(e) => {
+                    const input = e.target.value.replace(/[^0-9]/g, "");
+                    const cents = parseInt(input || "0", 10);
+                    setCreditRawAmount(cents);
+                    if (cents === 0) {
+                      setCreditDisplayAmount("");
+                    } else {
+                      setCreditDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    }
+                  }}
+                  placeholder="0.00"
+                  className="pl-7"
+                />
+              </div>
             </div>
             <Button
               onClick={handleAddCredits}
-              disabled={savingCredits || !creditAmount}
+              disabled={savingCredits || creditRawAmount === 0}
               className="h-10"
             >
               {savingCredits && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
