@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, ShoppingCart, UserPlus, Clock, DollarSign, Landmark, Receipt, MessageSquare, Gavel, Building2, ImagePlus, Filter } from "lucide-react";
+import { Loader2, ShoppingCart, UserPlus, Clock, DollarSign, Landmark, Receipt, MessageSquare, Gavel, Building2, ImagePlus, Filter, Image } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +18,8 @@ type ActivityType =
   | "property_message"
   | "auction_created"
   | "property_created"
-  | "payment_image";
+  | "payment_image"
+  | "property_image";
 
 type ActivityItem = {
   id: string;
@@ -39,6 +40,7 @@ const TYPE_LABELS: Record<ActivityType, string> = {
   auction_created: "Leilão",
   property_created: "Imóvel",
   payment_image: "Comprovante",
+  property_image: "Foto",
 };
 
 const TYPE_COLORS: Record<ActivityType, string> = {
@@ -51,6 +53,7 @@ const TYPE_COLORS: Record<ActivityType, string> = {
   auction_created: "bg-red-500/10 text-red-500",
   property_created: "bg-emerald-500/10 text-emerald-500",
   payment_image: "bg-pink-500/10 text-pink-500",
+  property_image: "bg-indigo-500/10 text-indigo-500",
 };
 
 export default function AdminAtividadesPage() {
@@ -72,6 +75,7 @@ export default function AdminAtividadesPage() {
         auctionsRes,
         propertiesRes,
         paymentImagesRes,
+        propertyImagesRes,
       ] = await Promise.all([
         supabase.from("shares").select("id, quantity, amount_paid, purchased_at, property_id, user_id").order("purchased_at", { ascending: false }).limit(200),
         supabase.from("profiles").select("id, user_id, full_name, created_at").order("created_at", { ascending: false }).limit(200),
@@ -82,6 +86,7 @@ export default function AdminAtividadesPage() {
         supabase.from("auctions").select("id, title, created_at, status").order("created_at", { ascending: false }).limit(200),
         supabase.from("properties").select("id, title, type, created_at").order("created_at", { ascending: false }).limit(200),
         supabase.from("user_payment_images").select("id, user_id, type, description, created_at, uploaded_by").order("created_at", { ascending: false }).limit(200),
+        supabase.from("property_images").select("id, property_id, created_at").order("created_at", { ascending: false }).limit(200),
       ]);
 
       // Build name map from profiles
@@ -231,6 +236,18 @@ export default function AdminAtividadesPage() {
         });
       });
 
+      // Property images added
+      (propertyImagesRes.data ?? []).forEach((pi) => {
+        items.push({
+          id: `propimg-${pi.id}`,
+          type: "property_image",
+          description: `Nova foto adicionada ao imóvel "${getProp(pi.property_id)}"`,
+          timestamp: pi.created_at,
+          icon: Image,
+          category: "Foto",
+        });
+      });
+
       return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     },
   });
@@ -285,6 +302,7 @@ export default function AdminAtividadesPage() {
                   <SelectItem value="auction_created">Leilões</SelectItem>
                   <SelectItem value="property_created">Imóveis</SelectItem>
                   <SelectItem value="payment_image">Comprovantes</SelectItem>
+                  <SelectItem value="property_image">Fotos</SelectItem>
                 </SelectContent>
               </Select>
             </div>
