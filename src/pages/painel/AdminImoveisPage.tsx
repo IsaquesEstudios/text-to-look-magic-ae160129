@@ -33,7 +33,7 @@ function ImoveisKPIs() {
       return {
         arremate: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0),
         reforma: props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0),
-        gastos: (expenses ?? []).reduce((s, e) => s + Number(e.price) * Number(e.quantity), 0),
+        gastos: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0) + Number(p.estimated_renovation_cost || 0), 0),
         venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
         discovery: (deposits ?? []).reduce((s, d) => s + Number(d.service_fee), 0),
       };
