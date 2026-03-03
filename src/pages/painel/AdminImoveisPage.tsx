@@ -4,7 +4,7 @@ import { AdminPropertyForm } from "@/components/painel/admin/AdminPropertyForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Gavel, Wrench, TrendingUp, DollarSign, Loader2, Receipt } from "lucide-react";
+import { Gavel, Wrench, TrendingUp, Loader2, Receipt } from "lucide-react";
 
 function ImoveisKPIs() {
   const { data: kpis, isLoading } = useQuery({
@@ -20,22 +20,12 @@ function ImoveisKPIs() {
         .in("id", linkedIds)
         .eq("type", "house");
 
-      const { data: deposits } = await supabase
-        .from("auction_deposits")
-        .select("service_fee");
-
-      const { data: expenses } = await supabase
-        .from("property_expenses")
-        .select("price, quantity")
-        .in("property_id", linkedIds);
-
       const props = properties ?? [];
       return {
         arremate: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0),
         reforma: props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0),
         gastos: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0) + Number(p.estimated_renovation_cost || 0), 0),
         venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
-        discovery: (deposits ?? []).reduce((s, d) => s + Number(d.service_fee), 0),
       };
     },
   });
@@ -53,11 +43,10 @@ function ImoveisKPIs() {
     { label: "Total em Reformas", value: kpis?.reforma ?? 0, icon: Wrench },
     { label: "Total em Gastos", value: kpis?.gastos ?? 0, icon: Receipt },
     { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
-    { label: "Valor Discovery", value: kpis?.discovery ?? 0, icon: DollarSign },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card) => (
         <Card key={card.label} className="bg-card/50 border-border/50">
           <CardContent className="p-5">
