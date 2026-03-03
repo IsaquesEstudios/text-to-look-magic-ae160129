@@ -216,7 +216,7 @@ export default function UserLeiloesPage() {
   const auctionIds = auctions?.map((a) => a.id) ?? [];
 
   const { data: userShares } = useQuery({
-    queryKey: ["user-shares-for-auctions", user?.id],
+    queryKey: ["user-shares-with-amounts", user?.id],
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
