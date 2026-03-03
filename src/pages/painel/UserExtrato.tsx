@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ArrowDownLeft, ArrowUpRight, Receipt, CreditCard, MessageCircle, ShieldCheck, RefreshCcw, DollarSign } from "lucide-react";
+import { Loader2, ArrowDownLeft, ArrowUpRight, Receipt, CreditCard, MessageCircle, ShieldCheck, RefreshCcw, DollarSign, Info, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export default function UserExtrato() {
   const { user, profile } = useAuth();
@@ -83,6 +84,63 @@ export default function UserExtrato() {
           </Button>
         </div>
       </div>
+
+      {/* Important Notice */}
+      <Collapsible>
+        <CollapsibleTrigger className="w-full">
+          <div className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 cursor-pointer hover:bg-amber-500/10 transition-colors group">
+            <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <Info className="h-4 w-4 text-amber-500" />
+            </div>
+            <p className="text-sm font-semibold text-amber-500 flex-1 text-left">Informações importantes antes de recarregar</p>
+            <ChevronDown className="h-4 w-4 text-amber-500 group-data-[state=open]:rotate-180 transition-transform" />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="rounded-2xl border border-border/30 bg-card/40 p-5 mt-2 space-y-4 text-sm text-muted-foreground">
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Como funciona o investimento</h3>
+              <p>
+                Seus créditos são utilizados para participar de leilões de imóveis e terrenos nos Estados Unidos. 
+                Após a recarga, a equipe Discovery alocará seu capital nos leilões conforme as oportunidades disponíveis.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Valores mínimos e taxas de serviço</h3>
+              <ul className="list-disc list-inside space-y-1.5 ml-1">
+                <li>O valor mínimo para participar de um leilão é de <span className="text-foreground font-medium">$800</span>.</li>
+                <li>Para investimentos de <span className="text-foreground font-medium">$800 a $10,999</span>, a taxa de serviço Discovery é de <span className="text-foreground font-medium">$500</span>.</li>
+                <li>Para investimentos a partir de <span className="text-foreground font-medium">$11,000</span>, a taxa de serviço é de <span className="text-foreground font-medium">$5,000</span>.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Imóveis (casas)</h3>
+              <p>
+                O investimento em casas envolve arremate em leilão, reforma e revenda. 
+                O retorno estimado é calculado com base na diferença entre o valor de venda e o custo total do projeto (arremate + reforma).
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Terrenos</h3>
+              <p>
+                O investimento em terrenos segue a mesma lógica de arremate em leilão, porém sem custos de reforma. 
+                O retorno é calculado pela valorização e revenda do terreno.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">Se não comprarmos nada no leilão</h3>
+              <p>
+                Caso a Discovery não arremate nenhum item em um leilão, <span className="text-foreground font-medium">seus créditos permanecem intactos</span> na sua conta. 
+                O saldo é cumulativo e fica disponível para as próximas oportunidades — você nunca perde seu capital por não haver arremate.
+              </p>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Recharge Dialog */}
       <Dialog open={rechargeOpen} onOpenChange={(open) => { setRechargeOpen(open); if (!open) setRechargeAmount(""); }}>
