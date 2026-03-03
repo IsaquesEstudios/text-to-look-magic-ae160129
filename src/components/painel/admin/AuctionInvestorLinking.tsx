@@ -27,7 +27,8 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   const queryClient = useQueryClient();
   const [linkingPropertyId, setLinkingPropertyId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [linkAmount, setLinkAmount] = useState("");
+  const [linkRawAmount, setLinkRawAmount] = useState(0);
+  const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
 
   const propertyItems = items.filter((item) => item.property_id);
   const propertyIds = propertyItems.map((item) => item.property_id!);
@@ -128,7 +129,8 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       toast({ title: "Investidor vinculado com sucesso!" });
       setSelectedUserId("");
-      setLinkAmount("");
+      setLinkRawAmount(0);
+      setLinkDisplayAmount("");
       setLinkingPropertyId(null);
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
@@ -320,37 +322,35 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
                           Valor a vincular (máx: ${maxLinkable.toLocaleString("en-US", { minimumFractionDigits: 2 })})
                         </label>
-                        <Input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="$0.00"
-                          value={linkAmount}
-                          onChange={(e) => {
-                            const raw = e.target.value.replace(/[^0-9.]/g, "");
-                            const parts = raw.split(".");
-                            const cleaned = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
-                            if (cleaned === "" || cleaned === ".") {
-                              setLinkAmount("");
-                              return;
-                            }
-                            const num = parseFloat(cleaned);
-                            if (!isNaN(num)) {
-                              const hasDecimal = cleaned.includes(".");
-                              const decimalPart = hasDecimal ? cleaned.split(".")[1] : "";
-                              const intPart = Math.floor(num).toLocaleString("en-US");
-                              setLinkAmount(hasDecimal ? `$${intPart}.${decimalPart}` : `$${intPart}`);
-                            }
-                          }}
-                        />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="0.00"
+                            value={linkDisplayAmount}
+                            onChange={(e) => {
+                              const input = e.target.value.replace(/[^0-9]/g, "");
+                              const cents = parseInt(input || "0", 10);
+                              setLinkRawAmount(cents);
+                              if (cents === 0) {
+                                setLinkDisplayAmount("");
+                              } else {
+                                setLinkDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                              }
+                            }}
+                            className="pl-7"
+                          />
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           className="gap-2"
-                          disabled={!selectedUserId || !linkAmount || linkMutation.isPending}
+                          disabled={!selectedUserId || linkRawAmount === 0 || linkMutation.isPending}
                           onClick={() => {
-                            const amount = parseFloat(linkAmount.replace(/[^0-9.]/g, ""));
-                            if (isNaN(amount) || amount <= 0) return;
+                            const amount = linkRawAmount / 100;
+                            if (amount <= 0) return;
                             if (amount > maxLinkable) {
                               toast({ title: "Valor excede o máximo permitido", description: `Máximo: $${maxLinkable.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, variant: "destructive" });
                               return;
@@ -365,7 +365,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                           <UserPlus className="h-4 w-4" />
                           {linkMutation.isPending ? "Vinculando..." : "Vincular"}
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => { setLinkingPropertyId(null); setSelectedUserId(""); setLinkAmount(""); }}>
+                        <Button variant="ghost" size="sm" onClick={() => { setLinkingPropertyId(null); setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
                           Cancelar
                         </Button>
                       </div>
