@@ -107,11 +107,10 @@ export default function UserExtrato() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-foreground mb-1">Valores mínimos e taxas de serviço</h3>
+              <h3 className="font-semibold text-foreground mb-1">Faixas de investimento</h3>
               <ul className="list-disc list-inside space-y-1.5 ml-1">
-                <li>O valor mínimo para participar de um leilão é de <span className="text-foreground font-medium">$800</span>.</li>
-                <li>Para investimentos de <span className="text-foreground font-medium">$800 a $10,999</span>, a taxa de serviço Discovery é de <span className="text-foreground font-medium">$500</span>.</li>
-                <li>Para investimentos a partir de <span className="text-foreground font-medium">$11,000</span>, a taxa de serviço é de <span className="text-foreground font-medium">$5,000</span>.</li>
+                <li>De <span className="text-foreground font-medium">$800 a $10,999</span> — investimento exclusivo em <span className="text-foreground font-medium">terrenos</span>. Taxa de serviço Discovery: <span className="text-foreground font-medium">$500</span>.</li>
+                <li>A partir de <span className="text-foreground font-medium">$11,000</span> — investimento em <span className="text-foreground font-medium">imóveis (casas)</span>. Taxa de serviço Discovery: <span className="text-foreground font-medium">$5,000</span>.</li>
               </ul>
             </div>
 
