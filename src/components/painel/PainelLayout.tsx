@@ -23,6 +23,7 @@ const userNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
   { label: "Meus Imóveis", icon: Building2, path: "/painel/meus-imoveis" },
+  { label: "Meus Terrenos", icon: MapPin, path: "/painel/meus-terrenos" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
   { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
   { label: "Minhas Informações", icon: UserCircle, path: "/painel/perfil" },
@@ -101,7 +102,7 @@ export function PainelLayout() {
             {navItems.map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
-                : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-imoveis" && location.pathname.startsWith("/painel/imovel/"));
+                : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-imoveis" && location.pathname.startsWith("/painel/imovel/")) || (item.path === "/painel/meus-terrenos" && location.pathname.startsWith("/painel/imovel/"));
               const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
