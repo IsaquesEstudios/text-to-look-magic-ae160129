@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, UserCheck } from "lucide-react";
+import { Clock, Gavel, MapPin, Home, TreePine, CalendarDays, ArrowUpRight, UserCheck, DollarSign, Percent } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect } from "react";
@@ -69,7 +69,18 @@ function CountdownBlock({ targetDate, status }: { targetDate: string; status: st
   );
 }
 
-function AuctionItemCard({ item, linkedPropertyIds }: { item: any; linkedPropertyIds: Set<string> }) {
+interface ShareInfo {
+  property_id: string;
+  amount_paid: number;
+}
+
+interface DepositInfo {
+  auction_id: string;
+  amount: number;
+  service_fee: number;
+}
+
+function AuctionItemCard({ item, userSharesMap, linkedPropertyIds }: { item: any; userSharesMap: Map<string, ShareInfo>; linkedPropertyIds: Set<string> }) {
   const prop = item.properties;
   const image = prop?.cover_image_url || item.image_url;
   const title = prop?.title || item.title;
@@ -77,6 +88,7 @@ function AuctionItemCard({ item, linkedPropertyIds }: { item: any; linkedPropert
   const type = prop?.type === "house" || item.type === "casa" ? "Casa" : "Terreno";
   const hasProperty = !!prop;
   const isLinked = prop ? linkedPropertyIds.has(prop.id) : false;
+  const shareInfo = prop ? userSharesMap.get(prop.id) : undefined;
 
   const content = (
     <div className={`group relative flex flex-col rounded-2xl border ${isLinked ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border/30'} bg-card overflow-hidden hover:shadow-lg transition-all duration-300`}>
@@ -118,6 +130,8 @@ function AuctionItemCard({ item, linkedPropertyIds }: { item: any; linkedPropert
               const totalProject = auctionVal + renovationVal;
               const saleVal = Number(prop.estimated_sale_value) || 0;
               const ret = totalProject > 0 ? ((saleVal - totalProject) / totalProject) * 100 : 0;
+              const investedAmount = shareInfo?.amount_paid ?? 0;
+              const participationPct = totalProject > 0 ? (investedAmount / totalProject) * 100 : 0;
               return (
                 <>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -138,6 +152,25 @@ function AuctionItemCard({ item, linkedPropertyIds }: { item: any; linkedPropert
                       <p className="font-semibold text-foreground">${saleVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
                     </div>
                   </div>
+
+                  {isLinked && shareInfo && (
+                    <>
+                      <div className="border-t border-border/30 pt-3 mt-1">
+                        <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-medium mb-2">Sua Participação</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Investido</p>
+                            <p className="font-semibold text-primary">${investedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Participação</p>
+                            <p className="font-semibold text-primary">{participationPct.toFixed(1)}%</p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   <Badge variant="outline" className="w-fit text-[10px] border-primary/30 text-primary">
                     {ret.toFixed(1)}% retorno estimado
                   </Badge>
@@ -188,7 +221,7 @@ export default function UserLeiloesPage() {
       if (!user) return [];
       const { data, error } = await supabase
         .from("shares")
-        .select("property_id")
+        .select("property_id, amount_paid")
         .eq("user_id", user.id);
       if (error) throw error;
       return data;
@@ -196,7 +229,26 @@ export default function UserLeiloesPage() {
     enabled: !!user,
   });
 
+  const { data: userDeposits } = useQuery({
+    queryKey: ["user-deposits-for-auctions", user?.id, auctionIds],
+    queryFn: async () => {
+      if (!user || auctionIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("auction_deposits")
+        .select("auction_id, amount, service_fee")
+        .eq("user_id", user.id)
+        .in("auction_id", auctionIds);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && auctionIds.length > 0,
+  });
+
   const linkedPropertyIds = new Set(userShares?.map((s) => s.property_id) ?? []);
+  const userSharesMap = new Map<string, ShareInfo>();
+  userShares?.forEach((s) => userSharesMap.set(s.property_id, { property_id: s.property_id, amount_paid: Number(s.amount_paid) }));
+  const depositsByAuction = new Map<string, DepositInfo>();
+  userDeposits?.forEach((d) => depositsByAuction.set(d.auction_id, { auction_id: d.auction_id, amount: Number(d.amount), service_fee: Number(d.service_fee) }));
 
 
   const { data: allItems } = useQuery({
@@ -274,10 +326,20 @@ export default function UserLeiloesPage() {
             <p className="text-sm text-muted-foreground">{auction.description}</p>
           )}
 
+          {depositsByAuction.has(auction.id) && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 border border-border/30">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Taxa de serviço paga neste leilão:</span>
+              <span className="text-xs font-semibold text-foreground">
+                ${depositsByAuction.get(auction.id)!.service_fee.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+          )}
+
           {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((item) => (
-                <AuctionItemCard key={item.id} item={item} linkedPropertyIds={linkedPropertyIds} />
+                <AuctionItemCard key={item.id} item={item} userSharesMap={userSharesMap} linkedPropertyIds={linkedPropertyIds} />
               ))}
             </div>
           ) : (
