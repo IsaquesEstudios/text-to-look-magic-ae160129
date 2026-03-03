@@ -197,7 +197,7 @@ export function UserDashboard() {
             <Wallet className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Créditos</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Crédito Disponível</p>
             <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
