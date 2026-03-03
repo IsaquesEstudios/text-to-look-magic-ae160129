@@ -4,7 +4,7 @@ import { AdminPropertyForm } from "@/components/painel/admin/AdminPropertyForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Gavel, Wrench, TrendingUp, Loader2, Receipt } from "lucide-react";
+import { Gavel, TrendingUp, Loader2 } from "lucide-react";
 
 function TerrenosKPIs() {
   const { data: kpis, isLoading } = useQuery({
@@ -12,19 +12,17 @@ function TerrenosKPIs() {
     queryFn: async () => {
       const { data: shareRows } = await supabase.from("shares").select("property_id");
       const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
-      if (linkedIds.length === 0) return { arremate: 0, reforma: 0, gastos: 0, venda: 0 };
+      if (linkedIds.length === 0) return { arremate: 0, venda: 0 };
 
       const { data: properties } = await supabase
         .from("properties")
-        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
+        .select("estimated_auction_value, estimated_sale_value")
         .in("id", linkedIds)
         .eq("type", "land");
 
       const props = properties ?? [];
       return {
         arremate: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0),
-        reforma: props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0),
-        gastos: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0) + Number(p.estimated_renovation_cost || 0), 0),
         venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
       };
     },
@@ -40,13 +38,11 @@ function TerrenosKPIs() {
 
   const cards = [
     { label: "Total em Arremate", value: kpis?.arremate ?? 0, icon: Gavel },
-    { label: "Total em Reformas", value: kpis?.reforma ?? 0, icon: Wrench },
-    { label: "Total em Gastos", value: kpis?.gastos ?? 0, icon: Receipt },
     { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {cards.map((card) => (
         <Card key={card.label} className="bg-card/50 border-border/50">
           <CardContent className="p-5">
