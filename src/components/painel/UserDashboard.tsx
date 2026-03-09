@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard, History, MessageSquare, Gavel } from "lucide-react";
+import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard, History, MessageSquare, Gavel, Percent } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
