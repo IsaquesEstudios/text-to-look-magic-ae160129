@@ -160,6 +160,9 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       queryClient.invalidateQueries({ queryKey: ["property-investors"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
       toast({ title: "Vínculo removido" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),

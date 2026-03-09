@@ -153,6 +153,10 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["property-detail", property.id] });
       queryClient.invalidateQueries({ queryKey: ["property-images", property.id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
+      queryClient.invalidateQueries({ queryKey: ["auction-items"] });
       toast({ title: "Imóvel atualizado com sucesso!" });
       onDone();
     },
