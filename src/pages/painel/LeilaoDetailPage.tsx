@@ -106,6 +106,7 @@ export default function LeilaoDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction", id] });
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Leilão atualizado!" });
       setEditing(false);
     },
