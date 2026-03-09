@@ -11,26 +11,24 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
     queryKey: ["admin-properties-kpis", filterType],
     queryFn: async () => {
-      const { data: shareRows } = await supabase.from("shares").select("property_id, amount_paid");
+      const { data: shareRows } = await supabase.from("shares").select("property_id");
       const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
       if (linkedIds.length === 0) return { arremate: 0, reforma: 0, investido: 0, venda: 0 };
 
       const { data: properties } = await supabase
         .from("properties")
-        .select("id, estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
+        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
         .in("id", linkedIds)
         .eq("type", filterType);
 
       const props = properties ?? [];
-      const propIds = new Set(props.map((p) => p.id));
-      const investido = (shareRows ?? [])
-        .filter((s) => propIds.has(s.property_id))
-        .reduce((s, r) => s + Number(r.amount_paid || 0), 0);
+      const arremate = props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0);
+      const reforma = props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0);
 
       return {
-        arremate: props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0),
-        reforma: props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0),
-        investido,
+        arremate,
+        reforma,
+        investido: arremate + reforma,
         venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
       };
     },
