@@ -220,8 +220,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
             ? linkedShares.reduce((sum, s) => sum + (Number(s.amount_paid) / totalProject) * serviceFee, 0)
             : 0;
 
-          const linkedUserIds = new Set(linkedShares.map((s) => s.user_id));
-          const availableInvestors = investors.filter((inv) => !linkedUserIds.has(inv.user_id) && inv.credits > 0);
+          const availableInvestors = investors.filter((inv) => inv.credits > 0);
 
           const selectedInvestor = investors.find((inv) => inv.user_id === selectedUserId);
           const userMaxCredits = selectedInvestor?.credits ?? 0;
