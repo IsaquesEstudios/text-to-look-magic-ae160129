@@ -70,7 +70,7 @@ export default function Auth() {
       if (error) throw error;
       navigate("/painel");
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
