@@ -662,6 +662,7 @@ export type Database = {
         Returns: undefined
       }
       auto_finish_expired_auctions: { Args: never; Returns: undefined }
+      check_name_available: { Args: { p_name: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

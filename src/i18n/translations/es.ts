@@ -389,5 +389,7 @@ export const es = {
     accountCreated: "¡Cuenta creada!",
     checkEmail: "Revisa tu correo para confirmar el registro.",
     error: "Error",
+    nameTaken: "Este nombre ya está en uso.",
+    emailTaken: "Este correo ya está registrado.",
   },
 };

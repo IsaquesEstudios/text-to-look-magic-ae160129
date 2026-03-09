@@ -54,11 +54,24 @@ export default function Auth() {
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
 
-  const handleStep1 = (e: React.FormEvent) => {
+  const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
       handleLogin();
     } else {
+      // Check for duplicate name
+      setLoading(true);
+      try {
+        const { data: isAvailable } = await supabase.rpc("check_name_available", { p_name: fullName.trim() });
+        if (isAvailable === false) {
+          toast({ title: a.error, description: a.nameTaken, variant: "destructive" });
+          return;
+        }
+      } catch {
+        // If check fails, proceed anyway
+      } finally {
+        setLoading(false);
+      }
       setStep(2);
     }
   };
