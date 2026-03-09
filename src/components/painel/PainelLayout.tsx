@@ -274,7 +274,7 @@ export function PainelLayout() {
         </div>
 
         {/* ── Main content ── */}
-        <main className="flex-1 px-6 py-8 max-w-6xl mx-auto w-full pb-20 md:pb-8">
+        <main className="flex-1 px-6 py-8 w-full pb-20 md:pb-8">
           <Outlet />
         </main>
       </div>
