@@ -138,6 +138,7 @@ export default function AdminImoveisPage() {
           >
             <MapPin className="h-4 w-4" />
             Terrenos
+            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.land})</span>}
           </TabsTrigger>
         </TabsList>
 
