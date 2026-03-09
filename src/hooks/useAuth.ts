@@ -39,7 +39,7 @@ export function useAuthInternal(): AuthState {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState<{ full_name: string | null; credits: number } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string | null; credits: number; preferred_language: string } | null>(null);
 
   useEffect(() => {
     if (!isBrowser) {
