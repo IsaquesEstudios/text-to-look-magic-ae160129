@@ -106,6 +106,7 @@ export default function Auth() {
           address_city: addressCity.trim() || null,
           address_state: addressState.trim() || null,
           postal_code: postalCode.trim() || null,
+          preferred_language: preferredLanguage,
         } as any).eq("user_id", data.user.id);
       }
 
