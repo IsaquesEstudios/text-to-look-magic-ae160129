@@ -249,8 +249,8 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="s2-whatsapp">{a.whatsapp}</Label>
                     <div className="flex gap-2">
-                      <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={setWhatsappPrefix} />
-                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={20} minLength={4} />
+                      <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={(v) => { setWhatsappPrefix(v); setWhatsapp(""); }} />
+                      <MaskedPhoneInput id="s2-whatsapp" prefix={whatsappPrefix} value={whatsapp} onChange={setWhatsapp} required />
                     </div>
                   </div>
                 )}
