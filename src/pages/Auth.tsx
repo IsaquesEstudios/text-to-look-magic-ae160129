@@ -275,8 +275,8 @@ export default function Auth() {
                     <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={a.postalCodePlaceholder} maxLength={15} minLength={3} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Cidade / City</Label>
-                    <Input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} placeholder="City" maxLength={100} />
+                    <Label>{a.city}</Label>
+                    <Input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} placeholder={a.cityPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
                     <Label>{labels.state}</Label>
