@@ -164,8 +164,8 @@ export default function Auth() {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required maxLength={255} />
+                  <Label htmlFor="email">{a.email}</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required maxLength={255} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Senha</Label>
