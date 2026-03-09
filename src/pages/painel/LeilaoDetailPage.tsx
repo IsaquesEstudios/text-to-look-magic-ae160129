@@ -106,6 +106,7 @@ export default function LeilaoDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction", id] });
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Leilão atualizado!" });
       setEditing(false);
     },
@@ -129,6 +130,7 @@ export default function LeilaoDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       toast({ title: "Imóvel removido do leilão" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),

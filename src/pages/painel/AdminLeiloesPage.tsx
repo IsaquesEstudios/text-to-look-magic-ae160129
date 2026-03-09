@@ -204,6 +204,7 @@ export default function AdminLeiloesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Leilão removido" });
     },
   });
@@ -215,6 +216,7 @@ export default function AdminLeiloesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Status atualizado" });
     },
   });
@@ -227,6 +229,7 @@ export default function AdminLeiloesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Visibilidade atualizada" });
     },
   });

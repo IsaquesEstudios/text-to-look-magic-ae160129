@@ -135,6 +135,8 @@ export default function AdminUserProfilePage() {
       setCreditRawAmount(0);
       setCreditDisplayAmount("");
       queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
