@@ -91,8 +91,7 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 // Panel child routes — rendered inside PainelLayout's <Outlet />
 const panelChildren: RouteRecord[] = [
   { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
-  { path: "meus-imoveis", element: <SuspenseWrapper><UserImoveis /></SuspenseWrapper> },
-  { path: "meus-terrenos", element: <SuspenseWrapper><UserTerrenosPage /></SuspenseWrapper> },
+  { path: "meus-projetos", element: <SuspenseWrapper><UserPropriedadesPage /></SuspenseWrapper> },
   { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
