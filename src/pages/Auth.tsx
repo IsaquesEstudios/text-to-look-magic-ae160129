@@ -132,25 +132,22 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : "Suas Informações"}
+              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : step === 2 ? "Idioma / Language" : "Suas Informações"}
             </CardTitle>
             <CardDescription>
               {isLogin
                 ? "Acesse sua conta na plataforma"
                 : step === 1
                   ? "Cadastre-se para começar a investir"
-                  : "Complete seu perfil para continuar"}
+                  : step === 2
+                    ? "Escolha seu idioma preferido"
+                    : "Complete seu perfil para continuar"}
             </CardDescription>
-            {!isLogin && step === 2 && (
+            {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-              </div>
-            )}
-            {!isLogin && step === 1 && (
-              <div className="flex justify-center gap-2 pt-2">
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-                <div className="h-1.5 w-8 rounded-full bg-muted" />
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
+                ))}
               </div>
             )}
           </CardHeader>
