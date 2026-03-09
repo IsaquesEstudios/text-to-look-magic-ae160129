@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
-import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
+import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { languages, Language, translations } from "@/i18n";
 
 const countries = [
@@ -234,8 +234,8 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="s2-phone">{a.phone}</Label>
                   <div className="flex gap-2">
-                    <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={setPhonePrefix} />
-                    <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={20} minLength={4} />
+                    <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={(v) => { setPhonePrefix(v); setPhone(""); }} />
+                    <MaskedPhoneInput id="s2-phone" prefix={phonePrefix} value={phone} onChange={setPhone} required />
                   </div>
                 </div>
 
@@ -249,8 +249,8 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="s2-whatsapp">{a.whatsapp}</Label>
                     <div className="flex gap-2">
-                      <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={setWhatsappPrefix} />
-                      <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={20} minLength={4} />
+                      <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={(v) => { setWhatsappPrefix(v); setWhatsapp(""); }} />
+                      <MaskedPhoneInput id="s2-whatsapp" prefix={whatsappPrefix} value={whatsapp} onChange={setWhatsapp} required />
                     </div>
                   </div>
                 )}
