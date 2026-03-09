@@ -253,7 +253,7 @@ export default function Auth() {
                     <Input value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} placeholder={a.streetPlaceholder} maxLength={200} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Nº</Label>
+                    <Label>{a.number}</Label>
                     <Input value={addressNumber} onChange={(e) => setAddressNumber(e.target.value)} placeholder="Nº" maxLength={20} />
                   </div>
                 </div>
