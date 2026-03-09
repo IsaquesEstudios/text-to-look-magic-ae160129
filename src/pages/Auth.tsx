@@ -134,16 +134,16 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : step === 2 ? "Idioma / Language" : "Suas Informações"}
+              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
               {isLogin
-                ? "Acesse sua conta na plataforma"
+                ? a.accessAccount
                 : step === 1
-                  ? "Cadastre-se para começar a investir"
+                  ? a.signupDescription
                   : step === 2
-                    ? "Escolha seu idioma preferido"
-                    : "Complete seu perfil para continuar"}
+                    ? a.chooseLanguageDescription
+                    : a.completeProfile}
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
