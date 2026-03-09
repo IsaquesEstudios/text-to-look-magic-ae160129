@@ -147,14 +147,15 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   });
 
   const unlinkMutation = useMutation({
-    mutationFn: async (shareId: string) => {
-      const { error } = await supabase.from("shares").delete().eq("id", shareId);
+    mutationFn: async (shareIds: string[]) => {
+      const { error } = await supabase.from("shares").delete().in("id", shareIds);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property-investors"] });
       toast({ title: "Vínculo removido" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
