@@ -159,8 +159,8 @@ export default function Auth() {
               <form onSubmit={handleStep1} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Nome Completo</Label>
-                    <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome completo" required={!isLogin} maxLength={100} />
+                    <Label htmlFor="fullName">{a.fullName}</Label>
+                    <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={a.fullNamePlaceholder} required={!isLogin} maxLength={100} />
                   </div>
                 )}
                 <div className="space-y-2">
