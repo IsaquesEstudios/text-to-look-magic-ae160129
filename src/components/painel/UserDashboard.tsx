@@ -167,7 +167,8 @@ export function UserDashboard() {
       const participation = totalProject > 0 ? totalPaid / totalProject : 0;
       estimated += totalPaid + (participation * (saleVal - totalProject));
     });
-    return { totalInvested: invested, totalEstimatedReturn: estimated };
+    const portfolioRoi = invested > 0 ? ((estimated - invested) / invested) * 100 : 0;
+    return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
   })();
 
   if (isLoading) {
