@@ -229,7 +229,7 @@ export default function Auth() {
                 <div className="flex items-center gap-3">
                   <Switch id="s2-diff-whatsapp" checked={differentWhatsapp} onCheckedChange={setDifferentWhatsapp} />
                   <Label htmlFor="s2-diff-whatsapp" className="cursor-pointer text-sm text-muted-foreground">
-                    Meu WhatsApp é diferente do telefone
+                    {a.whatsappDifferent}
                   </Label>
                 </div>
                 {differentWhatsapp && (
