@@ -49,7 +49,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       ? [
           { label: "Total em Arremate", value: kpis?.arremate ?? 0, icon: Gavel },
           { label: "Total em Reformas", value: kpis?.reforma ?? 0, icon: Wrench },
-          { label: "Total em Gastos", value: kpis?.gastos ?? 0, icon: Receipt },
+          { label: "Total Investido", value: kpis?.investido ?? 0, icon: Receipt },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
         ]
       : [
