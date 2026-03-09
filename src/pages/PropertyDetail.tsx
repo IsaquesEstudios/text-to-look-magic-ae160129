@@ -147,11 +147,11 @@ export default function PropertyDetail() {
               </div>
             ))}
         </div>
+        </div>
 
         {isAdmin && (
           <PropertyInvestors propertyId={property.id} totalProject={purchasePrice} />
         )}
-        </div>
 
         <div
           className="relative w-full rounded-2xl overflow-hidden bg-secondary/30 cursor-pointer group"
