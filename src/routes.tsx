@@ -22,7 +22,7 @@ const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
 const PropertyGastosPage = lazy(() => import("./pages/painel/PropertyGastosPage"));
-const UserImoveis = lazy(() => import("./pages/painel/UserImoveis"));
+const UserPropriedadesPage = lazy(() => import("./pages/painel/UserPropriedadesPage"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));

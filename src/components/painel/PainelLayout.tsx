@@ -21,11 +21,10 @@ const adminNavItems = [
 const userNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
-  { label: "Meus Imóveis", icon: Building2, path: "/painel/meus-imoveis" },
-  { label: "Meus Terrenos", icon: MapPin, path: "/painel/meus-terrenos" },
+  { label: "Meus Projetos", icon: Building2, path: "/painel/meus-projetos" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
   { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
-  { label: "Minhas Informações", icon: UserCircle, path: "/painformacoeserfil" },
+  { label: "Minhas Informações", icon: UserCircle, path: "/painel/informacoes" },
 ];
 
 /**
