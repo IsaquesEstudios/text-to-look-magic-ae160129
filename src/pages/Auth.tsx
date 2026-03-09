@@ -301,7 +301,7 @@ export default function Auth() {
                 onClick={() => { setIsLogin(!isLogin); setStep(1); }}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
+                {isLogin ? a.noAccount : a.hasAccount}
               </button>
             </div>
           </CardContent>
