@@ -52,7 +52,7 @@ export function useAuthInternal(): AuthState {
       try {
         const [rolesResult, profileResult] = await Promise.all([
           supabase.from("user_roles").select("role").eq("user_id", userId),
-          supabase.from("profiles").select("full_name, credits").eq("user_id", userId).maybeSingle(),
+          supabase.from("profiles").select("full_name, credits, preferred_language").eq("user_id", userId).maybeSingle(),
         ]);
 
         if (!isMounted) return;
