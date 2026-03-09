@@ -137,6 +137,10 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property-investors"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
+      queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
       toast({ title: "Investidor vinculado com sucesso!" });
       setSelectedUserId("");
       setLinkRawAmount(0);
