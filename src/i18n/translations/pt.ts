@@ -389,5 +389,7 @@ export const pt = {
     accountCreated: "Conta criada!",
     checkEmail: "Verifique seu email para confirmar o cadastro.",
     error: "Erro",
+    nameTaken: "Este nome já está em uso.",
+    emailTaken: "Este email já está cadastrado.",
   },
 };
