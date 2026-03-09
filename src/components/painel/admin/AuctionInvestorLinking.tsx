@@ -298,51 +298,73 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
               )}
 
               {/* Linked investors */}
-              {linkedShares.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground">Investidores vinculados:</p>
-                  {linkedShares.map((share) => {
-                    const pct = totalProject > 0 ? ((Number(share.amount_paid) / totalProject) * 100).toFixed(1) : "0";
-                    const estReturn = propDetail?.estimated_return_pct
-                      ? Number(share.amount_paid) * (propDetail.estimated_return_pct / 100)
-                      : 0;
-                    const shareFee = totalProject > 0
-                      ? Math.round((Number(share.amount_paid) / totalProject) * serviceFee * 100) / 100
-                      : 0;
+              {linkedShares.length > 0 && (() => {
+                // Group shares by user
+                const grouped = new Map<string, { userId: string; totalPaid: number; shareIds: string[] }>();
+                for (const share of linkedShares) {
+                  const existing = grouped.get(share.user_id);
+                  if (existing) {
+                    existing.totalPaid += Number(share.amount_paid);
+                    existing.shareIds.push(share.id);
+                  } else {
+                    grouped.set(share.user_id, {
+                      userId: share.user_id,
+                      totalPaid: Number(share.amount_paid),
+                      shareIds: [share.id],
+                    });
+                  }
+                }
 
-                    return (
-                      <div key={share.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
-                        <div>
-                          <span className="font-medium">{profileMap.get(share.user_id) || "Usuário"}</span>
-                          <span className="text-muted-foreground ml-2">({pct}%)</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <p className="font-semibold">${formatUSD(Number(share.amount_paid))}</p>
-                            <p className="text-[10px] text-amber-500">
-                              Taxa: ${formatUSD(shareFee)}
-                            </p>
-                            {estReturn > 0 && (
-                              <p className="text-[10px] text-discovery-green">
-                                Lucro est.: ${formatUSD(estReturn)}
-                              </p>
-                            )}
+                return (
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">Investidores vinculados:</p>
+                    {[...grouped.values()].map((g) => {
+                      const pct = totalProject > 0 ? ((g.totalPaid / totalProject) * 100).toFixed(1) : "0";
+                      const estReturn = propDetail?.estimated_return_pct
+                        ? g.totalPaid * (propDetail.estimated_return_pct / 100)
+                        : 0;
+                      const shareFee = totalProject > 0
+                        ? Math.round((g.totalPaid / totalProject) * serviceFee * 100) / 100
+                        : 0;
+
+                      return (
+                        <div key={g.userId} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
+                          <div>
+                            <span className="font-medium">{profileMap.get(g.userId) || "Usuário"}</span>
+                            <span className="text-muted-foreground ml-2">({pct}%)</span>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-destructive"
-                            onClick={() => unlinkMutation.mutate(share.id)}
-                            disabled={unlinkMutation.isPending}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p className="font-semibold">${formatUSD(g.totalPaid)}</p>
+                              <p className="text-[10px] text-amber-500">
+                                Taxa: ${formatUSD(shareFee)}
+                              </p>
+                              {estReturn > 0 && (
+                                <p className="text-[10px] text-discovery-green">
+                                  Lucro est.: ${formatUSD(estReturn)}
+                                </p>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive"
+                              onClick={() => {
+                                for (const sid of g.shareIds) {
+                                  unlinkMutation.mutate(sid);
+                                }
+                              }}
+                              disabled={unlinkMutation.isPending}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                );
+              })()}
 
               {/* Link form */}
               {!isFullyCovered && (
