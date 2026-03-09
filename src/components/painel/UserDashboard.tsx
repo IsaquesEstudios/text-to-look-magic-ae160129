@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard, History, MessageSquare, Gavel } from "lucide-react";
+import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard, History, MessageSquare, Gavel, Percent } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
@@ -143,8 +143,8 @@ export function UserDashboard() {
   const totalProperties = new Set(shares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
   // Portfolio aggregation
-  const { totalInvested, totalEstimatedReturn } = (() => {
-    if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0 };
+  const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
+    if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
     const propMap = new Map<string, { totalPaid: number; prop: any }>();
     shares.forEach((s) => {
       const prop = s.properties as any;
@@ -167,7 +167,8 @@ export function UserDashboard() {
       const participation = totalProject > 0 ? totalPaid / totalProject : 0;
       estimated += totalPaid + (participation * (saleVal - totalProject));
     });
-    return { totalInvested: invested, totalEstimatedReturn: estimated };
+    const portfolioRoi = invested > 0 ? ((estimated - invested) / invested) * 100 : 0;
+    return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
   })();
 
   if (isLoading) {
@@ -191,7 +192,7 @@ export function UserDashboard() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <Wallet className="h-5 w-5 text-primary" />
@@ -230,6 +231,18 @@ export function UserDashboard() {
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno Estimado</p>
             <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
               ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Percent className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">ROI Estimado</p>
+            <p className={`text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>
+              {portfolioRoi.toFixed(1)}%
             </p>
           </div>
         </div>
