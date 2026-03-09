@@ -219,7 +219,7 @@ export default function Auth() {
             {!isLogin && step === 3 && (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="s2-phone">Telefone / Phone</Label>
+                  <Label htmlFor="s2-phone">{a.phone}</Label>
                   <div className="flex gap-2">
                     <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={setPhonePrefix} />
                     <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={20} minLength={4} />
