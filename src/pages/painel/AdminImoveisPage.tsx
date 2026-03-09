@@ -130,7 +130,12 @@ export default function AdminImoveisPage() {
           >
             <Building2 className="h-4 w-4" />
             Imóveis
-            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.house})</span>}
+            {counts && (
+              <>
+                <span className="w-px h-3.5 bg-border/60 mx-1" />
+                <span className="text-xs text-muted-foreground">{counts.house}</span>
+              </>
+            )}
           </TabsTrigger>
           <TabsTrigger
             value="land"
@@ -138,7 +143,12 @@ export default function AdminImoveisPage() {
           >
             <MapPin className="h-4 w-4" />
             Terrenos
-            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.land})</span>}
+            {counts && (
+              <>
+                <span className="w-px h-3.5 bg-border/60 mx-1" />
+                <span className="text-xs text-muted-foreground">{counts.land}</span>
+              </>
+            )}
           </TabsTrigger>
         </TabsList>
 
