@@ -648,6 +648,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_link_investor_to_property: {
+        Args: {
+          p_amount: number
+          p_property_id: string
+          p_property_title: string
+          p_property_type: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       auto_finish_expired_auctions: { Args: never; Returns: undefined }
       has_role: {
         Args: {
