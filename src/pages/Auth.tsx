@@ -181,8 +181,40 @@ export default function Auth() {
               </form>
             )}
 
-            {/* Step 2: profile info */}
+            {/* Step 2: language selection */}
             {!isLogin && step === 2 && (
+              <div className="space-y-4">
+                <div className="grid gap-3">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setPreferredLanguage(lang.code)}
+                      className={`flex items-center gap-3 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                        preferredLanguage === lang.code
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-xl">{lang.flag}</span>
+                      <span className="flex-1">{lang.name}</span>
+                      {preferredLanguage === lang.code && <Check className="h-4 w-4 text-primary" />}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={() => setStep(1)} className="gap-2">
+                    <ArrowLeft className="h-4 w-4" /> Voltar
+                  </Button>
+                  <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(3)}>
+                    Próximo
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: profile info */}
+            {!isLogin && step === 3 && (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="s2-phone">Telefone / Phone</Label>
