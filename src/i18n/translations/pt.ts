@@ -353,7 +353,7 @@ export const pt = {
   auth: {
     login: "Entrar",
     createAccount: "Criar Conta",
-    chooseLanguage: "Idioma / Language",
+    chooseLanguage: "Idioma",
     yourInfo: "Suas Informações",
     accessAccount: "Acesse sua conta na plataforma",
     signupDescription: "Cadastre-se para começar a investir",

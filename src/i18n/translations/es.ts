@@ -353,7 +353,7 @@ export const es = {
   auth: {
     login: "Iniciar Sesión",
     createAccount: "Crear Cuenta",
-    chooseLanguage: "Idioma / Language",
+    chooseLanguage: "Idioma",
     yourInfo: "Tu Información",
     accessAccount: "Accede a tu cuenta en la plataforma",
     signupDescription: "Regístrate para empezar a invertir",
