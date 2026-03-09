@@ -83,7 +83,7 @@ export default function Auth() {
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { full_name: fullName, preferred_language: preferredLanguage },
           emailRedirectTo: window.location.origin,
         },
       });
