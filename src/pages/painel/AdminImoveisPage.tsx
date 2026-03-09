@@ -81,6 +81,26 @@ export default function AdminImoveisPage() {
   const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("house");
 
+  const { data: counts } = useQuery({
+    queryKey: ["admin-portfolio-counts"],
+    queryFn: async () => {
+      const { data: shareRows } = await supabase.from("shares").select("property_id");
+      const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
+      if (linkedIds.length === 0) return { house: 0, land: 0 };
+
+      const { data: props } = await supabase
+        .from("properties")
+        .select("type")
+        .in("id", linkedIds);
+
+      const list = props ?? [];
+      return {
+        house: list.filter((p) => p.type === "house").length,
+        land: list.filter((p) => p.type === "land").length,
+      };
+    },
+  });
+
   const handleEdit = (id: string) => {
     setEditingPropertyId(id);
     setShowForm(true);
@@ -110,6 +130,7 @@ export default function AdminImoveisPage() {
           >
             <Building2 className="h-4 w-4" />
             Imóveis
+            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.house})</span>}
           </TabsTrigger>
           <TabsTrigger
             value="land"
@@ -117,6 +138,7 @@ export default function AdminImoveisPage() {
           >
             <MapPin className="h-4 w-4" />
             Terrenos
+            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.land})</span>}
           </TabsTrigger>
         </TabsList>
 
