@@ -209,7 +209,7 @@ export default function Auth() {
                     <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
                   <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(3)}>
-                    Próximo
+                    {a.next}
                   </Button>
                 </div>
               </div>
