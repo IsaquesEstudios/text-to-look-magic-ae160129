@@ -279,8 +279,8 @@ export default function Auth() {
                     <Input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} placeholder={a.cityPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
-                    <Label>{labels.state}</Label>
-                    <Input value={addressState} onChange={(e) => setAddressState(e.target.value)} placeholder={labels.statePlaceholder} maxLength={50} />
+                    <Label>{a.state}</Label>
+                    <Input value={addressState} onChange={(e) => setAddressState(e.target.value)} placeholder={a.statePlaceholder} maxLength={50} />
                   </div>
                 </div>
 
