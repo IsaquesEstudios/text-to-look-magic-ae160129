@@ -97,7 +97,7 @@ const panelChildren: RouteRecord[] = [
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
   { path: "imovel/:id/gastos", element: <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper> },
-  { path: "propriedadeedades", element: <SuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></SuspenseWrapper> },
+  { path: "propriedades", element: <SuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></SuspenseWrapper> },
   
   { path: "usuarios", element: <SuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></SuspenseWrapper> },
   { path: "usuarios/:userId", element: <SuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></SuspenseWrapper> },
