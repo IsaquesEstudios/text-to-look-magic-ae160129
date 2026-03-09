@@ -264,8 +264,8 @@ export default function Auth() {
                     <Input value={addressComplement} onChange={(e) => setAddressComplement(e.target.value)} placeholder={a.complementPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Bairro / Neighborhood</Label>
-                    <Input value={addressNeighborhood} onChange={(e) => setAddressNeighborhood(e.target.value)} placeholder="Neighborhood" maxLength={100} />
+                    <Label>{a.neighborhood}</Label>
+                    <Input value={addressNeighborhood} onChange={(e) => setAddressNeighborhood(e.target.value)} placeholder={a.neighborhoodPlaceholder} maxLength={100} />
                   </div>
                 </div>
 
