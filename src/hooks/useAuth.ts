@@ -62,7 +62,7 @@ export function useAuthInternal(): AuthState {
         setIsAdmin(userRoles.includes("admin"));
         setProfile(
           profileResult.data
-            ? { full_name: profileResult.data.full_name, credits: Number(profileResult.data.credits) }
+            ? { full_name: profileResult.data.full_name, credits: Number(profileResult.data.credits), preferred_language: (profileResult.data as any).preferred_language ?? 'pt' }
             : null
         );
       } catch {
