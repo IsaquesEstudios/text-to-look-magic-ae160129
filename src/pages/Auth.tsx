@@ -271,8 +271,8 @@ export default function Auth() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label>{labels.postal}</Label>
-                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={labels.postalPlaceholder} maxLength={15} minLength={3} />
+                    <Label>{a.postalCode}</Label>
+                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={a.postalCodePlaceholder} maxLength={15} minLength={3} />
                   </div>
                   <div className="space-y-2">
                     <Label>Cidade / City</Label>
