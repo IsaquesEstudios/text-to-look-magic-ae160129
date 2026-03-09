@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { PropertyPageSkeleton } from "@/components/painel/property/PropertyPageSkeleton";
+import { PropertyInvestors } from "@/components/painel/property/PropertyInvestors";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   available: { label: "Disponível", color: "bg-primary/90 text-primary-foreground" },
