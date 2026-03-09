@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Mail, Phone, MapPin, Save } from "lucide-react";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
+import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
 export default function UserProfilePage() {
   const { user } = useAuth();
