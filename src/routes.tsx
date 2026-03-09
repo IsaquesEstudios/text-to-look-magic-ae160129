@@ -22,7 +22,7 @@ const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
 const PropertyGastosPage = lazy(() => import("./pages/painel/PropertyGastosPage"));
-const UserImoveis = lazy(() => import("./pages/painel/UserImoveis"));
+const UserPropriedadesPage = lazy(() => import("./pages/painel/UserPropriedadesPage"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
@@ -34,7 +34,7 @@ const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
 const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
 const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
-const UserTerrenosPage = lazy(() => import("./pages/painel/UserTerrenosPage"));
+
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
 const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
 
@@ -91,8 +91,7 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 // Panel child routes — rendered inside PainelLayout's <Outlet />
 const panelChildren: RouteRecord[] = [
   { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
-  { path: "meus-imoveis", element: <SuspenseWrapper><UserImoveis /></SuspenseWrapper> },
-  { path: "meus-terrenos", element: <SuspenseWrapper><UserTerrenosPage /></SuspenseWrapper> },
+  { path: "meus-projetos", element: <SuspenseWrapper><UserPropriedadesPage /></SuspenseWrapper> },
   { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
   { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
