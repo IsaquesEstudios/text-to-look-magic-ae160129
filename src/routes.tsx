@@ -34,7 +34,7 @@ const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
 const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
 const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
-const UserTerrenosPage = lazy(() => import("./pages/painel/UserTerrenosPage"));
+
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
 const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
 
