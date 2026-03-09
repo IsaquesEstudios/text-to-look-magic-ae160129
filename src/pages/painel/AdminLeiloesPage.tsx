@@ -229,6 +229,7 @@ export default function AdminLeiloesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Visibilidade atualizada" });
     },
   });
