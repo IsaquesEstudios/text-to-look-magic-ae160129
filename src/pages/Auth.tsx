@@ -47,6 +47,7 @@ export default function Auth() {
   const [addressCity, setAddressCity] = useState("");
   const [addressState, setAddressState] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
   const navigate = useNavigate();
   const { toast } = useToast();
