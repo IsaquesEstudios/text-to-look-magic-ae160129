@@ -130,6 +130,7 @@ export default function AdminImoveisPage() {
           >
             <Building2 className="h-4 w-4" />
             Imóveis
+            {counts && <span className="ml-1 text-xs text-muted-foreground">({counts.house})</span>}
           </TabsTrigger>
           <TabsTrigger
             value="land"
