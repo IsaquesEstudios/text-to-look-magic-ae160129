@@ -118,7 +118,7 @@ export default function AdminImoveisPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Portfólio</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
         <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos com investidores vinculados</p>
       </div>
 
