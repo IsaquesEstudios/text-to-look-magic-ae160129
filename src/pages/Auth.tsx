@@ -249,8 +249,8 @@ export default function Auth() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2 space-y-2">
-                    <Label>Rua / Street</Label>
-                    <Input value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} placeholder="Street name" maxLength={200} />
+                    <Label>{a.street}</Label>
+                    <Input value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} placeholder={a.streetPlaceholder} maxLength={200} />
                   </div>
                   <div className="space-y-2">
                     <Label>Nº</Label>
