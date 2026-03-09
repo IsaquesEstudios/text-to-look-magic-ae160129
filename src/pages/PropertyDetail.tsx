@@ -146,7 +146,11 @@ export default function PropertyDetail() {
                 <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
               </div>
             ))}
-          </div>
+        </div>
+
+        {isAdmin && (
+          <PropertyInvestors propertyId={property.id} totalProject={purchasePrice} />
+        )}
         </div>
 
         <div
