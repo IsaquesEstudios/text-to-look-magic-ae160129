@@ -178,7 +178,7 @@ export default function Auth() {
                 </div>
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="animate-spin" />}
-                  {isLogin ? "Entrar" : "Próximo"}
+                  {isLogin ? a.login : a.next}
                 </Button>
               </form>
             )}
