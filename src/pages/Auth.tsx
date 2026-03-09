@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
-import { languages, Language } from "@/i18n";
+import { languages, Language, translations } from "@/i18n";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
