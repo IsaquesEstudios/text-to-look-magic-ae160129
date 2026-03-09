@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
-import { languages, Language } from "@/i18n";
+import { languages, Language, translations } from "@/i18n";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
@@ -51,6 +51,7 @@ export default function Auth() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
 
   const handleStep1 = (e: React.FormEvent) => {
@@ -69,7 +70,7 @@ export default function Auth() {
       if (error) throw error;
       navigate("/painel");
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -111,13 +112,13 @@ export default function Auth() {
       }
 
       toast({
-        title: "Conta criada!",
-        description: "Verifique seu email para confirmar o cadastro.",
+        title: a.accountCreated,
+        description: a.checkEmail,
       });
       setStep(1);
       setIsLogin(true);
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -133,16 +134,16 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : step === 2 ? "Idioma / Language" : "Suas Informações"}
+              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
               {isLogin
-                ? "Acesse sua conta na plataforma"
+                ? a.accessAccount
                 : step === 1
-                  ? "Cadastre-se para começar a investir"
+                  ? a.signupDescription
                   : step === 2
-                    ? "Escolha seu idioma preferido"
-                    : "Complete seu perfil para continuar"}
+                    ? a.chooseLanguageDescription
+                    : a.completeProfile}
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
@@ -158,16 +159,16 @@ export default function Auth() {
               <form onSubmit={handleStep1} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Nome Completo</Label>
-                    <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome completo" required={!isLogin} maxLength={100} />
+                    <Label htmlFor="fullName">{a.fullName}</Label>
+                    <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={a.fullNamePlaceholder} required={!isLogin} maxLength={100} />
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required maxLength={255} />
+                  <Label htmlFor="email">{a.email}</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required maxLength={255} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
+                  <Label htmlFor="password">{a.password}</Label>
                   <div className="relative">
                     <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -177,7 +178,7 @@ export default function Auth() {
                 </div>
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="animate-spin" />}
-                  {isLogin ? "Entrar" : "Próximo"}
+                  {isLogin ? a.login : a.next}
                 </Button>
               </form>
             )}
@@ -205,10 +206,10 @@ export default function Auth() {
                 </div>
                 <div className="flex gap-3">
                   <Button type="button" variant="outline" onClick={() => setStep(1)} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Voltar
+                    <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
                   <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(3)}>
-                    Próximo
+                    {a.next}
                   </Button>
                 </div>
               </div>
@@ -218,7 +219,7 @@ export default function Auth() {
             {!isLogin && step === 3 && (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="s2-phone">Telefone / Phone</Label>
+                  <Label htmlFor="s2-phone">{a.phone}</Label>
                   <div className="flex gap-2">
                     <PhonePrefixSelect id="s2-phone-prefix" value={phonePrefix} onValueChange={setPhonePrefix} />
                     <Input id="s2-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={getPhoneFormat(phonePrefix)} required maxLength={20} minLength={4} />
@@ -228,12 +229,12 @@ export default function Auth() {
                 <div className="flex items-center gap-3">
                   <Switch id="s2-diff-whatsapp" checked={differentWhatsapp} onCheckedChange={setDifferentWhatsapp} />
                   <Label htmlFor="s2-diff-whatsapp" className="cursor-pointer text-sm text-muted-foreground">
-                    Meu WhatsApp é diferente do telefone
+                    {a.whatsappDifferent}
                   </Label>
                 </div>
                 {differentWhatsapp && (
                   <div className="space-y-2">
-                    <Label htmlFor="s2-whatsapp">WhatsApp</Label>
+                    <Label htmlFor="s2-whatsapp">{a.whatsapp}</Label>
                     <div className="flex gap-2">
                       <PhonePrefixSelect id="s2-whatsapp-prefix" value={whatsappPrefix} onValueChange={setWhatsappPrefix} />
                       <Input id="s2-whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder={getPhoneFormat(whatsappPrefix)} required maxLength={20} minLength={4} />
@@ -242,54 +243,54 @@ export default function Auth() {
                 )}
 
                 <div className="space-y-2">
-                  <Label>País / Country</Label>
-                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Brasil, United States..." maxLength={60} />
+                  <Label>{a.country}</Label>
+                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder={a.countryPlaceholder} maxLength={60} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2 space-y-2">
-                    <Label>Rua / Street</Label>
-                    <Input value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} placeholder="Street name" maxLength={200} />
+                    <Label>{a.street}</Label>
+                    <Input value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} placeholder={a.streetPlaceholder} maxLength={200} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Nº</Label>
+                    <Label>{a.number}</Label>
                     <Input value={addressNumber} onChange={(e) => setAddressNumber(e.target.value)} placeholder="Nº" maxLength={20} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>Complemento / Unit</Label>
-                    <Input value={addressComplement} onChange={(e) => setAddressComplement(e.target.value)} placeholder="Apt, suite..." maxLength={100} />
+                    <Label>{a.complement}</Label>
+                    <Input value={addressComplement} onChange={(e) => setAddressComplement(e.target.value)} placeholder={a.complementPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Bairro / Neighborhood</Label>
-                    <Input value={addressNeighborhood} onChange={(e) => setAddressNeighborhood(e.target.value)} placeholder="Neighborhood" maxLength={100} />
+                    <Label>{a.neighborhood}</Label>
+                    <Input value={addressNeighborhood} onChange={(e) => setAddressNeighborhood(e.target.value)} placeholder={a.neighborhoodPlaceholder} maxLength={100} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label>{labels.postal}</Label>
-                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={labels.postalPlaceholder} maxLength={15} minLength={3} />
+                    <Label>{a.postalCode}</Label>
+                    <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder={a.postalCodePlaceholder} maxLength={15} minLength={3} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Cidade / City</Label>
-                    <Input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} placeholder="City" maxLength={100} />
+                    <Label>{a.city}</Label>
+                    <Input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} placeholder={a.cityPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
-                    <Label>{labels.state}</Label>
-                    <Input value={addressState} onChange={(e) => setAddressState(e.target.value)} placeholder={labels.statePlaceholder} maxLength={50} />
+                    <Label>{a.state}</Label>
+                    <Input value={addressState} onChange={(e) => setAddressState(e.target.value)} placeholder={a.statePlaceholder} maxLength={50} />
                   </div>
                 </div>
 
                 <div className="flex gap-3">
                   <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Voltar
+                    <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
                     {loading && <Loader2 className="animate-spin" />}
-                    Criar Conta
+                    {a.createAccountBtn}
                   </Button>
                 </div>
               </form>
@@ -300,7 +301,7 @@ export default function Auth() {
                 onClick={() => { setIsLogin(!isLogin); setStep(1); }}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
+                {isLogin ? a.noAccount : a.hasAccount}
               </button>
             </div>
           </CardContent>
