@@ -243,8 +243,8 @@ export default function Auth() {
                 )}
 
                 <div className="space-y-2">
-                  <Label>País / Country</Label>
-                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Brasil, United States..." maxLength={60} />
+                  <Label>{a.country}</Label>
+                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder={a.countryPlaceholder} maxLength={60} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
