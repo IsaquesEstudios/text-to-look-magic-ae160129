@@ -1,13 +1,18 @@
-import { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, Shield, LayoutDashboard, Building2, Receipt, History, Loader2, Settings, Gavel, FileImage, UserCircle, MapPin } from "lucide-react";
+import {
+  LogOut, Home, Shield, LayoutDashboard, Building2, Receipt,
+  History, Loader2, Settings, Gavel, FileImage, UserCircle,
+  PanelLeftClose, PanelLeft,
+} from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
@@ -24,29 +29,22 @@ const userNavItems = [
   { label: "Meus Projetos", icon: Building2, path: "/painel/meus-projetos" },
   { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
   { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
-  { label: "Minhas Informações", icon: UserCircle, path: "/painel/informacoes" },
 ];
 
-/**
- * Route-level layout for /painel/*.
- * Renders once and stays mounted across child navigations via <Outlet />.
- * Handles auth guard so child pages don't need to.
- */
 export function PainelLayout() {
   const { user, isAdmin, isLoading, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const totalUnread = useUnreadNews();
   const unreadAuctions = useUnreadAuctions();
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Auth guard — redirect if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
       navigate("/auth", { replace: true });
     }
   }, [isLoading, user, navigate]);
 
-  // Full-screen loader while auth is resolving
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -58,86 +56,199 @@ export function PainelLayout() {
   if (!user) return null;
 
   const navItems = isAdmin ? adminNavItems : userNavItems;
+  const userInitials = profile?.full_name
+    ? profile.full_name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    : (user?.email?.[0] ?? "U").toUpperCase();
+
+  const profilePath = isAdmin ? "/painel/usuarios" : "/painel/informacoes";
+  const isProfileActive = location.pathname === "/painel/informacoes";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 border-b border-border/30 bg-background/90 backdrop-blur-xl">
-        <div className="flex items-center justify-between h-14 px-6">
-          <div className="flex items-center gap-3">
-            <Link to="/pt" className="flex items-center gap-3 group">
-              <img src={discoveryLogo} alt="Discovery" className="h-7 group-hover:opacity-80 transition-opacity" />
+    <TooltipProvider delayDuration={0}>
+      <div className="min-h-screen bg-background flex">
+        {/* ── Desktop Sidebar ── */}
+        <aside
+          className={cn(
+            "hidden md:flex flex-col flex-shrink-0 border-r border-border/20 bg-card/30 min-h-screen sticky top-0 transition-all duration-300",
+            collapsed ? "w-[68px]" : "w-56"
+          )}
+        >
+          {/* Logo + Collapse toggle */}
+          <div className={cn("flex items-center h-14 px-3 border-b border-border/20", collapsed ? "justify-center" : "justify-between")}>
+            <Link to="/pt" className="flex items-center gap-2 group flex-shrink-0">
+              <img src={discoveryLogo} alt="Discovery" className={cn("transition-all", collapsed ? "h-6" : "h-7")} />
             </Link>
-            <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground/40">
-              /
-            </span>
-            <span className="text-sm font-medium text-foreground/80 flex items-center gap-1.5">
-              {isAdmin && <Shield className="h-3.5 w-3.5 text-primary" />}
-              {isAdmin ? "Admin" : "Investidor"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground mr-2 hidden sm:block">
-              {profile?.full_name || user?.email}
-            </span>
-            <Link to="/pt">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
-                <Home className="h-4 w-4" />
+            {!collapsed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => setCollapsed(true)}
+              >
+                <PanelLeftClose className="h-4 w-4" />
               </Button>
-            </Link>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-            </Button>
+            )}
+            {collapsed && (
+              <div className="absolute -right-3 top-4 z-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 w-6 p-0 rounded-full border-border/40 bg-background shadow-sm"
+                  onClick={() => setCollapsed(false)}
+                >
+                  <PanelLeft className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
           </div>
-        </div>
-      </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden md:flex w-56 flex-shrink-0 border-r border-border/20 bg-card/30 flex-col min-h-[calc(100vh-3.5rem)] sticky top-14">
-          <nav className="flex-1 p-3 space-y-1 mt-2">
+          {/* Role badge */}
+          {!collapsed && (
+            <div className="px-4 py-2">
+              <span className="text-[10px] font-medium tracking-widest uppercase text-muted-foreground/50 flex items-center gap-1.5">
+                {isAdmin && <Shield className="h-3 w-3 text-primary" />}
+                {isAdmin ? "Admin" : "Investidor"}
+              </span>
+            </div>
+          )}
+
+          {/* Nav links */}
+          <nav className="flex-1 p-2 space-y-1">
             {navItems.map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
                 : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
-              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
               const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
-              return (
+
+              const linkContent = (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                    "relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
+                    collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
                     isActive
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   )}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
-                  {item.label}
-                  {badgeCount > 0 && (
+                  {!collapsed && item.label}
+                  {!collapsed && badgeCount > 0 && (
                     <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                      {badgeCount > 9 ? "+9" : badgeCount}
+                    </span>
+                  )}
+                  {collapsed && badgeCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                       {badgeCount > 9 ? "+9" : badgeCount}
                     </span>
                   )}
                 </Link>
               );
+
+              if (collapsed) {
+                return (
+                  <Tooltip key={item.path}>
+                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+                    <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
+                  </Tooltip>
+                );
+              }
+
+              return linkContent;
             })}
           </nav>
+
+          {/* Bottom section: Home, User, Logout */}
+          <div className={cn("border-t border-border/20 p-2 space-y-1", collapsed && "flex flex-col items-center")}>
+            {/* Home link */}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/pt" className="flex items-center justify-center px-2 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+                    <Home className="h-4 w-4" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">Ir ao site</TooltipContent>
+              </Tooltip>
+            ) : (
+              <Link to="/pt" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+                <Home className="h-4 w-4 flex-shrink-0" />
+                Ir ao site
+              </Link>
+            )}
+
+            {/* User profile link */}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to={profilePath} className={cn(
+                    "flex items-center justify-center px-2 py-2.5 rounded-xl transition-colors",
+                    isProfileActive ? "bg-primary/10" : "hover:bg-secondary/50"
+                  )}>
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className={cn("text-[10px] font-bold", isProfileActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">
+                  {profile?.full_name || user?.email}
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Link to={profilePath} className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                isProfileActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              )}>
+                <Avatar className="h-6 w-6">
+                  <AvatarFallback className={cn("text-[9px] font-bold", isProfileActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="truncate">{profile?.full_name || user?.email}</span>
+              </Link>
+            )}
+
+            {/* Logout */}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={signOut}
+                    className="flex items-center justify-center px-2 py-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">Sair</TooltipContent>
+              </Tooltip>
+            ) : (
+              <button
+                onClick={signOut}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+              >
+                <LogOut className="h-4 w-4 flex-shrink-0" />
+                Sair
+              </button>
+            )}
+          </div>
         </aside>
 
-        {/* Mobile nav */}
+        {/* ── Mobile bottom nav ── */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
           <nav className="flex items-center justify-around h-14 px-2">
-            {navItems.map((item) => {
+            {[...navItems, { label: "Perfil", icon: UserCircle, path: profilePath }].map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
                 : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
-              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
               const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
               return (
@@ -146,9 +257,7 @@ export function PainelLayout() {
                   to={item.path}
                   className={cn(
                     "relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors",
-                    isActive
-                      ? "text-primary"
-                      : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -164,11 +273,11 @@ export function PainelLayout() {
           </nav>
         </div>
 
-        {/* Main content — child routes render here */}
+        {/* ── Main content ── */}
         <main className="flex-1 px-6 py-8 max-w-6xl mx-auto w-full pb-20 md:pb-8">
           <Outlet />
         </main>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
