@@ -8,9 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
+import { languages, Language } from "@/i18n";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
