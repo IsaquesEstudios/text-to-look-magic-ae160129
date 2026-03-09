@@ -112,8 +112,8 @@ export default function Auth() {
       }
 
       toast({
-        title: "Conta criada!",
-        description: "Verifique seu email para confirmar o cadastro.",
+        title: a.accountCreated,
+        description: a.checkEmail,
       });
       setStep(1);
       setIsLogin(true);
