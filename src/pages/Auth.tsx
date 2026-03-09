@@ -283,7 +283,7 @@ export default function Auth() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => setStep(1)} className="gap-2">
+                  <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> Voltar
                   </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
