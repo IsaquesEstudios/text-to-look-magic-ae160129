@@ -54,11 +54,28 @@ export default function Auth() {
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
 
-  const handleStep1 = (e: React.FormEvent) => {
+  const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
       handleLogin();
     } else {
+      // Check for duplicate name
+      setLoading(true);
+      try {
+        const { data: existing } = await supabase
+          .from("profiles")
+          .select("id")
+          .ilike("full_name", fullName.trim())
+          .limit(1);
+        if (existing && existing.length > 0) {
+          toast({ title: a.error, description: a.nameTaken ?? "Este nome já está em uso.", variant: "destructive" });
+          return;
+        }
+      } catch {
+        // If check fails (e.g. RLS), proceed anyway
+      } finally {
+        setLoading(false);
+      }
       setStep(2);
     }
   };
