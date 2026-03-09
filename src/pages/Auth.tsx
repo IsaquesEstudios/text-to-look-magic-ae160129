@@ -286,11 +286,11 @@ export default function Auth() {
 
                 <div className="flex gap-3">
                   <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Voltar
+                    <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
                     {loading && <Loader2 className="animate-spin" />}
-                    Criar Conta
+                    {a.createAccountBtn}
                   </Button>
                 </div>
               </form>
