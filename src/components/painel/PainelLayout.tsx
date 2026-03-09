@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
 import { Button } from "@/components/ui/button";
@@ -14,30 +15,31 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const adminNavItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
-  { label: "Leilões", icon: Gavel, path: "/painel/leiloes" },
-  { label: "Propriedades", icon: Building2, path: "/painel/propriedades" },
-  { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
-  { label: "Atividades", icon: History, path: "/painel/atividades" },
-  { label: "Configurações", icon: Settings, path: "/painel/configuracoes" },
-];
-
-const userNavItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
-  { label: "Leilões", icon: Gavel, path: "/painel/leiloes-user" },
-  { label: "Meus Projetos", icon: Building2, path: "/painel/meus-projetos" },
-  { label: "Extrato", icon: Receipt, path: "/painel/extrato" },
-  { label: "Comprovantes", icon: FileImage, path: "/painel/comprovantes" },
-];
-
 export function PainelLayout() {
   const { user, isAdmin, isLoading, profile, signOut } = useAuth();
+  const { p } = usePanelTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const totalUnread = useUnreadNews();
   const unreadAuctions = useUnreadAuctions();
   const [collapsed, setCollapsed] = useState(false);
+
+  const adminNavItems = [
+    { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
+    { label: p.auctions, icon: Gavel, path: "/painel/leiloes" },
+    { label: p.properties, icon: Building2, path: "/painel/propriedades" },
+    { label: p.users, icon: Shield, path: "/painel/usuarios" },
+    { label: p.activities, icon: History, path: "/painel/atividades" },
+    { label: p.settings, icon: Settings, path: "/painel/configuracoes" },
+  ];
+
+  const userNavItems = [
+    { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
+    { label: p.auctions, icon: Gavel, path: "/painel/leiloes-user" },
+    { label: p.myProjects, icon: Building2, path: "/painel/meus-projetos" },
+    { label: p.statement, icon: Receipt, path: "/painel/extrato" },
+    { label: p.receipts, icon: FileImage, path: "/painel/comprovantes" },
+  ];
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -73,46 +75,33 @@ export function PainelLayout() {
             collapsed ? "w-[68px]" : "w-56"
           )}
         >
-          {/* Logo + Collapse toggle */}
           <div className={cn("flex items-center h-14 px-3 border-b border-border/20", collapsed ? "justify-center" : "justify-between")}>
             <Link to="/pt" className="flex items-center gap-2 group flex-shrink-0">
               <img src={discoveryLogo} alt="Discovery" className={cn("transition-all", collapsed ? "h-6" : "h-7")} />
             </Link>
             {!collapsed && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => setCollapsed(true)}
-              >
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => setCollapsed(true)}>
                 <PanelLeftClose className="h-4 w-4" />
               </Button>
             )}
             {collapsed && (
               <div className="absolute -right-3 top-4 z-10">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-6 w-6 p-0 rounded-full border-border/40 bg-background shadow-sm"
-                  onClick={() => setCollapsed(false)}
-                >
+                <Button variant="outline" size="sm" className="h-6 w-6 p-0 rounded-full border-border/40 bg-background shadow-sm" onClick={() => setCollapsed(false)}>
                   <PanelLeft className="h-3 w-3" />
                 </Button>
               </div>
             )}
           </div>
 
-          {/* Role badge */}
           {!collapsed && (
             <div className="px-4 py-2">
               <span className="text-[10px] font-medium tracking-widest uppercase text-muted-foreground/50 flex items-center gap-1.5">
                 {isAdmin && <Shield className="h-3 w-3 text-primary" />}
-                {isAdmin ? "Admin" : "Investidor"}
+                {isAdmin ? "Admin" : p.investor}
               </span>
             </div>
           )}
 
-          {/* Nav links */}
           <nav className="flex-1 p-2 space-y-1">
             {navItems.map((item) => {
               const isActive = item.path === "/painel"
@@ -130,9 +119,7 @@ export function PainelLayout() {
                   className={cn(
                     "relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   )}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -163,9 +150,7 @@ export function PainelLayout() {
             })}
           </nav>
 
-          {/* Bottom section: Home, User, Logout */}
           <div className={cn("border-t border-border/20 p-2 space-y-1", collapsed && "flex flex-col items-center")}>
-            {/* Home link */}
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -173,16 +158,15 @@ export function PainelLayout() {
                     <Home className="h-4 w-4" />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="text-xs">Ir ao site</TooltipContent>
+                <TooltipContent side="right" className="text-xs">{p.goToSite}</TooltipContent>
               </Tooltip>
             ) : (
               <Link to="/pt" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
                 <Home className="h-4 w-4 flex-shrink-0" />
-                Ir ao site
+                {p.goToSite}
               </Link>
             )}
 
-            {/* User profile link */}
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -215,7 +199,6 @@ export function PainelLayout() {
               </Link>
             )}
 
-            {/* Logout */}
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -226,7 +209,7 @@ export function PainelLayout() {
                     <LogOut className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="text-xs">Sair</TooltipContent>
+                <TooltipContent side="right" className="text-xs">{p.logout}</TooltipContent>
               </Tooltip>
             ) : (
               <button
@@ -234,7 +217,7 @@ export function PainelLayout() {
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
               >
                 <LogOut className="h-4 w-4 flex-shrink-0" />
-                Sair
+                {p.logout}
               </button>
             )}
           </div>
@@ -243,7 +226,7 @@ export function PainelLayout() {
         {/* ── Mobile bottom nav ── */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
           <nav className="flex items-center justify-around h-14 px-2">
-            {[...navItems, { label: "Perfil", icon: UserCircle, path: profilePath }].map((item) => {
+            {[...navItems, { label: p.profile, icon: UserCircle, path: profilePath }].map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
                 : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
@@ -273,7 +256,6 @@ export function PainelLayout() {
           </nav>
         </div>
 
-        {/* ── Main content ── */}
         <main className="flex-1 px-6 py-8 w-full pb-20 md:pb-8">
           <Outlet />
         </main>

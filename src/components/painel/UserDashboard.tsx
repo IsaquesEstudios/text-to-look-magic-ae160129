@@ -1,13 +1,18 @@
 import { useAuth } from "@/hooks/useAuth";
+import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard, History, MessageSquare, Gavel, Percent } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, enUS, es } from "date-fns/locale";
 import { Link } from "react-router-dom";
+
+const dateFnsLocales = { pt: ptBR, en: enUS, es };
 
 export function UserDashboard() {
   const { user, profile } = useAuth();
+  const { p, lang } = usePanelTranslation();
+  const dateLocale = dateFnsLocales[lang] || ptBR;
 
   const { data: shares, isLoading } = useQuery({
     queryKey: ["user-shares", user?.id],
@@ -40,11 +45,11 @@ export function UserDashboard() {
 
       creditsRes.data?.forEach((c) => {
         const typeMap: Record<string, string> = {
-          deposit: "Depósito",
-          withdrawal: "Saque",
-          refund: "Estorno",
-          auction_deposit: "Investimento em Leilão",
-          profit: "Retorno de Lucro",
+          deposit: p.deposit,
+          withdrawal: p.withdrawal,
+          refund: p.refund,
+          auction_deposit: p.auctionDeposit,
+          profit: p.profitReturn,
         };
         items.push({
           id: c.id,
@@ -62,7 +67,6 @@ export function UserDashboard() {
     enabled: !!user,
   });
 
-  // Properties the user is linked to, with unread message + expense count
   const { data: propertyNews } = useQuery({
     queryKey: ["property-news", user?.id],
     queryFn: async () => {
@@ -81,16 +85,8 @@ export function UserDashboard() {
       const propertyIds = Array.from(propertyMap.keys());
 
       const [{ data: msgReads }, { data: expReads }] = await Promise.all([
-        supabase
-          .from("property_message_reads")
-          .select("property_id, last_read_at")
-          .eq("user_id", user!.id)
-          .in("property_id", propertyIds),
-        supabase
-          .from("property_expense_reads")
-          .select("property_id, last_read_at")
-          .eq("user_id", user!.id)
-          .in("property_id", propertyIds),
+        supabase.from("property_message_reads").select("property_id, last_read_at").eq("user_id", user!.id).in("property_id", propertyIds),
+        supabase.from("property_expense_reads").select("property_id, last_read_at").eq("user_id", user!.id).in("property_id", propertyIds),
       ]);
 
       const msgReadMap = new Map<string, string>();
@@ -101,33 +97,19 @@ export function UserDashboard() {
       const results = await Promise.all(
         propertyIds.map(async (pid) => {
           const msgLastRead = msgReadMap.get(pid);
-          let mq = supabase
-            .from("property_messages")
-            .select("id", { count: "exact", head: true })
-            .eq("property_id", pid);
+          let mq = supabase.from("property_messages").select("id", { count: "exact", head: true }).eq("property_id", pid);
           if (msgLastRead) mq = mq.gt("created_at", msgLastRead);
           const { count: mc } = await mq;
 
           const expLastRead = expReadMap.get(pid);
-          let eq = supabase
-            .from("property_expenses")
-            .select("id", { count: "exact", head: true })
-            .eq("property_id", pid);
+          let eq = supabase.from("property_expenses").select("id", { count: "exact", head: true }).eq("property_id", pid);
           if (expLastRead) eq = eq.gt("created_at", expLastRead);
           const { count: ec } = await eq;
 
           const prop = propertyMap.get(pid);
           const unreadMessages = mc ?? 0;
           const unreadExpenses = ec ?? 0;
-          return {
-            id: pid,
-            title: prop.title,
-            cover_image_url: prop.cover_image_url,
-            status: prop.status,
-            unread: unreadMessages + unreadExpenses,
-            unreadMessages,
-            unreadExpenses,
-          };
+          return { id: pid, title: prop.title, cover_image_url: prop.cover_image_url, status: prop.status, unread: unreadMessages + unreadExpenses, unreadMessages, unreadExpenses };
         })
       );
 
@@ -142,7 +124,6 @@ export function UserDashboard() {
   const credits = profile?.credits ?? 0;
   const totalProperties = new Set(shares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
-  // Portfolio aggregation
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
     if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
     const propMap = new Map<string, { totalPaid: number; prop: any }>();
@@ -150,14 +131,10 @@ export function UserDashboard() {
       const prop = s.properties as any;
       if (!prop) return;
       const existing = propMap.get(prop.id);
-      if (existing) {
-        existing.totalPaid += Number(s.amount_paid);
-      } else {
-        propMap.set(prop.id, { totalPaid: Number(s.amount_paid), prop });
-      }
+      if (existing) { existing.totalPaid += Number(s.amount_paid); }
+      else { propMap.set(prop.id, { totalPaid: Number(s.amount_paid), prop }); }
     });
-    let invested = 0;
-    let estimated = 0;
+    let invested = 0, estimated = 0;
     propMap.forEach(({ totalPaid, prop }) => {
       invested += totalPaid;
       const auctionVal = Number(prop.estimated_auction_value) || 0;
@@ -172,95 +149,75 @@ export function UserDashboard() {
   })();
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
   }
+
+  const fmtUnread = (messages: number, expenses: number) => {
+    const parts: string[] = [];
+    if (messages > 0) parts.push(messages === 1 ? p.newsCount.replace("{count}", "1") : p.newsCountPlural.replace("{count}", String(messages)));
+    if (expenses > 0) parts.push(expenses === 1 ? p.expenseCount.replace("{count}", "1") : p.expenseCountPlural.replace("{count}", String(expenses)));
+    return parts.join(" · ");
+  };
 
   return (
     <div className="space-y-10">
-      {/* Greeting */}
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
-          Olá, {profile?.full_name?.split(" ")[0] || "Investidor"} 👋
+          {p.greeting.replace("{name}", profile?.full_name?.split(" ")[0] || p.investor)}
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Resumo dos seus investimentos
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      {/* Summary stats */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Wallet className="h-5 w-5 text-primary" />
-          </div>
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Wallet className="h-5 w-5 text-primary" /></div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Crédito Disponível</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.availableCredit}</p>
             <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-          <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
-          </div>
+          <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground" /></div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Imóveis</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.propertiesLabel}</p>
             <p className="text-lg font-bold text-foreground">{totalProperties}</p>
           </div>
         </div>
-
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <TrendingUp className="h-5 w-5 text-primary" />
-          </div>
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total Investido</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.totalInvested}</p>
             <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-          <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-            <TrendingUp className="h-5 w-5 text-accent" />
-          </div>
+          <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno Estimado</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedReturn}</p>
             <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
               ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
-
         <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Percent className="h-5 w-5 text-primary" />
-          </div>
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Percent className="h-5 w-5 text-primary" /></div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">ROI Estimado</p>
-            <p className={`text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>
-              {portfolioRoi.toFixed(1)}%
-            </p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedROI}</p>
+            <p className={`text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
           </div>
         </div>
       </div>
 
-      {/* Property News / Novidades */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          Atualizações dos seus imóveis
+          {p.propertyUpdates}
         </h2>
         {!propertyNews?.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Building2 className="h-8 w-8 mb-2 opacity-20" />
-            <p className="text-sm">Você ainda não possui imóveis vinculados</p>
-            <Link to="/painel/leiloes-user" className="text-xs text-primary hover:underline mt-1">
-              Ver leilões →
-            </Link>
+            <p className="text-sm">{p.noLinkedProperties}</p>
+            <Link to="/painel/leiloes-user" className="text-xs text-primary hover:underline mt-1">{p.viewAuctions}</Link>
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -274,29 +231,19 @@ export function UserDashboard() {
                   {prop.cover_image_url ? (
                     <img src={prop.cover_image_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Building2 className="h-5 w-5 text-muted-foreground/20" />
-                    </div>
+                    <div className="w-full h-full flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground/20" /></div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-foreground text-sm truncate">{prop.title}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {prop.unread > 0
-                      ? [
-                          prop.unreadMessages > 0 ? `${prop.unreadMessages} novidade${prop.unreadMessages === 1 ? "" : "s"}` : null,
-                          prop.unreadExpenses > 0 ? `${prop.unreadExpenses} gasto${prop.unreadExpenses === 1 ? "" : "s"}` : null,
-                        ].filter(Boolean).join(" · ")
-                      : "Sem atualizações"}
+                    {prop.unread > 0 ? fmtUnread(prop.unreadMessages, prop.unreadExpenses) : p.noUpdates}
                   </p>
                 </div>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
-
                 {prop.unread > 0 && (
                   <span className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full text-[11px] font-bold flex items-center justify-center ${
-                    prop.unreadExpenses > 0 && prop.unreadMessages === 0
-                      ? "bg-amber-500 text-white"
-                      : "bg-destructive text-destructive-foreground"
+                    prop.unreadExpenses > 0 && prop.unreadMessages === 0 ? "bg-amber-500 text-white" : "bg-destructive text-destructive-foreground"
                   }`}>
                     {prop.unread > 9 ? "+9" : prop.unread}
                   </span>
@@ -307,22 +254,17 @@ export function UserDashboard() {
         )}
       </div>
 
-      {/* Recent Activity */}
       <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden flex flex-col" style={{ maxHeight: 350 }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 flex-shrink-0">
           <div className="flex items-center gap-2">
             <History className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-foreground text-sm">Histórico Recente</h3>
+            <h3 className="font-semibold text-foreground text-sm">{p.recentHistory}</h3>
           </div>
-          <Link to="/painel/extrato" className="text-xs text-primary hover:underline">
-            Ver tudo →
-          </Link>
+          <Link to="/painel/extrato" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
         </div>
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {!recentActivity?.length ? (
-            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
-              Nenhuma atividade ainda
-            </div>
+            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{p.noActivityYet}</div>
           ) : (
             <div className="divide-y divide-border/10">
               {recentActivity.map((item) => (
@@ -342,7 +284,7 @@ export function UserDashboard() {
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
                     <Clock className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: ptBR })}
+                    {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: dateLocale })}
                   </div>
                 </div>
               ))}
