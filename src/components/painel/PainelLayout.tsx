@@ -12,8 +12,7 @@ import { useEffect } from "react";
 const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/painel" },
   { label: "Leilões", icon: Gavel, path: "/painel/leiloes" },
-  { label: "Imóveis", icon: Building2, path: "/painel/imoveis" },
-  { label: "Terrenos", icon: MapPin, path: "/painel/terrenos" },
+  { label: "Portfólio", icon: Building2, path: "/painel/imoveis" },
   { label: "Usuários", icon: Shield, path: "/painel/usuarios" },
   { label: "Atividades", icon: History, path: "/painel/atividades" },
   { label: "Configurações", icon: Settings, path: "/painel/configuracoes" },

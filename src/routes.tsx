@@ -26,7 +26,7 @@ const UserImoveis = lazy(() => import("./pages/painel/UserImoveis"));
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
-const AdminTerrenosPage = lazy(() => import("./pages/painel/AdminTerrenosPage"));
+
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
@@ -98,7 +98,7 @@ const panelChildren: RouteRecord[] = [
   { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
   { path: "imovel/:id/gastos", element: <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper> },
   { path: "imoveis", element: <SuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></SuspenseWrapper> },
-  { path: "terrenos", element: <SuspenseWrapper><AdminGuard><AdminTerrenosPage /></AdminGuard></SuspenseWrapper> },
+  
   { path: "usuarios", element: <SuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></SuspenseWrapper> },
   { path: "usuarios/:userId", element: <SuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></SuspenseWrapper> },
   { path: "atividades", element: <SuspenseWrapper><AdminGuard><AdminAtividadesPage /></AdminGuard></SuspenseWrapper> },
