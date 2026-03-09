@@ -118,7 +118,7 @@ export default function Auth() {
       setStep(1);
       setIsLogin(true);
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
