@@ -12,7 +12,7 @@ export interface AuthState {
   roles: AppRole[];
   isAdmin: boolean;
   isLoading: boolean;
-  profile: { full_name: string | null; credits: number } | null;
+  profile: { full_name: string | null; credits: number; preferred_language: string } | null;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
