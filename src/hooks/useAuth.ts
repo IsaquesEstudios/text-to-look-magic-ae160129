@@ -12,7 +12,7 @@ export interface AuthState {
   roles: AppRole[];
   isAdmin: boolean;
   isLoading: boolean;
-  profile: { full_name: string | null; credits: number } | null;
+  profile: { full_name: string | null; credits: number; preferred_language: string } | null;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -39,7 +39,7 @@ export function useAuthInternal(): AuthState {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState<{ full_name: string | null; credits: number } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string | null; credits: number; preferred_language: string } | null>(null);
 
   useEffect(() => {
     if (!isBrowser) {
@@ -52,7 +52,7 @@ export function useAuthInternal(): AuthState {
       try {
         const [rolesResult, profileResult] = await Promise.all([
           supabase.from("user_roles").select("role").eq("user_id", userId),
-          supabase.from("profiles").select("full_name, credits").eq("user_id", userId).maybeSingle(),
+          supabase.from("profiles").select("full_name, credits, preferred_language").eq("user_id", userId).maybeSingle(),
         ]);
 
         if (!isMounted) return;
@@ -62,7 +62,7 @@ export function useAuthInternal(): AuthState {
         setIsAdmin(userRoles.includes("admin"));
         setProfile(
           profileResult.data
-            ? { full_name: profileResult.data.full_name, credits: Number(profileResult.data.credits) }
+            ? { full_name: profileResult.data.full_name, credits: Number(profileResult.data.credits), preferred_language: (profileResult.data as any).preferred_language ?? 'pt' }
             : null
         );
       } catch {
@@ -119,9 +119,9 @@ export function useAuthInternal(): AuthState {
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase.from("profiles").select("full_name, credits").eq("user_id", user.id).maybeSingle();
+    const { data } = await supabase.from("profiles").select("full_name, credits, preferred_language").eq("user_id", user.id).maybeSingle();
     if (data) {
-      setProfile({ full_name: data.full_name, credits: Number(data.credits) });
+      setProfile({ full_name: data.full_name, credits: Number(data.credits), preferred_language: (data as any).preferred_language ?? 'pt' });
     }
   }, [user]);
 

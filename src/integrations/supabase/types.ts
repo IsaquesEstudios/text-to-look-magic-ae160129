@@ -245,6 +245,7 @@ export type Database = {
           id: string
           phone: string | null
           postal_code: string | null
+          preferred_language: string
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -264,6 +265,7 @@ export type Database = {
           id?: string
           phone?: string | null
           postal_code?: string | null
+          preferred_language?: string
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -283,6 +285,7 @@ export type Database = {
           id?: string
           phone?: string | null
           postal_code?: string | null
+          preferred_language?: string
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
