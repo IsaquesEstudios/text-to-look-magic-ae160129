@@ -247,7 +247,6 @@ export function UserDashboard() {
           </div>
         </div>
       </div>
-      </div>
 
       {/* Property News / Novidades */}
       <div>
