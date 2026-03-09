@@ -62,17 +62,13 @@ export default function Auth() {
       // Check for duplicate name
       setLoading(true);
       try {
-        const { data: existing } = await supabase
-          .from("profiles")
-          .select("id")
-          .ilike("full_name", fullName.trim())
-          .limit(1);
-        if (existing && existing.length > 0) {
+        const { data: isAvailable } = await supabase.rpc("check_name_available", { p_name: fullName.trim() });
+        if (isAvailable === false) {
           toast({ title: a.error, description: a.nameTaken, variant: "destructive" });
           return;
         }
       } catch {
-        // If check fails (e.g. RLS), proceed anyway
+        // If check fails, proceed anyway
       } finally {
         setLoading(false);
       }
