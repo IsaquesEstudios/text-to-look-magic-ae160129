@@ -257,7 +257,7 @@ export default function Auth() {
 
                 <div className="space-y-2">
                   <Label>{a.country}</Label>
-                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder={a.countryPlaceholder} maxLength={60} />
+                  <CountryAutocomplete value={country} onValueChange={setCountry} placeholder={a.countryPlaceholder} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">

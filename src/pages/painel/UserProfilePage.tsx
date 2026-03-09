@@ -149,7 +149,7 @@ export default function UserProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>{p.country}</Label>
-            <Input value={form.country} onChange={(e) => update("country", e.target.value)} placeholder={p.countryPlaceholder} maxLength={60} />
+            <CountryAutocomplete value={form.country} onValueChange={(v) => update("country", v)} placeholder={p.countryPlaceholder} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2 space-y-2">
