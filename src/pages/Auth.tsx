@@ -68,7 +68,7 @@ export default function Auth() {
           .ilike("full_name", fullName.trim())
           .limit(1);
         if (existing && existing.length > 0) {
-          toast({ title: a.error, description: a.nameTaken ?? "Este nome já está em uso.", variant: "destructive" });
+          toast({ title: a.error, description: a.nameTaken, variant: "destructive" });
           return;
         }
       } catch {
