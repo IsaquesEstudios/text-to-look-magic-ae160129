@@ -51,6 +51,7 @@ export default function Auth() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
 
   const handleStep1 = (e: React.FormEvent) => {
