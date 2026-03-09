@@ -8,9 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, getPhoneFormat } from "@/components/PhonePrefixSelect";
+import { languages, Language } from "@/i18n";
 
 const countries = [
   { code: "BR", name: "Brasil", labels: { state: "Estado", postal: "CEP", statePlaceholder: "SP", postalPlaceholder: "00000-000" } },
@@ -46,6 +47,7 @@ export default function Auth() {
   const [addressCity, setAddressCity] = useState("");
   const [addressState, setAddressState] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -81,7 +83,7 @@ export default function Auth() {
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { full_name: fullName, preferred_language: preferredLanguage },
           emailRedirectTo: window.location.origin,
         },
       });
@@ -130,25 +132,22 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : "Suas Informações"}
+              {isLogin ? "Entrar" : step === 1 ? "Criar Conta" : step === 2 ? "Idioma / Language" : "Suas Informações"}
             </CardTitle>
             <CardDescription>
               {isLogin
                 ? "Acesse sua conta na plataforma"
                 : step === 1
                   ? "Cadastre-se para começar a investir"
-                  : "Complete seu perfil para continuar"}
+                  : step === 2
+                    ? "Escolha seu idioma preferido"
+                    : "Complete seu perfil para continuar"}
             </CardDescription>
-            {!isLogin && step === 2 && (
+            {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-              </div>
-            )}
-            {!isLogin && step === 1 && (
-              <div className="flex justify-center gap-2 pt-2">
-                <div className="h-1.5 w-8 rounded-full bg-primary" />
-                <div className="h-1.5 w-8 rounded-full bg-muted" />
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
+                ))}
               </div>
             )}
           </CardHeader>
@@ -182,8 +181,40 @@ export default function Auth() {
               </form>
             )}
 
-            {/* Step 2: profile info */}
+            {/* Step 2: language selection */}
             {!isLogin && step === 2 && (
+              <div className="space-y-4">
+                <div className="grid gap-3">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setPreferredLanguage(lang.code)}
+                      className={`flex items-center gap-3 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                        preferredLanguage === lang.code
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-xl">{lang.flag}</span>
+                      <span className="flex-1">{lang.name}</span>
+                      {preferredLanguage === lang.code && <Check className="h-4 w-4 text-primary" />}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={() => setStep(1)} className="gap-2">
+                    <ArrowLeft className="h-4 w-4" /> Voltar
+                  </Button>
+                  <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(3)}>
+                    Próximo
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: profile info */}
+            {!isLogin && step === 3 && (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="s2-phone">Telefone / Phone</Label>
@@ -252,7 +283,7 @@ export default function Auth() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => setStep(1)} className="gap-2">
+                  <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> Voltar
                   </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
