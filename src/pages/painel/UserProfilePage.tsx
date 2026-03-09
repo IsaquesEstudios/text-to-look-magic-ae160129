@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Mail, Phone, MapPin, Save } from "lucide-react";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
+import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
 export default function UserProfilePage() {
   const { user } = useAuth();
@@ -149,7 +150,7 @@ export default function UserProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>{p.country}</Label>
-            <Input value={form.country} onChange={(e) => update("country", e.target.value)} placeholder={p.countryPlaceholder} maxLength={60} />
+            <CountryAutocomplete value={form.country} onValueChange={(v) => update("country", v)} placeholder={p.countryPlaceholder} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2 space-y-2">

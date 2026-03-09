@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
+import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 import { languages, Language, translations } from "@/i18n";
 
 const countries = [
@@ -257,7 +258,7 @@ export default function Auth() {
 
                 <div className="space-y-2">
                   <Label>{a.country}</Label>
-                  <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder={a.countryPlaceholder} maxLength={60} />
+                  <CountryAutocomplete value={country} onValueChange={setCountry} placeholder={a.countryPlaceholder} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
