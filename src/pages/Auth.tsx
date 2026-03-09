@@ -260,8 +260,8 @@ export default function Auth() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>Complemento / Unit</Label>
-                    <Input value={addressComplement} onChange={(e) => setAddressComplement(e.target.value)} placeholder="Apt, suite..." maxLength={100} />
+                    <Label>{a.complement}</Label>
+                    <Input value={addressComplement} onChange={(e) => setAddressComplement(e.target.value)} placeholder={a.complementPlaceholder} maxLength={100} />
                   </div>
                   <div className="space-y-2">
                     <Label>Bairro / Neighborhood</Label>
