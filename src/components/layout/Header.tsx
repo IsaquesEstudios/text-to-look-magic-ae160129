@@ -222,7 +222,7 @@ export function Header() {
                 )
               ))}
               <Button variant="cta" size="lg" className="mt-4" asChild>
-                <a href="https://wa.link/0sgbl5" target="_blank" rel="noopener noreferrer">
+                <a href="https://chat.whatsapp.com/J9VELIIjT2FDnRg2vXS6am" target="_blank" rel="noopener noreferrer">
                   {t.common.cta}
                 </a>
               </Button>

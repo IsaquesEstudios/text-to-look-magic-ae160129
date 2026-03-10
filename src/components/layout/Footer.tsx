@@ -56,7 +56,7 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-foreground font-semibold">{t.footer.contact}</h4>
             <div className="flex flex-col gap-4">
-              <a href="https://wa.link/0sgbl5" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground text-sm hover:text-discovery-green transition-colors">
+              <a href="https://chat.whatsapp.com/J9VELIIjT2FDnRg2vXS6am" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground text-sm hover:text-discovery-green transition-colors">
                 <div className="w-8 h-8 rounded-lg bg-discovery-green/10 flex items-center justify-center">
                   <MessageCircle size={16} className="text-discovery-green" />
                 </div>

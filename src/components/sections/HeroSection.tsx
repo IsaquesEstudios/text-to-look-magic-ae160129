@@ -9,7 +9,7 @@ interface HeroSectionProps {
   backgroundImage: string;
 }
 
-const WHATSAPP_LINK = "https://wa.link/0sgbl5";
+const WHATSAPP_LINK = "https://chat.whatsapp.com/J9VELIIjT2FDnRg2vXS6am";
 
 export function HeroSection({
   title,

@@ -51,7 +51,7 @@ export function CTASection({
             {displayDescription}
           </p>
           <Button variant="hero" size="lg" className="inline-flex items-center gap-2 sm:gap-3 text-sm sm:text-base" asChild>
-            <a href="https://wa.link/0sgbl5" target="_blank" rel="noopener noreferrer">
+            <a href="https://chat.whatsapp.com/J9VELIIjT2FDnRg2vXS6am" target="_blank" rel="noopener noreferrer">
               <MessageCircle size={18} className="sm:w-5 sm:h-5" />
               {displayCtaText}
             </a>
