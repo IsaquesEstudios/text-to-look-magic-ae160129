@@ -67,6 +67,7 @@ export default function UserProfilePage() {
         address_number: pr.address_number ?? "", address_complement: pr.address_complement ?? "",
         address_neighborhood: pr.address_neighborhood ?? "", address_city: pr.address_city ?? "",
         address_state: pr.address_state ?? "", postal_code: pr.postal_code ?? "",
+        preferred_language: pr.preferred_language ?? "pt",
       });
       const rawPhone = (pr.phone ?? "").trim();
       const rawWhatsapp = (pr.whatsapp ?? "").trim();
