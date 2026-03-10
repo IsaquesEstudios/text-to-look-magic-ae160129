@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, Mail, Phone, MapPin, Save } from "lucide-react";
+import { Loader2, User, Mail, Phone, MapPin, Save, Globe } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { languages } from "@/i18n";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
 export default function UserProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -36,6 +38,7 @@ export default function UserProfilePage() {
     full_name: "", phone_prefix: "", phone: "", whatsapp_prefix: "", whatsapp: "",
     country: "", address_street: "", address_number: "", address_complement: "",
     address_neighborhood: "", address_city: "", address_state: "", postal_code: "",
+    preferred_language: "pt",
   });
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
@@ -64,6 +67,7 @@ export default function UserProfilePage() {
         address_number: pr.address_number ?? "", address_complement: pr.address_complement ?? "",
         address_neighborhood: pr.address_neighborhood ?? "", address_city: pr.address_city ?? "",
         address_state: pr.address_state ?? "", postal_code: pr.postal_code ?? "",
+        preferred_language: pr.preferred_language ?? "pt",
       });
       const rawPhone = (pr.phone ?? "").trim();
       const rawWhatsapp = (pr.whatsapp ?? "").trim();
@@ -82,10 +86,11 @@ export default function UserProfilePage() {
         address_number: form.address_number.trim() || null, address_complement: form.address_complement.trim() || null,
         address_neighborhood: form.address_neighborhood.trim() || null, address_city: form.address_city.trim() || null,
         address_state: form.address_state.trim() || null, postal_code: form.postal_code.trim() || null,
+        preferred_language: form.preferred_language,
       } as any).eq("user_id", user!.id);
       if (error) throw error;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["user-profile-full"] }); toast({ title: p.profileUpdated }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["user-profile-full"] }); refreshProfile(); toast({ title: p.profileUpdated }); },
     onError: (err: any) => { toast({ title: p.saveError, description: err.message, variant: "destructive" }); },
   });
 
@@ -112,6 +117,26 @@ export default function UserProfilePage() {
             <Input value={user.email ?? ""} disabled className="bg-muted/50" />
             <p className="text-xs text-muted-foreground">{p.emailCannotChange}</p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4 text-primary" />{p.preferredLanguage}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={form.preferred_language} onValueChange={(v) => update("preferred_language", v)}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map((l) => (
+                <SelectItem key={l.code} value={l.code}>
+                  {l.flag} {l.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardContent>
       </Card>
 
