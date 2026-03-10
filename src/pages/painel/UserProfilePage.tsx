@@ -122,6 +122,26 @@ export default function UserProfilePage() {
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4 text-primary" />{p.preferredLanguage}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={form.preferred_language} onValueChange={(v) => update("preferred_language", v)}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map((l) => (
+                <SelectItem key={l.code} value={l.code}>
+                  {l.flag} {l.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Phone className="h-4 w-4 text-primary" />{p.contact}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
