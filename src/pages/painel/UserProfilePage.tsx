@@ -90,7 +90,7 @@ export default function UserProfilePage() {
       } as any).eq("user_id", user!.id);
       if (error) throw error;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["user-profile-full"] }); toast({ title: p.profileUpdated }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["user-profile-full"] }); refreshProfile(); toast({ title: p.profileUpdated }); },
     onError: (err: any) => { toast({ title: p.saveError, description: err.message, variant: "destructive" }); },
   });
 
