@@ -1,7 +1,7 @@
 export const pt = {
   // Common
   common: {
-    cta: "Falar com Consultor",
+    cta: "Entre para o Grupo",
     learnMore: "Saiba Mais",
     readMore: "Ler Mais",
   },

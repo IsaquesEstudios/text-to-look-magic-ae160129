@@ -1,7 +1,7 @@
 export const en = {
   // Common
   common: {
-    cta: "Talk to a Consultant",
+    cta: "Join the Group",
     learnMore: "Learn More",
     readMore: "Read More",
   },
