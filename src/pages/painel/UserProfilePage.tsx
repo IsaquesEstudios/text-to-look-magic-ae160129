@@ -86,6 +86,7 @@ export default function UserProfilePage() {
         address_number: form.address_number.trim() || null, address_complement: form.address_complement.trim() || null,
         address_neighborhood: form.address_neighborhood.trim() || null, address_city: form.address_city.trim() || null,
         address_state: form.address_state.trim() || null, postal_code: form.postal_code.trim() || null,
+        preferred_language: form.preferred_language,
       } as any).eq("user_id", user!.id);
       if (error) throw error;
     },
