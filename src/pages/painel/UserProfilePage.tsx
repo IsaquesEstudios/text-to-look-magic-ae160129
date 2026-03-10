@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, Mail, Phone, MapPin, Save } from "lucide-react";
+import { Loader2, User, Mail, Phone, MapPin, Save, Globe } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { languages } from "@/i18n";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
