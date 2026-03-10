@@ -38,6 +38,7 @@ export default function UserProfilePage() {
     full_name: "", phone_prefix: "", phone: "", whatsapp_prefix: "", whatsapp: "",
     country: "", address_street: "", address_number: "", address_complement: "",
     address_neighborhood: "", address_city: "", address_state: "", postal_code: "",
+    preferred_language: "pt",
   });
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
