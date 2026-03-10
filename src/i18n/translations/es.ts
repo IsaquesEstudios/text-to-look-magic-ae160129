@@ -459,6 +459,7 @@ export const es = {
     cityPlaceholder: "Ciudad",
     state: "Estado / Provincia",
     statePlaceholder: "Estado",
+    preferredLanguage: "Idioma preferido",
     saveChanges: "Guardar Cambios",
     profileUpdated: "¡Perfil actualizado con éxito!",
     saveError: "Error al guardar",

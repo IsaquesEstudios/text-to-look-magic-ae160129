@@ -16,7 +16,7 @@ import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSel
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
 export default function UserProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();

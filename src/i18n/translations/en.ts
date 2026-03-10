@@ -459,6 +459,7 @@ export const en = {
     cityPlaceholder: "City",
     state: "State",
     statePlaceholder: "State",
+    preferredLanguage: "Preferred language",
     saveChanges: "Save Changes",
     profileUpdated: "Profile updated successfully!",
     saveError: "Error saving",
