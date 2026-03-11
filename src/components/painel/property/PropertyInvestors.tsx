@@ -326,7 +326,6 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
               disabled={
                 !selectedUserId ||
                 currentAmount <= 0 ||
-                currentAmount > remaining ||
                 currentTotalDeduction > userMaxCredits ||
                 linkMutation.isPending
               }
