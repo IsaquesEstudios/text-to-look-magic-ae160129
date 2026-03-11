@@ -177,7 +177,7 @@ export default function UserPropriedadesPage() {
   if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.myProjects}</h1>
         <p className="text-sm text-muted-foreground mt-1">{p.propertiesAndLands}</p>

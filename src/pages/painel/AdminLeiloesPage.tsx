@@ -244,7 +244,7 @@ export default function AdminLeiloesPage() {
 
   if (showForm) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">Novo Leilão</h1>
           <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
@@ -331,7 +331,7 @@ export default function AdminLeiloesPage() {
     );
   }
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leilões</h1>

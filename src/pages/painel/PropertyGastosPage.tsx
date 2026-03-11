@@ -74,7 +74,7 @@ export default function PropertyGastosPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="gastos" hasShares={!!(userShares && userShares.length > 0)} />
       <PropertyExpenses propertyId={property.id} propertyStateCode={property.state_code ?? undefined} />
     </div>

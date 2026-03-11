@@ -251,7 +251,7 @@ export default function UserLeiloesPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2"><Gavel className="h-6 w-6 text-primary" /> {p.auctionsTitle}</h1>
         <p className="text-sm text-muted-foreground mt-1">{p.followAuctions}</p>

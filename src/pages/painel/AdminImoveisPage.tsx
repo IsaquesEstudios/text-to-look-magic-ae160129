@@ -112,7 +112,7 @@ export default function AdminImoveisPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
