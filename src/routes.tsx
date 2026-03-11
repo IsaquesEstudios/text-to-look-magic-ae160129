@@ -1,4 +1,5 @@
 import { Suspense, lazy } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
 import { translations, Language } from "@/i18n";
@@ -50,8 +51,27 @@ const PageLoader = () => (
   </div>
 );
 
+const PanelPageLoader = () => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Skeleton className="h-7 w-48 rounded-lg" />
+      <Skeleton className="h-4 w-32 rounded-md" />
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <Skeleton className="h-24 rounded-2xl" />
+      <Skeleton className="h-24 rounded-2xl" />
+    </div>
+    <Skeleton className="h-40 w-full rounded-2xl" />
+    <Skeleton className="h-32 w-full rounded-2xl" />
+  </div>
+);
+
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
+);
+
+const PanelSuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<PanelPageLoader />}>{children}</Suspense>
 );
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
@@ -91,24 +111,24 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 
 // Panel child routes — rendered inside PainelLayout's <Outlet />
 const panelChildren: RouteRecord[] = [
-  { index: true, element: <SuspenseWrapper><Painel /></SuspenseWrapper> },
-  { path: "meus-projetos", element: <SuspenseWrapper><UserPropriedadesPage /></SuspenseWrapper> },
-  { path: "extrato", element: <SuspenseWrapper><UserExtrato /></SuspenseWrapper> },
-  { path: "imovel/:id", element: <SuspenseWrapper><PropertyDetail /></SuspenseWrapper> },
-  { path: "imovel/:id/novidades", element: <SuspenseWrapper><PropertyNovidadesPage /></SuspenseWrapper> },
-  { path: "imovel/:id/gastos", element: <SuspenseWrapper><PropertyGastosPage /></SuspenseWrapper> },
-  { path: "propriedades", element: <SuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></SuspenseWrapper> },
+  { index: true, element: <PanelSuspenseWrapper><Painel /></PanelSuspenseWrapper> },
+  { path: "meus-projetos", element: <PanelSuspenseWrapper><UserPropriedadesPage /></PanelSuspenseWrapper> },
+  { path: "extrato", element: <PanelSuspenseWrapper><UserExtrato /></PanelSuspenseWrapper> },
+  { path: "imovel/:id", element: <PanelSuspenseWrapper><PropertyDetail /></PanelSuspenseWrapper> },
+  { path: "imovel/:id/novidades", element: <PanelSuspenseWrapper><PropertyNovidadesPage /></PanelSuspenseWrapper> },
+  { path: "imovel/:id/gastos", element: <PanelSuspenseWrapper><PropertyGastosPage /></PanelSuspenseWrapper> },
+  { path: "propriedades", element: <PanelSuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></PanelSuspenseWrapper> },
   
-  { path: "usuarios", element: <SuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></SuspenseWrapper> },
-  { path: "usuarios/:userId", element: <SuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></SuspenseWrapper> },
-  { path: "atividades", element: <SuspenseWrapper><AdminGuard><AdminAtividadesPage /></AdminGuard></SuspenseWrapper> },
-  { path: "configuracoes", element: <SuspenseWrapper><AdminGuard><AdminConfigPage /></AdminGuard></SuspenseWrapper> },
-  { path: "leiloes", element: <SuspenseWrapper><AdminGuard><AdminLeiloesPage /></AdminGuard></SuspenseWrapper> },
-  { path: "leiloes-user", element: <SuspenseWrapper><UserLeiloesPage /></SuspenseWrapper> },
-  { path: "leilao/:id", element: <SuspenseWrapper><LeilaoDetailPage /></SuspenseWrapper> },
-  { path: "comprovantes", element: <SuspenseWrapper><UserComprovantesPage /></SuspenseWrapper> },
-  { path: "contratos", element: <SuspenseWrapper><UserContratosPage /></SuspenseWrapper> },
-  { path: "informacoes", element: <SuspenseWrapper><UserProfilePage /></SuspenseWrapper> },
+  { path: "usuarios", element: <PanelSuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></PanelSuspenseWrapper> },
+  { path: "usuarios/:userId", element: <PanelSuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></PanelSuspenseWrapper> },
+  { path: "atividades", element: <PanelSuspenseWrapper><AdminGuard><AdminAtividadesPage /></AdminGuard></PanelSuspenseWrapper> },
+  { path: "configuracoes", element: <PanelSuspenseWrapper><AdminGuard><AdminConfigPage /></AdminGuard></PanelSuspenseWrapper> },
+  { path: "leiloes", element: <PanelSuspenseWrapper><AdminGuard><AdminLeiloesPage /></AdminGuard></PanelSuspenseWrapper> },
+  { path: "leiloes-user", element: <PanelSuspenseWrapper><UserLeiloesPage /></PanelSuspenseWrapper> },
+  { path: "leilao/:id", element: <PanelSuspenseWrapper><LeilaoDetailPage /></PanelSuspenseWrapper> },
+  { path: "comprovantes", element: <PanelSuspenseWrapper><UserComprovantesPage /></PanelSuspenseWrapper> },
+  { path: "contratos", element: <PanelSuspenseWrapper><UserContratosPage /></PanelSuspenseWrapper> },
+  { path: "informacoes", element: <PanelSuspenseWrapper><UserProfilePage /></PanelSuspenseWrapper> },
 ];
 
 export const routes: RouteRecord[] = [
