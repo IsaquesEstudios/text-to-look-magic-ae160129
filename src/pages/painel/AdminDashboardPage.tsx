@@ -35,8 +35,8 @@ export default function AdminDashboardPage() {
 
   const cards = [
     { label: "Valor Discovery", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
-    { label: "Imóveis em Trabalho", value: String(stats?.casas ?? 0), icon: Building2 },
-    { label: "Terrenos", value: String(stats?.terrenos ?? 0), icon: MapPin },
+    { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
+    { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
     { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
     { label: "Total Investido", value: `$ ${(stats?.totalInvested ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
   ];
