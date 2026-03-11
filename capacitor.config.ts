@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Discovery Investments',
   webDir: 'dist',
   server: {
-    url: 'https://text-to-look-magic.lovable.app?forceHideBadge=true',
+    url: 'https://text-to-look-magic.lovable.app/auth?forceHideBadge=true',
     cleartext: true,
   },
 };
