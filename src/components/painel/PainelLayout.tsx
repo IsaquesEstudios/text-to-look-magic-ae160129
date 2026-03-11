@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Home, Shield, LayoutDashboard, Building2, Receipt,
   History, Loader2, Settings, Gavel, FileImage, UserCircle,
-  PanelLeftClose, PanelLeft,
+  PanelLeftClose, PanelLeft, FileText,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
