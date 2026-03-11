@@ -497,10 +497,10 @@ export const es = {
     receiptsDesc: "Comprobantes de pagos e historial de recargas",
     received: "Recibidos",
     sent: "Enviados",
-    recharges: "Recargas",
+    recharges: "Aportes",
     noReceivedReceipts: "Ningún comprobante de recepción",
     noSentReceipts: "Ningún comprobante de envío",
-    noRecharges: "Ninguna recarga realizada",
+    noRecharges: "Ningún aporte realizado",
 
     myProperties: "Mis Inmuebles",
     projectsYouInvest: "Proyectos en los que inviertes",

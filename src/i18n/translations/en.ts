@@ -497,10 +497,10 @@ export const en = {
     receiptsDesc: "Payment receipts and recharge history",
     received: "Received",
     sent: "Sent",
-    recharges: "Recharges",
+    recharges: "Deposits",
     noReceivedReceipts: "No received receipts",
     noSentReceipts: "No sent receipts",
-    noRecharges: "No recharges yet",
+    noRecharges: "No deposits yet",
 
     myProperties: "My Properties",
     projectsYouInvest: "Projects you invest in",

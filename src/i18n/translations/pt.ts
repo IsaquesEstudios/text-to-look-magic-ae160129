@@ -500,13 +500,13 @@ export const pt = {
 
     // Receipts page
     receiptsTitle: "Comprovantes",
-    receiptsDesc: "Comprovantes de pagamentos e histórico de recargas",
+    receiptsDesc: "Comprovantes de pagamentos e histórico de aportes",
     received: "Recebidos",
     sent: "Enviados",
-    recharges: "Recargas",
+    recharges: "Aportes",
     noReceivedReceipts: "Nenhum comprovante de recebimento",
     noSentReceipts: "Nenhum comprovante de envio",
-    noRecharges: "Nenhuma recarga realizada",
+    noRecharges: "Nenhum aporte realizado",
 
     // Properties pages
     myProperties: "Meus Imóveis",
