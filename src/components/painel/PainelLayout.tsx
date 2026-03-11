@@ -151,6 +151,7 @@ export function PainelLayout() {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={(event) => handlePanelNavigation(event, item.path)}
                   className={cn(
                     "relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
