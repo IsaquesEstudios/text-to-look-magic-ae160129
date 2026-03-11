@@ -471,7 +471,7 @@ export const pt = {
     // Statement page
     transactionHistory: "Histórico de movimentações",
     currentBalance: "Saldo atual",
-    recharge: "Recarga",
+    recharge: "Aporte",
     importantInfoTitle: "Informações importantes antes de recarregar",
     howInvestmentWorks: "Como funciona o investimento",
     howInvestmentWorksDesc: "Seus créditos são utilizados para participar de leilões de imóveis e terrenos nos Estados Unidos. Após a recarga, a equipe Discovery alocará seu capital nos leilões conforme as oportunidades disponíveis.",
