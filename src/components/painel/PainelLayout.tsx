@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { PageTransition } from "./PageTransition";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MoreHorizontal, X } from "lucide-react";
