@@ -117,6 +117,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseCurrency(form.price);
+    const taxRate = form.taxRate ? parseFloat(form.taxRate) : 0;
     if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
     const { error } = await supabase.from("property_expenses").insert({
@@ -126,10 +127,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       quantity: 1,
       price,
       month: form.month,
+      tax_rate: taxRate,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      // Save tax rate as default on the property
+      if (taxRate > 0) {
+        await supabase.from("properties").update({ default_tax_rate: taxRate } as any).eq("id", propertyId);
+        queryClient.invalidateQueries({ queryKey: ["property-tax-rate", propertyId] });
+      }
       setForm((prev) => ({ ...prev, category: "", price: "" }));
       queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
     }
