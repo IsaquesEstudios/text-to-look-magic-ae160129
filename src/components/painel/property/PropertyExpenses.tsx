@@ -58,7 +58,7 @@ function parseCurrency(val: string): number {
 }
 
 export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
