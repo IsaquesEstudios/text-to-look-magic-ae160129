@@ -228,6 +228,11 @@ export function PainelLayout() {
           </div>
         </aside>
 
+        {/* ── Mobile top search bar ── */}
+        <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/20 px-[4%] py-2.5 safe-area-top">
+          <PanelSearchBar />
+        </div>
+
         {/* ── Mobile bottom nav ── */}
         {(() => {
           const bottomItems = isAdmin
