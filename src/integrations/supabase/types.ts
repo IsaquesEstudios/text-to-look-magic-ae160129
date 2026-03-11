@@ -199,6 +199,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          admin_signed_at: string | null
+          created_at: string
+          id: string
+          pdf_url: string
+          title: string
+          updated_at: string
+          user_id: string
+          user_signed_at: string | null
+        }
+        Insert: {
+          admin_signed_at?: string | null
+          created_at?: string
+          id?: string
+          pdf_url: string
+          title: string
+          updated_at?: string
+          user_id: string
+          user_signed_at?: string | null
+        }
+        Update: {
+          admin_signed_at?: string | null
+          created_at?: string
+          id?: string
+          pdf_url?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          user_signed_at?: string | null
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
