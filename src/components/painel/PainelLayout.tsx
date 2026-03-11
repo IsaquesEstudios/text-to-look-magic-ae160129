@@ -226,8 +226,8 @@ export function PainelLayout() {
         </aside>
 
         {/* ── Mobile bottom nav ── */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
-          <nav className="flex items-center justify-around h-14 px-2">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
+          <nav className="flex items-center justify-evenly h-14 px-1 w-full overflow-x-auto">
             {[...navItems, { label: p.profile, icon: UserCircle, path: profilePath }].map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
@@ -241,12 +241,13 @@ export function PainelLayout() {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors",
+                    "relative flex flex-col items-center gap-0.5 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0",
+                    "text-[9px] px-1.5 min-w-0",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
-                  {item.label}
+                  <item.icon className="h-4 w-4" />
+                  <span className="truncate max-w-[56px] text-center">{item.label}</span>
                   {badgeCount > 0 && (
                     <span className="absolute -top-1 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                       {badgeCount > 9 ? "+9" : badgeCount}
