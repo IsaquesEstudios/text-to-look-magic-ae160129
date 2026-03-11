@@ -80,14 +80,9 @@ export default function AdminImoveisPage() {
   const { data: counts } = useQuery({
     queryKey: ["admin-portfolio-counts"],
     queryFn: async () => {
-      const { data: shareRows } = await supabase.from("shares").select("property_id");
-      const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
-      if (linkedIds.length === 0) return { house: 0, land: 0 };
-
       const { data: props } = await supabase
         .from("properties")
-        .select("type")
-        .in("id", linkedIds);
+        .select("type");
 
       const list = props ?? [];
       return {
