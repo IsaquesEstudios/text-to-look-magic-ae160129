@@ -614,7 +614,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            Taxa proporcional ({totalProjeto > 0 ? ((currentAmount / totalProjeto) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
+                            Taxa proporcional ({totalProjeto > 0 ? Math.min((currentAmount / totalProjeto) * 100, 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
                           </span>
                           <span className="font-semibold text-amber-500">${formatUSD(currentFeeShare)}</span>
                         </div>
