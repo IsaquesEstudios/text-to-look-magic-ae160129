@@ -106,6 +106,24 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
+  // Fetch last read timestamp for this user
+  const { data: lastReadData } = useQuery({
+    queryKey: ["expense-last-read", propertyId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("property_expense_reads")
+        .select("last_read_at")
+        .eq("property_id", propertyId)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const lastReadAt = lastReadData?.last_read_at ?? null;
+
   // Existing categories for autocomplete
   const existingCategories = useMemo(() => {
     if (!expenses) return [];
