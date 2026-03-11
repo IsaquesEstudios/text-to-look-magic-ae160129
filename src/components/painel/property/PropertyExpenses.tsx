@@ -289,18 +289,21 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
-              <div className="w-24">
-                <label className="text-xs text-muted-foreground">Tarifa (%)</label>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  value={form.taxRate}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^0-9.]/g, "");
-                    setForm({ ...form, taxRate: v });
-                  }}
-                  placeholder="0"
-                />
+              <div className="w-44">
+                <label className="text-xs text-muted-foreground">Tarifa</label>
+                <Select value={form.taxRate} onValueChange={(v) => setForm({ ...form, taxRate: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sem tarifa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Sem tarifa</SelectItem>
+                    {stateTaxes?.map((t) => (
+                      <SelectItem key={t.state_code} value={String(t.tax_rate)}>
+                        {t.state_name} ({t.tax_rate}%)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
