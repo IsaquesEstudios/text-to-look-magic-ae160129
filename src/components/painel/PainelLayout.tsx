@@ -306,7 +306,7 @@ export function PainelLayout() {
                         <Link
                           key={item.path}
                           to={item.path}
-                          onClick={() => setMoreOpen(false)}
+                          onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                           className={cn(
                             "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
                             isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
