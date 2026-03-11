@@ -27,6 +27,15 @@ function getCountryLabels(code: string) {
 }
 
 export default function Auth() {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to panel if already logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/painel", { replace: true });
+    }
+  }, [user, isLoading, navigate]);
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
