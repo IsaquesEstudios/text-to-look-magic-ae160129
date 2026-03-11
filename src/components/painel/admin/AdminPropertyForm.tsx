@@ -105,7 +105,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const reservedCredits = new Map<string, number>();
   for (const inv of investorsToLink) {
     const amount = inv.rawAmount / 100;
-    const fee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * serviceFee * 100) / 100 : 0;
+    const fee = totalProjeto > 0 ? Math.min(Math.round((amount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
     reservedCredits.set(inv.userId, (reservedCredits.get(inv.userId) ?? 0) + amount + fee);
   }
 
