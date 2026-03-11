@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MoreHorizontal, X } from "lucide-react";
+import { PanelSearchBar } from "./PanelSearchBar";
 
 export function PainelLayout() {
   const { user, isAdmin, isLoading, profile, signOut } = useAuth();
@@ -227,6 +228,11 @@ export function PainelLayout() {
           </div>
         </aside>
 
+        {/* ── Mobile top search bar ── */}
+        <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/20 px-[4%] py-2.5 safe-area-top">
+          <PanelSearchBar />
+        </div>
+
         {/* ── Mobile bottom nav ── */}
         {(() => {
           const bottomItems = isAdmin
@@ -348,7 +354,7 @@ export function PainelLayout() {
           );
         })()}
 
-        <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 py-6 md:py-8 px-[4%] md:px-6 overflow-x-hidden">
+        <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 pt-16 md:pt-8 py-6 md:py-8 px-[4%] md:px-6 overflow-x-hidden">
           <Outlet />
         </main>
       </div>
