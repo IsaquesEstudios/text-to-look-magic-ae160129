@@ -131,7 +131,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
 
   // Resolve tax rate from selected state code
   const resolvedTaxRate = useMemo(() => {
-    if (!form.taxStateCode || !stateTaxes) return 0;
+    if (!form.taxStateCode || form.taxStateCode === "none" || !stateTaxes) return 0;
     const found = stateTaxes.find((t) => t.state_code === form.taxStateCode);
     return found ? Number(found.tax_rate) : 0;
   }, [form.taxStateCode, stateTaxes]);
