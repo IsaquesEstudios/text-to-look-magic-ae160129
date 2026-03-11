@@ -152,11 +152,10 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
   const currentTotalDeduction = currentAmount + currentFeeShare;
   const selectedInvestor = investorsWithCredits?.find((inv) => inv.user_id === selectedUserId);
   const userMaxCredits = Number(selectedInvestor?.credits ?? 0);
-  const maxLinkableByRemaining = remaining;
   const maxLinkableByCredits = totalProject > 0
     ? Math.floor((userMaxCredits / (1 + serviceFee / totalProject)) * 100) / 100
     : userMaxCredits;
-  const maxLinkable = Math.min(maxLinkableByRemaining, maxLinkableByCredits);
+  const maxLinkable = maxLinkableByCredits;
 
   return (
     <div>
