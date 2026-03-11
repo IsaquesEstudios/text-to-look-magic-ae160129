@@ -15,7 +15,7 @@ interface Props {
 const navItems = [
   { key: "overview" as const, label: "Visão Geral", icon: LayoutDashboard, path: "", restricted: false, badgeKey: null },
   { key: "novidades" as const, label: "Novidades", icon: MessageSquare, path: "/novidades", restricted: true, badgeKey: "novidades" as const },
-  { key: "gastos" as const, label: "Gastos", icon: Receipt, path: "/gastos", restricted: true, badgeKey: "gastos" as const },
+  { key: "gastos" as const, label: "Despesas", icon: Receipt, path: "/gastos", restricted: true, badgeKey: "gastos" as const },
 ];
 
 export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, onEdit, isEditing }: Props) {
