@@ -258,7 +258,8 @@ export function PainelLayout() {
           </nav>
         </div>
 
-        <main className="flex-1 px-4 md:px-6 py-6 md:py-8 w-full pb-20 md:pb-8 overflow-x-hidden">
+        <main className="flex-1 w-full pb-20 md:pb-8 overflow-x-hidden" style={{ padding: '1.5rem 4% 5rem', paddingRight: '4%' }}>
+          <div className="hidden md:block" style={{ padding: '2rem 1.5rem 2rem' }}></div>
           <Outlet />
         </main>
       </div>
