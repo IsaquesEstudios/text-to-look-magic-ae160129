@@ -202,10 +202,15 @@ export function UserDashboard() {
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          {p.propertyUpdates}
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            {p.propertyUpdates}
+          </h2>
+          {propertyNews && propertyNews.length > 4 && (
+            <Link to="/painel/meus-projetos" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
+          )}
+        </div>
         {!propertyNews?.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Building2 className="h-8 w-8 mb-2 opacity-20" />
