@@ -474,7 +474,7 @@ export const pt = {
     recharge: "Aporte",
     importantInfoTitle: "Informações importantes antes de aportar",
     howInvestmentWorks: "Como funciona o investimento",
-    howInvestmentWorksDesc: "Seus créditos são utilizados para participar de leilões de imóveis e terrenos nos Estados Unidos. Após a recarga, a equipe Discovery alocará seu capital nos leilões conforme as oportunidades disponíveis.",
+    howInvestmentWorksDesc: "Seus créditos são utilizados para participar de leilões de imóveis e terrenos nos Estados Unidos. Após o aporte, a equipe Discovery alocará seu capital nos leilões conforme as oportunidades disponíveis.",
     investmentTiers: "Faixas de investimento",
     tierLand: "De $800 a $10,999 — investimento exclusivo em terrenos. Taxa de serviço Discovery: $500.",
     tierHouse: "A partir de $11,000 — investimento em imóveis (casas). Taxa de serviço Discovery: $5,000.",
