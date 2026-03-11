@@ -118,9 +118,18 @@ export default function AdminImoveisPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
-        <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos com investidores vinculados</p>
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
+          <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos do portfólio</p>
+        </div>
+        <Button
+          onClick={() => setShowForm(true)}
+          className="gap-2 rounded-xl h-10 px-5 font-medium"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Nova Propriedade
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

@@ -321,7 +321,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Total do Projeto (computed) + Return % */}
+            {/* Total + Sale Value */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Total Est. do Projeto ($)</Label>
@@ -331,22 +331,28 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <p className="text-xs text-muted-foreground">Arremate + Reforma</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="returnPct">Retorno Estimado (%)</Label>
+                <Label htmlFor="saleValue">Valor Est. de Venda ($)</Label>
                 <Input
-                  id="returnPct"
+                  id="saleValue"
                   type="number"
-                  step="0.1"
+                  step="0.01"
                   min="0"
-                  value={form.estimated_return_pct}
-                  onChange={(e) => setForm({ ...form, estimated_return_pct: e.target.value })}
-                  placeholder="Ex: 30"
+                  value={form.estimated_sale_value}
+                  onChange={(e) => setForm({ ...form, estimated_sale_value: e.target.value })}
+                  placeholder="Ex: 350000"
                 />
-                {totalProjeto > 0 && parseFloat(form.estimated_return_pct) > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Valor de mercado: ${(totalProjeto * (1 + (parseFloat(form.estimated_return_pct) || 0) / 100)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                )}
               </div>
+            </div>
+
+            {/* Calculated Return */}
+            <div className="space-y-2">
+              <Label>Retorno Estimado (%)</Label>
+              <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
+                {totalProjeto > 0 && parseFloat(form.estimated_sale_value) > 0
+                  ? `${(((parseFloat(form.estimated_sale_value) - totalProjeto) / totalProjeto) * 100).toFixed(1)}%`
+                  : "—"}
+              </div>
+              <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
             </div>
 
             {/* Shares */}

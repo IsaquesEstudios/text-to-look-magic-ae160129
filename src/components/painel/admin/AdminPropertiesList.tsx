@@ -25,19 +25,9 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
   const { data: properties, isLoading } = useQuery({
     queryKey: ["admin-properties", filterType ?? "all"],
     queryFn: async () => {
-      // Get property IDs that have linked investors (shares)
-      const { data: shareRows, error: sharesError } = await supabase
-        .from("shares")
-        .select("property_id");
-      if (sharesError) throw sharesError;
-
-      const linkedIds = [...new Set(shareRows.map((s) => s.property_id))];
-      if (linkedIds.length === 0) return [];
-
       let query = supabase
         .from("properties")
-        .select("*")
-        .in("id", linkedIds);
+        .select("*");
       if (filterType) {
         query = query.eq("type", filterType);
       }
