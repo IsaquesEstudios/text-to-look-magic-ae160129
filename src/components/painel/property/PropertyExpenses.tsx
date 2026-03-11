@@ -79,13 +79,13 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
-  // Fetch property default tax rate
+  // Fetch property default tax state code
   const { data: propertyData } = useQuery({
     queryKey: ["property-tax-rate", propertyId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("default_tax_rate")
+        .select("default_tax_rate, state_code")
         .eq("id", propertyId)
         .maybeSingle();
       if (error) throw error;
