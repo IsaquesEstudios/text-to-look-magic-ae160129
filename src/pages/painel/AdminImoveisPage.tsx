@@ -12,14 +12,9 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
     queryKey: ["admin-properties-kpis", filterType],
     queryFn: async () => {
-      const { data: shareRows } = await supabase.from("shares").select("property_id");
-      const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
-      if (linkedIds.length === 0) return { arremate: 0, reforma: 0, investido: 0, venda: 0 };
-
       const { data: properties } = await supabase
         .from("properties")
         .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
-        .in("id", linkedIds)
         .eq("type", filterType);
 
       const props = properties ?? [];
