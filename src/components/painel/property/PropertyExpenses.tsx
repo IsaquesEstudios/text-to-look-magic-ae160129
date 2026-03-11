@@ -62,7 +62,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ month: "", category: "", price: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "", taxRate: "" });
   const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
 
@@ -79,6 +79,20 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
+  // Fetch property default tax rate
+  const { data: propertyData } = useQuery({
+    queryKey: ["property-tax-rate", propertyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("default_tax_rate")
+        .eq("id", propertyId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Existing categories for autocomplete
   const existingCategories = useMemo(() => {
     if (!expenses) return [];
@@ -89,19 +103,21 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (expenses === undefined) return;
+    if (expenses === undefined || propertyData === undefined) return;
 
     const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
     const now = new Date();
     const defaultMonth = lastExpense?.month || String(now.getMonth() + 1).padStart(2, "0");
+    const defaultTaxRate = propertyData?.default_tax_rate ? String(propertyData.default_tax_rate) : "";
 
-    setForm((f) => ({ ...f, month: defaultMonth }));
+    setForm((f) => ({ ...f, month: defaultMonth, taxRate: defaultTaxRate }));
     defaultInitialized.current = true;
-  }, [expenses]);
+  }, [expenses, propertyData]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseCurrency(form.price);
+    const taxRate = form.taxRate ? parseFloat(form.taxRate) : 0;
     if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
     const { error } = await supabase.from("property_expenses").insert({
@@ -111,10 +127,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       quantity: 1,
       price,
       month: form.month,
+      tax_rate: taxRate,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      // Save tax rate as default on the property
+      if (taxRate > 0) {
+        await supabase.from("properties").update({ default_tax_rate: taxRate } as any).eq("id", propertyId);
+        queryClient.invalidateQueries({ queryKey: ["property-tax-rate", propertyId] });
+      }
       setForm((prev) => ({ ...prev, category: "", price: "" }));
       queryClient.invalidateQueries({ queryKey: ["property-expenses", propertyId] });
     }
@@ -142,20 +164,23 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Group expenses by category
   const groupedExpenses = useMemo(() => {
     if (!expenses) return [];
-    const map = new Map<string, { category: string; total: number; items: typeof expenses }>();
+    const map = new Map<string, { category: string; total: number; totalTax: number; items: typeof expenses }>();
     expenses.forEach((e) => {
+      const tax = Number(e.price) * (Number(e.tax_rate || 0) / 100);
       const existing = map.get(e.category);
       if (existing) {
         existing.total += Number(e.price);
+        existing.totalTax += tax;
         existing.items.push(e);
       } else {
-        map.set(e.category, { category: e.category, total: Number(e.price), items: [e] });
+        map.set(e.category, { category: e.category, total: Number(e.price), totalTax: tax, items: [e] });
       }
     });
     return Array.from(map.values());
   }, [expenses]);
 
   const totalSpent = groupedExpenses.reduce((sum, g) => sum + g.total, 0);
+  const totalTax = groupedExpenses.reduce((sum, g) => sum + g.totalTax, 0);
 
   if (isLoading) {
     return (
@@ -251,6 +276,19 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
+              <div className="w-24">
+                <label className="text-xs text-muted-foreground">Tarifa (%)</label>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={form.taxRate}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9.]/g, "");
+                    setForm({ ...form, taxRate: v });
+                  }}
+                  placeholder="0"
+                />
+              </div>
 
               <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -268,6 +306,8 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
               <thead>
                 <tr className="border-b border-border/50">
                   <th className="text-left p-3 text-muted-foreground font-medium">Categoria</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Valor</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Tarifa</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
                 </tr>
@@ -296,7 +336,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                             <span className="text-xs text-muted-foreground">({group.items.length})</span>
                           )}
                         </td>
-                        <td className="p-3 text-right font-medium text-foreground">${fmt(group.total)}</td>
+                        <td className="p-3 text-right text-foreground">${fmt(group.total)}</td>
+                        <td className="p-3 text-right text-muted-foreground">{group.totalTax > 0 ? `$${fmt(group.totalTax)}` : "—"}</td>
+                        <td className="p-3 text-right font-medium text-foreground">${fmt(group.total + group.totalTax)}</td>
                         {isAdmin && !hasMultiple && (
                           <td className="p-3">
                             <button onClick={(e) => { e.stopPropagation(); deleteExpense(group.items[0].id); }} className="text-destructive/60 hover:text-destructive">
@@ -306,21 +348,28 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                         )}
                         {isAdmin && hasMultiple && <td />}
                       </tr>
-                      {isExpanded && group.items.map((expense) => (
-                        <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
-                          <td className="p-2 pl-10 text-muted-foreground text-xs">
-                            {formatMonthLabel(expense.month)}
-                          </td>
-                          <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price))}</td>
-                          {isAdmin && (
-                            <td className="p-2">
-                              <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
+                      {isExpanded && group.items.map((expense) => {
+                        const itemTax = Number(expense.price) * (Number(expense.tax_rate || 0) / 100);
+                        return (
+                          <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
+                            <td className="p-2 pl-10 text-muted-foreground text-xs">
+                              {formatMonthLabel(expense.month)}
                             </td>
-                          )}
-                        </tr>
-                      ))}
+                            <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price))}</td>
+                            <td className="p-2 text-right text-muted-foreground text-xs">
+                              {Number(expense.tax_rate || 0) > 0 ? `${expense.tax_rate}% ($${fmt(itemTax)})` : "—"}
+                            </td>
+                            <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price) + itemTax)}</td>
+                            {isAdmin && (
+                              <td className="p-2">
+                                <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                     </Fragment>
                   );
                 })}
@@ -328,7 +377,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
               <tfoot>
                 <tr className="border-t border-border/50">
                   <td className="p-3 font-bold text-foreground">Total</td>
-                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent)}</td>
+                  <td className="p-3 text-right font-bold text-foreground">${fmt(totalSpent)}</td>
+                  <td className="p-3 text-right font-bold text-muted-foreground">{totalTax > 0 ? `$${fmt(totalTax)}` : "—"}</td>
+                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent + totalTax)}</td>
                   {isAdmin && <td />}
                 </tr>
               </tfoot>

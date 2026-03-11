@@ -298,6 +298,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           created_by: string
+          default_tax_rate: number | null
           estimated_auction_value: number | null
           estimated_renovation_cost: number | null
           estimated_return_pct: number
@@ -319,6 +320,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by: string
+          default_tax_rate?: number | null
           estimated_auction_value?: number | null
           estimated_renovation_cost?: number | null
           estimated_return_pct?: number
@@ -340,6 +342,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
+          default_tax_rate?: number | null
           estimated_auction_value?: number | null
           estimated_renovation_cost?: number | null
           estimated_return_pct?: number
