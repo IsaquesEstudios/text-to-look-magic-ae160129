@@ -355,32 +355,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
             </div>
 
-            {/* Shares */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="totalShares">Quantidade de Cotas</Label>
-                <Input
-                  id="totalShares"
-                  type="number"
-                  min="1"
-                  value={form.total_shares}
-                  onChange={(e) => setForm({ ...form, total_shares: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="sharePrice">Preço por Cota ($)</Label>
-                <Input
-                  id="sharePrice"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={form.share_price}
-                  onChange={(e) => setForm({ ...form, share_price: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
+
 
             {/* Timeline */}
             <div className="space-y-2">
