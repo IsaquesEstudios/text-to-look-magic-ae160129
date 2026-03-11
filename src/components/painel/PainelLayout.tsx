@@ -302,9 +302,9 @@ export function PainelLayout() {
               <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
                 <nav className="flex items-center justify-evenly h-16 px-1 w-full">
                   {bottomItems.map((item) => {
-                    const isActive = item.path === "/painel"
+                    const isActive = !moreOpen && (item.path === "/painel"
                       ? location.pathname === "/painel"
-                      : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
+                      : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/")));
                     const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
                     const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
                     const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
