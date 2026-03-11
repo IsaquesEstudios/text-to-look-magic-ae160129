@@ -7,11 +7,25 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2, AlertTriangle } from "lucide-react";
 
 interface Props {
   propertyId: string | null;
   onClose: () => void;
+}
+
+interface InvestorToLink {
+  userId: string;
+  rawAmount: number;
+  displayAmount: string;
+}
+
+function formatUSD(value: number) {
+  return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function getServiceFee(type: string): number {
+  return type === "land" || type === "terreno" ? 500 : 5000;
 }
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
@@ -39,7 +53,13 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
-  // Fetch US states for dropdown
+  // Investor linking state (only for new properties)
+  const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
+  const [showAddInvestor, setShowAddInvestor] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [linkRawAmount, setLinkRawAmount] = useState(0);
+  const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
+
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
     queryFn: async () => {
@@ -51,10 +71,74 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     },
   });
 
-  // Computed total
+  // Fetch investors with credits (only when not editing)
+  const { data: investorsWithCredits } = useQuery({
+    queryKey: ["investors-with-credits-form"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, credits")
+        .gt("credits", 0)
+        .order("credits", { ascending: false });
+      if (error) throw error;
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
+      return data.filter((p) => !adminIds.has(p.user_id));
+    },
+    enabled: !propertyId,
+  });
+
   const totalProjeto =
     (parseFloat(form.estimated_auction_value) || 0) +
     (parseFloat(form.estimated_renovation_cost) || 0);
+
+  const serviceFee = getServiceFee(form.type);
+
+  // Calculate already-added amounts per investor
+  const totalLinked = investorsToLink.reduce((s, inv) => s + inv.rawAmount / 100, 0);
+  const remaining = totalProjeto - totalLinked;
+
+  // Build a map of credits already "reserved" by pending links
+  const reservedCredits = new Map<string, number>();
+  for (const inv of investorsToLink) {
+    const amount = inv.rawAmount / 100;
+    const fee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * serviceFee * 100) / 100 : 0;
+    reservedCredits.set(inv.userId, (reservedCredits.get(inv.userId) ?? 0) + amount + fee);
+  }
+
+  const getAvailableCredits = (userId: string) => {
+    const inv = investorsWithCredits?.find((i) => i.user_id === userId);
+    if (!inv) return 0;
+    return Number(inv.credits) - (reservedCredits.get(userId) ?? 0);
+  };
+
+  // Current link preview
+  const currentAmount = linkRawAmount / 100;
+  const currentFeeShare = totalProjeto > 0 ? Math.round((currentAmount / totalProjeto) * serviceFee * 100) / 100 : 0;
+  const currentTotalDeduction = currentAmount + currentFeeShare;
+  const selectedAvailableCredits = getAvailableCredits(selectedUserId);
+
+  const maxLinkableByRemaining = remaining;
+  const maxLinkableByCredits = totalProjeto > 0
+    ? Math.floor((selectedAvailableCredits / (1 + serviceFee / totalProjeto)) * 100) / 100
+    : selectedAvailableCredits;
+  const maxLinkable = Math.min(maxLinkableByRemaining, maxLinkableByCredits);
+
+  const addInvestorToList = () => {
+    if (!selectedUserId || currentAmount <= 0) return;
+    setInvestorsToLink((prev) => [...prev, { userId: selectedUserId, rawAmount: linkRawAmount, displayAmount: linkDisplayAmount }]);
+    setSelectedUserId("");
+    setLinkRawAmount(0);
+    setLinkDisplayAmount("");
+    setShowAddInvestor(false);
+  };
+
+  const removeInvestorFromList = (index: number) => {
+    setInvestorsToLink((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Load existing property
   useEffect(() => {
@@ -62,11 +146,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     const load = async () => {
       const [propRes, imgRes] = await Promise.all([
         supabase.from("properties").select("*").eq("id", propertyId).maybeSingle(),
-        supabase
-          .from("property_images")
-          .select("*")
-          .eq("property_id", propertyId)
-          .order("sort_order"),
+        supabase.from("property_images").select("*").eq("property_id", propertyId).order("sort_order"),
       ]);
 
       if (propRes.data) {
@@ -135,6 +215,18 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-portfolio-counts"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-properties-kpis"] });
+    queryClient.invalidateQueries({ queryKey: ["investors-with-credits-form"] });
+    queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
+    queryClient.invalidateQueries({ queryKey: ["property-investors"] });
+    queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
+    queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
+    queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -195,8 +287,29 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         }
       }
 
+      // Link investors (only for new properties)
+      if (propId && !propertyId && investorsToLink.length > 0) {
+        for (const inv of investorsToLink) {
+          const amount = inv.rawAmount / 100;
+          const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
+            p_property_id: propId,
+            p_user_id: inv.userId,
+            p_amount: amount,
+            p_property_type: form.type,
+            p_property_title: form.title.trim(),
+          });
+          if (error) {
+            toast({
+              title: "Erro ao vincular investidor",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        }
+      }
+
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
-      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      invalidateAll();
       onClose();
     } catch (error: any) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -204,6 +317,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       setLoading(false);
     }
   };
+
+  const availableInvestors = (investorsWithCredits ?? []).filter((inv) => getAvailableCredits(inv.user_id) > 0);
 
   return (
     <div className="space-y-6">
@@ -355,8 +470,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
             </div>
 
-
-
             {/* Timeline */}
             <div className="space-y-2">
               <Label htmlFor="timeline">Prazo Estimado</Label>
@@ -367,6 +480,193 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 placeholder="Ex: 6 meses"
               />
             </div>
+
+            {/* ===== Investor Linking Section (only for new properties) ===== */}
+            {!propertyId && (
+              <div className="space-y-3 rounded-xl border border-border/50 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4 text-primary" />
+                    <Label className="text-sm font-semibold">Vincular Investidores</Label>
+                  </div>
+                  {totalProjeto > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      Falta: <span className="font-semibold text-foreground">${formatUSD(Math.max(remaining, 0))}</span> de ${formatUSD(totalProjeto)}
+                    </span>
+                  )}
+                </div>
+
+                {/* Service fee info */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 text-xs">
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    Taxa de serviço: <span className="font-semibold text-foreground">${formatUSD(serviceFee)}</span>
+                    {" "}({form.type === "land" ? "terreno" : "casa"}) — proporcional ao valor vinculado
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                {totalProjeto > 0 && totalLinked > 0 && (
+                  <div>
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                      <span>Vinculado: ${formatUSD(totalLinked)}</span>
+                      <span>Total: ${formatUSD(totalProjeto)}</span>
+                    </div>
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${Math.min((totalLinked / totalProjeto) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Listed investors to link */}
+                {investorsToLink.length > 0 && (
+                  <div className="space-y-1.5">
+                    {investorsToLink.map((inv, idx) => {
+                      const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
+                      const amount = inv.rawAmount / 100;
+                      const fee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * serviceFee * 100) / 100 : 0;
+                      const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
+
+                      return (
+                        <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
+                          <div>
+                            <span className="font-medium">{profile?.full_name || "Usuário"}</span>
+                            <span className="text-muted-foreground ml-2">({pct}%)</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p className="font-semibold">${formatUSD(amount)}</p>
+                              <p className="text-[10px] text-amber-500">Taxa: ${formatUSD(fee)}</p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive"
+                              onClick={() => removeInvestorFromList(idx)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Add investor form */}
+                {showAddInvestor ? (
+                  <div className="space-y-3 pt-2 border-t border-border/50">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Investidor</label>
+                      <select
+                        value={selectedUserId}
+                        onChange={(e) => { setSelectedUserId(e.target.value); setLinkRawAmount(0); setLinkDisplayAmount(""); }}
+                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">Selecione um investidor</option>
+                        {availableInvestors.map((inv) => (
+                          <option key={inv.user_id} value={inv.user_id}>
+                            {inv.full_name || "Usuário"} — Saldo: ${formatUSD(getAvailableCredits(inv.user_id))}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {selectedUserId && (
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          Valor a vincular (máx: ${formatUSD(Math.max(maxLinkable, 0))})
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="0.00"
+                            value={linkDisplayAmount}
+                            onChange={(e) => {
+                              const input = e.target.value.replace(/[^0-9]/g, "");
+                              const cents = parseInt(input || "0", 10);
+                              setLinkRawAmount(cents);
+                              if (cents === 0) {
+                                setLinkDisplayAmount("");
+                              } else {
+                                setLinkDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                              }
+                            }}
+                            className="pl-7"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fee breakdown preview */}
+                    {currentAmount > 0 && selectedUserId && (
+                      <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
+                        <p className="font-medium text-foreground">Resumo da operação:</p>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Investimento</span>
+                          <span className="font-semibold">${formatUSD(currentAmount)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            Taxa proporcional ({totalProjeto > 0 ? ((currentAmount / totalProjeto) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
+                          </span>
+                          <span className="font-semibold text-amber-500">${formatUSD(currentFeeShare)}</span>
+                        </div>
+                        <div className="border-t border-border/50 pt-1.5 flex justify-between">
+                          <span className="font-medium text-foreground">Total debitado</span>
+                          <span className="font-bold text-foreground">${formatUSD(currentTotalDeduction)}</span>
+                        </div>
+                        {currentTotalDeduction > selectedAvailableCredits && (
+                          <p className="text-destructive font-medium mt-1">
+                            ⚠ Saldo insuficiente (disponível: ${formatUSD(selectedAvailableCredits)})
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="gap-2"
+                        disabled={
+                          !selectedUserId ||
+                          currentAmount <= 0 ||
+                          currentAmount > remaining ||
+                          currentTotalDeduction > selectedAvailableCredits ||
+                          totalProjeto <= 0
+                        }
+                        onClick={addInvestorToList}
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        Adicionar
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => { setShowAddInvestor(false); setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  remaining > 0 && totalProjeto > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 w-full"
+                      onClick={() => setShowAddInvestor(true)}
+                    >
+                      <UserPlus className="h-4 w-4" /> Vincular Investidor
+                    </Button>
+                  )
+                )}
+              </div>
+            )}
 
             {/* Status */}
             <div className="space-y-2">
