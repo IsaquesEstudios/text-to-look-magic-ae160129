@@ -241,11 +241,65 @@ export function PainelLayout() {
           const extraItems = [
             ...navItems.filter(i => !bottomItems.includes(i)),
             { label: p.profile, icon: UserCircle, path: profilePath },
-            { label: p.goToSite, icon: Home, path: "/pt" },
           ];
 
           return (
             <>
+              {/* More panel – full width, above bottom nav */}
+              {moreOpen && (
+                <div className="md:hidden fixed inset-0 z-30" onClick={() => setMoreOpen(false)}>
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+                </div>
+              )}
+              <div
+                className={cn(
+                  "md:hidden fixed inset-x-0 bottom-16 z-35 transition-transform duration-300 ease-out safe-area-bottom",
+                  moreOpen ? "translate-y-0" : "translate-y-full"
+                )}
+                style={{ zIndex: 35 }}
+              >
+                <div className="bg-background border-t border-border/30 rounded-t-2xl shadow-2xl px-4 pt-5 pb-4">
+                  <div className="flex items-center justify-between mb-4 px-1">
+                    <span className="text-sm font-semibold text-foreground">Menu</span>
+                    <button onClick={() => setMoreOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <nav className="space-y-1">
+                    {extraItems.map((item) => {
+                      const isActive = item.path === profilePath
+                        ? location.pathname === profilePath
+                        : location.pathname.startsWith(item.path);
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setMoreOpen(false)}
+                          className={cn(
+                            "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
+                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          )}
+                        >
+                          <item.icon className="h-5 w-5 flex-shrink-0" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+
+                  <div className="border-t border-border/20 mt-3 pt-3">
+                    <button
+                      onClick={() => { setMoreOpen(false); signOut(); }}
+                      className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                    >
+                      <LogOut className="h-5 w-5 flex-shrink-0" />
+                      {p.logout}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
                 <nav className="flex items-center justify-evenly h-16 px-1 w-full">
                   {bottomItems.map((item) => {
@@ -260,6 +314,7 @@ export function PainelLayout() {
                       <Link
                         key={item.path}
                         to={item.path}
+                        onClick={() => setMoreOpen(false)}
                         className={cn(
                           "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
                           "text-[10px]",
@@ -277,9 +332,8 @@ export function PainelLayout() {
                     );
                   })}
 
-                  {/* More button */}
                   <button
-                    onClick={() => setMoreOpen(true)}
+                    onClick={() => setMoreOpen(prev => !prev)}
                     className={cn(
                       "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
                       "text-[10px]",
@@ -291,56 +345,6 @@ export function PainelLayout() {
                   </button>
                 </nav>
               </div>
-
-              {/* More panel (Sheet from left) */}
-              <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
-                <SheetContent
-                  side="left"
-                  className="w-[85%] max-w-[85%] p-0 border-r border-border/30 backdrop-blur-2xl bg-background/95"
-                >
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
-                      <img src={discoveryLogo} alt="Discovery" className="h-7" />
-                      <button onClick={() => setMoreOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-
-                    <nav className="flex-1 p-4 space-y-1">
-                      {extraItems.map((item) => {
-                        const isActive = item.path === profilePath
-                          ? location.pathname === profilePath
-                          : location.pathname.startsWith(item.path);
-                        return (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            onClick={() => setMoreOpen(false)}
-                            className={cn(
-                              "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
-                              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                            )}
-                          >
-                            <item.icon className="h-5 w-5 flex-shrink-0" />
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </nav>
-
-                    <div className="border-t border-border/20 p-4">
-                      <button
-                        onClick={() => { setMoreOpen(false); signOut(); }}
-                        className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
-                      >
-                        <LogOut className="h-5 w-5 flex-shrink-0" />
-                        {p.logout}
-                      </button>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
             </>
           );
         })()}
