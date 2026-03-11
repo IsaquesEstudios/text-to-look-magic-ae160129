@@ -148,7 +148,7 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
 
   // Link form calculations
   const currentAmount = linkRawAmount / 100;
-  const currentFeeShare = totalProject > 0 ? Math.round((currentAmount / totalProject) * serviceFee * 100) / 100 : 0;
+  const currentFeeShare = totalProject > 0 ? Math.min(Math.round((currentAmount / totalProject) * serviceFee * 100) / 100, serviceFee) : 0;
   const currentTotalDeduction = currentAmount + currentFeeShare;
   const selectedInvestor = investorsWithCredits?.find((inv) => inv.user_id === selectedUserId);
   const userMaxCredits = Number(selectedInvestor?.credits ?? 0);
