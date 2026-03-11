@@ -52,7 +52,7 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
   return (
     <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
       <p className="text-xs text-muted-foreground mb-1">
-        {isStarted ? "Status" : "Começa em"}
+        {isStarted ? "Status" : label}
       </p>
       <p className="text-2xl font-bold font-mono tracking-wider">{timeLeft}</p>
     </div>
