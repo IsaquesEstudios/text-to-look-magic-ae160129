@@ -396,7 +396,10 @@ export default function AdminLeiloesPage() {
                           </div>
                           <p className="text-xs text-muted-foreground">
                             <Clock className="h-3 w-3 inline mr-1" />
-                            {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                            Leilão: {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Prazo invest.: {format(new Date(new Date(auction.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
                           </p>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0" onClick={(e) => e.preventDefault()}>
