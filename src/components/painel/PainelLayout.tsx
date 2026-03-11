@@ -15,6 +15,10 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MoreHorizontal, X } from "lucide-react";
+import { PanelSearchBar } from "./PanelSearchBar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { MoreHorizontal, X } from "lucide-react";
 
 export function PainelLayout() {
   const { user, isAdmin, isLoading, profile, signOut } = useAuth();
