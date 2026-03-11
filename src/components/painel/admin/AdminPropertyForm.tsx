@@ -578,7 +578,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {selectedUserId && (
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                          Valor a vincular (máx: ${formatUSD(Math.max(maxLinkable, 0))})
+                          Valor a vincular
                         </label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
