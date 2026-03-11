@@ -256,10 +256,29 @@ export default function LeilaoDetailPage() {
         </div>
       )}
 
-      {/* Countdown */}
-      {auction.status !== "finished" && (
-        <CountdownTimer targetDate={auction.scheduled_start} />
-      )}
+      {/* Dates */}
+      {auction.status !== "finished" && (() => {
+        const auctionDate = new Date(auction.scheduled_start);
+        const paymentDeadline = new Date(auctionDate.getTime() - 2 * 24 * 60 * 60 * 1000);
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">Prazo Máximo para Investimento</p>
+              <CountdownTimer targetDate={paymentDeadline.toISOString()} label="Prazo para investir" />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                {format(paymentDeadline, "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">Data do Leilão</p>
+              <CountdownTimer targetDate={auction.scheduled_start} label="Leilão começa em" />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                {format(auctionDate, "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Auction items */}
       <Card className="bg-card/50 border-border/50">
