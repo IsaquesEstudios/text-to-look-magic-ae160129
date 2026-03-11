@@ -304,7 +304,7 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  Taxa proporcional ({totalProject > 0 ? ((currentAmount / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
+                  Taxa proporcional ({totalProject > 0 ? Math.min((currentAmount / totalProject) * 100, 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
                 </span>
                 <span className="font-semibold text-amber-500">${formatUSD(currentFeeShare)}</span>
               </div>
