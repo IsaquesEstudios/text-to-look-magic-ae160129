@@ -62,7 +62,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ month: "", category: "", price: "", taxRate: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "", taxStateCode: "" });
   const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
 
