@@ -527,7 +527,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {investorsToLink.map((inv, idx) => {
                       const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
                       const amount = inv.rawAmount / 100;
-                      const fee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * serviceFee * 100) / 100 : 0;
+                      const fee = totalProjeto > 0 ? Math.min(Math.round((amount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
                       const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
 
                       return (
