@@ -1,11 +1,11 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 function PanelSkeleton() {
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4">
       <div className="space-y-2">
         <Skeleton className="h-7 w-48 rounded-lg" />
         <Skeleton className="h-4 w-32 rounded-md" />
@@ -22,36 +22,41 @@ function PanelSkeleton() {
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [showSkeleton, setShowSkeleton] = useState(false);
-  const [currentChildren, setCurrentChildren] = useState(children);
-  const [key, setKey] = useState(location.pathname);
+  const prevPath = useRef(location.pathname);
+  const [phase, setPhase] = useState<"content" | "skeleton">("content");
+  const [renderedChildren, setRenderedChildren] = useState(children);
+  const [animKey, setAnimKey] = useState(location.pathname);
 
   useEffect(() => {
-    if (location.pathname !== key) {
-      setShowSkeleton(true);
+    if (location.pathname !== prevPath.current) {
+      prevPath.current = location.pathname;
+      // Immediately show skeleton
+      setPhase("skeleton");
+      // Short delay then show new content with animation
       const timer = setTimeout(() => {
-        setCurrentChildren(children);
-        setKey(location.pathname);
-        setShowSkeleton(false);
-      }, 150);
+        setRenderedChildren(children);
+        setAnimKey(location.pathname);
+        setPhase("content");
+      }, 120);
       return () => clearTimeout(timer);
     } else {
-      setCurrentChildren(children);
+      // Same path, just update children (e.g. data loaded)
+      setRenderedChildren(children);
     }
-  }, [location.pathname, children, key]);
+  }, [location.pathname, children]);
 
-  if (showSkeleton) {
+  if (phase === "skeleton") {
     return <PanelSkeleton />;
   }
 
   return (
     <motion.div
-      key={key}
-      initial={{ opacity: 0, y: 8 }}
+      key={animKey}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
     >
-      {currentChildren}
+      {renderedChildren}
     </motion.div>
   );
 }
