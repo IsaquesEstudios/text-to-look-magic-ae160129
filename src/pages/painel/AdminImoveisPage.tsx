@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle } from "lucide-react";
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
