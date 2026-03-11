@@ -318,7 +318,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             {/* Total do Projeto (computed) + Return % */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Total do Projeto ($)</Label>
+                <Label>Total Est. do Projeto ($)</Label>
                 <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
                   {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
