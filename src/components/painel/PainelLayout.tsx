@@ -72,6 +72,16 @@ export function PainelLayout() {
     }
   }, [isLoading, user, navigate]);
 
+  useEffect(() => {
+    if (!isPanelNavigating) return;
+
+    const resetTimer = window.setTimeout(() => {
+      setIsPanelNavigating(false);
+    }, 220);
+
+    return () => window.clearTimeout(resetTimer);
+  }, [location.pathname, isPanelNavigating]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
