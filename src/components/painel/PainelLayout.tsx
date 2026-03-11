@@ -27,6 +27,25 @@ export function PainelLayout() {
   const unreadAuctions = useUnreadAuctions();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [isPanelNavigating, setIsPanelNavigating] = useState(false);
+
+  const handlePanelNavigation = (
+    event: MouseEvent<HTMLElement>,
+    path: string,
+    callback?: () => void,
+  ) => {
+    if (path === location.pathname || isPanelNavigating) {
+      callback?.();
+      return;
+    }
+
+    event.preventDefault();
+    callback?.();
+    setIsPanelNavigating(true);
+    window.requestAnimationFrame(() => {
+      navigate(path);
+    });
+  };
 
   const adminNavItems = [
     { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
