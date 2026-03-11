@@ -103,15 +103,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (expenses === undefined) return;
+    if (expenses === undefined || propertyData === undefined) return;
 
     const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
     const now = new Date();
     const defaultMonth = lastExpense?.month || String(now.getMonth() + 1).padStart(2, "0");
+    const defaultTaxRate = propertyData?.default_tax_rate ? String(propertyData.default_tax_rate) : "";
 
-    setForm((f) => ({ ...f, month: defaultMonth }));
+    setForm((f) => ({ ...f, month: defaultMonth, taxRate: defaultTaxRate }));
     defaultInitialized.current = true;
-  }, [expenses]);
+  }, [expenses, propertyData]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
