@@ -178,7 +178,7 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
         {/* Auction & Renovation Values */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Valor de Arremate ($)</Label>
+            <Label>Valor Est. de Arremate ($)</Label>
             <Input type="number" step="0.01" min="0" value={data.estimated_auction_value} onChange={(e) => set("estimated_auction_value", e.target.value)} />
           </div>
           <div className="space-y-2">
