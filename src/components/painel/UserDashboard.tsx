@@ -219,7 +219,7 @@ export function UserDashboard() {
           </div>
         ) : (
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {propertyNews.map((prop) => (
+            {propertyNews.slice(0, 4).map((prop) => (
               <Link
                 key={prop.id}
                 to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
