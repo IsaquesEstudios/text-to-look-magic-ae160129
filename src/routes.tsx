@@ -1,9 +1,22 @@
 import { Suspense, lazy } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
+import {
+  DashboardSkeleton,
+  AuctionsSkeleton,
+  PropertiesSkeleton,
+  StatementSkeleton,
+  PropertyDetailSkeleton,
+  PropertySubPageSkeleton,
+  AdminListSkeleton,
+  AuctionDetailSkeleton,
+  ReceiptsSkeleton,
+  ContractsSkeleton,
+  ProfileSkeleton,
+  GenericPanelSkeleton,
+} from "@/components/painel/PanelSkeletons";
 import App from "./App";
 
 // Lazy load pages
@@ -51,27 +64,12 @@ const PageLoader = () => (
   </div>
 );
 
-const PanelPageLoader = () => (
-  <div className="space-y-4">
-    <div className="space-y-2">
-      <Skeleton className="h-7 w-48 rounded-lg" />
-      <Skeleton className="h-4 w-32 rounded-md" />
-    </div>
-    <div className="grid grid-cols-2 gap-3">
-      <Skeleton className="h-24 rounded-2xl" />
-      <Skeleton className="h-24 rounded-2xl" />
-    </div>
-    <Skeleton className="h-40 w-full rounded-2xl" />
-    <Skeleton className="h-32 w-full rounded-2xl" />
-  </div>
-);
-
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
 );
 
-const PanelSuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<PanelPageLoader />}>{children}</Suspense>
+const PS = ({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) => (
+  <Suspense fallback={fallback}>{children}</Suspense>
 );
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
