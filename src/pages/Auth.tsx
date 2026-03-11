@@ -60,7 +60,7 @@ export default function Auth() {
   const [postalCode, setPostalCode] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
-  const navigate = useNavigate();
+  const { toast } = useToast();
   const { toast } = useToast();
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
