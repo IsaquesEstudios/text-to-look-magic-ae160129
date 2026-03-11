@@ -58,7 +58,7 @@ function parseCurrency(val: string): number {
 }
 
 export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
@@ -105,6 +105,24 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       return data;
     },
   });
+
+  // Fetch last read timestamp for this user
+  const { data: lastReadData } = useQuery({
+    queryKey: ["expense-last-read", propertyId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("property_expense_reads")
+        .select("last_read_at")
+        .eq("property_id", propertyId)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const lastReadAt = lastReadData?.last_read_at ?? null;
 
   // Existing categories for autocomplete
   const existingCategories = useMemo(() => {
@@ -186,20 +204,22 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Group expenses by category
   const groupedExpenses = useMemo(() => {
     if (!expenses) return [];
-    const map = new Map<string, { category: string; total: number; totalTax: number; items: typeof expenses }>();
+    const map = new Map<string, { category: string; total: number; totalTax: number; newCount: number; items: typeof expenses }>();
     expenses.forEach((e) => {
       const tax = Number(e.price) * (Number(e.tax_rate || 0) / 100);
+      const isNew = lastReadAt ? new Date(e.created_at) > new Date(lastReadAt) : false;
       const existing = map.get(e.category);
       if (existing) {
         existing.total += Number(e.price);
         existing.totalTax += tax;
+        if (isNew) existing.newCount++;
         existing.items.push(e);
       } else {
-        map.set(e.category, { category: e.category, total: Number(e.price), totalTax: tax, items: [e] });
+        map.set(e.category, { category: e.category, total: Number(e.price), totalTax: tax, newCount: isNew ? 1 : 0, items: [e] });
       }
     });
     return Array.from(map.values());
-  }, [expenses]);
+  }, [expenses, lastReadAt]);
 
   const totalSpent = groupedExpenses.reduce((sum, g) => sum + g.total, 0);
   const totalTax = groupedExpenses.reduce((sum, g) => sum + g.totalTax, 0);
@@ -359,6 +379,11 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                           <span>{group.category}</span>
                           {hasMultiple && (
                             <span className="text-xs text-muted-foreground">({group.items.length})</span>
+                          )}
+                          {group.newCount > 0 && (
+                            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+                              {group.newCount}
+                            </span>
                           )}
                         </td>
                         <td className="p-3 text-right text-foreground">${fmt(group.total)}</td>

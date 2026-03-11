@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, MapPin, Loader2, ArrowUpRight, Bell, TrendingUp } from "lucide-react";
+import { Building2, MapPin, Loader2, ArrowUpRight, Bell, TrendingUp, Percent } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
@@ -53,9 +53,10 @@ function computeKpis(aggregated: AggregatedProperty[]) {
 
 function KPICards({ aggregated, p }: { aggregated: AggregatedProperty[]; p: any }) {
   const { totalInvested, totalEstimatedReturn } = computeKpis(aggregated);
+  const roi = totalInvested > 0 ? ((totalEstimatedReturn - totalInvested) / totalInvested) * 100 : 0;
   if (aggregated.length === 0) return null;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
         <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
         <div>
@@ -70,6 +71,13 @@ function KPICards({ aggregated, p }: { aggregated: AggregatedProperty[]; p: any 
           <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
             ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Percent className="h-5 w-5 text-primary" /></div>
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedROI}</p>
+          <p className={`text-lg font-bold ${roi >= 0 ? 'text-primary' : 'text-destructive'}`}>{roi.toFixed(1)}%</p>
         </div>
       </div>
     </div>

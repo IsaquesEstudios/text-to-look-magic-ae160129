@@ -44,7 +44,7 @@ export default function UserExtrato() {
   const handleWhatsAppRedirect = () => {
     if (!isValidAmount) return;
     const msg = encodeURIComponent(
-      `${lang === "en" ? "Hi" : lang === "es" ? "Hola" : "Olá"}! ${lang === "en" ? "I'd like to recharge" : lang === "es" ? "Me gustaría recargar" : "Gostaria de fazer uma recarga de créditos no valor de"} $${parsedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}. ${lang === "en" ? "My email is" : lang === "es" ? "Mi correo es" : "Meu e-mail cadastrado é"}: ${user?.email || "N/A"}`
+      `${lang === "en" ? "Hi" : lang === "es" ? "Hola" : "Olá"}! ${lang === "en" ? "I'd like to make a deposit of" : lang === "es" ? "Me gustaría hacer un aporte de" : "Gostaria de fazer um aporte no valor de"} $${parsedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}. ${lang === "en" ? "My email is" : lang === "es" ? "Mi correo es" : "Meu e-mail cadastrado é"}: ${user?.email || "N/A"}`
     );
     window.open(`https://wa.me/14752985931?text=${msg}`, "_blank");
     setRechargeOpen(false);
