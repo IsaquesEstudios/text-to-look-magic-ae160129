@@ -466,7 +466,7 @@ export const en = {
 
     transactionHistory: "Transaction history",
     currentBalance: "Current balance",
-    recharge: "Recharge",
+    recharge: "Deposit",
     importantInfoTitle: "Important information before recharging",
     howInvestmentWorks: "How the investment works",
     howInvestmentWorksDesc: "Your credits are used to participate in real estate and land auctions in the United States. After recharging, the Discovery team will allocate your capital to auctions as opportunities arise.",
