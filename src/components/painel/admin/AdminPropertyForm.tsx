@@ -121,11 +121,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const currentTotalDeduction = currentAmount + currentFeeShare;
   const selectedAvailableCredits = getAvailableCredits(selectedUserId);
 
-  const maxLinkableByRemaining = remaining;
   const maxLinkableByCredits = totalProjeto > 0
     ? Math.floor((selectedAvailableCredits / (1 + serviceFee / totalProjeto)) * 100) / 100
     : selectedAvailableCredits;
-  const maxLinkable = Math.min(maxLinkableByRemaining, maxLinkableByCredits);
+  const maxLinkable = maxLinkableByCredits;
 
   const addInvestorToList = () => {
     if (!selectedUserId || currentAmount <= 0) return;
