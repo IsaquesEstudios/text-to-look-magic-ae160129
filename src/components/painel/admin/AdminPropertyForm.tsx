@@ -121,11 +121,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const currentTotalDeduction = currentAmount + currentFeeShare;
   const selectedAvailableCredits = getAvailableCredits(selectedUserId);
 
-  const maxLinkableByRemaining = remaining;
   const maxLinkableByCredits = totalProjeto > 0
     ? Math.floor((selectedAvailableCredits / (1 + serviceFee / totalProjeto)) * 100) / 100
     : selectedAvailableCredits;
-  const maxLinkable = Math.min(maxLinkableByRemaining, maxLinkableByCredits);
+  const maxLinkable = maxLinkableByCredits;
 
   const addInvestorToList = () => {
     if (!selectedUserId || currentAmount <= 0) return;
@@ -579,7 +578,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {selectedUserId && (
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                          Valor a vincular (máx: ${formatUSD(Math.max(maxLinkable, 0))})
+                          Valor a vincular
                         </label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -638,7 +637,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                         disabled={
                           !selectedUserId ||
                           currentAmount <= 0 ||
-                          currentAmount > remaining ||
                           currentTotalDeduction > selectedAvailableCredits ||
                           totalProjeto <= 0
                         }
