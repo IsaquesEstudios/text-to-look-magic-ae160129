@@ -28,6 +28,7 @@ export function PainelLayout() {
     { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
     { label: p.auctions, icon: Gavel, path: "/painel/leiloes" },
     { label: p.properties, icon: Building2, path: "/painel/propriedades" },
+    { label: "Contratos", icon: FileText, path: "/painel/contratos" },
     { label: p.users, icon: Shield, path: "/painel/usuarios" },
     { label: p.activities, icon: History, path: "/painel/atividades" },
     { label: p.settings, icon: Settings, path: "/painel/configuracoes" },

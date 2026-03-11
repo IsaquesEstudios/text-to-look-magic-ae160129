@@ -1,25 +1,22 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Loader2, CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { FileText, Loader2, CheckCircle2, Clock, ExternalLink, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { ptBR, enUS, es } from "date-fns/locale";
+import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
-
-const dateFnsLocales: Record<string, any> = { pt: ptBR, en: enUS, es };
+import { AdminContractForm } from "@/components/painel/admin/AdminContractForm";
 
 export default function UserContratosPage() {
   const { user, isAdmin } = useAuth();
-  const { p, lang } = usePanelTranslation();
-  const dateLocale = dateFnsLocales[lang] || ptBR;
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [signing, setSigning] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ["user-contracts", user?.id],
@@ -40,11 +37,25 @@ export default function UserContratosPage() {
     enabled: !!user,
   });
 
+  // Fetch profile names for admin view
+  const { data: profiles } = useQuery({
+    queryKey: ["contract-profiles"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("user_id, full_name");
+      return data || [];
+    },
+    enabled: !!user && isAdmin,
+  });
+
+  const getProfileName = (userId: string) => {
+    return profiles?.find((p) => p.user_id === userId)?.full_name || "—";
+  };
+
   const handleUserSign = async (contractId: string) => {
     setSigning(contractId);
     const { error } = await supabase
       .from("contracts")
-      .update({ user_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() } as any)
+      .update({ user_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq("id", contractId);
 
     if (error) {
@@ -60,7 +71,7 @@ export default function UserContratosPage() {
     setSigning(contractId);
     const { error } = await supabase
       .from("contracts")
-      .update({ admin_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() } as any)
+      .update({ admin_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq("id", contractId);
 
     if (error) {
@@ -70,6 +81,16 @@ export default function UserContratosPage() {
       toast({ title: "Contrato assinado pelo admin!" });
     }
     setSigning(null);
+  };
+
+  const handleDelete = async (contractId: string) => {
+    const { error } = await supabase.from("contracts").delete().eq("id", contractId);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
+      toast({ title: "Contrato removido" });
+    }
   };
 
   if (isLoading) {
@@ -84,10 +105,24 @@ export default function UserContratosPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Contratos</h1>
-        <p className="text-sm text-muted-foreground mt-1">Contratos de investimento para assinatura</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Contratos</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {isAdmin ? "Gerencie contratos dos investidores" : "Contratos de investimento para assinatura"}
+          </p>
+        </div>
+        {isAdmin && (
+          <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl">
+            <PlusCircle className="h-4 w-4" />
+            Novo Contrato
+          </Button>
+        )}
       </div>
+
+      {showForm && isAdmin && (
+        <AdminContractForm onClose={() => setShowForm(false)} />
+      )}
 
       {!contracts?.length ? (
         <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -108,38 +143,37 @@ export default function UserContratosPage() {
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-foreground">{contract.title}</h3>
+                        {isAdmin && (
+                          <p className="text-xs text-muted-foreground">
+                            Investidor: {getProfileName(contract.user_id)}
+                          </p>
+                        )}
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {format(new Date(contract.created_at), "dd MMM yyyy", { locale: dateLocale })}
+                          {format(new Date(contract.created_at), "dd MMM yyyy", { locale: ptBR })}
                         </p>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {/* User signature status */}
-                          <div className="flex items-center gap-1.5">
-                            {contract.user_signed_at ? (
-                              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Investidor assinou • {format(new Date(contract.user_signed_at), "dd/MM/yyyy", { locale: dateLocale })}
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500 gap-1">
-                                <Clock className="h-3 w-3" />
-                                Aguardando assinatura do investidor
-                              </Badge>
-                            )}
-                          </div>
-                          {/* Admin signature status */}
-                          <div className="flex items-center gap-1.5">
-                            {contract.admin_signed_at ? (
-                              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Discovery assinou • {format(new Date(contract.admin_signed_at), "dd/MM/yyyy", { locale: dateLocale })}
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-[10px] border-muted-foreground/30 text-muted-foreground gap-1">
-                                <Clock className="h-3 w-3" />
-                                Aguardando assinatura da Discovery
-                              </Badge>
-                            )}
-                          </div>
+                          {contract.user_signed_at ? (
+                            <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Investidor assinou • {format(new Date(contract.user_signed_at), "dd/MM/yyyy", { locale: ptBR })}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500 gap-1">
+                              <Clock className="h-3 w-3" />
+                              Aguardando assinatura do investidor
+                            </Badge>
+                          )}
+                          {contract.admin_signed_at ? (
+                            <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Discovery assinou • {format(new Date(contract.admin_signed_at), "dd/MM/yyyy", { locale: ptBR })}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px] border-muted-foreground/30 text-muted-foreground gap-1">
+                              <Clock className="h-3 w-3" />
+                              Aguardando assinatura da Discovery
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -155,7 +189,6 @@ export default function UserContratosPage() {
                         Ver PDF
                       </Button>
 
-                      {/* User can sign if not yet signed */}
                       {!isAdmin && !contract.user_signed_at && (
                         <Button
                           variant="cta"
@@ -169,7 +202,6 @@ export default function UserContratosPage() {
                         </Button>
                       )}
 
-                      {/* Admin can sign if user has signed */}
                       {isAdmin && contract.user_signed_at && !contract.admin_signed_at && (
                         <Button
                           variant="cta"
@@ -180,6 +212,17 @@ export default function UserContratosPage() {
                         >
                           {signing === contract.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                           Assinar (Admin)
+                        </Button>
+                      )}
+
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDelete(contract.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       )}
 
