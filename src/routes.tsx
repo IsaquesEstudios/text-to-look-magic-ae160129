@@ -106,6 +106,7 @@ const panelChildren: RouteRecord[] = [
   { path: "leiloes-user", element: <SuspenseWrapper><UserLeiloesPage /></SuspenseWrapper> },
   { path: "leilao/:id", element: <SuspenseWrapper><LeilaoDetailPage /></SuspenseWrapper> },
   { path: "comprovantes", element: <SuspenseWrapper><UserComprovantesPage /></SuspenseWrapper> },
+  { path: "contratos", element: <SuspenseWrapper><UserContratosPage /></SuspenseWrapper> },
   { path: "informacoes", element: <SuspenseWrapper><UserProfilePage /></SuspenseWrapper> },
 ];
 
