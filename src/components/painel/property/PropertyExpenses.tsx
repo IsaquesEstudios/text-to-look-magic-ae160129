@@ -62,7 +62,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ month: "", category: "", price: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "", taxRate: "" });
   const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
 
@@ -74,6 +74,20 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
         .select("*")
         .eq("property_id", propertyId)
         .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch property default tax rate
+  const { data: propertyData } = useQuery({
+    queryKey: ["property-tax-rate", propertyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("default_tax_rate")
+        .eq("id", propertyId)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
