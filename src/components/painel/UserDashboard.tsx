@@ -168,8 +168,8 @@ export function UserDashboard() {
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Wallet className="h-5 w-5 text-primary" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.availableCredit}</p>
