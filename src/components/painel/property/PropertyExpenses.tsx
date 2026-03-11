@@ -298,16 +298,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
-              <div className="w-44">
+              <div className="w-48">
                 <label className="text-xs text-muted-foreground">Tarifa</label>
-                <Select value={form.taxRate} onValueChange={(v) => setForm({ ...form, taxRate: v })}>
+                <Select value={form.taxStateCode} onValueChange={(v) => setForm({ ...form, taxStateCode: v })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Sem tarifa" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Sem tarifa</SelectItem>
+                    <SelectItem value="none">Sem tarifa</SelectItem>
                     {stateTaxes?.map((t) => (
-                      <SelectItem key={t.state_code} value={String(t.tax_rate)}>
+                      <SelectItem key={t.state_code} value={t.state_code}>
                         {t.state_name} ({t.tax_rate}%)
                       </SelectItem>
                     ))}
