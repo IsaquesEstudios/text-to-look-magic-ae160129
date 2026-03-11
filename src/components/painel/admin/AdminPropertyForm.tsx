@@ -141,13 +141,16 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     setLoading(true);
 
     try {
+      const saleValue = parseFloat(form.estimated_sale_value) || 0;
+      const calculatedReturn = totalProjeto > 0 ? ((saleValue - totalProjeto) / totalProjeto) * 100 : 0;
+
       const propertyData = {
         type: form.type,
         title: form.title.trim(),
         location: form.location.trim(),
         state_code: form.state_code || null,
         purchase_price: totalProjeto,
-        estimated_return_pct: parseFloat(form.estimated_return_pct) || 0,
+        estimated_return_pct: Math.round(calculatedReturn * 10) / 10,
         total_shares: parseInt(form.total_shares),
         share_price: parseFloat(form.share_price),
         available_shares: parseInt(form.total_shares),
@@ -156,6 +159,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         created_by: user.id,
         estimated_auction_value: parseFloat(form.estimated_auction_value) || 0,
         estimated_renovation_cost: parseFloat(form.estimated_renovation_cost) || 0,
+        estimated_sale_value: saleValue,
         estimated_timeline: form.estimated_timeline.trim(),
       };
 
