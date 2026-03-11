@@ -61,7 +61,6 @@ export default function Auth() {
   const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
   const { toast } = useToast();
-  const { toast } = useToast();
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
 
