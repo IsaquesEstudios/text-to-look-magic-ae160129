@@ -401,7 +401,7 @@ export const pt = {
     users: "Usuários",
     activities: "Atividades",
     settings: "Configurações",
-    myProjects: "Meus Projetos",
+    myProjects: "Propriedades",
     statement: "Extrato",
     receipts: "Comprovantes",
     profile: "Perfil",
