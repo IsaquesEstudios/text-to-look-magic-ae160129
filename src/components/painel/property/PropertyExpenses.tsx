@@ -93,6 +93,19 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
+  // Fetch pre-defined tax rates from config
+  const { data: stateTaxes } = useQuery({
+    queryKey: ["us-state-taxes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("us_state_taxes")
+        .select("state_code, state_name, tax_rate")
+        .order("state_name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Existing categories for autocomplete
   const existingCategories = useMemo(() => {
     if (!expenses) return [];
