@@ -55,7 +55,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
         ];
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 ${filterType === "house" ? "lg:grid-cols-4" : ""} gap-4`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-4`}>
       {cards.map((card) => (
         <Card key={card.label} className="bg-card/50 border-border/50">
           <CardContent className="p-5">
@@ -65,8 +65,10 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
               </span>
               <card.icon className="h-4 w-4 text-muted-foreground/60" />
             </div>
-            <p className="text-2xl font-bold text-foreground">
-              $ {card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            <p className={`text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
+              {(card as any).isPercentage
+                ? `${card.value.toFixed(1)}%`
+                : `$ ${card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
             </p>
           </CardContent>
         </Card>
