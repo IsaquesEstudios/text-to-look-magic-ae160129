@@ -466,7 +466,7 @@ export const es = {
 
     transactionHistory: "Historial de movimientos",
     currentBalance: "Saldo actual",
-    recharge: "Recarga",
+    recharge: "Aporte",
     importantInfoTitle: "Información importante antes de recargar",
     howInvestmentWorks: "Cómo funciona la inversión",
     howInvestmentWorksDesc: "Tus créditos se usan para participar en subastas de inmuebles y terrenos en Estados Unidos. Después de la recarga, el equipo Discovery asignará tu capital en las subastas según las oportunidades disponibles.",
