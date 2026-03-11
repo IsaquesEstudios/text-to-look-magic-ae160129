@@ -400,7 +400,7 @@ export const es = {
     users: "Usuarios",
     activities: "Actividades",
     settings: "Configuración",
-    myProjects: "Mis Proyectos",
+    myProjects: "Propiedades",
     statement: "Extracto",
     receipts: "Comprobantes",
     profile: "Perfil",
