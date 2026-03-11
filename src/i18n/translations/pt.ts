@@ -412,7 +412,7 @@ export const pt = {
     // Dashboard
     greeting: "Olá, {name} 👋",
     investmentSummary: "Resumo dos seus investimentos",
-    availableCredit: "Crédito Disponível",
+    availableCredit: "Saldo Disponível",
     propertiesLabel: "Imóveis",
     totalInvested: "Total Investido",
     estimatedReturn: "Retorno Estimado",
