@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { useRef } from "react";
 import {
   DashboardSkeleton,
   AuctionsSkeleton,
@@ -38,15 +39,22 @@ export function PageTransition({
   isNavigating?: boolean;
 }) {
   const location = useLocation();
+  const visitedPages = useRef(new Set<string>());
 
-  if (isNavigating) {
+  // Mark current page as visited once it renders content
+  if (!isNavigating) {
+    visitedPages.current.add(location.pathname);
+  }
+
+  // Only show skeleton if navigating AND the target page hasn't been visited yet
+  if (isNavigating && !visitedPages.current.has(location.pathname)) {
     return getSkeletonForPath(location.pathname);
   }
 
   return (
     <motion.div
       key={location.pathname}
-      initial={{ opacity: 0, y: 6 }}
+      initial={visitedPages.current.has(location.pathname) ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
     >
