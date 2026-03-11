@@ -220,7 +220,7 @@ export function UserDashboard() {
             <Link to="/painel/leiloes-user" className="text-xs text-primary hover:underline mt-1">{p.viewAuctions}</Link>
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {propertyNews.map((prop) => (
               <Link
                 key={prop.id}
