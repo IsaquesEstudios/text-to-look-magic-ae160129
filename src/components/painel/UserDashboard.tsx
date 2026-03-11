@@ -176,7 +176,7 @@ export function UserDashboard() {
             <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.propertiesLabel}</p>
