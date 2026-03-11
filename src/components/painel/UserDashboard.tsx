@@ -168,42 +168,35 @@ export function UserDashboard() {
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Wallet className="h-5 w-5 text-primary" /></div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.availableCredit}</p>
-            <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground/60 truncate">{p.availableCredit}</p>
+            <p className="text-sm sm:text-lg font-bold text-foreground truncate">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
-          <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground" /></div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.propertiesLabel}</p>
-            <p className="text-lg font-bold text-foreground">{totalProperties}</p>
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground/60 truncate">{p.totalInvested}</p>
+            <p className="text-sm sm:text-lg font-bold text-foreground truncate">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.totalInvested}</p>
-            <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
-          <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedReturn}</p>
-            <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /></div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground/60 truncate">{p.estimatedReturn}</p>
+            <p className={`text-sm sm:text-lg font-bold truncate ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
               ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Percent className="h-5 w-5 text-primary" /></div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedROI}</p>
-            <p className={`text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground/60 truncate">{p.estimatedROI}</p>
+            <p className={`text-sm sm:text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
           </div>
         </div>
       </div>
