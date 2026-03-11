@@ -227,7 +227,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
         {/* Values */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Valor de Arremate ($)</Label>
+            <Label>Valor Est. de Arremate ($)</Label>
             <Input type="number" step="0.01" min="0" value={form.estimated_auction_value} onChange={(e) => set("estimated_auction_value", e.target.value)} />
           </div>
           <div className="space-y-2">
@@ -238,13 +238,13 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Total do Projeto ($)</Label>
+            <Label>Total Est. do Projeto ($)</Label>
             <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
               {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Valor de Venda ($)</Label>
+            <Label>Valor Est. de Venda ($)</Label>
             <Input type="number" step="0.01" min="0" value={form.estimated_sale_value} onChange={(e) => set("estimated_sale_value", e.target.value)} />
           </div>
         </div>

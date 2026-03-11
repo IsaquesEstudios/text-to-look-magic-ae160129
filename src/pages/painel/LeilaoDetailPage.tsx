@@ -16,7 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 import AuctionInvestorLinking from "@/components/painel/admin/AuctionInvestorLinking";
 
-function CountdownTimer({ targetDate }: { targetDate: string }) {
+function CountdownTimer({ targetDate, label = "Começa em" }: { targetDate: string; label?: string }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isStarted, setIsStarted] = useState(false);
 
@@ -52,7 +52,7 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
   return (
     <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
       <p className="text-xs text-muted-foreground mb-1">
-        {isStarted ? "Status" : "Começa em"}
+        {isStarted ? "Status" : label}
       </p>
       <p className="text-2xl font-bold font-mono tracking-wider">{timeLeft}</p>
     </div>
@@ -216,8 +216,13 @@ export default function LeilaoDetailPage() {
               <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
             </div>
             <div>
-              <Label>Data e Hora de Início *</Label>
+              <Label>Data e Hora do Leilão *</Label>
               <Input type="datetime-local" value={editForm.scheduled_start} onChange={(e) => setEditForm({ ...editForm, scheduled_start: e.target.value })} />
+              {editForm.scheduled_start && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Prazo máximo para investimento: {format(new Date(new Date(editForm.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })} (2 dias antes)
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <Button onClick={() => updateAuctionMutation.mutate()} disabled={!editForm.title || !editForm.scheduled_start || updateAuctionMutation.isPending} className="gap-2">
@@ -256,10 +261,29 @@ export default function LeilaoDetailPage() {
         </div>
       )}
 
-      {/* Countdown */}
-      {auction.status !== "finished" && (
-        <CountdownTimer targetDate={auction.scheduled_start} />
-      )}
+      {/* Dates */}
+      {auction.status !== "finished" && (() => {
+        const auctionDate = new Date(auction.scheduled_start);
+        const paymentDeadline = new Date(auctionDate.getTime() - 2 * 24 * 60 * 60 * 1000);
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">Prazo Máximo para Investimento</p>
+              <CountdownTimer targetDate={paymentDeadline.toISOString()} label="Prazo para investir" />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                {format(paymentDeadline, "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">Data do Leilão</p>
+              <CountdownTimer targetDate={auction.scheduled_start} label="Leilão começa em" />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                {format(auctionDate, "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Auction items */}
       <Card className="bg-card/50 border-border/50">

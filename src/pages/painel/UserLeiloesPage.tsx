@@ -213,11 +213,17 @@ export default function UserLeiloesPage() {
           <div className="flex flex-col sm:flex-row sm:items-start justify-between w-full pr-3 gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Gavel className="h-5 w-5 text-primary" /></div>
-              <div className="min-w-0">
+                <div className="min-w-0">
                 <span className="font-bold text-sm sm:text-base text-foreground block">{auction.title}</span>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <CalendarDays className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">{format(start, "dd MMMM yyyy", { locale: dateLocale })}</span>
+                <div className="flex flex-col gap-0.5 mt-0.5">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">{p.auctionDate || "Leilão"}: {format(start, "dd MMMM yyyy", { locale: dateLocale })}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">{p.investmentDeadline || "Prazo invest."}: {format(new Date(start.getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMMM yyyy", { locale: dateLocale })}</span>
+                  </div>
                 </div>
               </div>
             </div>
