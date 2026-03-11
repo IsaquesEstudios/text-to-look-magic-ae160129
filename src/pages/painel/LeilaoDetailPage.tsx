@@ -216,8 +216,13 @@ export default function LeilaoDetailPage() {
               <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
             </div>
             <div>
-              <Label>Data e Hora de Início *</Label>
+              <Label>Data e Hora do Leilão *</Label>
               <Input type="datetime-local" value={editForm.scheduled_start} onChange={(e) => setEditForm({ ...editForm, scheduled_start: e.target.value })} />
+              {editForm.scheduled_start && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Prazo máximo para investimento: {format(new Date(new Date(editForm.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })} (2 dias antes)
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <Button onClick={() => updateAuctionMutation.mutate()} disabled={!editForm.title || !editForm.scheduled_start || updateAuctionMutation.isPending} className="gap-2">
