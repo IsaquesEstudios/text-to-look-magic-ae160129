@@ -51,7 +51,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       : [
           { label: "Total em Arremate", value: kpis?.arremate ?? 0, icon: Gavel },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
-          { label: "ROI Estimado", value: roi, icon: TrendingUp, isPercentage: true, colorClass: roiColor },
+          { label: "ROI Estimado", value: roi, icon: Percent, isPercentage: true, colorClass: roiColor },
         ];
 
   return (
