@@ -51,8 +51,27 @@ const PageLoader = () => (
   </div>
 );
 
+const PanelPageLoader = () => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Skeleton className="h-7 w-48 rounded-lg" />
+      <Skeleton className="h-4 w-32 rounded-md" />
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <Skeleton className="h-24 rounded-2xl" />
+      <Skeleton className="h-24 rounded-2xl" />
+    </div>
+    <Skeleton className="h-40 w-full rounded-2xl" />
+    <Skeleton className="h-32 w-full rounded-2xl" />
+  </div>
+);
+
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
+);
+
+const PanelSuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<PanelPageLoader />}>{children}</Suspense>
 );
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
