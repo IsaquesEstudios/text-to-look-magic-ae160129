@@ -82,6 +82,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           estimated_auction_value: String(p.estimated_auction_value ?? 0),
           estimated_renovation_cost: String(p.estimated_renovation_cost ?? 0),
           estimated_return_pct: String(p.estimated_return_pct ?? 0),
+          estimated_sale_value: String(p.estimated_sale_value ?? 0),
           estimated_timeline: p.estimated_timeline ?? "",
         });
         setCoverImage(p.cover_image_url);
