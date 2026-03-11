@@ -273,6 +273,19 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
+              <div className="w-24">
+                <label className="text-xs text-muted-foreground">Tarifa (%)</label>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={form.taxRate}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9.]/g, "");
+                    setForm({ ...form, taxRate: v });
+                  }}
+                  placeholder="0"
+                />
+              </div>
 
               <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
