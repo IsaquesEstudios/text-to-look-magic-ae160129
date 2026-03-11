@@ -1,4 +1,5 @@
 import { Suspense, lazy } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
 import { translations, Language } from "@/i18n";
