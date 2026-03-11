@@ -39,6 +39,7 @@ export function PainelLayout() {
     { label: p.myProjects, icon: Building2, path: "/painel/meus-projetos" },
     { label: p.statement, icon: Receipt, path: "/painel/extrato" },
     { label: p.receipts, icon: FileImage, path: "/painel/comprovantes" },
+    { label: "Contratos", icon: FileText, path: "/painel/contratos" },
   ];
 
   useEffect(() => {

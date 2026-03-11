@@ -36,6 +36,7 @@ const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
 
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
+const UserContratosPage = lazy(() => import("./pages/painel/UserContratosPage"));
 const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
 
 // PainelLayout is the persistent layout for all /painel/* routes
