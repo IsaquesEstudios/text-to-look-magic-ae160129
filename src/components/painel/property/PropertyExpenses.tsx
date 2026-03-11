@@ -116,21 +116,29 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (expenses === undefined || propertyData === undefined) return;
+    if (expenses === undefined || propertyData === undefined || stateTaxes === undefined) return;
 
     const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
     const now = new Date();
     const defaultMonth = lastExpense?.month || String(now.getMonth() + 1).padStart(2, "0");
-    const defaultTaxRate = propertyData?.default_tax_rate ? String(propertyData.default_tax_rate) : "";
+    
+    // Use property state_code as default tax
+    const defaultStateCode = propertyData?.state_code || "";
 
-    setForm((f) => ({ ...f, month: defaultMonth, taxRate: defaultTaxRate }));
+    setForm((f) => ({ ...f, month: defaultMonth, taxStateCode: defaultStateCode }));
     defaultInitialized.current = true;
-  }, [expenses, propertyData]);
+  }, [expenses, propertyData, stateTaxes]);
+
+  // Resolve tax rate from selected state code
+  const resolvedTaxRate = useMemo(() => {
+    if (!form.taxStateCode || !stateTaxes) return 0;
+    const found = stateTaxes.find((t) => t.state_code === form.taxStateCode);
+    return found ? Number(found.tax_rate) : 0;
+  }, [form.taxStateCode, stateTaxes]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseCurrency(form.price);
-    const taxRate = form.taxRate ? parseFloat(form.taxRate) : 0;
     if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
     const { error } = await supabase.from("property_expenses").insert({
@@ -140,14 +148,15 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       quantity: 1,
       price,
       month: form.month,
-      tax_rate: taxRate,
+      tax_rate: resolvedTaxRate,
+      state_code: form.taxStateCode || null,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      // Save tax rate as default on the property
-      if (taxRate > 0) {
-        await supabase.from("properties").update({ default_tax_rate: taxRate } as any).eq("id", propertyId);
+      // Save state_code as default on the property
+      if (form.taxStateCode) {
+        await supabase.from("properties").update({ state_code: form.taxStateCode } as any).eq("id", propertyId);
         queryClient.invalidateQueries({ queryKey: ["property-tax-rate", propertyId] });
       }
       setForm((prev) => ({ ...prev, category: "", price: "" }));
