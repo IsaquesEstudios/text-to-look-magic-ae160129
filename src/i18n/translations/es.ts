@@ -529,7 +529,7 @@ export const es = {
     noItemsInAuction: "Ningún inmueble registrado en esta subasta",
     serviceFee: "Tarifa de servicio pagada en esta subasta:",
     estimates: "Estimaciones",
-    auctionPrice: "Puja (Est.)",
+    auctionPrice: "Puja hasta (Est.)",
     renovation: "Reforma (Est.)",
     projectTotal: "Total del Proyecto (Est.)",
     saleValue: "Valor de Venta (Est.)",

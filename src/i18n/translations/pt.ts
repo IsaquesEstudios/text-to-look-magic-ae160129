@@ -537,7 +537,7 @@ export const pt = {
     noItemsInAuction: "Nenhum imóvel cadastrado neste leilão",
     serviceFee: "Taxa de serviço paga neste leilão:",
     estimates: "Estimativas",
-    auctionPrice: "Arremate (Est.)",
+    auctionPrice: "Arremate até (Est.)",
     renovation: "Reforma (Est.)",
     projectTotal: "Total do Projeto (Est.)",
     saleValue: "Valor de Venda (Est.)",

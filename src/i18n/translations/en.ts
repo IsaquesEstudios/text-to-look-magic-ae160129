@@ -529,7 +529,7 @@ export const en = {
     noItemsInAuction: "No properties listed in this auction",
     serviceFee: "Service fee paid in this auction:",
     estimates: "Estimates",
-    auctionPrice: "Auction Price (Est.)",
+    auctionPrice: "Auction Price up to (Est.)",
     renovation: "Renovation (Est.)",
     projectTotal: "Project Total (Est.)",
     saleValue: "Sale Value (Est.)",
