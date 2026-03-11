@@ -222,7 +222,7 @@ export function PainelLayout() {
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <Link to={profilePath} className={cn(
+              <Link to={profilePath} onClick={(event) => handlePanelNavigation(event, profilePath)} className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                 isProfileActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}>
