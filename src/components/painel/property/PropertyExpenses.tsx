@@ -164,20 +164,23 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Group expenses by category
   const groupedExpenses = useMemo(() => {
     if (!expenses) return [];
-    const map = new Map<string, { category: string; total: number; items: typeof expenses }>();
+    const map = new Map<string, { category: string; total: number; totalTax: number; items: typeof expenses }>();
     expenses.forEach((e) => {
+      const tax = Number(e.price) * (Number(e.tax_rate || 0) / 100);
       const existing = map.get(e.category);
       if (existing) {
         existing.total += Number(e.price);
+        existing.totalTax += tax;
         existing.items.push(e);
       } else {
-        map.set(e.category, { category: e.category, total: Number(e.price), items: [e] });
+        map.set(e.category, { category: e.category, total: Number(e.price), totalTax: tax, items: [e] });
       }
     });
     return Array.from(map.values());
   }, [expenses]);
 
   const totalSpent = groupedExpenses.reduce((sum, g) => sum + g.total, 0);
+  const totalTax = groupedExpenses.reduce((sum, g) => sum + g.totalTax, 0);
 
   if (isLoading) {
     return (
