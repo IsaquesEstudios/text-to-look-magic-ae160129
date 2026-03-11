@@ -262,10 +262,9 @@ export default function UserLeiloesPage() {
           <Accordion type="single" collapsible className="flex flex-col gap-3">{active.map(renderAuction)}</Accordion>
         </div>
       )}
-      {finished.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-muted-foreground mb-3">{p.closed}</h2>
-          <Accordion type="single" collapsible className="flex flex-col gap-3">{finished.map(renderAuction)}</Accordion>
+      {active.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <Gavel className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noAuctionsAvailable}</p>
         </div>
       )}
       {auctions?.length === 0 && (
