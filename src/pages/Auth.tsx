@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,15 @@ function getCountryLabels(code: string) {
 }
 
 export default function Auth() {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to panel if already logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/painel", { replace: true });
+    }
+  }, [user, isLoading, navigate]);
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -50,7 +60,6 @@ export default function Auth() {
   const [postalCode, setPostalCode] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
-  const navigate = useNavigate();
   const { toast } = useToast();
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
