@@ -74,7 +74,7 @@ export default function PropertyNovidadesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PropertySubNav propertyId={property.id} propertyTitle={property.title} active="novidades" hasShares={!!(userShares && userShares.length > 0)} />
       <PropertyCommunity propertyId={property.id} />
     </div>

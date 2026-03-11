@@ -207,7 +207,7 @@ export default function AdminUserProfilePage() {
   const credits = Number(profile.credits) || 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <button
         onClick={() => navigate("/painel/usuarios")}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

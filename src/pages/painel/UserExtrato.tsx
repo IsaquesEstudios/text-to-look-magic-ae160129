@@ -54,7 +54,7 @@ export default function UserExtrato() {
   const dateLocale = lang === "en" ? "en-US" : lang === "es" ? "es-ES" : "pt-BR";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.statement}</h1>

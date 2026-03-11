@@ -31,7 +31,7 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>

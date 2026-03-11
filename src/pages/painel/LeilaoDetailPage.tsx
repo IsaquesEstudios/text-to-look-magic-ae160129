@@ -202,7 +202,7 @@ export default function LeilaoDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       {editing ? (
         <Card className="bg-card/50 border-border/50">

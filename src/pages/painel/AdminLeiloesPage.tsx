@@ -331,7 +331,7 @@ export default function AdminLeiloesPage() {
     );
   }
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leilões</h1>
