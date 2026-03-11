@@ -62,7 +62,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ month: "", category: "", price: "", taxRate: "" });
+  const [form, setForm] = useState({ month: "", category: "", price: "", taxStateCode: "" });
   const [catOpen, setCatOpen] = useState(false);
   const defaultInitialized = useRef(false);
 
@@ -79,13 +79,13 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     },
   });
 
-  // Fetch property default tax rate
+  // Fetch property default tax state code
   const { data: propertyData } = useQuery({
     queryKey: ["property-tax-rate", propertyId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("default_tax_rate")
+        .select("default_tax_rate, state_code")
         .eq("id", propertyId)
         .maybeSingle();
       if (error) throw error;
@@ -116,21 +116,29 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
   // Set defaults
   useEffect(() => {
     if (defaultInitialized.current) return;
-    if (expenses === undefined || propertyData === undefined) return;
+    if (expenses === undefined || propertyData === undefined || stateTaxes === undefined) return;
 
     const lastExpense = expenses?.length ? expenses[expenses.length - 1] : null;
     const now = new Date();
     const defaultMonth = lastExpense?.month || String(now.getMonth() + 1).padStart(2, "0");
-    const defaultTaxRate = propertyData?.default_tax_rate ? String(propertyData.default_tax_rate) : "";
+    
+    // Use property state_code as default tax
+    const defaultStateCode = propertyData?.state_code || "";
 
-    setForm((f) => ({ ...f, month: defaultMonth, taxRate: defaultTaxRate }));
+    setForm((f) => ({ ...f, month: defaultMonth, taxStateCode: defaultStateCode }));
     defaultInitialized.current = true;
-  }, [expenses, propertyData]);
+  }, [expenses, propertyData, stateTaxes]);
+
+  // Resolve tax rate from selected state code
+  const resolvedTaxRate = useMemo(() => {
+    if (!form.taxStateCode || form.taxStateCode === "none" || !stateTaxes) return 0;
+    const found = stateTaxes.find((t) => t.state_code === form.taxStateCode);
+    return found ? Number(found.tax_rate) : 0;
+  }, [form.taxStateCode, stateTaxes]);
 
   const addExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseCurrency(form.price);
-    const taxRate = form.taxRate ? parseFloat(form.taxRate) : 0;
     if (!price || !form.category.trim() || !form.month) return;
     setAdding(true);
     const { error } = await supabase.from("property_expenses").insert({
@@ -140,14 +148,15 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       quantity: 1,
       price,
       month: form.month,
-      tax_rate: taxRate,
+      tax_rate: resolvedTaxRate,
+      state_code: form.taxStateCode || null,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      // Save tax rate as default on the property
-      if (taxRate > 0) {
-        await supabase.from("properties").update({ default_tax_rate: taxRate } as any).eq("id", propertyId);
+      // Save state_code as default on the property
+      if (form.taxStateCode) {
+        await supabase.from("properties").update({ state_code: form.taxStateCode } as any).eq("id", propertyId);
         queryClient.invalidateQueries({ queryKey: ["property-tax-rate", propertyId] });
       }
       setForm((prev) => ({ ...prev, category: "", price: "" }));
@@ -289,16 +298,16 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 />
               </div>
 
-              <div className="w-44">
+              <div className="w-48">
                 <label className="text-xs text-muted-foreground">Tarifa</label>
-                <Select value={form.taxRate} onValueChange={(v) => setForm({ ...form, taxRate: v })}>
+                <Select value={form.taxStateCode} onValueChange={(v) => setForm({ ...form, taxStateCode: v })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Sem tarifa" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Sem tarifa</SelectItem>
+                    <SelectItem value="none">Sem tarifa</SelectItem>
                     {stateTaxes?.map((t) => (
-                      <SelectItem key={t.state_code} value={String(t.tax_rate)}>
+                      <SelectItem key={t.state_code} value={t.state_code}>
                         {t.state_name} ({t.tax_rate}%)
                       </SelectItem>
                     ))}
