@@ -229,38 +229,121 @@ export function PainelLayout() {
         </aside>
 
         {/* ── Mobile bottom nav ── */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
-          <nav className="flex items-center justify-evenly h-14 px-1 w-full overflow-x-auto">
-            {[...navItems, { label: p.profile, icon: UserCircle, path: profilePath }].map((item) => {
-              const isActive = item.path === "/painel"
-                ? location.pathname === "/painel"
-                : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
-              const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
-              const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
-              const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
-              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    "relative flex flex-col items-center gap-0.5 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0",
-                    "text-[9px] px-1.5 min-w-0",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )}
+        {(() => {
+          const bottomItems = isAdmin
+            ? navItems.slice(0, 4)
+            : [
+                navItems.find(i => i.path === "/painel")!,
+                navItems.find(i => i.path === "/painel/leiloes-user")!,
+                navItems.find(i => i.path === "/painel/meus-projetos")!,
+                navItems.find(i => i.path === "/painel/extrato")!,
+              ];
+          const extraItems = [
+            ...navItems.filter(i => !bottomItems.includes(i)),
+            { label: p.profile, icon: UserCircle, path: profilePath },
+            { label: p.goToSite, icon: Home, path: "/pt" },
+          ];
+
+          return (
+            <>
+              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
+                <nav className="flex items-center justify-evenly h-16 px-1 w-full">
+                  {bottomItems.map((item) => {
+                    const isActive = item.path === "/painel"
+                      ? location.pathname === "/painel"
+                      : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
+                    const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+                    const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
+                    const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
+                    const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
+                          "text-[10px]",
+                          isActive ? "text-primary" : "text-muted-foreground"
+                        )}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span className="truncate max-w-[60px] text-center">{item.label}</span>
+                        {badgeCount > 0 && (
+                          <span className="absolute -top-0.5 right-0.5 min-w-[18px] h-[18px] px-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                            {badgeCount > 9 ? "+9" : badgeCount}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+
+                  {/* More button */}
+                  <button
+                    onClick={() => setMoreOpen(true)}
+                    className={cn(
+                      "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
+                      "text-[10px]",
+                      moreOpen ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                    <span>Mais</span>
+                  </button>
+                </nav>
+              </div>
+
+              {/* More panel (Sheet from left) */}
+              <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+                <SheetContent
+                  side="left"
+                  className="w-[85%] max-w-[85%] p-0 border-r border-border/30 backdrop-blur-2xl bg-background/95"
                 >
-                  <item.icon className="h-4 w-4" />
-                  <span className="truncate max-w-[56px] text-center">{item.label}</span>
-                  {badgeCount > 0 && (
-                    <span className="absolute -top-1 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
-                      {badgeCount > 9 ? "+9" : badgeCount}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
+                      <img src={discoveryLogo} alt="Discovery" className="h-7" />
+                      <button onClick={() => setMoreOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+
+                    <nav className="flex-1 p-4 space-y-1">
+                      {extraItems.map((item) => {
+                        const isActive = item.path === profilePath
+                          ? location.pathname === profilePath
+                          : location.pathname.startsWith(item.path);
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setMoreOpen(false)}
+                            className={cn(
+                              "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
+                              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                            )}
+                          >
+                            <item.icon className="h-5 w-5 flex-shrink-0" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </nav>
+
+                    <div className="border-t border-border/20 p-4">
+                      <button
+                        onClick={() => { setMoreOpen(false); signOut(); }}
+                        className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                      >
+                        <LogOut className="h-5 w-5 flex-shrink-0" />
+                        {p.logout}
+                      </button>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          );
+        })()}
 
         <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 py-6 md:py-8 px-[4%] md:px-6 overflow-x-hidden">
           <Outlet />
