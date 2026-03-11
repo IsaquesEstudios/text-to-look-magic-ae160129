@@ -5,20 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle } from "lucide-react";
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
     queryKey: ["admin-properties-kpis", filterType],
     queryFn: async () => {
-      const { data: shareRows } = await supabase.from("shares").select("property_id");
-      const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
-      if (linkedIds.length === 0) return { arremate: 0, reforma: 0, investido: 0, venda: 0 };
-
       const { data: properties } = await supabase
         .from("properties")
         .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
-        .in("id", linkedIds)
         .eq("type", filterType);
 
       const props = properties ?? [];
@@ -84,14 +80,9 @@ export default function AdminImoveisPage() {
   const { data: counts } = useQuery({
     queryKey: ["admin-portfolio-counts"],
     queryFn: async () => {
-      const { data: shareRows } = await supabase.from("shares").select("property_id");
-      const linkedIds = [...new Set((shareRows ?? []).map((s) => s.property_id))];
-      if (linkedIds.length === 0) return { house: 0, land: 0 };
-
       const { data: props } = await supabase
         .from("properties")
-        .select("type")
-        .in("id", linkedIds);
+        .select("type");
 
       const list = props ?? [];
       return {
@@ -117,9 +108,18 @@ export default function AdminImoveisPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
-        <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos com investidores vinculados</p>
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
+          <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos do portfólio</p>
+        </div>
+        <Button
+          onClick={() => setShowForm(true)}
+          className="gap-2 rounded-xl h-10 px-5 font-medium"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Nova Propriedade
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

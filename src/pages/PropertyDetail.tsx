@@ -150,7 +150,12 @@ export default function PropertyDetail() {
         </div>
 
         {isAdmin && (
-          <PropertyInvestors propertyId={property.id} totalProject={purchasePrice} />
+          <PropertyInvestors
+            propertyId={property.id}
+            totalProject={purchasePrice}
+            propertyType={property.type}
+            propertyTitle={property.title}
+          />
         )}
 
         <div
