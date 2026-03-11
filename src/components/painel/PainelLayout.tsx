@@ -14,7 +14,6 @@ import discoveryLogo from "@/assets/discovery-logo.png";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { MoreHorizontal, X } from "lucide-react";
 
 export function PainelLayout() {
