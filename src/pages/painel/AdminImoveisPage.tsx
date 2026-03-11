@@ -20,13 +20,11 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       const props = properties ?? [];
       const arremate = props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0);
       const reforma = props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0);
+      const investido = arremate + reforma;
+      const venda = props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0);
+      const roi = investido > 0 ? ((venda - investido) / investido) * 100 : 0;
 
-      return {
-        arremate,
-        reforma,
-        investido: arremate + reforma,
-        venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
-      };
+      return { arremate, reforma, investido, venda, roi };
     },
   });
 
@@ -38,6 +36,9 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
     );
   }
 
+  const roi = kpis?.roi ?? 0;
+  const roiColor = roi >= 0 ? "text-primary" : "text-destructive";
+
   const cards =
     filterType === "house"
       ? [
@@ -45,14 +46,16 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
           { label: "Total em Reformas", value: kpis?.reforma ?? 0, icon: Wrench },
           { label: "Total Investido", value: kpis?.investido ?? 0, icon: Receipt },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
+          { label: "ROI Estimado", value: roi, icon: TrendingUp, isPercentage: true, colorClass: roiColor },
         ]
       : [
           { label: "Total em Arremate", value: kpis?.arremate ?? 0, icon: Gavel },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
+          { label: "ROI Estimado", value: roi, icon: TrendingUp, isPercentage: true, colorClass: roiColor },
         ];
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 ${filterType === "house" ? "lg:grid-cols-4" : ""} gap-4`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-4`}>
       {cards.map((card) => (
         <Card key={card.label} className="bg-card/50 border-border/50">
           <CardContent className="p-5">
@@ -62,8 +65,10 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
               </span>
               <card.icon className="h-4 w-4 text-muted-foreground/60" />
             </div>
-            <p className="text-2xl font-bold text-foreground">
-              $ {card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            <p className={`text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
+              {(card as any).isPercentage
+                ? `${card.value.toFixed(1)}%`
+                : `$ ${card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
             </p>
           </CardContent>
         </Card>
