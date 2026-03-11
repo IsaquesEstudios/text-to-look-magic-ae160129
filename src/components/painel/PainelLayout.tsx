@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { PageTransition } from "./PageTransition";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MoreHorizontal, X } from "lucide-react";
@@ -27,6 +27,25 @@ export function PainelLayout() {
   const unreadAuctions = useUnreadAuctions();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [isPanelNavigating, setIsPanelNavigating] = useState(false);
+
+  const handlePanelNavigation = (
+    event: MouseEvent<HTMLElement>,
+    path: string,
+    callback?: () => void,
+  ) => {
+    if (path === location.pathname || isPanelNavigating) {
+      callback?.();
+      return;
+    }
+
+    event.preventDefault();
+    callback?.();
+    setIsPanelNavigating(true);
+    window.requestAnimationFrame(() => {
+      navigate(path);
+    });
+  };
 
   const adminNavItems = [
     { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
@@ -52,6 +71,16 @@ export function PainelLayout() {
       navigate("/auth", { replace: true });
     }
   }, [isLoading, user, navigate]);
+
+  useEffect(() => {
+    if (!isPanelNavigating) return;
+
+    const resetTimer = window.setTimeout(() => {
+      setIsPanelNavigating(false);
+    }, 220);
+
+    return () => window.clearTimeout(resetTimer);
+  }, [location.pathname, isPanelNavigating]);
 
   if (isLoading) {
     return (
@@ -122,6 +151,7 @@ export function PainelLayout() {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={(event) => handlePanelNavigation(event, item.path)}
                   className={cn(
                     "relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
@@ -192,7 +222,7 @@ export function PainelLayout() {
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <Link to={profilePath} className={cn(
+              <Link to={profilePath} onClick={(event) => handlePanelNavigation(event, profilePath)} className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                 isProfileActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}>
@@ -276,7 +306,7 @@ export function PainelLayout() {
                         <Link
                           key={item.path}
                           to={item.path}
-                          onClick={() => setMoreOpen(false)}
+                          onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                           className={cn(
                             "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
                             isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
@@ -315,7 +345,7 @@ export function PainelLayout() {
                       <Link
                         key={item.path}
                         to={item.path}
-                        onClick={() => setMoreOpen(false)}
+                        onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                         className={cn(
                           "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
                           "text-[10px]",
@@ -351,7 +381,7 @@ export function PainelLayout() {
         })()}
 
         <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden">
-          <PageTransition>
+          <PageTransition isNavigating={isPanelNavigating}>
             <Outlet />
           </PageTransition>
         </main>
