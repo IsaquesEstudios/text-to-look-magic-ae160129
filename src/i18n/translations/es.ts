@@ -410,7 +410,7 @@ export const es = {
 
     greeting: "Hola, {name} 👋",
     investmentSummary: "Resumen de tus inversiones",
-    availableCredit: "Crédito Disponible",
+    availableCredit: "Saldo Disponible",
     propertiesLabel: "Inmuebles",
     totalInvested: "Total Invertido",
     estimatedReturn: "Retorno Estimado",
