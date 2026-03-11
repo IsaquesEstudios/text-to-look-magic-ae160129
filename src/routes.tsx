@@ -109,24 +109,24 @@ const generateBlogPostRoutes = (): RouteRecord[] =>
 
 // Panel child routes — rendered inside PainelLayout's <Outlet />
 const panelChildren: RouteRecord[] = [
-  { index: true, element: <PanelSuspenseWrapper><Painel /></PanelSuspenseWrapper> },
-  { path: "meus-projetos", element: <PanelSuspenseWrapper><UserPropriedadesPage /></PanelSuspenseWrapper> },
-  { path: "extrato", element: <PanelSuspenseWrapper><UserExtrato /></PanelSuspenseWrapper> },
-  { path: "imovel/:id", element: <PanelSuspenseWrapper><PropertyDetail /></PanelSuspenseWrapper> },
-  { path: "imovel/:id/novidades", element: <PanelSuspenseWrapper><PropertyNovidadesPage /></PanelSuspenseWrapper> },
-  { path: "imovel/:id/gastos", element: <PanelSuspenseWrapper><PropertyGastosPage /></PanelSuspenseWrapper> },
-  { path: "propriedades", element: <PanelSuspenseWrapper><AdminGuard><AdminImoveisPage /></AdminGuard></PanelSuspenseWrapper> },
+  { index: true, element: <PS fallback={<DashboardSkeleton />}><Painel /></PS> },
+  { path: "meus-projetos", element: <PS fallback={<PropertiesSkeleton />}><UserPropriedadesPage /></PS> },
+  { path: "extrato", element: <PS fallback={<StatementSkeleton />}><UserExtrato /></PS> },
+  { path: "imovel/:id", element: <PS fallback={<PropertyDetailSkeleton />}><PropertyDetail /></PS> },
+  { path: "imovel/:id/novidades", element: <PS fallback={<PropertySubPageSkeleton />}><PropertyNovidadesPage /></PS> },
+  { path: "imovel/:id/gastos", element: <PS fallback={<PropertySubPageSkeleton />}><PropertyGastosPage /></PS> },
+  { path: "propriedades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminImoveisPage /></AdminGuard></PS> },
   
-  { path: "usuarios", element: <PanelSuspenseWrapper><AdminGuard><AdminUsersPage /></AdminGuard></PanelSuspenseWrapper> },
-  { path: "usuarios/:userId", element: <PanelSuspenseWrapper><AdminGuard><AdminUserProfilePage /></AdminGuard></PanelSuspenseWrapper> },
-  { path: "atividades", element: <PanelSuspenseWrapper><AdminGuard><AdminAtividadesPage /></AdminGuard></PanelSuspenseWrapper> },
-  { path: "configuracoes", element: <PanelSuspenseWrapper><AdminGuard><AdminConfigPage /></AdminGuard></PanelSuspenseWrapper> },
-  { path: "leiloes", element: <PanelSuspenseWrapper><AdminGuard><AdminLeiloesPage /></AdminGuard></PanelSuspenseWrapper> },
-  { path: "leiloes-user", element: <PanelSuspenseWrapper><UserLeiloesPage /></PanelSuspenseWrapper> },
-  { path: "leilao/:id", element: <PanelSuspenseWrapper><LeilaoDetailPage /></PanelSuspenseWrapper> },
-  { path: "comprovantes", element: <PanelSuspenseWrapper><UserComprovantesPage /></PanelSuspenseWrapper> },
-  { path: "contratos", element: <PanelSuspenseWrapper><UserContratosPage /></PanelSuspenseWrapper> },
-  { path: "informacoes", element: <PanelSuspenseWrapper><UserProfilePage /></PanelSuspenseWrapper> },
+  { path: "usuarios", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminUsersPage /></AdminGuard></PS> },
+  { path: "usuarios/:userId", element: <PS fallback={<ProfileSkeleton />}><AdminGuard><AdminUserProfilePage /></AdminGuard></PS> },
+  { path: "atividades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminAtividadesPage /></AdminGuard></PS> },
+  { path: "configuracoes", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminConfigPage /></AdminGuard></PS> },
+  { path: "leiloes", element: <PS fallback={<AuctionsSkeleton />}><AdminGuard><AdminLeiloesPage /></AdminGuard></PS> },
+  { path: "leiloes-user", element: <PS fallback={<AuctionsSkeleton />}><UserLeiloesPage /></PS> },
+  { path: "leilao/:id", element: <PS fallback={<AuctionDetailSkeleton />}><LeilaoDetailPage /></PS> },
+  { path: "comprovantes", element: <PS fallback={<ReceiptsSkeleton />}><UserComprovantesPage /></PS> },
+  { path: "contratos", element: <PS fallback={<ContractsSkeleton />}><UserContratosPage /></PS> },
+  { path: "informacoes", element: <PS fallback={<ProfileSkeleton />}><UserProfilePage /></PS> },
 ];
 
 export const routes: RouteRecord[] = [
