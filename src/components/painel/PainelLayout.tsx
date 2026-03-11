@@ -9,6 +9,7 @@ import {
   PanelLeftClose, PanelLeft, FileText,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
+import { PageTransition } from "./PageTransition";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { useEffect, useState } from "react";
