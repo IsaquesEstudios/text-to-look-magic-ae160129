@@ -117,7 +117,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   // Current link preview
   const currentAmount = linkRawAmount / 100;
-  const currentFeeShare = totalProjeto > 0 ? Math.round((currentAmount / totalProjeto) * serviceFee * 100) / 100 : 0;
+  const currentFeeShare = totalProjeto > 0 ? Math.min(Math.round((currentAmount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
   const currentTotalDeduction = currentAmount + currentFeeShare;
   const selectedAvailableCredits = getAvailableCredits(selectedUserId);
 
