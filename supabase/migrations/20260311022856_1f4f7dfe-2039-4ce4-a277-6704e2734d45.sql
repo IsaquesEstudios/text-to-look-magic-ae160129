@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN default_tax_rate numeric DEFAULT 0;
