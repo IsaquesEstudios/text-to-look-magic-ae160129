@@ -32,6 +32,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     estimated_auction_value: "",
     estimated_renovation_cost: "",
     estimated_return_pct: "",
+    estimated_sale_value: "",
     estimated_timeline: "",
   });
 
