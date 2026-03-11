@@ -16,7 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 import AuctionInvestorLinking from "@/components/painel/admin/AuctionInvestorLinking";
 
-function CountdownTimer({ targetDate }: { targetDate: string }) {
+function CountdownTimer({ targetDate, label = "Começa em" }: { targetDate: string; label?: string }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isStarted, setIsStarted] = useState(false);
 
