@@ -25,6 +25,7 @@ export function PainelLayout() {
   const totalUnread = useUnreadNews();
   const unreadAuctions = useUnreadAuctions();
   const [collapsed, setCollapsed] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const adminNavItems = [
     { label: p.dashboard, icon: LayoutDashboard, path: "/painel" },
