@@ -653,17 +653,15 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     </div>
                   </div>
                 ) : (
-                  remaining > 0 && totalProjeto > 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 w-full"
-                      onClick={() => setShowAddInvestor(true)}
-                    >
-                      <UserPlus className="h-4 w-4" /> Vincular Investidor
-                    </Button>
-                  )
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 w-full"
+                    onClick={() => setShowAddInvestor(true)}
+                  >
+                    <UserPlus className="h-4 w-4" /> Vincular Investidor
+                  </Button>
                 )}
               </div>
             )}
