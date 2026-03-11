@@ -199,7 +199,6 @@ export default function UserLeiloesPage() {
   });
 
   const active = auctions?.filter((a) => a.status !== "finished") ?? [];
-  const finished = auctions?.filter((a) => a.status === "finished") ?? [];
 
   if (isLoading) return <div className="animate-pulse text-muted-foreground">{p.loading}</div>;
 
