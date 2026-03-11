@@ -380,6 +380,11 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                           {hasMultiple && (
                             <span className="text-xs text-muted-foreground">({group.items.length})</span>
                           )}
+                          {group.newCount > 0 && (
+                            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+                              {group.newCount}
+                            </span>
+                          )}
                         </td>
                         <td className="p-3 text-right text-foreground">${fmt(group.total)}</td>
                         <td className="p-3 text-right text-muted-foreground">{group.totalTax > 0 ? `$${fmt(group.totalTax)}` : "—"}</td>
