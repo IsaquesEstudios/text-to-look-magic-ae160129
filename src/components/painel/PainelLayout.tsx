@@ -9,6 +9,7 @@ import {
   PanelLeftClose, PanelLeft, FileText,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
+import { PageTransition } from "./PageTransition";
 import { cn } from "@/lib/utils";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { useEffect, useState } from "react";
@@ -350,7 +351,9 @@ export function PainelLayout() {
         })()}
 
         <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
     </TooltipProvider>
