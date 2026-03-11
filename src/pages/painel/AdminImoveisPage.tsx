@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle } from "lucide-react";
+import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle, Percent } from "lucide-react";
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
@@ -46,12 +46,12 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
           { label: "Total em Reformas", value: kpis?.reforma ?? 0, icon: Wrench },
           { label: "Total Investido", value: kpis?.investido ?? 0, icon: Receipt },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
-          { label: "ROI Estimado", value: roi, icon: TrendingUp, isPercentage: true, colorClass: roiColor },
+          { label: "ROI Estimado", value: roi, icon: Percent, isPercentage: true, colorClass: roiColor },
         ]
       : [
           { label: "Total em Arremate", value: kpis?.arremate ?? 0, icon: Gavel },
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
-          { label: "ROI Estimado", value: roi, icon: TrendingUp, isPercentage: true, colorClass: roiColor },
+          { label: "ROI Estimado", value: roi, icon: Percent, isPercentage: true, colorClass: roiColor },
         ];
 
   return (
