@@ -306,6 +306,8 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
               <thead>
                 <tr className="border-b border-border/50">
                   <th className="text-left p-3 text-muted-foreground font-medium">Categoria</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Valor</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Tarifa</th>
                   <th className="text-right p-3 text-muted-foreground font-medium">Total</th>
                   {isAdmin && <th className="w-10" />}
                 </tr>
@@ -334,7 +336,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                             <span className="text-xs text-muted-foreground">({group.items.length})</span>
                           )}
                         </td>
-                        <td className="p-3 text-right font-medium text-foreground">${fmt(group.total)}</td>
+                        <td className="p-3 text-right text-foreground">${fmt(group.total)}</td>
+                        <td className="p-3 text-right text-muted-foreground">{group.totalTax > 0 ? `$${fmt(group.totalTax)}` : "—"}</td>
+                        <td className="p-3 text-right font-medium text-foreground">${fmt(group.total + group.totalTax)}</td>
                         {isAdmin && !hasMultiple && (
                           <td className="p-3">
                             <button onClick={(e) => { e.stopPropagation(); deleteExpense(group.items[0].id); }} className="text-destructive/60 hover:text-destructive">
@@ -344,21 +348,28 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                         )}
                         {isAdmin && hasMultiple && <td />}
                       </tr>
-                      {isExpanded && group.items.map((expense) => (
-                        <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
-                          <td className="p-2 pl-10 text-muted-foreground text-xs">
-                            {formatMonthLabel(expense.month)}
-                          </td>
-                          <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price))}</td>
-                          {isAdmin && (
-                            <td className="p-2">
-                              <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
+                      {isExpanded && group.items.map((expense) => {
+                        const itemTax = Number(expense.price) * (Number(expense.tax_rate || 0) / 100);
+                        return (
+                          <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
+                            <td className="p-2 pl-10 text-muted-foreground text-xs">
+                              {formatMonthLabel(expense.month)}
                             </td>
-                          )}
-                        </tr>
-                      ))}
+                            <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price))}</td>
+                            <td className="p-2 text-right text-muted-foreground text-xs">
+                              {Number(expense.tax_rate || 0) > 0 ? `${expense.tax_rate}% ($${fmt(itemTax)})` : "—"}
+                            </td>
+                            <td className="p-2 text-right text-muted-foreground text-xs">${fmt(Number(expense.price) + itemTax)}</td>
+                            {isAdmin && (
+                              <td className="p-2">
+                                <button onClick={() => deleteExpense(expense.id)} className="text-destructive/60 hover:text-destructive">
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                     </Fragment>
                   );
                 })}
@@ -366,7 +377,9 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
               <tfoot>
                 <tr className="border-t border-border/50">
                   <td className="p-3 font-bold text-foreground">Total</td>
-                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent)}</td>
+                  <td className="p-3 text-right font-bold text-foreground">${fmt(totalSpent)}</td>
+                  <td className="p-3 text-right font-bold text-muted-foreground">{totalTax > 0 ? `$${fmt(totalTax)}` : "—"}</td>
+                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent + totalTax)}</td>
                   {isAdmin && <td />}
                 </tr>
               </tfoot>
