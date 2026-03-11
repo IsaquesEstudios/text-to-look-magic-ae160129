@@ -1,22 +1,33 @@
 import { motion } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "react-router-dom";
+import {
+  DashboardSkeleton,
+  AuctionsSkeleton,
+  PropertiesSkeleton,
+  StatementSkeleton,
+  PropertyDetailSkeleton,
+  PropertySubPageSkeleton,
+  AdminListSkeleton,
+  AuctionDetailSkeleton,
+  ReceiptsSkeleton,
+  ContractsSkeleton,
+  ProfileSkeleton,
+  GenericPanelSkeleton,
+} from "./PanelSkeletons";
 
-function PanelSkeleton() {
-  return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="space-y-2">
-        <Skeleton className="h-7 w-48 rounded-lg" />
-        <Skeleton className="h-4 w-32 rounded-md" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-24 rounded-2xl" />
-        <Skeleton className="h-24 rounded-2xl" />
-      </div>
-      <Skeleton className="h-40 w-full rounded-2xl" />
-      <Skeleton className="h-32 w-full rounded-2xl" />
-    </div>
-  );
+function getSkeletonForPath(path: string) {
+  if (path === "/painel") return <DashboardSkeleton />;
+  if (path.includes("/leiloes-user") || path.includes("/leiloes")) return <AuctionsSkeleton />;
+  if (path.includes("/meus-projetos")) return <PropertiesSkeleton />;
+  if (path.includes("/extrato")) return <StatementSkeleton />;
+  if (path.includes("/novidades") || path.includes("/gastos")) return <PropertySubPageSkeleton />;
+  if (path.includes("/imovel/")) return <PropertyDetailSkeleton />;
+  if (path.includes("/leilao/")) return <AuctionDetailSkeleton />;
+  if (path.includes("/comprovantes")) return <ReceiptsSkeleton />;
+  if (path.includes("/contratos")) return <ContractsSkeleton />;
+  if (path.includes("/informacoes") || path.includes("/usuarios/")) return <ProfileSkeleton />;
+  if (path.includes("/usuarios") || path.includes("/propriedades") || path.includes("/atividades") || path.includes("/configuracoes")) return <AdminListSkeleton />;
+  return <GenericPanelSkeleton />;
 }
 
 export function PageTransition({
@@ -29,7 +40,7 @@ export function PageTransition({
   const location = useLocation();
 
   if (isNavigating) {
-    return <PanelSkeleton />;
+    return getSkeletonForPath(location.pathname);
   }
 
   return (
