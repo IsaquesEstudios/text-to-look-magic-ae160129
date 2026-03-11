@@ -410,7 +410,7 @@ export const en = {
 
     greeting: "Hi, {name} 👋",
     investmentSummary: "Your investment summary",
-    availableCredit: "Available Credit",
+    availableCredit: "Available Balance",
     propertiesLabel: "Properties",
     totalInvested: "Total Invested",
     estimatedReturn: "Estimated Return",
