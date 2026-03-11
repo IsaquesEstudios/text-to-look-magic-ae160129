@@ -345,7 +345,7 @@ export function PainelLayout() {
                       <Link
                         key={item.path}
                         to={item.path}
-                        onClick={() => setMoreOpen(false)}
+                        onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                         className={cn(
                           "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
                           "text-[10px]",
