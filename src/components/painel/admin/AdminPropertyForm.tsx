@@ -637,7 +637,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                         disabled={
                           !selectedUserId ||
                           currentAmount <= 0 ||
-                          currentAmount > remaining ||
                           currentTotalDeduction > selectedAvailableCredits ||
                           totalProjeto <= 0
                         }
