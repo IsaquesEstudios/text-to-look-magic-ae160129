@@ -168,29 +168,29 @@ export function UserDashboard() {
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Wallet className="h-5 w-5 text-primary" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.availableCredit}</p>
             <p className="text-lg font-bold text-foreground">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.propertiesLabel}</p>
             <p className="text-lg font-bold text-foreground">{totalProperties}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.totalInvested}</p>
             <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedReturn}</p>
@@ -199,7 +199,7 @@ export function UserDashboard() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
+        <div className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 sm:p-5 overflow-hidden">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><Percent className="h-5 w-5 text-primary" /></div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedROI}</p>
@@ -220,12 +220,12 @@ export function UserDashboard() {
             <Link to="/painel/leiloes-user" className="text-xs text-primary hover:underline mt-1">{p.viewAuctions}</Link>
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {propertyNews.map((prop) => (
               <Link
                 key={prop.id}
                 to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
-                className="group relative flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
+                className="group relative flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-4 sm:gap-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300 overflow-hidden"
               >
                 <div className="h-11 w-11 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
                   {prop.cover_image_url ? (
