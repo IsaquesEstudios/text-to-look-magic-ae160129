@@ -160,7 +160,7 @@ export function UserDashboard() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 max-w-full">
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           {p.greeting.replace("{name}", profile?.full_name?.split(" ")[0] || p.investor)}
