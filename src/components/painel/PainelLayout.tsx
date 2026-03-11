@@ -381,7 +381,7 @@ export function PainelLayout() {
         })()}
 
         <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden">
-          <PageTransition>
+          <PageTransition isNavigating={isPanelNavigating}>
             <Outlet />
           </PageTransition>
         </main>
