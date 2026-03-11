@@ -252,15 +252,15 @@ export function UserDashboard() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden flex flex-col" style={{ maxHeight: 350 }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 flex-shrink-0">
+      <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
           <div className="flex items-center gap-2">
             <History className="h-4 w-4 text-muted-foreground" />
             <h3 className="font-semibold text-foreground text-sm">{p.recentHistory}</h3>
           </div>
           <Link to="/painel/extrato" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
         </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div>
           {!recentActivity?.length ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{p.noActivityYet}</div>
           ) : (
