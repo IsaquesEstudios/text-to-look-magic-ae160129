@@ -334,7 +334,13 @@ export function PainelLayout() {
               </div>
 
               <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
-                <nav className="flex items-center justify-evenly h-16 px-1 w-full" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                <nav
+                  className="flex items-center justify-evenly px-1 w-full"
+                  style={{
+                    height: mobileNavHeight,
+                    paddingBottom: mobileBottomInset,
+                  }}
+                >
                   {bottomItems.map((item) => {
                     const isActive = !moreOpen && (item.path === "/painel"
                       ? location.pathname === "/painel"
