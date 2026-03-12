@@ -289,7 +289,7 @@ export function PainelLayout() {
                   "md:hidden fixed inset-x-0 z-35 transition-transform duration-300 ease-out",
                   moreOpen ? "translate-y-0" : "translate-y-full"
                 )}
-                style={{ zIndex: 35, bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+                style={{ zIndex: 35, bottom: mobileNavHeight }}
               >
                 <div className="bg-background border-t border-border/30 rounded-t-2xl shadow-2xl px-4 pt-5 pb-4">
                   <div className="flex items-center justify-between mb-4 px-1">
