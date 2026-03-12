@@ -284,7 +284,7 @@ export function PainelLayout() {
               )}
               <div
                 className={cn(
-                  "md:hidden fixed inset-x-0 bottom-16 z-35 transition-transform duration-300 ease-out safe-area-bottom",
+                  "md:hidden fixed inset-x-0 z-35 transition-transform duration-300 ease-out",
                   moreOpen ? "translate-y-0" : "translate-y-full"
                 )}
                 style={{ zIndex: 35 }}
