@@ -82,7 +82,7 @@ export default function UserComprovantesPage() {
                   <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><ArrowDownLeft className="h-4 w-4 text-primary" /></div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground truncate">{r.description || p.creditDeposit}</p>
-                    <p className="text-[11px] text-muted-foreground/60">{format(new Date(r.created_at), "dd MMM yyyy, HH:mm", { locale: dateLocale })}</p>
+                    <p className="text-[11px] text-muted-foreground">{format(new Date(r.created_at), "dd MMM yyyy, HH:mm", { locale: dateLocale })}</p>
                   </div>
                   <p className="text-sm font-semibold text-primary flex-shrink-0">+${Math.abs(Number(r.amount)).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
                 </div>

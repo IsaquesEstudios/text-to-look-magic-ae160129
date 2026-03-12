@@ -134,15 +134,15 @@ export default function PropertyDetail() {
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-2">Estimativas do Projeto</p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {[
-              { icon: DollarSign, label: "Arremate até (Est.)", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-              { icon: DollarSign, label: "Reforma (Est.)", value: `$${renovationCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-              { icon: DollarSign, label: "Total do Projeto (Est.)", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
-              { icon: DollarSign, label: "Valor de Venda (Est.)", value: `$${saleValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground/60" },
+              { icon: DollarSign, label: "Arremate até (Est.)", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
+              { icon: DollarSign, label: "Reforma (Est.)", value: `$${renovationCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
+              { icon: DollarSign, label: "Total do Projeto (Est.)", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
+              { icon: DollarSign, label: "Valor de Venda (Est.)", value: `$${saleValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: TrendingUp, label: "Retorno (Est.)", value: `${calculatedReturn.toFixed(1)}%`, iconClass: "text-primary", valueClass: "text-primary" },
             ].map((stat, i) => (
               <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
                 <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">{stat.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">{stat.label}</p>
                 <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
               </div>
             ))}

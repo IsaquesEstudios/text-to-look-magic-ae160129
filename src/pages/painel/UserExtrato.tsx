@@ -62,7 +62,7 @@ export default function UserExtrato() {
         </div>
         <div className="flex items-center justify-between rounded-xl border border-border/30 bg-card/40 px-4 py-3">
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.currentBalance}</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.currentBalance}</p>
             <p className="text-xl font-bold text-primary">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
           <Button variant="outline" size="sm" className="gap-2" onClick={() => setRechargeOpen(true)}>
@@ -148,7 +148,7 @@ export default function UserExtrato() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground truncate">{item.description}</p>
-                <p className="text-[11px] text-muted-foreground/60">
+                <p className="text-[11px] text-muted-foreground">
                   {new Date(item.date).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
