@@ -19,7 +19,10 @@ export function PropertyCommunity({ propertyId }: Props) {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [mediaPopoverOpen, setMediaPopoverOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const { data: messages, isLoading } = useQuery({
     queryKey: ["property-messages", propertyId],
