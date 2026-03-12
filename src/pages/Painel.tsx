@@ -23,10 +23,12 @@ function AdminDashboardContent() {
     staleTime: 0,
     queryFn: async () => {
       const [feesRes, depositsRes, sharesRes, propertiesRes, profilesCountRes] = await Promise.all([
-        supabase.from("credit_transactions").select("amount").ilike("description", "%Taxa de serviço%"),
+        supabase.from("credit_transactions").select("amount").ilike("description", "%taxa de serv%"),
         supabase.from("auction_deposits").select("amount, service_fee"),
         supabase.from("shares").select("property_id, amount_paid"),
-        supabase.from("properties").select("id, type, status"),
+        supabase
+          .from("properties")
+          .select("id, type, status, estimated_auction_value, estimated_renovation_cost"),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
       ]);
       const fees = feesRes.data ?? [];
@@ -35,15 +37,14 @@ function AdminDashboardContent() {
       const properties = propertiesRes.data ?? [];
       const linkedPropertyIds = new Set(shares.map(s => s.property_id));
       const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
-      const activePropertyIds = new Set(
-        properties
-          .filter((p) => (p.status ?? "").toLowerCase() !== "sold")
-          .map((p) => p.id)
-      );
       const feesFromTransactions = fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0);
       const feesFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
-      const activePropertiesInvested = shares.reduce(
-        (acc, s) => acc + (activePropertyIds.has(s.property_id) ? Number(s.amount_paid) : 0),
+      const activePropertiesInvested = properties.reduce(
+        (acc, p) =>
+          acc +
+          ((p.status ?? "").toLowerCase() !== "sold"
+            ? Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0)
+            : 0),
         0
       );
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
