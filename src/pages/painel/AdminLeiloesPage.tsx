@@ -343,33 +343,29 @@ export default function AdminLeiloesPage() {
       </div>
 
       {/* KPIs: Available + Invested */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
-              <Wallet className="h-5 w-5 text-discovery-green" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Disponível para Investimento</p>
-              <p className="text-xl font-bold text-foreground">
-                ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Investido em Leilões</p>
-              <p className="text-xl font-bold text-foreground">
-                ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
+            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-discovery-green" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Disponível para Investimento</p>
+            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
+              ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Total Investido em Leilões</p>
+            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
+              ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -383,44 +379,32 @@ export default function AdminLeiloesPage() {
                 {upcoming.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
                     <Card className="bg-card/50 border-border/50 hover:shadow-md transition-shadow cursor-pointer">
-                      <CardContent className="p-5 flex items-center justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-foreground truncate">{auction.title}</span>
-                            {getStatusBadge(auction.status)}
-                            {(auction as any).visibility === "private" && (
-                              <Badge variant="outline" className="text-[10px] gap-1">
-                                <Lock className="h-3 w-3" /> Privado
-                              </Badge>
-                            )}
+                      <CardContent className="p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="font-semibold text-sm sm:text-base text-foreground truncate max-w-[140px] sm:max-w-none">{auction.title}</span>
+                              {getStatusBadge(auction.status)}
+                              {(auction as any).visibility === "private" && (
+                                <Badge variant="outline" className="text-[10px] gap-1">
+                                  <Lock className="h-3 w-3" /> Privado
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3 inline mr-1" />
+                              Leilão: {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Prazo invest.: {format(new Date(new Date(auction.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                            </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3 inline mr-1" />
-                            Leilão: {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Prazo invest.: {format(new Date(new Date(auction.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3 flex-shrink-0" onClick={(e) => e.preventDefault()}>
-                          <AdminCountdown targetDate={auction.scheduled_start} status={auction.status} />
-                          {(auction as any).visibility === "private" && (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                toggleVisibilityMutation.mutate({ id: auction.id, visibility: (auction as any).visibility });
-                              }}
-                              title="Alternar visibilidade"
-                            >
-                              <Globe className="h-4 w-4" />
+                          <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.preventDefault()}>
+                            <AdminCountdown targetDate={auction.scheduled_start} status={auction.status} />
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={(e) => { e.preventDefault(); deleteMutation.mutate(auction.id); }}>
+                              <Trash2 className="h-4 w-4" />
                             </Button>
-                          )}
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={(e) => { e.preventDefault(); deleteMutation.mutate(auction.id); }}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
