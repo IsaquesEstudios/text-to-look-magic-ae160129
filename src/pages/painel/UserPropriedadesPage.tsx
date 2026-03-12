@@ -67,7 +67,7 @@ function KPICards({ aggregated, p }: { aggregated: AggregatedProperty[]; p: any 
       <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
         <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedReturn}</p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturn}</p>
           <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
             ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
