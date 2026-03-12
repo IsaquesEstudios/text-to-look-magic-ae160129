@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, Upload, Loader2, Image as ImageIcon, Video } from "lucide-react";
+import { Send, Loader2, Camera, Image as ImageIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 interface Props {
