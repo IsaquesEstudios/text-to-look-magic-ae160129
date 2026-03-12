@@ -36,6 +36,7 @@ export default function Auth() {
       navigate("/painel", { replace: true });
     }
   }, [user, isLoading, navigate]);
+
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
