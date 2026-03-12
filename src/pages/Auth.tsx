@@ -36,6 +36,7 @@ export default function Auth() {
       navigate("/painel", { replace: true });
     }
   }, [user, isLoading, navigate]);
+
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -146,6 +147,16 @@ export default function Auth() {
       setLoading(false);
     }
   };
+
+  // Show splash while checking session — prevents login form flash
+  if (isLoading || user) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
