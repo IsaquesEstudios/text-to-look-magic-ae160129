@@ -130,33 +130,36 @@ function AdminDashboardContent() {
     );
   }
 
-  const cards = [
+  const kpis = [
     { label: "Valor Discovery", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
     { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
     { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
-    { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
     { label: "Total Investido", value: `$ ${(stats?.totalInvested ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {cards.map((card) => (
-          <Card key={card.label} className="bg-card/50 border-border/50">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {card.label}
-                </span>
-                <card.icon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="text-2xl font-bold text-foreground">{card.value}</p>
-            </CardContent>
-          </Card>
+
+      {/* Mobile: 2-2-1 layout | Desktop: 5 cols */}
+      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-5">
+        {kpis.map((card, i) => (
+          <div
+            key={card.label}
+            className={`flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden ${i === 4 ? "col-span-2 lg:col-span-1" : ""}`}
+          >
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <card.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{card.label}</p>
+              <p className="text-sm sm:text-lg font-bold text-foreground truncate">{card.value}</p>
+            </div>
+          </div>
         ))}
       </div>
 
