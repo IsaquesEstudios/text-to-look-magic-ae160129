@@ -8,6 +8,12 @@ const config: CapacitorConfig = {
     url: 'https://text-to-look-magic.lovable.app/auth?forceHideBadge=true',
     cleartext: true,
   },
+  android: {
+    backgroundColor: '#141414',
+  },
+  ios: {
+    contentInset: 'always',
+  },
 };
 
 export default config;
