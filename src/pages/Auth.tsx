@@ -159,6 +159,7 @@ export default function Auth() {
   }
 
   return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <img src={discoveryLogo} alt="Discovery" className="h-12" />
