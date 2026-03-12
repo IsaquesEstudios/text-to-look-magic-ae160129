@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, Upload, Loader2, Image as ImageIcon, Video } from "lucide-react";
+import { Send, Loader2, Camera, Image as ImageIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 interface Props {
@@ -18,7 +19,10 @@ export function PropertyCommunity({ propertyId }: Props) {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [mediaPopoverOpen, setMediaPopoverOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const { data: messages, isLoading } = useQuery({
     queryKey: ["property-messages", propertyId],
@@ -156,19 +160,52 @@ export function PropertyCommunity({ propertyId }: Props) {
               placeholder="Enviar atualização..."
               maxLength={2000}
             />
-            <label className="cursor-pointer">
-              <Button variant="outline" size="icon" asChild disabled={uploading}>
-                <span>
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-                </span>
-              </Button>
-              <input
-                type="file"
-                accept="image/*,video/*"
-                onChange={uploadMedia}
-                className="hidden"
-              />
-            </label>
+            <Popover open={mediaPopoverOpen} onOpenChange={setMediaPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" disabled={uploading}>
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-44 p-2" align="end">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-sm hover:bg-secondary transition-colors"
+                  onClick={() => {
+                    setMediaPopoverOpen(false);
+                    cameraInputRef.current?.click();
+                  }}
+                >
+                  <Camera className="h-4 w-4 text-muted-foreground" />
+                  Câmera
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-sm hover:bg-secondary transition-colors"
+                  onClick={() => {
+                    setMediaPopoverOpen(false);
+                    galleryInputRef.current?.click();
+                  }}
+                >
+                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                  Galeria
+                </button>
+              </PopoverContent>
+            </Popover>
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={uploadMedia}
+              className="hidden"
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*,video/*"
+              onChange={uploadMedia}
+              className="hidden"
+            />
             <Button variant="cta" size="icon" onClick={sendMessage} disabled={sending || !message.trim()}>
               <Send className="h-4 w-4" />
             </Button>
