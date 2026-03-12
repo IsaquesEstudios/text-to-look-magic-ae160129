@@ -34,8 +34,8 @@ function AdminDashboardContent() {
       const linkedPropertyIds = new Set(shares.map(s => s.property_id));
       const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
       return {
-        adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
-        totalInvested: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
+        adminFees: fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0),
+        totalInvested: shares.reduce((acc, s) => acc + Number(s.amount_paid), 0),
         casas: linkedProperties.filter(p => p.type === "house").length,
         terrenos: linkedProperties.filter(p => p.type === "land").length,
         totalUsers: profilesCountRes.count ?? 0,
