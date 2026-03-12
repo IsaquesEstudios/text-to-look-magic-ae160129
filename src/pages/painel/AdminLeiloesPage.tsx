@@ -382,25 +382,15 @@ export default function AdminLeiloesPage() {
                       <CardContent className="p-4 sm:p-5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <div className="flex items-center gap-2 sm:hidden mb-0.5">
-                                {getStatusBadge(auction.status)}
-                                {(auction as any).visibility === "private" && (
-                                  <Badge variant="outline" className="text-[10px] gap-1">
-                                    <Lock className="h-3 w-3" /> Privado
-                                  </Badge>
-                                )}
-                              </div>
-                              <span className="font-semibold text-sm sm:text-base text-foreground truncate max-w-[200px] sm:max-w-none">{auction.title}</span>
-                              <span className="hidden sm:inline-flex items-center gap-2">
-                                {getStatusBadge(auction.status)}
-                                {(auction as any).visibility === "private" && (
-                                  <Badge variant="outline" className="text-[10px] gap-1">
-                                    <Lock className="h-3 w-3" /> Privado
-                                  </Badge>
-                                )}
-                              </span>
+                            <div className="flex items-center gap-2 mb-1">
+                              {getStatusBadge(auction.status)}
+                              {(auction as any).visibility === "private" && (
+                                <Badge variant="outline" className="text-[10px] gap-1">
+                                  <Lock className="h-3 w-3" /> Privado
+                                </Badge>
+                              )}
                             </div>
+                            <p className="font-semibold text-sm sm:text-base text-foreground truncate">{auction.title}</p>
                             <p className="text-xs text-muted-foreground">
                               <Clock className="h-3 w-3 inline mr-1" />
                               Leilão: {format(new Date(auction.scheduled_start), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
