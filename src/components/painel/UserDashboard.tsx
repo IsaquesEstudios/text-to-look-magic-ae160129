@@ -195,7 +195,7 @@ export function UserDashboard() {
         <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
           <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground/60 truncate">{p.estimatedROI}</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{p.estimatedROI}</p>
             <p className={`text-sm sm:text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
           </div>
         </div>
