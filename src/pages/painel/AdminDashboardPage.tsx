@@ -26,25 +26,20 @@ export default function AdminDashboardPage() {
       const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
       const discoveryFromProperties = properties.reduce((acc, p) => {
-        if ((p.status ?? "").toLowerCase() === "sold") return acc;
         const normalizedType = (p.type ?? "").toLowerCase();
         const maxFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
         return acc + maxFee;
       }, 0);
       const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
-      const activePropertiesInvested = properties.reduce(
-        (acc, p) =>
-          acc +
-          ((p.status ?? "").toLowerCase() !== "sold"
-            ? Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0)
-            : 0),
+      const totalPropertiesInvested = properties.reduce(
+        (acc, p) => acc + Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0),
         0
       );
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
       return {
         adminFees: discoveryFromProperties + discoveryFromDeposits,
-        totalInvested: activePropertiesInvested + auctionInvested,
+        totalInvested: totalPropertiesInvested + auctionInvested,
         casas: linkedProperties.filter(p => p.type === "house").length,
         terrenos: linkedProperties.filter(p => p.type === "land").length,
         totalUsers: profiles.length,
