@@ -10,8 +10,7 @@ export default function AdminDashboardPage() {
     queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
-      const [feesRes, depositsRes, sharesRes, propertiesRes, profilesRes] = await Promise.all([
-        supabase.from("credit_transactions").select("amount").ilike("description", "%taxa de serv%"),
+      const [depositsRes, sharesRes, propertiesRes, profilesRes] = await Promise.all([
         supabase.from("auction_deposits").select("amount, service_fee"),
         supabase.from("shares").select("property_id, amount_paid"),
         supabase
@@ -20,15 +19,19 @@ export default function AdminDashboardPage() {
         supabase.from("profiles").select("id"),
       ]);
 
-      const fees = feesRes.data ?? [];
       const deposits = depositsRes.data ?? [];
       const shares = sharesRes.data ?? [];
       const properties = propertiesRes.data ?? [];
       const profiles = profilesRes.data ?? [];
       const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
-      const feesFromTransactions = fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0);
-      const feesFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
+      const discoveryFromProperties = properties.reduce((acc, p) => {
+        if ((p.status ?? "").toLowerCase() === "sold") return acc;
+        const normalizedType = (p.type ?? "").toLowerCase();
+        const maxFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
+        return acc + maxFee;
+      }, 0);
+      const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
       const activePropertiesInvested = properties.reduce(
         (acc, p) =>
           acc +
@@ -40,7 +43,7 @@ export default function AdminDashboardPage() {
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
       return {
-        adminFees: feesFromTransactions + feesFromDeposits,
+        adminFees: discoveryFromProperties + discoveryFromDeposits,
         totalInvested: activePropertiesInvested + auctionInvested,
         casas: linkedProperties.filter(p => p.type === "house").length,
         terrenos: linkedProperties.filter(p => p.type === "land").length,
