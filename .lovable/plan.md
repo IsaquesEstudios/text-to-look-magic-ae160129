@@ -1,44 +1,46 @@
 
 
-# Melhorias no Painel do Investidor
+## Problema
 
-## 1. Corrigir bug de calculo em "Meus Imoveis" (UserImoveis.tsx)
+Quando o app nativo reabre, o Capacitor carrega a URL `/auth`. O componente `Auth` renderiza o formulário de login **imediatamente** e só redireciona para `/painel` depois que o `useAuth` termina de carregar (`isLoading` vira `false` e `user` existe). Isso causa o flash da tela de login.
 
-A pagina usa `purchase_price` e `estimated_return_pct` para calcular valores. Sera atualizada para usar a formula correta:
-- **Total do Projeto** = `estimated_auction_value` + `estimated_renovation_cost`
-- **Valor de Venda** = `estimated_sale_value`
-- **ROI** = `((Venda - Total) / Total) * 100`
-- **Retorno estimado do usuario** = participacao proporcional sobre a margem de lucro
+## Solução
 
-## 2. Resumo do portfolio no Dashboard (UserDashboard.tsx)
+Mostrar uma **tela de splash/loading** enquanto `isLoading` é `true`, antes de renderizar qualquer conteúdo do formulário. Só quando a verificação de sessão terminar:
+- Se tem usuário → redireciona para `/painel` (sem nunca mostrar o form)
+- Se não tem → mostra o formulário de login normalmente
 
-Adicionar dois novos KPIs na grade de estatisticas do dashboard, calculados a partir dos `shares` e `properties`:
-- **Total Investido**: soma de todos os `amount_paid` do usuario
-- **Retorno Estimado Total**: soma dos retornos proporcionais de cada imovel
+## Alteração
 
-Substituir o card generico "Leiloes" por esses dois KPIs mais uteis, mantendo o link para leiloes em outro local.
+**Arquivo: `src/pages/Auth.tsx`**
 
-## 3. Porcentagem de participacao nos cards de imoveis
+Adicionar um early return logo após o hook `useAuth`, antes de qualquer renderização do formulário:
 
-Em **UserImoveis.tsx**, exibir a % de participacao do usuario em cada imovel (calculado como `totalPaid / totalProject * 100`).
+```tsx
+const { user, isLoading } = useAuth();
+const navigate = useNavigate();
 
-Em **UserLeiloesPage.tsx**, nos cards de imoveis onde o usuario tem depositos, mostrar a participacao relativa.
+useEffect(() => {
+  if (!isLoading && user) {
+    navigate("/painel", { replace: true });
+  }
+}, [user, isLoading, navigate]);
 
-## 4. Extrato mais descritivo
+// Enquanto verifica sessão, mostra apenas o logo com spinner
+if (isLoading || user) {
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+      <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  );
+}
+```
 
-No **UserDashboard.tsx**, melhorar os titulos do historico recente para incluir o tipo `refund` como "Estorno" e exibir valores negativos/positivos com cores distintas.
+A condição `isLoading || user` garante que:
+- Durante o carregamento → mostra splash
+- Após confirmar que tem usuário (mas antes do redirect completar) → continua mostrando splash
+- Sem usuário → renderiza o form normalmente
 
----
-
-### Detalhes tecnicos
-
-**Arquivo: `src/pages/painel/UserImoveis.tsx`**
-- Linhas 76-80: substituir calculo por formula dinamica usando `estimated_auction_value`, `estimated_renovation_cost`, `estimated_sale_value`
-- Linha 132-134: atualizar badge de ROI
-- Adicionar badge com % de participacao
-
-**Arquivo: `src/components/painel/UserDashboard.tsx`**
-- Linhas 133-134: calcular `totalInvested` e `totalEstimatedReturn` a partir dos shares
-- Linhas 157-191: reorganizar grid de KPIs para incluir Total Investido e Retorno Estimado
-- Linhas 40-47: adicionar mapeamento para tipo `refund` -> "Estorno" e colorir valores
+Nenhuma outra alteração necessária. A mudança é mínima e isolada ao componente `Auth`.
 
