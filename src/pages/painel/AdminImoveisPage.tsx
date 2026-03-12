@@ -55,20 +55,33 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
         ];
 
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-4`}>
+  const formatCompact = (value: number) => {
+    if (value >= 1_000_000) return `$ ${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000) return `$ ${(value / 1_000).toFixed(1)}K`;
+    return `$ ${value.toFixed(2)}`;
+  };
+
+  const formatFull = (value: number) =>
+    `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+
+  return (
+    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-3 sm:gap-4`}>
       {cards.map((card) => (
-        <Card key={card.label} className="bg-card/50 border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <Card key={card.label} className={`bg-card/50 border-border/50 ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
+          <CardContent className="p-3 sm:p-5">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {card.label}
               </span>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
+              <card.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
             </div>
-            <p className={`text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
+            <p className={`text-lg sm:text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
               {(card as any).isPercentage
                 ? `${card.value.toFixed(1)}%`
-                : `$ ${card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+                : (<>
+                    <span className="sm:hidden">{formatCompact(card.value)}</span>
+                    <span className="hidden sm:inline">{formatFull(card.value)}</span>
+                  </>)}
             </p>
           </CardContent>
         </Card>
