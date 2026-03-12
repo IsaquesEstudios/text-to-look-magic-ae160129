@@ -139,7 +139,7 @@ function PropertyGrid({ aggregated, emptyIcon: EmptyIcon, emptyText, p }: { aggr
               </div>
               <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">{p.invested}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p>
                   <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div>
