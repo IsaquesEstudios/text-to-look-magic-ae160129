@@ -238,22 +238,37 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
       {isAdmin && (
         <Card className="bg-card/50 border-border/50">
           <CardContent className="p-4">
-            <form onSubmit={addExpense} className="flex flex-wrap gap-2 items-end">
-              <div className="w-44">
-                <label className="text-xs text-muted-foreground">Mês</label>
-                <Select value={form.month} onValueChange={(v) => setForm({ ...form, month: v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Mês" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MONTHS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <form onSubmit={addExpense} className="space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-2 sm:items-end">
+              {/* Row 1 mobile: Mês + Valor */}
+              <div className="flex gap-2 sm:contents">
+                <div className="flex-1 sm:w-44 sm:flex-none">
+                  <label className="text-xs text-muted-foreground">Mês</label>
+                  <Select value={form.month} onValueChange={(v) => setForm({ ...form, month: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Mês" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MONTHS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="w-28 sm:w-32">
+                  <label className="text-xs text-muted-foreground">Valor ($)</label>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: formatCurrency(e.target.value) })}
+                    placeholder="$0.00"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="flex-1 min-w-[160px]">
+              {/* Row 2 mobile: Categoria */}
+              <div className="sm:flex-1 sm:min-w-[160px]">
                 <label className="text-xs text-muted-foreground">Categoria</label>
                 <Popover open={catOpen} onOpenChange={setCatOpen}>
                   <PopoverTrigger asChild>
@@ -306,38 +321,28 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 </Popover>
               </div>
 
-              <div className="w-32">
-                <label className="text-xs text-muted-foreground">Valor ($)</label>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: formatCurrency(e.target.value) })}
-                  placeholder="$0.00"
-                  required
-                />
+              {/* Row 3 mobile: Tarifa + Botão */}
+              <div className="flex gap-2 items-end sm:contents">
+                <div className="flex-1 sm:w-48 sm:flex-none">
+                  <label className="text-xs text-muted-foreground">Tarifa</label>
+                  <Select value={form.taxStateCode} onValueChange={(v) => setForm({ ...form, taxStateCode: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sem tarifa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sem tarifa</SelectItem>
+                      {stateTaxes?.map((t) => (
+                        <SelectItem key={t.state_code} value={t.state_code}>
+                          {t.state_name} ({t.tax_rate}%)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
+                  {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                </Button>
               </div>
-
-              <div className="w-48">
-                <label className="text-xs text-muted-foreground">Tarifa</label>
-                <Select value={form.taxStateCode} onValueChange={(v) => setForm({ ...form, taxStateCode: v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sem tarifa" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Sem tarifa</SelectItem>
-                    {stateTaxes?.map((t) => (
-                      <SelectItem key={t.state_code} value={t.state_code}>
-                        {t.state_name} ({t.tax_rate}%)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button type="submit" variant="cta" size="sm" disabled={adding || !form.category.trim()}>
-                {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              </Button>
             </form>
           </CardContent>
         </Card>
