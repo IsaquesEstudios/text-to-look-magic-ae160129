@@ -343,33 +343,29 @@ export default function AdminLeiloesPage() {
       </div>
 
       {/* KPIs: Available + Invested */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
-              <Wallet className="h-5 w-5 text-discovery-green" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Disponível para Investimento</p>
-              <p className="text-xl font-bold text-foreground">
-                ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Investido em Leilões</p>
-              <p className="text-xl font-bold text-foreground">
-                ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
+            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-discovery-green" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Disponível para Investimento</p>
+            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
+              ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Total Investido em Leilões</p>
+            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
+              ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
