@@ -10,22 +10,37 @@ export default function AdminDashboardPage() {
     queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
-      const [depositsRes, propertiesRes, profilesRes, sharesRes] = await Promise.all([
-        supabase.from("auction_deposits").select("id, amount, service_fee"),
-        supabase.from("properties").select("id, type"),
+      const [feesRes, depositsRes, sharesRes, propertiesRes, profilesRes] = await Promise.all([
+        supabase.from("credit_transactions").select("amount").ilike("description", "%Taxa de serviço%"),
+        supabase.from("auction_deposits").select("amount, service_fee"),
+        supabase.from("shares").select("property_id, amount_paid"),
+        supabase.from("properties").select("id, type, status"),
         supabase.from("profiles").select("id"),
-        supabase.from("shares").select("property_id"),
       ]);
 
+      const fees = feesRes.data ?? [];
       const deposits = depositsRes.data ?? [];
+      const shares = sharesRes.data ?? [];
       const properties = propertiesRes.data ?? [];
       const profiles = profilesRes.data ?? [];
-      const linkedPropertyIds = new Set((sharesRes.data ?? []).map(s => s.property_id));
-      const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
+      const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
+      const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
+      const activePropertyIds = new Set(
+        properties
+          .filter((p) => (p.status ?? "").toLowerCase() !== "sold")
+          .map((p) => p.id)
+      );
+      const feesFromTransactions = fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0);
+      const feesFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
+      const activePropertiesInvested = shares.reduce(
+        (acc, s) => acc + (activePropertyIds.has(s.property_id) ? Number(s.amount_paid) : 0),
+        0
+      );
+      const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
       return {
-        adminFees: deposits.reduce((acc, d) => acc + Number(d.service_fee), 0),
-        totalInvested: deposits.reduce((acc, d) => acc + Number(d.amount), 0),
+        adminFees: feesFromTransactions + feesFromDeposits,
+        totalInvested: activePropertiesInvested + auctionInvested,
         casas: linkedProperties.filter(p => p.type === "house").length,
         terrenos: linkedProperties.filter(p => p.type === "land").length,
         totalUsers: profiles.length,
