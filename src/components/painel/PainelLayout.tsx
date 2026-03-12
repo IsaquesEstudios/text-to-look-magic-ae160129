@@ -284,10 +284,10 @@ export function PainelLayout() {
               )}
               <div
                 className={cn(
-                  "md:hidden fixed inset-x-0 bottom-16 z-35 transition-transform duration-300 ease-out safe-area-bottom",
+                  "md:hidden fixed inset-x-0 z-35 transition-transform duration-300 ease-out",
                   moreOpen ? "translate-y-0" : "translate-y-full"
                 )}
-                style={{ zIndex: 35 }}
+                style={{ zIndex: 35, bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
               >
                 <div className="bg-background border-t border-border/30 rounded-t-2xl shadow-2xl px-4 pt-5 pb-4">
                   <div className="flex items-center justify-between mb-4 px-1">
@@ -331,8 +331,8 @@ export function PainelLayout() {
                 </div>
               </div>
 
-              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl safe-area-bottom">
-                <nav className="flex items-center justify-evenly h-16 px-1 w-full">
+              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
+                <nav className="flex items-center justify-evenly h-16 px-1 w-full" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                   {bottomItems.map((item) => {
                     const isActive = !moreOpen && (item.path === "/painel"
                       ? location.pathname === "/painel"
@@ -380,7 +380,7 @@ export function PainelLayout() {
           );
         })()}
 
-        <main className="flex-1 min-w-0 w-full pb-20 md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden">
+        <main className="flex-1 min-w-0 w-full md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
           <PageTransition isNavigating={isPanelNavigating}>
             <Outlet />
           </PageTransition>
