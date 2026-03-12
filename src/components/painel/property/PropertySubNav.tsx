@@ -61,14 +61,14 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, o
         {propertyTitle}
       </h1>
 
-      <nav className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
+      <nav className="flex gap-0.5 sm:gap-1 p-1 rounded-xl bg-secondary/50 w-full sm:w-fit overflow-x-auto">
         {visibleItems.map((item) => {
           const count = item.badgeKey && unread ? unread[item.badgeKey] : 0;
           return (
             <Link
               key={item.key}
               to={`${basePath}${item.path}`}
-              className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 active === item.key
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/50"
