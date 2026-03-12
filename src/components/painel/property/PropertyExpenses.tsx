@@ -436,7 +436,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                   <td className="p-2 sm:p-3 font-bold text-foreground text-xs sm:text-sm">Total</td>
                   <td className="p-2 sm:p-3 text-right font-bold text-foreground text-xs sm:text-sm">${fmt(totalSpent)}</td>
                   <td className="p-2 sm:p-3 text-right font-bold text-muted-foreground text-xs sm:text-sm">{totalTax > 0 ? `$${fmt(totalTax)}` : "—"}</td>
-                  <td className="p-3 text-right font-bold text-primary">${fmt(totalSpent + totalTax)}</td>
+                  <td className="p-2 sm:p-3 text-right font-bold text-primary text-xs sm:text-sm">${fmt(totalSpent + totalTax)}</td>
                   {isAdmin && <td />}
                 </tr>
               </tfoot>
