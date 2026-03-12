@@ -74,17 +74,17 @@ export default function AdminConfigPage() {
 
       <Card className="bg-card/50 border-border/50">
         <CardContent className="p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
               <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Receipt className="h-5 w-5 text-primary" />
               </div>
-              <div>
-                <h3 className="font-semibold text-foreground text-lg">Tarifas dos Estados (EUA)</h3>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-foreground text-base sm:text-lg">Tarifas dos Estados (EUA)</h3>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Impostos estaduais aplicados automaticamente nos gastos dos imóveis.
                 </p>
-                <div className="flex gap-4 mt-3 text-sm">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm">
                   <span className="text-muted-foreground">
                     <span className="font-medium text-foreground">{taxes?.length ?? 0}</span> estados cadastrados
                   </span>
@@ -97,7 +97,7 @@ export default function AdminConfigPage() {
                 </div>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="gap-2 flex-shrink-0" onClick={() => setOpen(true)}>
+            <Button variant="outline" size="sm" className="gap-2 flex-shrink-0 self-start" onClick={() => setOpen(true)}>
               <Pencil className="h-4 w-4" />
               Alterar
             </Button>
