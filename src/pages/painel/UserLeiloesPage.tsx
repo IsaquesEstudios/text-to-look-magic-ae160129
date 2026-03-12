@@ -102,8 +102,8 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
                 <div className="border-t border-border/30 pt-3 mt-1">
                   <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-medium mb-2">{p.yourParticipation}</p>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">{p.invested}</p><p className="font-semibold text-primary">${investedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
-                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">{p.participation}</p><p className="font-semibold text-primary">{participationPct.toFixed(1)}%</p></div>
+                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p><p className="font-semibold text-primary">${investedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.participation}</p><p className="font-semibold text-primary">{participationPct.toFixed(1)}%</p></div>
                   </div>
                 </div>
               )}

@@ -148,7 +148,7 @@ export default function UserExtrato() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground truncate">{item.description}</p>
-                <p className="text-[11px] text-muted-foreground/60">
+                <p className="text-[11px] text-muted-foreground">
                   {new Date(item.date).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>

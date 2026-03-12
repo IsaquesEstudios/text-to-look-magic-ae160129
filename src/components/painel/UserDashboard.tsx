@@ -280,7 +280,7 @@ export function UserDashboard() {
                       item.type === "deposit" || item.type === "profit" ? "text-primary" : item.type === "withdrawal" || item.type === "auction_deposit" ? "text-destructive" : "text-muted-foreground"
                     }`}>{item.detail}</p>
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 flex-shrink-0">
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground flex-shrink-0">
                     <Clock className="h-3 w-3" />
                     {formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: dateLocale })}
                   </div>

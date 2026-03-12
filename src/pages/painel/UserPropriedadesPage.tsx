@@ -143,7 +143,7 @@ function PropertyGrid({ aggregated, emptyIcon: EmptyIcon, emptyText, p }: { aggr
                   <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">{p.estimatedReturnShort}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturnShort}</p>
                   <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
               </div>

@@ -56,7 +56,7 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   {card.label}
                 </span>
-                <card.icon className="h-4 w-4 text-muted-foreground/60" />
+                <card.icon className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="text-2xl font-bold text-foreground">{card.value}</p>
             </CardContent>

@@ -142,7 +142,7 @@ export default function PropertyDetail() {
             ].map((stat, i) => (
               <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
                 <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">{stat.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">{stat.label}</p>
                 <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
               </div>
             ))}
