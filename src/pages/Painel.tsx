@@ -22,19 +22,23 @@ function AdminDashboardContent() {
     refetchOnMount: "always",
     staleTime: 0,
     queryFn: async () => {
-      const [feesRes, sharesRes, propertiesRes, profilesCountRes] = await Promise.all([
+      const [feesRes, depositsRes, sharesRes, propertiesRes, profilesCountRes] = await Promise.all([
         supabase.from("credit_transactions").select("amount").ilike("description", "Taxa de serviço%"),
+        supabase.from("auction_deposits").select("service_fee"),
         supabase.from("shares").select("property_id, amount_paid"),
         supabase.from("properties").select("id, type"),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
       ]);
       const fees = feesRes.data ?? [];
+      const deposits = depositsRes.data ?? [];
       const shares = sharesRes.data ?? [];
       const properties = propertiesRes.data ?? [];
       const linkedPropertyIds = new Set(shares.map(s => s.property_id));
       const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
+      const feesFromTransactions = fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0);
+      const feesFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
       return {
-        adminFees: fees.reduce((acc, f) => acc + Math.abs(Number(f.amount)), 0),
+        adminFees: feesFromTransactions + feesFromDeposits,
         totalInvested: shares.reduce((acc, s) => acc + Number(s.amount_paid), 0),
         casas: linkedProperties.filter(p => p.type === "house").length,
         terrenos: linkedProperties.filter(p => p.type === "land").length,
