@@ -160,19 +160,52 @@ export function PropertyCommunity({ propertyId }: Props) {
               placeholder="Enviar atualização..."
               maxLength={2000}
             />
-            <label className="cursor-pointer">
-              <Button variant="outline" size="icon" asChild disabled={uploading}>
-                <span>
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-                </span>
-              </Button>
-              <input
-                type="file"
-                accept="image/*,video/*"
-                onChange={uploadMedia}
-                className="hidden"
-              />
-            </label>
+            <Popover open={mediaPopoverOpen} onOpenChange={setMediaPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" disabled={uploading}>
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-44 p-2" align="end">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-sm hover:bg-secondary transition-colors"
+                  onClick={() => {
+                    setMediaPopoverOpen(false);
+                    cameraInputRef.current?.click();
+                  }}
+                >
+                  <Camera className="h-4 w-4 text-muted-foreground" />
+                  Câmera
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-sm hover:bg-secondary transition-colors"
+                  onClick={() => {
+                    setMediaPopoverOpen(false);
+                    galleryInputRef.current?.click();
+                  }}
+                >
+                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                  Galeria
+                </button>
+              </PopoverContent>
+            </Popover>
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={uploadMedia}
+              className="hidden"
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*,video/*"
+              onChange={uploadMedia}
+              className="hidden"
+            />
             <Button variant="cta" size="icon" onClick={sendMessage} disabled={sending || !message.trim()}>
               <Send className="h-4 w-4" />
             </Button>
