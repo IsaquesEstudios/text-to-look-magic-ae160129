@@ -54,7 +54,8 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
           { label: "ROI Estimado", value: roi, icon: Percent, isPercentage: true, colorClass: roiColor },
         ];
 
-  return (
+
+
   const formatCompact = (value: number) => {
     if (value >= 1_000_000) return `$ ${(value / 1_000_000).toFixed(1)}M`;
     if (value >= 1_000) return `$ ${(value / 1_000).toFixed(1)}K`;
