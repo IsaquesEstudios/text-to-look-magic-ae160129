@@ -1,39 +1,44 @@
 
-Objetivo: explicar por que o erro continuou na VPS mesmo após você “descartar o local” e definir o caminho de correção.
 
-1) O que está acontecendo
-- Você tinha dois problemas diferentes:
-  - Git local fora de sincronia (já tratado ao descartar/resetar).
-  - Build da VPS falhando (independente do seu estado local).
-- No código atual, existe inconsistência real entre `package.json` e `package-lock.json`:
-  - `package.json` contém `@capacitor/android`, `@capacitor/core`, `@capacitor/ios`
-  - `package-lock.json` não contém esses pacotes
-- Como o Dockerfile usa `npm ci`, a build na VPS quebra quando lock e package divergem.
-- Por isso, “descartar local” não resolve sozinho: a VPS constrói a partir do repositório remoto + cache de build.
+# Melhorias no Painel do Investidor
 
-2) Plano de correção (ordem exata)
-- Sincronizar lockfile com package:
-  - Rodar `npm install`
-  - Commitar e enviar o novo `package-lock.json`
-- Redeploy na VPS com cache limpo (importantíssimo).
-- Confirmar que o deploy está usando Dockerfile (não Nixpacks) e Build Args `VITE_*` no painel da VPS.
+## 1. Corrigir bug de calculo em "Meus Imoveis" (UserImoveis.tsx)
 
-3) Comandos recomendados
-```bash
-git fetch origin
-git checkout main
-git reset --hard origin/main
-npm install
-git add package-lock.json
-git commit -m "fix: sync package-lock with package.json"
-git push origin main
-```
-Depois: na VPS/Coolify, acionar redeploy com “no cache/clear cache”.
+A pagina usa `purchase_price` e `estimated_return_pct` para calcular valores. Sera atualizada para usar a formula correta:
+- **Total do Projeto** = `estimated_auction_value` + `estimated_renovation_cost`
+- **Valor de Venda** = `estimated_sale_value`
+- **ROI** = `((Venda - Total) / Total) * 100`
+- **Retorno estimado do usuario** = participacao proporcional sobre a margem de lucro
 
-4) Plano B (rápido, menos ideal)
-- Trocar `npm ci` por `npm install` no Dockerfile para evitar bloqueio por lock divergente.
-- Melhor manter como fallback; o ideal é lockfile consistente.
+## 2. Resumo do portfolio no Dashboard (UserDashboard.tsx)
 
-5) Detalhes técnicos
-- `npm ci` é estrito e exige paridade total entre manifest (`package.json`) e lock (`package-lock.json`).
-- Reset local só afeta sua máquina; não corrige automaticamente lockfile remoto nem cache da pipeline.
+Adicionar dois novos KPIs na grade de estatisticas do dashboard, calculados a partir dos `shares` e `properties`:
+- **Total Investido**: soma de todos os `amount_paid` do usuario
+- **Retorno Estimado Total**: soma dos retornos proporcionais de cada imovel
+
+Substituir o card generico "Leiloes" por esses dois KPIs mais uteis, mantendo o link para leiloes em outro local.
+
+## 3. Porcentagem de participacao nos cards de imoveis
+
+Em **UserImoveis.tsx**, exibir a % de participacao do usuario em cada imovel (calculado como `totalPaid / totalProject * 100`).
+
+Em **UserLeiloesPage.tsx**, nos cards de imoveis onde o usuario tem depositos, mostrar a participacao relativa.
+
+## 4. Extrato mais descritivo
+
+No **UserDashboard.tsx**, melhorar os titulos do historico recente para incluir o tipo `refund` como "Estorno" e exibir valores negativos/positivos com cores distintas.
+
+---
+
+### Detalhes tecnicos
+
+**Arquivo: `src/pages/painel/UserImoveis.tsx`**
+- Linhas 76-80: substituir calculo por formula dinamica usando `estimated_auction_value`, `estimated_renovation_cost`, `estimated_sale_value`
+- Linha 132-134: atualizar badge de ROI
+- Adicionar badge com % de participacao
+
+**Arquivo: `src/components/painel/UserDashboard.tsx`**
+- Linhas 133-134: calcular `totalInvested` e `totalEstimatedReturn` a partir dos shares
+- Linhas 157-191: reorganizar grid de KPIs para incluir Total Investido e Retorno Estimado
+- Linhas 40-47: adicionar mapeamento para tipo `refund` -> "Estorno" e colorir valores
+
