@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
