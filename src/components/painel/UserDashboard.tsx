@@ -148,7 +148,7 @@ export function UserDashboard() {
     return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
   })();
 
-  if (isLoading) {
+  if (isLoading || isNewsLoading || isActivityLoading) {
     return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
   }
 
