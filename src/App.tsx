@@ -4,11 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { Loader2, WifiOff } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 // Optimized QueryClient for SSG
 const queryClient = new QueryClient({
@@ -68,21 +69,12 @@ const RootRedirect = () => {
 
 const App = () => {
   const location = useLocation();
-  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
-
-  useEffect(() => {
-    const goOffline = () => setIsOffline(true);
-    const goOnline = () => { setIsOffline(false); window.location.reload(); };
-    window.addEventListener('offline', goOffline);
-    window.addEventListener('online', goOnline);
-    return () => { window.removeEventListener('offline', goOffline); window.removeEventListener('online', goOnline); };
-  }, []);
-
-  if (isOffline) {
-    return <OfflineScreen onRetry={() => window.location.reload()} />;
-  }
-
+  const { isOnline, checkConnection } = useOnlineStatus();
   const auth = useAuthInternal();
+
+  if (!isOnline) {
+    return <OfflineScreen onRetry={checkConnection} />;
+  }
   
   // Handle root redirect
   if (location.pathname === "/") {
