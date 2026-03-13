@@ -29,7 +29,7 @@ export function UserDashboard() {
     staleTime: 0,
   });
 
-  const { data: recentActivity } = useQuery({
+  const { data: recentActivity, isLoading: isActivityLoading } = useQuery({
     queryKey: ["user-recent-activity", user?.id],
     refetchOnMount: "always",
     staleTime: 0,
@@ -67,7 +67,7 @@ export function UserDashboard() {
     enabled: !!user,
   });
 
-  const { data: propertyNews } = useQuery({
+  const { data: propertyNews, isLoading: isNewsLoading } = useQuery({
     queryKey: ["property-news", user?.id],
     queryFn: async () => {
       const { data: userShares, error: sharesErr } = await supabase
@@ -148,7 +148,7 @@ export function UserDashboard() {
     return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
   })();
 
-  if (isLoading) {
+  if (isLoading || isNewsLoading || isActivityLoading) {
     return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
   }
 
