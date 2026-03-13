@@ -59,15 +59,12 @@ const PainelLayoutModule = lazy(() =>
   import("./components/painel/PainelLayout").then((m) => ({ default: m.PainelLayout }))
 );
 
-const PageLoader = () => {
-  const logo = new URL("@/assets/discovery-logo.png", import.meta.url).href;
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-      <img src={logo} alt="Discovery" className="h-12 mb-6" />
-      <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-    </div>
-  );
-};
+const PageLoader = () => (
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+    <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+  </div>
+);
 
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
