@@ -34,7 +34,6 @@ const PageLoader = () => (
 const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-[#141414] text-white px-8"
     style={{ paddingTop: 'env(safe-area-inset-top, 2rem)', paddingBottom: 'env(safe-area-inset-bottom, 2rem)' }}>
-    <img src={discoveryLogo} alt="Discovery" className="h-10 mb-10 opacity-90" />
     <WifiOff className="h-12 w-12 mb-5 opacity-35 text-gray-400" />
     <h1 className="text-lg font-semibold mb-1">Sem conexão</h1>
     <p className="text-sm text-gray-500 text-center mb-8">Verifique sua internet e tente novamente.</p>
@@ -44,7 +43,6 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
     >
       Reconectar
     </button>
-    <p className="text-xs text-gray-600 mt-4">O app será reconectado automaticamente quando a internet voltar.</p>
   </div>
 );
 
