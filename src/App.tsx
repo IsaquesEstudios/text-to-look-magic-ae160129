@@ -96,6 +96,7 @@ const App = () => {
           <Suspense fallback={<PageLoader />}>
             <Outlet />
           </Suspense>
+          <InstallPWABanner />
         </TooltipProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
