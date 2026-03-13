@@ -548,7 +548,7 @@ export const pt = {
     linked: "Vinculado",
     house: "Casa",
     land: "Terreno",
-    loading: "Carregando...",
+    loading: "",
 
     // Admin pages
     manageUsers: "Gerencie os usuários cadastrados",

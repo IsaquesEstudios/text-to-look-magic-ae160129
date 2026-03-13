@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Suspense, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 
 // Optimized QueryClient for SSG
@@ -20,8 +22,9 @@ const queryClient = new QueryClient({
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="animate-pulse text-muted-foreground">Carregando...</div>
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+    <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+    <Loader2 className="h-6 w-6 animate-spin text-primary" />
   </div>
 );
 

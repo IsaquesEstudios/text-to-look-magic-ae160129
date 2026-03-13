@@ -1,4 +1,5 @@
 import { Suspense, lazy } from "react";
+import discoveryLogo from "@/assets/discovery-logo.png";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
 import { translations, Language } from "@/i18n";
@@ -59,8 +60,9 @@ const PainelLayoutModule = lazy(() =>
 );
 
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="animate-pulse text-muted-foreground">Carregando...</div>
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+    <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
   </div>
 );
 
