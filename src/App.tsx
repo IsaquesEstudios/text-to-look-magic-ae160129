@@ -69,21 +69,12 @@ const RootRedirect = () => {
 
 const App = () => {
   const location = useLocation();
-  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
-
-  useEffect(() => {
-    const goOffline = () => setIsOffline(true);
-    const goOnline = () => { setIsOffline(false); window.location.reload(); };
-    window.addEventListener('offline', goOffline);
-    window.addEventListener('online', goOnline);
-    return () => { window.removeEventListener('offline', goOffline); window.removeEventListener('online', goOnline); };
-  }, []);
-
-  if (isOffline) {
-    return <OfflineScreen onRetry={() => window.location.reload()} />;
-  }
-
+  const { isOnline, checkConnection } = useOnlineStatus();
   const auth = useAuthInternal();
+
+  if (!isOnline) {
+    return <OfflineScreen onRetry={checkConnection} />;
+  }
   
   // Handle root redirect
   if (location.pathname === "/") {
