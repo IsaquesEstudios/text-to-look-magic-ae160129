@@ -1,44 +1,52 @@
 
 
-# Melhorias no Painel do Investidor
+# PWA exclusivo para iPhone (sem afetar site desktop ou app Android)
 
-## 1. Corrigir bug de calculo em "Meus Imoveis" (UserImoveis.tsx)
+## Conceito
 
-A pagina usa `purchase_price` e `estimated_return_pct` para calcular valores. Sera atualizada para usar a formula correta:
-- **Total do Projeto** = `estimated_auction_value` + `estimated_renovation_cost`
-- **Valor de Venda** = `estimated_sale_value`
-- **ROI** = `((Venda - Total) / Total) * 100`
-- **Retorno estimado do usuario** = participacao proporcional sobre a margem de lucro
+Sim, é totalmente possível. A ideia é registrar o Service Worker e exibir o prompt de instalação **apenas quando o dispositivo for um iPhone/iPad acessando via Safari**, sem afetar nada no site desktop nem no app Android nativo (Capacitor).
 
-## 2. Resumo do portfolio no Dashboard (UserDashboard.tsx)
+## Como funciona
 
-Adicionar dois novos KPIs na grade de estatisticas do dashboard, calculados a partir dos `shares` e `properties`:
-- **Total Investido**: soma de todos os `amount_paid` do usuario
-- **Retorno Estimado Total**: soma dos retornos proporcionais de cada imovel
+1. **Detecção de plataforma** — Verificamos se é iOS Safari (não Capacitor nativo) antes de ativar qualquer comportamento PWA.
 
-Substituir o card generico "Leiloes" por esses dois KPIs mais uteis, mantendo o link para leiloes em outro local.
+2. **Arquivos necessários:**
+   - `public/manifest.json` — Manifesto PWA com ícones, cores, nome do app
+   - `public/sw.js` — Service Worker simples para cache offline
+   - Metatags Apple no `index.html` (apple-mobile-web-app-capable, apple-touch-icon, etc.)
+   - Componente `InstallPWABanner` — Banner "Adicionar à Tela Inicial" que aparece **só no iOS Safari**
 
-## 3. Porcentagem de participacao nos cards de imoveis
+3. **Registro condicional do Service Worker:**
+   ```
+   // Só registra no iOS Safari (não no Capacitor nativo)
+   const isIOS = /iPhone|iPad/.test(navigator.userAgent)
+   const isCapacitor = window.Capacitor?.isNativePlatform()
+   const isStandalone = window.navigator.standalone
+   
+   if (isIOS && !isCapacitor && !isStandalone) {
+     navigator.serviceWorker.register('/sw.js')
+     // Mostrar banner de instalação
+   }
+   ```
 
-Em **UserImoveis.tsx**, exibir a % de participacao do usuario em cada imovel (calculado como `totalPaid / totalProject * 100`).
+4. **Zero impacto no site/Android:**
+   - Desktop: Service Worker nunca registrado, banner nunca aparece
+   - Android nativo (Capacitor): Detectado e ignorado
+   - iPhone Safari: PWA ativado com banner de instrução
 
-Em **UserLeiloesPage.tsx**, nos cards de imoveis onde o usuario tem depositos, mostrar a participacao relativa.
+## Arquivos a criar/editar
 
-## 4. Extrato mais descritivo
+| Arquivo | Ação |
+|---------|------|
+| `public/manifest.json` | Criar — manifesto PWA |
+| `public/sw.js` | Criar — Service Worker básico (cache offline) |
+| `index.html` | Editar — adicionar metatags Apple + link manifest |
+| `src/components/InstallPWABanner.tsx` | Criar — banner iOS-only "Adicionar à Tela Inicial" |
+| `src/App.tsx` | Editar — importar banner + registro condicional do SW |
 
-No **UserDashboard.tsx**, melhorar os titulos do historico recente para incluir o tipo `refund` como "Estorno" e exibir valores negativos/positivos com cores distintas.
+## Resultado
 
----
-
-### Detalhes tecnicos
-
-**Arquivo: `src/pages/painel/UserImoveis.tsx`**
-- Linhas 76-80: substituir calculo por formula dinamica usando `estimated_auction_value`, `estimated_renovation_cost`, `estimated_sale_value`
-- Linha 132-134: atualizar badge de ROI
-- Adicionar badge com % de participacao
-
-**Arquivo: `src/components/painel/UserDashboard.tsx`**
-- Linhas 133-134: calcular `totalInvested` e `totalEstimatedReturn` a partir dos shares
-- Linhas 157-191: reorganizar grid de KPIs para incluir Total Investido e Retorno Estimado
-- Linhas 40-47: adicionar mapeamento para tipo `refund` -> "Estorno" e colorir valores
+- Usuários de iPhone no Safari verão um banner elegante explicando como instalar o app
+- O app funcionará em tela cheia com ícone próprio, splash screen e suporte offline
+- Nenhuma mudança visível no desktop ou no app Android
 
