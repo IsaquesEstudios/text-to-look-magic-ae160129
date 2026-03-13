@@ -10,6 +10,7 @@ import { Capacitor } from "@capacitor/core";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { InstallPWABanner } from "@/components/InstallPWABanner";
 
 // Optimized QueryClient for SSG
 const queryClient = new QueryClient({
@@ -95,6 +96,7 @@ const App = () => {
           <Suspense fallback={<PageLoader />}>
             <Outlet />
           </Suspense>
+          <InstallPWABanner />
         </TooltipProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
