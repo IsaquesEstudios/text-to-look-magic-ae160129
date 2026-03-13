@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
@@ -104,6 +105,7 @@ export function PainelLayout() {
 
   return (
     <TooltipProvider delayDuration={0}>
+      <OfflineBanner />
       <div className="min-h-screen bg-background flex">
         {/* ── Desktop Sidebar ── */}
         <aside
