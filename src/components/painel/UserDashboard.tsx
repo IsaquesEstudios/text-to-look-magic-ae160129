@@ -67,7 +67,7 @@ export function UserDashboard() {
     enabled: !!user,
   });
 
-  const { data: propertyNews } = useQuery({
+  const { data: propertyNews, isLoading: isNewsLoading } = useQuery({
     queryKey: ["property-news", user?.id],
     queryFn: async () => {
       const { data: userShares, error: sharesErr } = await supabase
