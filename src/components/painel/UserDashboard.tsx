@@ -29,7 +29,7 @@ export function UserDashboard() {
     staleTime: 0,
   });
 
-  const { data: recentActivity } = useQuery({
+  const { data: recentActivity, isLoading: isActivityLoading } = useQuery({
     queryKey: ["user-recent-activity", user?.id],
     refetchOnMount: "always",
     staleTime: 0,
