@@ -7,11 +7,12 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://text-to-look-magic.lovable.app/auth?forceHideBadge=true',
     cleartext: true,
-    errorPath: 'offline.html',
+    errorPath: '/offline.html',
   },
   android: {
     backgroundColor: '#141414',
     allowMixedContent: true,
+    webContentsDebuggingEnabled: false,
   },
   ios: {
     contentInset: 'always',
