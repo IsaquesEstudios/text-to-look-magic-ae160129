@@ -4,11 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { Loader2, WifiOff } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 // Optimized QueryClient for SSG
 const queryClient = new QueryClient({
