@@ -6,6 +6,7 @@ import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Suspense, useEffect, useState } from "react";
 import { Loader2, WifiOff } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 
@@ -49,15 +50,17 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
 // Root redirect handler
 const RootRedirect = () => {
   const location = useLocation();
+  const isNative = Capacitor.isNativePlatform();
+  const target = isNative ? "/auth" : "/pt";
   
   useEffect(() => {
     if (location.pathname === "/") {
-      window.location.replace("/pt");
+      window.location.replace(target);
     }
-  }, [location.pathname]);
+  }, [location.pathname, target]);
   
   if (location.pathname === "/") {
-    return <Navigate to="/pt" replace />;
+    return <Navigate to={target} replace />;
   }
   
   return null;
