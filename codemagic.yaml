@@ -35,5 +35,9 @@ workflows:
     artifacts:
       - ios/App/build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        auth: integration
+      email:
+        recipients:
+          - isaquesestudios@gmail.com
+        notify:
+          success: true
+          failure: true
