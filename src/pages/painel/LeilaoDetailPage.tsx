@@ -198,7 +198,13 @@ export default function LeilaoDetailPage() {
   });
 
   if (!auction) {
-    return <div className="animate-pulse text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="h-8 w-48 rounded-lg bg-muted animate-pulse" />
+        <div className="h-32 rounded-xl bg-muted animate-pulse" />
+        <div className="h-48 rounded-xl bg-muted animate-pulse" />
+      </div>
+    );
   }
 
   return (

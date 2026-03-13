@@ -369,7 +369,9 @@ export default function AdminLeiloesPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-muted-foreground animate-pulse">Carregando...</div>
+        <div className="space-y-4">
+          {[1,2,3].map(i => <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />)}
+        </div>
       ) : (
         <>
           {upcoming.length > 0 && (
