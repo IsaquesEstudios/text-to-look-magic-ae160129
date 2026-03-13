@@ -105,6 +105,7 @@ export function PainelLayout() {
 
   return (
     <TooltipProvider delayDuration={0}>
+      <OfflineBanner />
       <div className="min-h-screen bg-background flex">
         {/* ── Desktop Sidebar ── */}
         <aside
