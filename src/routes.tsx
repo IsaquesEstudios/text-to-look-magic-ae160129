@@ -32,6 +32,13 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 
+// Legal pages
+const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./pages/legal/TermsOfUse"));
+const CookiePolicy = lazy(() => import("./pages/legal/CookiePolicy"));
+const RefundPolicy = lazy(() => import("./pages/legal/RefundPolicy"));
+const RiskDisclosure = lazy(() => import("./pages/legal/RiskDisclosure"));
+
 // Panel pages (client-only)
 const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
