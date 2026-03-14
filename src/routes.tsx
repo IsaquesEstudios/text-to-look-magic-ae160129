@@ -152,6 +152,11 @@ export const routes: RouteRecord[] = [
       ...generateLanguageRoutes("contato", Contato),
       ...generateLanguageRoutes("blog", Blog),
       ...generateBlogPostRoutes(),
+      ...generateLanguageRoutes("privacidade", PrivacyPolicy),
+      ...generateLanguageRoutes("termos", TermsOfUse),
+      ...generateLanguageRoutes("cookies", CookiePolicy),
+      ...generateLanguageRoutes("reembolso", RefundPolicy),
+      ...generateLanguageRoutes("aviso-de-risco", RiskDisclosure),
 
       // Legacy routes
       { path: "terrenos", element: <SuspenseWrapper><Terrenos /></SuspenseWrapper> },
