@@ -44,13 +44,13 @@ export function Footer() {
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-foreground font-semibold">{t.footer.legal || "Legal"}</h4>
+            <h4 className="text-foreground font-semibold">{t.footer.legal}</h4>
             <nav className="flex flex-col gap-3">
-              <Link to={`/${currentLang}/privacidade`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.privacyPolicy || "Política de Privacidade"}</Link>
-              <Link to={`/${currentLang}/termos`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.termsOfUse || "Termos de Uso"}</Link>
-              <Link to={`/${currentLang}/cookies`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.cookiePolicy || "Política de Cookies"}</Link>
-              <Link to={`/${currentLang}/reembolso`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.refundPolicy || "Política de Reembolso"}</Link>
-              <Link to={`/${currentLang}/aviso-de-risco`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.riskDisclosure || "Aviso de Risco"}</Link>
+              <Link to={`/${currentLang}/privacidade`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.privacyPolicy}</Link>
+              <Link to={`/${currentLang}/termos`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.termsOfUse}</Link>
+              <Link to={`/${currentLang}/cookies`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.cookiePolicy}</Link>
+              <Link to={`/${currentLang}/reembolso`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.refundPolicy}</Link>
+              <Link to={`/${currentLang}/aviso-de-risco`} className="text-muted-foreground hover:text-discovery-green transition-colors text-sm">{t.footer.riskDisclosure}</Link>
             </nav>
           </div>
 
