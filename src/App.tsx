@@ -11,6 +11,7 @@ import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { InstallPWABanner } from "@/components/InstallPWABanner";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 // Optimized QueryClient for SSG
 const queryClient = new QueryClient({
@@ -96,6 +97,7 @@ const App = () => {
           <Suspense fallback={<PageLoader />}>
             <Outlet />
           </Suspense>
+          <CookieConsentBanner />
           <InstallPWABanner />
         </TooltipProvider>
       </AuthContext.Provider>

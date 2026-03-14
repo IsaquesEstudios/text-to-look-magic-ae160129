@@ -32,6 +32,12 @@ export const en = {
     whatsappTriage: "WhatsApp Triage",
     unitedStates: "United States",
     copyright: "© 2026 Discovery Investments. All rights reserved.",
+    legal: "Legal",
+    privacyPolicy: "Privacy Policy",
+    termsOfUse: "Terms of Use",
+    cookiePolicy: "Cookie Policy",
+    refundPolicy: "Refund Policy",
+    riskDisclosure: "Risk Disclosure",
   },
 
   // Home Page
