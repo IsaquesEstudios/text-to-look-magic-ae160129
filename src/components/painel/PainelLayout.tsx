@@ -164,9 +164,11 @@ export function PainelLayout() {
                 ? location.pathname === "/painel"
                 : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const isRegistrosLink = item.path === "/painel/registros";
               const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
-              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
+              const showRegistrosBadge = isRegistrosLink && pendingRegistrations > 0;
+              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : showRegistrosBadge ? pendingRegistrations : 0;
 
               const linkContent = (
                 <Link
