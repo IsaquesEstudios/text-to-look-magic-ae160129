@@ -105,6 +105,9 @@ export function PainelLayout() {
 
   if (!user) return null;
 
+  // Block render for unapproved users (prevent panel flash before redirect)
+  if (profile && profile.status !== 'approved' && !isAdmin) return null;
+
   const navItems = isAdmin ? adminNavItems : userNavItems;
   const userInitials = profile?.full_name
     ? profile.full_name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
