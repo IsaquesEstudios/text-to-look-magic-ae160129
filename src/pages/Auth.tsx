@@ -57,8 +57,8 @@ export default function Auth() {
 
   // Generate random math equation
   const generateEquation = useCallback(() => {
-    const a = Math.floor(Math.random() * 15) + 1;
-    const b = Math.floor(Math.random() * 15) + 1;
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
     return { question: `${a} + ${b}`, answer: a + b };
   }, []);
 
