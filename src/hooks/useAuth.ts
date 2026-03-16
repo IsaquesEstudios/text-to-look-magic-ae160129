@@ -119,9 +119,9 @@ export function useAuthInternal(): AuthState {
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase.from("profiles").select("full_name, credits, preferred_language").eq("user_id", user.id).maybeSingle();
+    const { data } = await supabase.from("profiles").select("full_name, credits, preferred_language, status").eq("user_id", user.id).maybeSingle();
     if (data) {
-      setProfile({ full_name: data.full_name, credits: Number(data.credits), preferred_language: (data as any).preferred_language ?? 'pt' });
+      setProfile({ full_name: data.full_name, credits: Number(data.credits), preferred_language: (data as any).preferred_language ?? 'pt', status: (data as any).status ?? 'pending' });
     }
   }, [user]);
 
