@@ -21,6 +21,7 @@ export default function UserContratosPage() {
   const [showForm, setShowForm] = useState(false);
   const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
   const [agreed, setAgreed] = useState(false);
+  const [pdfViewer, setPdfViewer] = useState<{ url: string; title: string } | null>(null);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ["user-contracts", user?.id],
