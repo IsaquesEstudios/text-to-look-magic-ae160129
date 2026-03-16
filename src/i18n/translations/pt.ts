@@ -422,6 +422,7 @@ export const pt = {
     goToSite: "Ir ao site",
     logout: "Sair",
     investor: "Investidor",
+    registrations: "Registros",
 
     // Dashboard
     greeting: "Olá, {name} 👋",
