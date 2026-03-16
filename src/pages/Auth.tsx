@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +44,35 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [captchaChecked, setCaptchaChecked] = useState(false);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  // Generate random math equation
+  const generateEquation = useCallback(() => {
+    const ops = ["+", "-", "×"] as const;
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a: number, b: number, answer: number;
+    if (op === "+") {
+      a = Math.floor(Math.random() * 20) + 1;
+      b = Math.floor(Math.random() * 20) + 1;
+      answer = a + b;
+    } else if (op === "-") {
+      a = Math.floor(Math.random() * 20) + 5;
+      b = Math.floor(Math.random() * a);
+      answer = a - b;
+    } else {
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
+      answer = a * b;
+    }
+    return { question: `${a} ${op} ${b}`, answer };
+  }, []);
+
+  const [equation, setEquation] = useState(() => generateEquation());
+
+  const refreshEquation = useCallback(() => {
+    setEquation(generateEquation());
+    setCaptchaAnswer("");
+  }, [generateEquation]);
 
   // Step 2 fields
   const [phonePrefix, setPhonePrefix] = useState("");
@@ -68,8 +96,9 @@ export default function Auth() {
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin && !captchaChecked) {
-      toast({ title: a.error, description: (a as any).captchaRequired ?? "Confirme que você não é um robô.", variant: "destructive" });
+    if (isLogin && parseInt(captchaAnswer) !== equation.answer) {
+      toast({ title: a.error, description: (a as any).captchaRequired ?? "Resolva a equação corretamente.", variant: "destructive" });
+      refreshEquation();
       return;
     }
     if (isLogin) {
@@ -97,12 +126,14 @@ export default function Auth() {
       const { data: allowed } = await supabase.rpc("check_login_rate_limit", { p_email: email });
       if (allowed === false) {
         toast({ title: a.error, description: (a as any).tooManyAttempts ?? "Muitas tentativas. Tente novamente em 15 minutos.", variant: "destructive" });
+        refreshEquation();
         return;
       }
 
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         await supabase.rpc("record_login_attempt", { p_email: email, p_success: false });
+        refreshEquation();
         throw error;
       }
       await supabase.rpc("record_login_attempt", { p_email: email, p_success: true });
@@ -225,17 +256,24 @@ export default function Auth() {
                   </div>
                 </div>
                 {isLogin && (
-                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-3">
-                    <input
-                      type="checkbox"
-                      id="captcha"
-                      checked={captchaChecked}
-                      onChange={(e) => setCaptchaChecked(e.target.checked)}
-                      className="h-5 w-5 rounded border-border accent-primary cursor-pointer"
+                  <div className="space-y-2 rounded-lg border border-border bg-muted/50 p-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">
+                        {(a as any).solveEquation ?? "Resolva:"}{" "}
+                        <span className="font-mono text-base text-primary font-bold">{equation.question} = ?</span>
+                      </Label>
+                      <button type="button" onClick={refreshEquation} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                        ↻
+                      </button>
+                    </div>
+                    <Input
+                      type="number"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      placeholder={(a as any).answerPlaceholder ?? "Sua resposta"}
+                      className="font-mono"
+                      required
                     />
-                    <Label htmlFor="captcha" className="cursor-pointer text-sm font-medium select-none">
-                      {(a as any).notARobot ?? "Não sou um robô"}
-                    </Label>
                   </div>
                 )}
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>

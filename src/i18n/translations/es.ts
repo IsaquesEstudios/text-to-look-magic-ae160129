@@ -398,7 +398,9 @@ export const es = {
     nameTaken: "Este nombre ya está en uso.",
      emailTaken: "Este correo ya está registrado.",
      notARobot: "No soy un robot",
-     captchaRequired: "Confirma que no eres un robot.",
+     captchaRequired: "Resuelve la ecuación correctamente para continuar.",
+     solveEquation: "Resuelve:",
+     answerPlaceholder: "Tu respuesta",
      tooManyAttempts: "Demasiados intentos de inicio de sesión. Inténtalo de nuevo en 15 minutos.",
    },
 
