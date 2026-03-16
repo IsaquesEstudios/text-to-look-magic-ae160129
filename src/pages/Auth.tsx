@@ -133,7 +133,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         await supabase.rpc("record_login_attempt", { p_email: email, p_success: false });
-        throw error;
+        refreshEquation();
       }
       await supabase.rpc("record_login_attempt", { p_email: email, p_success: true });
       navigate("/painel");
