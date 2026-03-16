@@ -254,17 +254,24 @@ export default function Auth() {
                   </div>
                 </div>
                 {isLogin && (
-                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-3">
-                    <input
-                      type="checkbox"
-                      id="captcha"
-                      checked={captchaChecked}
-                      onChange={(e) => setCaptchaChecked(e.target.checked)}
-                      className="h-5 w-5 rounded border-border accent-primary cursor-pointer"
+                  <div className="space-y-2 rounded-lg border border-border bg-muted/50 p-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">
+                        {(a as any).solveEquation ?? "Resolva:"}{" "}
+                        <span className="font-mono text-base text-primary font-bold">{equation.question} = ?</span>
+                      </Label>
+                      <button type="button" onClick={refreshEquation} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                        ↻
+                      </button>
+                    </div>
+                    <Input
+                      type="number"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      placeholder={(a as any).answerPlaceholder ?? "Sua resposta"}
+                      className="font-mono"
+                      required
                     />
-                    <Label htmlFor="captcha" className="cursor-pointer text-sm font-medium select-none">
-                      {(a as any).notARobot ?? "Não sou um robô"}
-                    </Label>
                   </div>
                 )}
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>
