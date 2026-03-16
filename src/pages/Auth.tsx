@@ -44,7 +44,35 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [captchaChecked, setCaptchaChecked] = useState(false);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  // Generate random math equation
+  const generateEquation = useCallback(() => {
+    const ops = ["+", "-", "×"] as const;
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a: number, b: number, answer: number;
+    if (op === "+") {
+      a = Math.floor(Math.random() * 20) + 1;
+      b = Math.floor(Math.random() * 20) + 1;
+      answer = a + b;
+    } else if (op === "-") {
+      a = Math.floor(Math.random() * 20) + 5;
+      b = Math.floor(Math.random() * a);
+      answer = a - b;
+    } else {
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
+      answer = a * b;
+    }
+    return { question: `${a} ${op} ${b}`, answer };
+  }, []);
+
+  const [equation, setEquation] = useState(() => generateEquation());
+
+  const refreshEquation = useCallback(() => {
+    setEquation(generateEquation());
+    setCaptchaAnswer("");
+  }, [generateEquation]);
 
   // Step 2 fields
   const [phonePrefix, setPhonePrefix] = useState("");
