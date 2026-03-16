@@ -213,6 +213,20 @@ export default function Auth() {
                     </button>
                   </div>
                 </div>
+                {isLogin && (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-3">
+                    <input
+                      type="checkbox"
+                      id="captcha"
+                      checked={captchaChecked}
+                      onChange={(e) => setCaptchaChecked(e.target.checked)}
+                      className="h-5 w-5 rounded border-border accent-primary cursor-pointer"
+                    />
+                    <Label htmlFor="captcha" className="cursor-pointer text-sm font-medium select-none">
+                      {a.notARobot ?? "Não sou um robô"}
+                    </Label>
+                  </div>
+                )}
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="animate-spin" />}
                   {isLogin ? a.login : a.next}
