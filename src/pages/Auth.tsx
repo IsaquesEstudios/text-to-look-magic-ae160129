@@ -35,6 +35,15 @@ export default function Auth() {
     if (!isLoading && user) {
       navigate("/painel", { replace: true });
     }
+    // If auth finished loading with no user, clear any stale session data
+    if (!isLoading && !user) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          // Ensure no stale tokens cause refresh loops
+          supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        }
+      });
+    }
   }, [user, isLoading, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
