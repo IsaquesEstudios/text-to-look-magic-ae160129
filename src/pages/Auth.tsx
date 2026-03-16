@@ -27,24 +27,23 @@ function getCountryLabels(code: string) {
 }
 
 export default function Auth() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to panel if already logged in
+  // Redirect to panel if already logged in and approved
   useEffect(() => {
-    if (!isLoading && user) {
+    if (!isLoading && user && profile?.status === 'approved') {
       navigate("/painel", { replace: true });
     }
     // If auth finished loading with no user, clear any stale session data
     if (!isLoading && !user) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) {
-          // Ensure no stale tokens cause refresh loops
           supabase.auth.signOut({ scope: 'local' }).catch(() => {});
         }
       });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, profile, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
