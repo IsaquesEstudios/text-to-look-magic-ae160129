@@ -190,10 +190,9 @@ export default function UserContratosPage() {
                           variant="cta"
                           size="sm"
                           className="gap-1.5"
-                          disabled={signing === contract.id}
-                          onClick={() => handleUserSign(contract.id)}
+                          onClick={() => openSignDialog(contract.id, contract.title, "user")}
                         >
-                          {signing === contract.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                          <CheckCircle2 className="h-3.5 w-3.5" />
                           Assinar
                         </Button>
                       )}
@@ -203,10 +202,9 @@ export default function UserContratosPage() {
                           variant="cta"
                           size="sm"
                           className="gap-1.5"
-                          disabled={signing === contract.id}
-                          onClick={() => handleAdminSign(contract.id)}
+                          onClick={() => openSignDialog(contract.id, contract.title, "admin")}
                         >
-                          {signing === contract.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                          <CheckCircle2 className="h-3.5 w-3.5" />
                           Assinar (Admin)
                         </Button>
                       )}
