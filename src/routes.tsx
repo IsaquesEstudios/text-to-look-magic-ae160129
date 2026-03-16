@@ -50,6 +50,7 @@ const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
 
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
+const AdminRegistrosPage = lazy(() => import("./pages/painel/AdminRegistrosPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
 const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
