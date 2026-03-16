@@ -275,7 +275,7 @@ export default function LeilaoDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-muted-foreground mb-2 font-medium">Prazo Máximo para Investimento</p>
-              <CountdownTimer targetDate={paymentDeadline.toISOString()} label="Prazo para investir" />
+              <CountdownTimer targetDate={paymentDeadline.toISOString()} label="Prazo para investir" expiredLabel="Prazo para depósito encerrado!" />
               <p className="text-xs text-muted-foreground mt-2 text-center">
                 {format(paymentDeadline, "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
               </p>
