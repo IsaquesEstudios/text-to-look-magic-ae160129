@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, DollarSign, Building2, MapPin, Users, TrendingUp } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
