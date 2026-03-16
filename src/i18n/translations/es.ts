@@ -396,8 +396,10 @@ export const es = {
     checkEmail: "Revisa tu correo para confirmar el registro.",
     error: "Error",
     nameTaken: "Este nombre ya está en uso.",
-    emailTaken: "Este correo ya está registrado.",
-  },
+     emailTaken: "Este correo ya está registrado.",
+     notARobot: "No soy un robot",
+     captchaRequired: "Confirma que no eres un robot.",
+   },
 
   panel: {
     dashboard: "Dashboard",
