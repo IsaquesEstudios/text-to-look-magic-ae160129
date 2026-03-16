@@ -223,7 +223,7 @@ export default function Auth() {
                       className="h-5 w-5 rounded border-border accent-primary cursor-pointer"
                     />
                     <Label htmlFor="captcha" className="cursor-pointer text-sm font-medium select-none">
-                      {a.notARobot ?? "Não sou um robô"}
+                      {(a as any).notARobot ?? "Não sou um robô"}
                     </Label>
                   </div>
                 )}
