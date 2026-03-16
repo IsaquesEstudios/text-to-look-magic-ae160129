@@ -128,6 +128,7 @@ const panelChildren: RouteRecord[] = [
   { path: "propriedades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminImoveisPage /></AdminGuard></PS> },
   
   { path: "usuarios", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminUsersPage /></AdminGuard></PS> },
+  { path: "registros", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminRegistrosPage /></AdminGuard></PS> },
   { path: "usuarios/:userId", element: <PS fallback={<ProfileSkeleton />}><AdminGuard><AdminUserProfilePage /></AdminGuard></PS> },
   { path: "atividades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminAtividadesPage /></AdminGuard></PS> },
   { path: "configuracoes", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminConfigPage /></AdminGuard></PS> },
