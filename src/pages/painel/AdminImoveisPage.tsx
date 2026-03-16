@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle, Percent } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
