@@ -48,23 +48,9 @@ export default function Auth() {
 
   // Generate random math equation
   const generateEquation = useCallback(() => {
-    const ops = ["+", "-", "×"] as const;
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let a: number, b: number, answer: number;
-    if (op === "+") {
-      a = Math.floor(Math.random() * 20) + 1;
-      b = Math.floor(Math.random() * 20) + 1;
-      answer = a + b;
-    } else if (op === "-") {
-      a = Math.floor(Math.random() * 20) + 5;
-      b = Math.floor(Math.random() * a);
-      answer = a - b;
-    } else {
-      a = Math.floor(Math.random() * 10) + 1;
-      b = Math.floor(Math.random() * 10) + 1;
-      answer = a * b;
-    }
-    return { question: `${a} ${op} ${b}`, answer };
+    const a = Math.floor(Math.random() * 15) + 1;
+    const b = Math.floor(Math.random() * 15) + 1;
+    return { question: `${a} + ${b}`, answer: a + b };
   }, []);
 
   const [equation, setEquation] = useState(() => generateEquation());
