@@ -118,7 +118,7 @@ export default function Auth() {
 
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        await supabase.rpc("record_login_attempt", { p_email: email, p_success: false });
+        await supabase.rpc("record_login_attempt" as any, { p_email: email, p_success: false });
         refreshEquation();
         throw error;
       }
