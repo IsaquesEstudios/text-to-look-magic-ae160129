@@ -48,12 +48,19 @@ export default function AdminDashboardPage() {
     },
   });
 
+  const fmtVal = (v: number) => {
+    const { compact, full } = formatCurrencySmart(v);
+    return compact !== full
+      ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></>
+      : full;
+  };
+
   const cards = [
-    { label: "Valor Discovery", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Valor Discovery", value: fmtVal(stats?.adminFees ?? 0), icon: DollarSign },
     { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
     { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
     { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
-    { label: "Total Investido", value: `$ ${(stats?.totalInvested ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
+    { label: "Total Investido", value: fmtVal(stats?.totalInvested ?? 0), icon: TrendingUp },
   ];
 
   return (

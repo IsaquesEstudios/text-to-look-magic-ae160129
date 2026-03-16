@@ -126,7 +126,7 @@ export default function UserTerrenosPage() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturnShort}</p>
-                      <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="font-semibold text-sm text-primary">{formatCurrencySmart(estimatedValue).compact}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">

@@ -54,7 +54,7 @@ function TerrenosKPIs() {
               <card.icon className="h-4 w-4 text-muted-foreground/60" />
             </div>
             <p className="text-2xl font-bold text-foreground">
-              $ {card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              {(() => { const { compact, full } = formatCurrencySmart(card.value); return compact !== full ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></> : full; })()}
             </p>
           </CardContent>
         </Card>
