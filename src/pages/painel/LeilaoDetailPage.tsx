@@ -16,7 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { AuctionPropertyForm, AuctionPropertyData, emptyPropertyData } from "@/components/painel/admin/AuctionPropertyForm";
 import AuctionInvestorLinking from "@/components/painel/admin/AuctionInvestorLinking";
 
-function CountdownTimer({ targetDate, label = "Começa em" }: { targetDate: string; label?: string }) {
+function CountdownTimer({ targetDate, label = "Começa em", expiredLabel = "Leilão encerrado!" }: { targetDate: string; label?: string; expiredLabel?: string }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isStarted, setIsStarted] = useState(false);
 
@@ -27,7 +27,7 @@ function CountdownTimer({ targetDate, label = "Começa em" }: { targetDate: stri
       const diff = target - now;
 
       if (diff <= 0) {
-        setTimeLeft("Leilão encerrado!");
+        setTimeLeft(expiredLabel);
         setIsStarted(true);
         return;
       }
@@ -47,7 +47,7 @@ function CountdownTimer({ targetDate, label = "Começa em" }: { targetDate: stri
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, [targetDate, expiredLabel]);
 
   return (
     <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
