@@ -404,7 +404,9 @@ export const es = {
      tooManyAttempts: "Demasiados intentos de inicio de sesión. Inténtalo de nuevo en 15 minutos.",
      pendingTitle: "Registro en Revisión",
      pendingDescription: "¡Gracias por registrarte! Discovery Investimentos es una plataforma exclusiva para inversores calificados. Nuestro equipo está revisando tu información y recibirás una confirmación en un plazo de 24 horas. Agradecemos tu paciencia.",
-     backToLogin: "Volver al inicio de sesión",
+      backToLogin: "Volver al inicio de sesión",
+      rejectedTitle: "Registro No Aprobado",
+      rejectedDescription: "Lamentablemente, tu registro no fue aprobado. Si deseas apelar esta decisión, comunícate con nuestro equipo a través del correo contato@discoveryinvestimentos.com.",
    },
 
   panel: {

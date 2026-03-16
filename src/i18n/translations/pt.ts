@@ -404,7 +404,9 @@ export const pt = {
      tooManyAttempts: "Muitas tentativas de login. Tente novamente em 15 minutos.",
      pendingTitle: "Cadastro em Análise",
      pendingDescription: "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência.",
-     backToLogin: "Voltar ao login",
+      backToLogin: "Voltar ao login",
+      rejectedTitle: "Cadastro Não Aprovado",
+      rejectedDescription: "Infelizmente, seu cadastro não foi aprovado. Caso deseje recorrer desta decisão, entre em contato com nossa equipe pelo email contato@discoveryinvestimentos.com.",
    },
 
   panel: {
