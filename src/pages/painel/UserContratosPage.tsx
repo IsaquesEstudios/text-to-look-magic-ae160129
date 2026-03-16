@@ -55,36 +55,28 @@ export default function UserContratosPage() {
     return profiles?.find((p) => p.user_id === userId)?.full_name || "—";
   };
 
-  const handleUserSign = async (contractId: string) => {
-    setSigning(contractId);
-    const { error } = await supabase
-      .from("contracts")
-      .update({ user_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-      .eq("id", contractId);
-
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
-      toast({ title: "Contrato assinado com sucesso!" });
-    }
-    setSigning(null);
+  const openSignDialog = (contractId: string, title: string, type: "user" | "admin") => {
+    setAgreed(false);
+    setSignDialog({ id: contractId, title, type });
   };
 
-  const handleAdminSign = async (contractId: string) => {
-    setSigning(contractId);
+  const handleConfirmSign = async () => {
+    if (!signDialog) return;
+    setSigning(signDialog.id);
+    const updateField = signDialog.type === "user" ? "user_signed_at" : "admin_signed_at";
     const { error } = await supabase
       .from("contracts")
-      .update({ admin_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-      .eq("id", contractId);
+      .update({ [updateField]: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq("id", signDialog.id);
 
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
       queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
-      toast({ title: "Contrato assinado pelo admin!" });
+      toast({ title: signDialog.type === "user" ? "Contrato assinado com sucesso!" : "Contrato assinado pelo admin!" });
     }
     setSigning(null);
+    setSignDialog(null);
   };
 
   const handleDelete = async (contractId: string) => {
