@@ -277,6 +277,21 @@ export default function UserContratosPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!pdfViewer} onOpenChange={(open) => { if (!open) setPdfViewer(null); }}>
+        <DialogContent className="sm:max-w-4xl h-[85vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle>{pdfViewer?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 px-6 pb-6">
+            <iframe
+              src={pdfViewer?.url}
+              className="w-full h-full rounded-lg border border-border/50"
+              title="Visualizador de contrato"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
