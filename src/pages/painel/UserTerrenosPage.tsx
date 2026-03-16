@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Loader2, ArrowUpRight, Bell, TrendingUp } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
@@ -68,14 +69,14 @@ export default function UserTerrenosPage() {
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
             <div>
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.totalInvested}</p>
-              <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+              <p className="text-lg font-bold text-foreground">{formatCurrencySmart(totalInvested).compact}</p>
             </div>
           </div>
           <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
             <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
             <div>
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturn}</p>
-              <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+              <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>{formatCurrencySmart(totalEstimatedReturn).compact}</p>
             </div>
           </div>
         </div>
@@ -121,11 +122,11 @@ export default function UserTerrenosPage() {
                   <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p>
-                      <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                      <p className="font-semibold text-sm text-foreground">{formatCurrencySmart(totalPaid).compact}</p>
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturnShort}</p>
-                      <p className="font-semibold text-sm text-primary">${estimatedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="font-semibold text-sm text-primary">{formatCurrencySmart(estimatedValue).compact}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">

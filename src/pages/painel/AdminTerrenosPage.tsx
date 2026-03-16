@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Gavel, TrendingUp, Loader2 } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 
 function TerrenosKPIs() {
   const { data: kpis, isLoading } = useQuery({
@@ -53,7 +54,7 @@ function TerrenosKPIs() {
               <card.icon className="h-4 w-4 text-muted-foreground/60" />
             </div>
             <p className="text-2xl font-bold text-foreground">
-              $ {card.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              {(() => { const { compact, full } = formatCurrencySmart(card.value); return compact !== full ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></> : full; })()}
             </p>
           </CardContent>
         </Card>

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle, Percent } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
   const { data: kpis, isLoading } = useQuery({
@@ -56,14 +57,12 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
 
 
 
-  const formatCompact = (value: number) => {
-    if (value >= 1_000_000) return `$ ${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000) return `$ ${(value / 1_000).toFixed(1)}K`;
-    return `$ ${value.toFixed(2)}`;
+  const fmt = (value: number) => {
+    const { compact, full } = formatCurrencySmart(value);
+    return compact !== full
+      ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></>
+      : full;
   };
-
-  const formatFull = (value: number) =>
-    `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-3 sm:gap-4`}>
@@ -79,10 +78,8 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
             <p className={`text-lg sm:text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
               {(card as any).isPercentage
                 ? `${card.value.toFixed(1)}%`
-                : (<>
-                    <span className="sm:hidden">{formatCompact(card.value)}</span>
-                    <span className="hidden sm:inline">{formatFull(card.value)}</span>
-                  </>)}
+                : fmt(card.value)
+              }
             </p>
           </CardContent>
         </Card>
