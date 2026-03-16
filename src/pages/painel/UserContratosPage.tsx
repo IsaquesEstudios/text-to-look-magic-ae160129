@@ -6,6 +6,8 @@ import { FileText, Loader2, CheckCircle2, Clock, ExternalLink, PlusCircle, Trash
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +19,8 @@ export default function UserContratosPage() {
   const { toast } = useToast();
   const [signing, setSigning] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
+  const [agreed, setAgreed] = useState(false);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ["user-contracts", user?.id],
@@ -51,36 +55,28 @@ export default function UserContratosPage() {
     return profiles?.find((p) => p.user_id === userId)?.full_name || "—";
   };
 
-  const handleUserSign = async (contractId: string) => {
-    setSigning(contractId);
-    const { error } = await supabase
-      .from("contracts")
-      .update({ user_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-      .eq("id", contractId);
-
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
-      toast({ title: "Contrato assinado com sucesso!" });
-    }
-    setSigning(null);
+  const openSignDialog = (contractId: string, title: string, type: "user" | "admin") => {
+    setAgreed(false);
+    setSignDialog({ id: contractId, title, type });
   };
 
-  const handleAdminSign = async (contractId: string) => {
-    setSigning(contractId);
+  const handleConfirmSign = async () => {
+    if (!signDialog) return;
+    setSigning(signDialog.id);
+    const updateField = signDialog.type === "user" ? "user_signed_at" : "admin_signed_at";
     const { error } = await supabase
       .from("contracts")
-      .update({ admin_signed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-      .eq("id", contractId);
+      .update({ [updateField]: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq("id", signDialog.id);
 
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
       queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
-      toast({ title: "Contrato assinado pelo admin!" });
+      toast({ title: signDialog.type === "user" ? "Contrato assinado com sucesso!" : "Contrato assinado pelo admin!" });
     }
     setSigning(null);
+    setSignDialog(null);
   };
 
   const handleDelete = async (contractId: string) => {
@@ -194,10 +190,9 @@ export default function UserContratosPage() {
                           variant="cta"
                           size="sm"
                           className="gap-1.5"
-                          disabled={signing === contract.id}
-                          onClick={() => handleUserSign(contract.id)}
+                          onClick={() => openSignDialog(contract.id, contract.title, "user")}
                         >
-                          {signing === contract.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                          <CheckCircle2 className="h-3.5 w-3.5" />
                           Assinar
                         </Button>
                       )}
@@ -207,10 +202,9 @@ export default function UserContratosPage() {
                           variant="cta"
                           size="sm"
                           className="gap-1.5"
-                          disabled={signing === contract.id}
-                          onClick={() => handleAdminSign(contract.id)}
+                          onClick={() => openSignDialog(contract.id, contract.title, "admin")}
                         >
-                          {signing === contract.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                          <CheckCircle2 className="h-3.5 w-3.5" />
                           Assinar (Admin)
                         </Button>
                       )}
@@ -240,6 +234,48 @@ export default function UserContratosPage() {
           })}
         </div>
       )}
+
+      <Dialog open={!!signDialog} onOpenChange={(open) => { if (!open) setSignDialog(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assinar Contrato</DialogTitle>
+            <DialogDescription className="pt-2">
+              Você está prestes a assinar o contrato: <strong className="text-foreground">{signDialog?.title}</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              Antes de assinar, certifique-se de que leu o documento PDF completo. Ao marcar a caixa abaixo e confirmar, sua assinatura digital será registrada com data e hora.
+            </p>
+
+            <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-secondary/30 p-4">
+              <Checkbox
+                id="agree"
+                checked={agreed}
+                onCheckedChange={(v) => setAgreed(v === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="agree" className="text-sm leading-relaxed cursor-pointer select-none">
+                Declaro que li integralmente o contrato e concordo com todos os termos e condições nele estabelecidos.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setSignDialog(null)}>Cancelar</Button>
+            <Button
+              variant="cta"
+              disabled={!agreed || signing === signDialog?.id}
+              onClick={handleConfirmSign}
+              className="gap-1.5"
+            >
+              {signing === signDialog?.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Confirmar Assinatura
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
