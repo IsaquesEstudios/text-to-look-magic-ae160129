@@ -109,7 +109,7 @@ export default function Auth() {
     setLoading(true);
     try {
       // Rate limit check
-      const { data: allowed } = await supabase.rpc("check_login_rate_limit", { p_email: email });
+      const { data: allowed } = await supabase.rpc("check_login_rate_limit" as any, { p_email: email });
       if (allowed === false) {
         toast({ title: a.error, description: (a as any).tooManyAttempts ?? "Muitas tentativas. Tente novamente em 15 minutos.", variant: "destructive" });
         refreshEquation();
