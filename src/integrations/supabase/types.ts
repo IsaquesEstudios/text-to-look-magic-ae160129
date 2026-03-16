@@ -262,6 +262,27 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email: string
+          id: string
+          success: boolean
+        }
+        Insert: {
+          attempted_at?: string
+          email: string
+          id?: string
+          success?: boolean
+        }
+        Update: {
+          attempted_at?: string
+          email?: string
+          id?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address_city: string | null
@@ -698,6 +719,7 @@ export type Database = {
         Returns: undefined
       }
       auto_finish_expired_auctions: { Args: never; Returns: undefined }
+      check_login_rate_limit: { Args: { p_email: string }; Returns: boolean }
       check_name_available: { Args: { p_name: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -713,6 +735,10 @@ export type Database = {
           p_auction_title: string
           p_user_id: string
         }
+        Returns: undefined
+      }
+      record_login_attempt: {
+        Args: { p_email: string; p_success: boolean }
         Returns: undefined
       }
       refund_auction_deposit: {
