@@ -109,7 +109,7 @@ export default function Auth() {
     setLoading(true);
     try {
       // Rate limit check
-      const { data: allowed } = await supabase.rpc("check_login_rate_limit", { p_email: email });
+      const { data: allowed } = await supabase.rpc("check_login_rate_limit" as any, { p_email: email });
       if (allowed === false) {
         toast({ title: a.error, description: (a as any).tooManyAttempts ?? "Muitas tentativas. Tente novamente em 15 minutos.", variant: "destructive" });
         refreshEquation();
@@ -118,11 +118,11 @@ export default function Auth() {
 
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        await supabase.rpc("record_login_attempt", { p_email: email, p_success: false });
+        await supabase.rpc("record_login_attempt" as any, { p_email: email, p_success: false });
         refreshEquation();
         throw error;
       }
-      await supabase.rpc("record_login_attempt", { p_email: email, p_success: true });
+      await supabase.rpc("record_login_attempt" as any, { p_email: email, p_success: true });
       navigate("/painel");
     } catch (error: any) {
       toast({ title: a.error, description: error.message, variant: "destructive" });
