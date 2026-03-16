@@ -179,12 +179,8 @@ export default function Auth() {
         } as any).eq("user_id", data.user.id);
       }
 
-      toast({
-        title: a.accountCreated,
-        description: a.checkEmail,
-      });
-      setStep(1);
-      setIsLogin(true);
+      // The user is now signed up and auto-logged in — the pending screen will show automatically
+      // via the useAuth hook detecting profile.status === 'pending'
     } catch (error: any) {
       toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
