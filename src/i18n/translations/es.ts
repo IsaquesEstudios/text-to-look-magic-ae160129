@@ -421,6 +421,7 @@ export const es = {
     goToSite: "Ir al sitio",
     logout: "Salir",
     investor: "Inversor",
+    registrations: "Registros",
 
     greeting: "Hola, {name} 👋",
     investmentSummary: "Resumen de tus inversiones",

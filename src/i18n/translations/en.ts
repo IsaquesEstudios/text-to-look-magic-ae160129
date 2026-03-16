@@ -421,6 +421,7 @@ export const en = {
     goToSite: "Go to site",
     logout: "Log out",
     investor: "Investor",
+    registrations: "Registrations",
 
     greeting: "Hi, {name} 👋",
     investmentSummary: "Your investment summary",
