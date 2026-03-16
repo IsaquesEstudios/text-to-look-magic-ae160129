@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Gavel, TrendingUp, Loader2 } from "lucide-react";
+import { formatCurrencySmart } from "@/lib/utils";
 
 function TerrenosKPIs() {
   const { data: kpis, isLoading } = useQuery({
