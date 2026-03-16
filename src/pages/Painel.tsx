@@ -35,7 +35,7 @@ function AdminDashboardContent() {
       const properties = propertiesRes.data ?? [];
       const linkedPropertyIds = new Set(shares.map(s => s.property_id));
       const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
-      const discoveryFromProperties = properties.reduce((acc, p) => {
+      const discoveryFromProperties = linkedProperties.reduce((acc, p) => {
         const normalizedType = (p.type ?? "").toLowerCase();
         const maxFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
         return acc + maxFee;
