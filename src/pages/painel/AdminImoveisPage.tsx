@@ -56,14 +56,12 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
 
 
 
-  const formatCompact = (value: number) => {
-    if (value >= 1_000_000) return `$ ${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000) return `$ ${(value / 1_000).toFixed(1)}K`;
-    return `$ ${value.toFixed(2)}`;
+  const fmt = (value: number) => {
+    const { compact, full } = formatCurrencySmart(value);
+    return compact !== full
+      ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></>
+      : full;
   };
-
-  const formatFull = (value: number) =>
-    `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-3 sm:gap-4`}>
