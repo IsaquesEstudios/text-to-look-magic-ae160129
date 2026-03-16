@@ -122,7 +122,7 @@ export default function Auth() {
         refreshEquation();
         throw error;
       }
-      await supabase.rpc("record_login_attempt", { p_email: email, p_success: true });
+      await supabase.rpc("record_login_attempt" as any, { p_email: email, p_success: true });
       navigate("/painel");
     } catch (error: any) {
       toast({ title: a.error, description: error.message, variant: "destructive" });
