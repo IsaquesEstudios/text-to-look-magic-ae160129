@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-const dateFnsLocales: Record<string, Locale> = { pt: ptBR, en: enUS, es };
+const dateFnsLocales: Record<string, typeof ptBR> = { pt: ptBR, en: enUS, es };
 
 export default function UserComprovantesPage() {
   const { user } = useAuth();
