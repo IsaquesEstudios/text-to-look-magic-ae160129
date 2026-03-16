@@ -402,6 +402,9 @@ export const en = {
      solveEquation: "Solve:",
      answerPlaceholder: "Your answer",
      tooManyAttempts: "Too many login attempts. Please try again in 15 minutes.",
+     pendingTitle: "Registration Under Review",
+     pendingDescription: "Thank you for signing up! Discovery Investimentos is an exclusive platform for qualified investors. Our team is reviewing your information and you will receive a confirmation within 24 hours. We appreciate your patience.",
+     backToLogin: "Back to login",
    },
 
   panel: {

@@ -402,6 +402,9 @@ export const pt = {
      solveEquation: "Resolva:",
      answerPlaceholder: "Sua resposta",
      tooManyAttempts: "Muitas tentativas de login. Tente novamente em 15 minutos.",
+     pendingTitle: "Cadastro em Análise",
+     pendingDescription: "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência.",
+     backToLogin: "Voltar ao login",
    },
 
   panel: {
