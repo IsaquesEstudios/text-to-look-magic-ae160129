@@ -234,6 +234,48 @@ export default function UserContratosPage() {
           })}
         </div>
       )}
+
+      <Dialog open={!!signDialog} onOpenChange={(open) => { if (!open) setSignDialog(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assinar Contrato</DialogTitle>
+            <DialogDescription className="pt-2">
+              Você está prestes a assinar o contrato: <strong className="text-foreground">{signDialog?.title}</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              Antes de assinar, certifique-se de que leu o documento PDF completo. Ao marcar a caixa abaixo e confirmar, sua assinatura digital será registrada com data e hora.
+            </p>
+
+            <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-secondary/30 p-4">
+              <Checkbox
+                id="agree"
+                checked={agreed}
+                onCheckedChange={(v) => setAgreed(v === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="agree" className="text-sm leading-relaxed cursor-pointer select-none">
+                Declaro que li integralmente o contrato e concordo com todos os termos e condições nele estabelecidos.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setSignDialog(null)}>Cancelar</Button>
+            <Button
+              variant="cta"
+              disabled={!agreed || signing === signDialog?.id}
+              onClick={handleConfirmSign}
+              className="gap-1.5"
+            >
+              {signing === signDialog?.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Confirmar Assinatura
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
