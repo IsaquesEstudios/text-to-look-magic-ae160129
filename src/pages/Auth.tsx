@@ -82,27 +82,32 @@ export default function Auth() {
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin && parseInt(captchaAnswer) !== equation.answer) {
-      toast({ title: a.error, description: (a as any).captchaRequired ?? "Resolva a equação corretamente.", variant: "destructive" });
-      refreshEquation();
+
+    if (isLogin) {
+      if (parseInt(captchaAnswer, 10) !== equation.answer) {
+        toast({ title: a.error, description: (a as any).captchaRequired ?? "Resolva a equação corretamente.", variant: "destructive" });
+        refreshEquation();
+        return;
+      }
+
+      await handleLogin();
       return;
     }
-    if (isLogin) {
-      // Check for duplicate name
-      setLoading(true);
-      try {
-        const { data: isAvailable } = await supabase.rpc("check_name_available", { p_name: fullName.trim() });
-        if (isAvailable === false) {
-          toast({ title: a.error, description: a.nameTaken, variant: "destructive" });
-          return;
-        }
-      } catch {
-        // If check fails, proceed anyway
-      } finally {
-        setLoading(false);
+
+    // Check for duplicate name
+    setLoading(true);
+    try {
+      const { data: isAvailable } = await supabase.rpc("check_name_available", { p_name: fullName.trim() });
+      if (isAvailable === false) {
+        toast({ title: a.error, description: a.nameTaken, variant: "destructive" });
+        return;
       }
-      setStep(2);
+    } catch {
+      // If check fails, proceed anyway
+    } finally {
+      setLoading(false);
     }
+    setStep(2);
   };
 
   const handleLogin = async () => {
