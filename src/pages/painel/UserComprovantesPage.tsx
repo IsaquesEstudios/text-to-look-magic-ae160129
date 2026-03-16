@@ -341,11 +341,12 @@ export default function UserComprovantesPage() {
   );
 }
 
-function EmptyState({ text, icon }: { text: string; icon?: React.ReactNode }) {
-  return (
-    <div className="text-center py-16 text-muted-foreground rounded-2xl border border-dashed border-border/40">
+const EmptyState = forwardRef<HTMLDivElement, { text: string; icon?: React.ReactNode }>(
+  ({ text, icon }, ref) => (
+    <div ref={ref} className="text-center py-16 text-muted-foreground rounded-2xl border border-dashed border-border/40">
       {icon || <FileImage className="h-10 w-10 mx-auto mb-3 opacity-40" />}
       <p className="text-sm">{text}</p>
     </div>
-  );
-}
+  )
+);
+EmptyState.displayName = "EmptyState";
