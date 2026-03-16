@@ -122,7 +122,7 @@ export default function UserTerrenosPage() {
                   <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p>
-                      <p className="font-semibold text-sm text-foreground">${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                      <p className="font-semibold text-sm text-foreground">{formatCurrencySmart(totalPaid).compact}</p>
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturnShort}</p>
