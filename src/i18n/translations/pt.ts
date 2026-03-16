@@ -396,8 +396,10 @@ export const pt = {
     checkEmail: "Verifique seu email para confirmar o cadastro.",
     error: "Erro",
     nameTaken: "Este nome já está em uso.",
-    emailTaken: "Este email já está cadastrado.",
-  },
+     emailTaken: "Este email já está cadastrado.",
+     notARobot: "Não sou um robô",
+     captchaRequired: "Confirme que você não é um robô.",
+   },
 
   panel: {
     // Sidebar nav

@@ -44,6 +44,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaChecked, setCaptchaChecked] = useState(false);
 
   // Step 2 fields
   const [phonePrefix, setPhonePrefix] = useState("");
@@ -67,9 +68,11 @@ export default function Auth() {
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLogin && !captchaChecked) {
+      toast({ title: a.error, description: (a as any).captchaRequired ?? "Confirme que você não é um robô.", variant: "destructive" });
+      return;
+    }
     if (isLogin) {
-      handleLogin();
-    } else {
       // Check for duplicate name
       setLoading(true);
       try {
@@ -210,6 +213,20 @@ export default function Auth() {
                     </button>
                   </div>
                 </div>
+                {isLogin && (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-3">
+                    <input
+                      type="checkbox"
+                      id="captcha"
+                      checked={captchaChecked}
+                      onChange={(e) => setCaptchaChecked(e.target.checked)}
+                      className="h-5 w-5 rounded border-border accent-primary cursor-pointer"
+                    />
+                    <Label htmlFor="captcha" className="cursor-pointer text-sm font-medium select-none">
+                      {(a as any).notARobot ?? "Não sou um robô"}
+                    </Label>
+                  </div>
+                )}
                 <Button type="submit" variant="cta" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="animate-spin" />}
                   {isLogin ? a.login : a.next}
