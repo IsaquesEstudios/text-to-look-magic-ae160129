@@ -399,6 +399,7 @@ export const en = {
      emailTaken: "This email is already registered.",
      notARobot: "I'm not a robot",
      captchaRequired: "Please confirm you're not a robot.",
+     tooManyAttempts: "Too many login attempts. Please try again in 15 minutes.",
    },
 
   panel: {
