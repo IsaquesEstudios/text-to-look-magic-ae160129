@@ -134,6 +134,7 @@ export default function Auth() {
       if (error) {
         await supabase.rpc("record_login_attempt", { p_email: email, p_success: false });
         refreshEquation();
+        throw error;
       }
       await supabase.rpc("record_login_attempt", { p_email: email, p_success: true });
       navigate("/painel");
