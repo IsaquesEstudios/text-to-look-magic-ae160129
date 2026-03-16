@@ -21,6 +21,7 @@ export default function UserContratosPage() {
   const [showForm, setShowForm] = useState(false);
   const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
   const [agreed, setAgreed] = useState(false);
+  const [pdfViewer, setPdfViewer] = useState<{ url: string; title: string } | null>(null);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ["user-contracts", user?.id],
@@ -179,12 +180,10 @@ export default function UserContratosPage() {
                         variant="outline"
                         size="sm"
                         className="gap-1.5"
-                        asChild
+                        onClick={() => setPdfViewer({ url: contract.pdf_url, title: contract.title })}
                       >
-                        <a href={contract.pdf_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          Ver PDF
-                        </a>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Ver PDF
                       </Button>
 
                       {!isAdmin && !contract.user_signed_at && (
@@ -276,6 +275,21 @@ export default function UserContratosPage() {
               Confirmar Assinatura
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pdfViewer} onOpenChange={(open) => { if (!open) setPdfViewer(null); }}>
+        <DialogContent className="sm:max-w-4xl h-[85vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle>{pdfViewer?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 px-6 pb-6">
+            <iframe
+              src={pdfViewer?.url}
+              className="w-full h-full rounded-lg border border-border/50"
+              title="Visualizador de contrato"
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
