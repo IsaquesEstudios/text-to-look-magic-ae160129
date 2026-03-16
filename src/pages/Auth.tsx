@@ -184,8 +184,18 @@ export default function Auth() {
     }
   };
 
-  // Show splash while checking session — prevents login form flash
-  if (isLoading || user) {
+  // Show splash only while initial auth check is happening
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If user is already logged in, show splash while redirecting
+  if (user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
