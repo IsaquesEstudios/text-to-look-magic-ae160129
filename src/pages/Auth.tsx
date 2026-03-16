@@ -35,6 +35,15 @@ export default function Auth() {
     if (!isLoading && user) {
       navigate("/painel", { replace: true });
     }
+    // If auth finished loading with no user, clear any stale session data
+    if (!isLoading && !user) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          // Ensure no stale tokens cause refresh loops
+          supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        }
+      });
+    }
   }, [user, isLoading, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
@@ -184,8 +193,18 @@ export default function Auth() {
     }
   };
 
-  // Show splash while checking session — prevents login form flash
-  if (isLoading || user) {
+  // Show splash only while initial auth check is happening
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If user is already logged in, show splash while redirecting
+  if (user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
