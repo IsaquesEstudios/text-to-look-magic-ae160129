@@ -3,6 +3,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
+import { usePendingRegistrations } from "@/hooks/usePendingRegistrations";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Home, Shield, LayoutDashboard, Building2, Receipt,
