@@ -511,13 +511,19 @@ export const pt = {
 
     // Receipts page
     receiptsTitle: "Comprovantes",
-    receiptsDesc: "Comprovantes de pagamentos e histórico de aportes",
+    receiptsDesc: "Envie e acompanhe seus comprovantes de pagamento",
     received: "Recebidos",
     sent: "Enviados",
     recharges: "Aportes",
-    noReceivedReceipts: "Nenhum comprovante de recebimento",
-    noSentReceipts: "Nenhum comprovante de envio",
+    noReceivedReceipts: "Nenhum comprovante recebido do administrador",
+    noSentReceipts: "Nenhum comprovante enviado ainda",
     noRecharges: "Nenhum aporte realizado",
+    uploadReceipt: "Enviar comprovante",
+    uploadReceiptDesc: "Clique ou arraste para enviar um recibo (imagem ou PDF)",
+    uploading: "Enviando...",
+    receiptUploaded: "Comprovante enviado com sucesso!",
+    deleteReceipt: "Excluir comprovante",
+    receiptDeleted: "Comprovante excluído",
 
     // Properties pages
     myProperties: "Meus Imóveis",
