@@ -179,10 +179,12 @@ export default function UserContratosPage() {
                         variant="outline"
                         size="sm"
                         className="gap-1.5"
-                        onClick={() => window.open(contract.pdf_url, "_blank")}
+                        asChild
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        Ver PDF
+                        <a href={contract.pdf_url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Ver PDF
+                        </a>
                       </Button>
 
                       {!isAdmin && !contract.user_signed_at && (
