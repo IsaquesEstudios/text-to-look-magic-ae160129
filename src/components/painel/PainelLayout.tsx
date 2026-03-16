@@ -54,6 +54,7 @@ export function PainelLayout() {
     { label: p.properties, icon: Building2, path: "/painel/propriedades" },
     { label: "Contratos", icon: FileText, path: "/painel/contratos" },
     { label: p.users, icon: Shield, path: "/painel/usuarios" },
+    { label: (p as any).registrations ?? "Registros", icon: UserCircle, path: "/painel/registros" },
     { label: p.activities, icon: History, path: "/painel/atividades" },
     { label: p.settings, icon: Settings, path: "/painel/configuracoes" },
   ];
