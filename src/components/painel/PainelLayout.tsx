@@ -27,6 +27,7 @@ export function PainelLayout() {
   const navigate = useNavigate();
   const totalUnread = useUnreadNews();
   const unreadAuctions = useUnreadAuctions();
+  const pendingRegistrations = usePendingRegistrations();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [isPanelNavigating, setIsPanelNavigating] = useState(false);
