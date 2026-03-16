@@ -96,8 +96,9 @@ export default function Auth() {
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin && !captchaChecked) {
-      toast({ title: a.error, description: (a as any).captchaRequired ?? "Confirme que você não é um robô.", variant: "destructive" });
+    if (isLogin && parseInt(captchaAnswer) !== equation.answer) {
+      toast({ title: a.error, description: (a as any).captchaRequired ?? "Resolva a equação corretamente.", variant: "destructive" });
+      refreshEquation();
       return;
     }
     if (isLogin) {
