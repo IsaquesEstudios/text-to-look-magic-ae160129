@@ -3,6 +3,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useUnreadNews } from "@/hooks/useUnreadNews";
 import { useUnreadAuctions } from "@/hooks/useUnreadAuctions";
+import { usePendingRegistrations } from "@/hooks/usePendingRegistrations";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Home, Shield, LayoutDashboard, Building2, Receipt,
@@ -26,6 +27,7 @@ export function PainelLayout() {
   const navigate = useNavigate();
   const totalUnread = useUnreadNews();
   const unreadAuctions = useUnreadAuctions();
+  const pendingRegistrations = usePendingRegistrations();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [isPanelNavigating, setIsPanelNavigating] = useState(false);
@@ -162,9 +164,11 @@ export function PainelLayout() {
                 ? location.pathname === "/painel"
                 : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/"));
               const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+              const isRegistrosLink = item.path === "/painel/registros";
               const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
               const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
-              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
+              const showRegistrosBadge = isRegistrosLink && pendingRegistrations > 0;
+              const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : showRegistrosBadge ? pendingRegistrations : 0;
 
               const linkContent = (
                 <Link
@@ -363,9 +367,11 @@ export function PainelLayout() {
                       ? location.pathname === "/painel"
                       : location.pathname.startsWith(item.path) || (item.path === "/painel/meus-projetos" && location.pathname.startsWith("/painel/imovel/")));
                     const isAuctionLink = item.path === "/painel/leiloes-user" || item.path === "/painel/leiloes";
+                    const isRegistrosLink = item.path === "/painel/registros";
                     const showDashBadge = !isAdmin && item.path === "/painel" && totalUnread > 0;
                     const showAuctionBadge = isAuctionLink && unreadAuctions > 0;
-                    const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : 0;
+                    const showRegistrosBadge = isRegistrosLink && pendingRegistrations > 0;
+                    const badgeCount = showDashBadge ? totalUnread : showAuctionBadge ? unreadAuctions : showRegistrosBadge ? pendingRegistrations : 0;
                     return (
                       <Link
                         key={item.path}
