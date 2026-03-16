@@ -238,13 +238,15 @@ export default function Auth() {
                   : ((t as any).pendingDescription ?? "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência.")}
               </CardDescription>
               {isRejected && (
-                <a
-                  href="mailto:contato@discoveryinvestimentos.com"
-                  className="inline-flex items-center gap-2 mt-3 text-sm text-primary hover:underline transition-colors"
-                >
-                  <Mail className="h-4 w-4" />
-                  contato@discoveryinvestimentos.com
-                </a>
+                <div className="flex justify-center">
+                  <a
+                    href="mailto:contato@discoveryinvestimentos.com"
+                    className="inline-flex items-center gap-2 mt-3 text-sm text-primary hover:underline transition-colors"
+                  >
+                    <Mail className="h-4 w-4" />
+                    contato@discoveryinvestimentos.com
+                  </a>
+                </div>
               )}
             </CardHeader>
             <CardContent className="flex justify-center">
