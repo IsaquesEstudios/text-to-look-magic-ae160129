@@ -212,6 +212,7 @@ export default function Auth() {
   if (user && profile && profile.status !== 'approved') {
     const lang = (profile.preferred_language || 'pt') as Language;
     const t = translations[lang]?.auth ?? translations.pt.auth;
+    const isRejected = profile.status === 'rejected';
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -221,16 +222,31 @@ export default function Auth() {
           <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Clock className="h-8 w-8 text-primary" />
+                <div className={`h-16 w-16 rounded-full flex items-center justify-center ${isRejected ? "bg-destructive/10" : "bg-primary/10"}`}>
+                  {isRejected
+                    ? <ShieldX className="h-8 w-8 text-destructive" />
+                    : <Clock className="h-8 w-8 text-primary" />}
                 </div>
               </div>
               <CardTitle className="text-xl text-foreground">
-                {(t as any).pendingTitle ?? "Cadastro em Análise"}
+                {isRejected
+                  ? ((t as any).rejectedTitle ?? "Cadastro Não Aprovado")
+                  : ((t as any).pendingTitle ?? "Cadastro em Análise")}
               </CardTitle>
               <CardDescription className="text-sm leading-relaxed mt-2">
-                {(t as any).pendingDescription ?? "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência."}
+                {isRejected
+                  ? ((t as any).rejectedDescription ?? "Infelizmente, seu cadastro não foi aprovado. Caso deseje recorrer desta decisão, entre em contato com nossa equipe pelo email contato@discoveryinvestimentos.com.")
+                  : ((t as any).pendingDescription ?? "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência.")}
               </CardDescription>
+              {isRejected && (
+                <a
+                  href="mailto:contato@discoveryinvestimentos.com"
+                  className="inline-flex items-center gap-2 mt-3 text-sm text-primary hover:underline transition-colors"
+                >
+                  <Mail className="h-4 w-4" />
+                  contato@discoveryinvestimentos.com
+                </a>
+              )}
             </CardHeader>
             <CardContent className="flex justify-center">
               <Button
