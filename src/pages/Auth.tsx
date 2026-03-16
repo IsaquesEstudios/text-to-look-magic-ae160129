@@ -198,12 +198,52 @@ export default function Auth() {
     );
   }
 
-  // If user is already logged in, show splash while redirecting
-  if (user) {
+  // If user is logged in and approved, show splash while redirecting
+  if (user && profile?.status === 'approved') {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If user is logged in but pending approval
+  if (user && profile && profile.status !== 'approved') {
+    const lang = (profile.preferred_language || 'pt') as Language;
+    const t = translations[lang]?.auth ?? translations.pt.auth;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="flex justify-center mb-8">
+            <img src={discoveryLogo} alt="Discovery" className="h-12" />
+          </div>
+          <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Clock className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-xl text-foreground">
+                {(t as any).pendingTitle ?? "Cadastro em Análise"}
+              </CardTitle>
+              <CardDescription className="text-sm leading-relaxed mt-2">
+                {(t as any).pendingDescription ?? "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => signOut()}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                {(t as any).backToLogin ?? "Voltar ao login"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
