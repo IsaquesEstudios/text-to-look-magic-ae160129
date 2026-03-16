@@ -19,6 +19,8 @@ export default function UserContratosPage() {
   const { toast } = useToast();
   const [signing, setSigning] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
+  const [agreed, setAgreed] = useState(false);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ["user-contracts", user?.id],
