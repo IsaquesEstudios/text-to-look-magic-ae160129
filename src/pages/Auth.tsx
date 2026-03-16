@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check, Clock, LogOut } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
@@ -27,24 +27,23 @@ function getCountryLabels(code: string) {
 }
 
 export default function Auth() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to panel if already logged in
+  // Redirect to panel if already logged in and approved
   useEffect(() => {
-    if (!isLoading && user) {
+    if (!isLoading && user && profile?.status === 'approved') {
       navigate("/painel", { replace: true });
     }
     // If auth finished loading with no user, clear any stale session data
     if (!isLoading && !user) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) {
-          // Ensure no stale tokens cause refresh loops
           supabase.auth.signOut({ scope: 'local' }).catch(() => {});
         }
       });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, profile, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
@@ -180,12 +179,8 @@ export default function Auth() {
         } as any).eq("user_id", data.user.id);
       }
 
-      toast({
-        title: a.accountCreated,
-        description: a.checkEmail,
-      });
-      setStep(1);
-      setIsLogin(true);
+      // The user is now signed up and auto-logged in — the pending screen will show automatically
+      // via the useAuth hook detecting profile.status === 'pending'
     } catch (error: any) {
       toast({ title: a.error, description: error.message, variant: "destructive" });
     } finally {
@@ -203,12 +198,52 @@ export default function Auth() {
     );
   }
 
-  // If user is already logged in, show splash while redirecting
-  if (user) {
+  // If user is logged in and approved, show splash while redirecting
+  if (user && profile?.status === 'approved') {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If user is logged in but pending approval
+  if (user && profile && profile.status !== 'approved') {
+    const lang = (profile.preferred_language || 'pt') as Language;
+    const t = translations[lang]?.auth ?? translations.pt.auth;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="flex justify-center mb-8">
+            <img src={discoveryLogo} alt="Discovery" className="h-12" />
+          </div>
+          <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Clock className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-xl text-foreground">
+                {(t as any).pendingTitle ?? "Cadastro em Análise"}
+              </CardTitle>
+              <CardDescription className="text-sm leading-relaxed mt-2">
+                {(t as any).pendingDescription ?? "Obrigado por se cadastrar! A Discovery Investimentos é uma plataforma exclusiva para investidores qualificados. Nossa equipe está analisando suas informações e você receberá uma confirmação em até 24 horas. Agradecemos sua paciência."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => signOut()}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                {(t as any).backToLogin ?? "Voltar ao login"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

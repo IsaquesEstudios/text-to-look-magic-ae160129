@@ -50,6 +50,7 @@ const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
 
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
+const AdminRegistrosPage = lazy(() => import("./pages/painel/AdminRegistrosPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
 const AdminUserProfilePage = lazy(() => import("./pages/painel/AdminUserProfilePage"));
 const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
@@ -127,6 +128,7 @@ const panelChildren: RouteRecord[] = [
   { path: "propriedades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminImoveisPage /></AdminGuard></PS> },
   
   { path: "usuarios", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminUsersPage /></AdminGuard></PS> },
+  { path: "registros", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminRegistrosPage /></AdminGuard></PS> },
   { path: "usuarios/:userId", element: <PS fallback={<ProfileSkeleton />}><AdminGuard><AdminUserProfilePage /></AdminGuard></PS> },
   { path: "atividades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminAtividadesPage /></AdminGuard></PS> },
   { path: "configuracoes", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminConfigPage /></AdminGuard></PS> },

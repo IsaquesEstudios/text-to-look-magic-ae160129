@@ -300,6 +300,7 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           preferred_language: string
+          status: string
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -320,6 +321,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           preferred_language?: string
+          status?: string
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -340,6 +342,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           preferred_language?: string
+          status?: string
           updated_at?: string
           user_id?: string
           whatsapp?: string | null

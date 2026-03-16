@@ -54,6 +54,7 @@ export function PainelLayout() {
     { label: p.properties, icon: Building2, path: "/painel/propriedades" },
     { label: "Contratos", icon: FileText, path: "/painel/contratos" },
     { label: p.users, icon: Shield, path: "/painel/usuarios" },
+    { label: (p as any).registrations ?? "Registros", icon: UserCircle, path: "/painel/registros" },
     { label: p.activities, icon: History, path: "/painel/atividades" },
     { label: p.settings, icon: Settings, path: "/painel/configuracoes" },
   ];
@@ -76,8 +77,13 @@ export function PainelLayout() {
     // If user exists in auth but has no profile (deleted/orphan account), sign out
     if (profile === null && !isLoading) {
       signOut().then(() => navigate("/auth", { replace: true }));
+      return;
     }
-  }, [isLoading, user, profile, navigate, signOut]);
+    // If user is pending approval, redirect to auth (which shows pending screen)
+    if (profile && profile.status !== 'approved' && !isAdmin) {
+      navigate("/auth", { replace: true });
+    }
+  }, [isLoading, user, profile, navigate, signOut, isAdmin]);
 
   useEffect(() => {
     if (!isPanelNavigating) return;
