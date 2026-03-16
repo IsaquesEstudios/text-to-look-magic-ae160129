@@ -44,6 +44,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaChecked, setCaptchaChecked] = useState(false);
 
   // Step 2 fields
   const [phonePrefix, setPhonePrefix] = useState("");
