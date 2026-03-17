@@ -118,12 +118,10 @@ export default function AdminRegistrosPage() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0 space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-foreground text-sm truncate max-w-[160px] sm:max-w-none">
-                {reg.full_name || "Sem nome"}
-              </span>
-              {statusBadge(reg.status)}
-            </div>
+            <p className="font-semibold text-foreground text-sm break-words">
+              {reg.full_name || "Sem nome"}
+            </p>
+            {statusBadge(reg.status)}
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
               {reg.phone && (
                 <span className="flex items-center gap-1">
