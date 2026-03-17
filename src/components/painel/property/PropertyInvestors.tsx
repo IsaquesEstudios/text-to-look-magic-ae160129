@@ -75,8 +75,8 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
       const { data, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, credits")
-        .gt("credits", 0)
-        .order("credits", { ascending: false });
+        .eq("status", "approved")
+        .order("full_name");
       if (error) throw error;
       const { data: adminRoles } = await supabase
         .from("user_roles")
