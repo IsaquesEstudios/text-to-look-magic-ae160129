@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
@@ -84,7 +84,13 @@ const PS = ({ children, fallback }: { children: React.ReactNode; fallback: React
 );
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-  if (typeof window === "undefined") return <PageLoader />;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <PageLoader />;
   return <>{children}</>;
 };
 

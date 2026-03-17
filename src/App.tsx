@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Loader2, WifiOff } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import discoveryLogo from "@/assets/discovery-logo.png";
@@ -51,20 +51,29 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
 // Root redirect handler
 const RootRedirect = () => {
   const location = useLocation();
-  const isNative = Capacitor.isNativePlatform();
-  const target = isNative ? "/auth" : "/pt";
-  
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if (location.pathname === "/") {
+    setMounted(true);
+  }, []);
+
+  const target = mounted && Capacitor.isNativePlatform() ? "/auth" : "/pt";
+
+  useEffect(() => {
+    if (mounted && location.pathname === "/") {
       window.location.replace(target);
     }
-  }, [location.pathname, target]);
-  
-  if (location.pathname === "/") {
-    return <Navigate to={target} replace />;
+  }, [mounted, location.pathname, target]);
+
+  if (location.pathname !== "/") {
+    return null;
   }
-  
-  return null;
+
+  if (!mounted) {
+    return <PageLoader />;
+  }
+
+  return <Navigate to={target} replace />;
 };
 
 const App = () => {
@@ -95,7 +104,9 @@ const App = () => {
           <Sonner />
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
-            <Outlet />
+            <div suppressHydrationWarning>
+              <Outlet />
+            </div>
           </Suspense>
           <CookieConsentBanner />
           <InstallPWABanner />
