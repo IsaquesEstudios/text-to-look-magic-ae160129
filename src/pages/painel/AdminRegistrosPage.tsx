@@ -110,77 +110,77 @@ export default function AdminRegistrosPage() {
 
   const RegistrationCard = ({ reg, showActions }: { reg: Registration; showActions: boolean }) => (
     <Card className="border-border/50 bg-card/80">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <Avatar className="h-10 w-10 shrink-0">
-              <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                {(reg.full_name || "?").charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0 space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold text-foreground text-sm truncate">
-                  {reg.full_name || "Sem nome"}
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex items-start gap-3">
+          <Avatar className="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
+            <AvatarFallback className="bg-primary/10 text-primary text-sm">
+              {(reg.full_name || "?").charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-foreground text-sm truncate max-w-[160px] sm:max-w-none">
+                {reg.full_name || "Sem nome"}
+              </span>
+              {statusBadge(reg.status)}
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+              {reg.phone && (
+                <span className="flex items-center gap-1">
+                  <Phone className="h-3 w-3 shrink-0" /> {reg.phone}
                 </span>
-                {statusBadge(reg.status)}
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                {reg.phone && (
-                  <span className="flex items-center gap-1">
-                    <Phone className="h-3 w-3" /> {reg.phone}
-                  </span>
-                )}
-                {reg.country && (
-                  <span className="flex items-center gap-1">
-                    <Globe className="h-3 w-3" /> {reg.country}
-                  </span>
-                )}
-                {(reg.address_city || reg.address_state) && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" /> {[reg.address_city, reg.address_state].filter(Boolean).join(", ")}
-                  </span>
-                )}
-                <span>{langLabel(reg.preferred_language)}</span>
-              </div>
-              <p className="text-xs text-muted-foreground/70">
-                Cadastrado {formatDistanceToNow(new Date(reg.created_at), { addSuffix: true, locale: ptBR })}
-              </p>
+              )}
+              {reg.country && (
+                <span className="flex items-center gap-1">
+                  <Globe className="h-3 w-3 shrink-0" /> {reg.country}
+                </span>
+              )}
+              {(reg.address_city || reg.address_state) && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3 shrink-0" /> {[reg.address_city, reg.address_state].filter(Boolean).join(", ")}
+                </span>
+              )}
+              <span>{langLabel(reg.preferred_language)}</span>
             </div>
+            <p className="text-xs text-muted-foreground/70">
+              Cadastrado {formatDistanceToNow(new Date(reg.created_at), { addSuffix: true, locale: ptBR })}
+            </p>
+            {showActions && (
+              <div className="flex items-center gap-2 pt-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
+                  disabled={updateStatus.isPending}
+                >
+                  <Check className="h-3.5 w-3.5" /> Aprovar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1 h-8 text-xs"
+                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "rejected" })}
+                  disabled={updateStatus.isPending}
+                >
+                  <X className="h-3.5 w-3.5" /> Rejeitar
+                </Button>
+              </div>
+            )}
+            {!showActions && reg.status === "rejected" && (
+              <div className="pt-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
+                  disabled={updateStatus.isPending}
+                >
+                  <Check className="h-3.5 w-3.5" /> Aprovar
+                </Button>
+              </div>
+            )}
           </div>
-          {showActions && (
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1"
-                onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
-                disabled={updateStatus.isPending}
-              >
-                <Check className="h-3.5 w-3.5" /> Aprovar
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1"
-                onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "rejected" })}
-                disabled={updateStatus.isPending}
-              >
-                <X className="h-3.5 w-3.5" /> Rejeitar
-              </Button>
-            </div>
-          )}
-          {!showActions && reg.status === "rejected" && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 shrink-0"
-              onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
-              disabled={updateStatus.isPending}
-            >
-              <Check className="h-3.5 w-3.5" /> Aprovar
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>
