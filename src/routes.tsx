@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
+import { HydrationErrorBoundary } from "@/components/ErrorBoundary";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
 import {
