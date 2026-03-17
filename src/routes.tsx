@@ -29,7 +29,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Layout = lazy(() => import("./components/layout/Layout").then(m => ({ default: m.default ?? m.Layout })));
+const Layout = lazy(() => import("./components/layout/Layout").then(m => ({ default: m.Layout })));
 
 // Legal pages
 const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
