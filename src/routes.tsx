@@ -84,7 +84,13 @@ const PS = ({ children, fallback }: { children: React.ReactNode; fallback: React
 );
 
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-  if (typeof window === "undefined") return <PageLoader />;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <PageLoader />;
   return <>{children}</>;
 };
 

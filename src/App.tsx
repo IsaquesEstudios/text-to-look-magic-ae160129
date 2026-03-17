@@ -104,7 +104,9 @@ const App = () => {
           <Sonner />
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
-            <Outlet />
+            <div suppressHydrationWarning>
+              <Outlet />
+            </div>
           </Suspense>
           <CookieConsentBanner />
           <InstallPWABanner />
