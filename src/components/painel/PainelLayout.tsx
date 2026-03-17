@@ -78,7 +78,7 @@ export function PainelLayout() {
     }
     // If user exists in auth but has no profile (deleted/orphan account), sign out
     if (profile === null && !isLoading) {
-      signOut().then(() => navigate("/auth", { replace: true }));
+      signOut().then(() => navigate("/", { replace: true }));
       return;
     }
     // If user is pending approval, redirect to auth (which shows pending screen)
