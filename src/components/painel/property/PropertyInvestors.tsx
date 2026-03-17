@@ -157,7 +157,8 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
   const maxLinkableByCredits = totalProject > 0
     ? Math.floor((userMaxCredits / (1 + serviceFee / totalProject)) * 100) / 100
     : userMaxCredits;
-  const maxLinkable = maxLinkableByCredits;
+  const maxLinkableByRemaining = Math.max(remaining, 0);
+  const maxLinkable = Math.min(maxLinkableByCredits, maxLinkableByRemaining);
 
   return (
     <div>
