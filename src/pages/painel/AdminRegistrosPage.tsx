@@ -118,12 +118,10 @@ export default function AdminRegistrosPage() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0 space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-foreground text-sm truncate max-w-[160px] sm:max-w-none">
-                {reg.full_name || "Sem nome"}
-              </span>
-              {statusBadge(reg.status)}
-            </div>
+            <p className="font-semibold text-foreground text-sm break-words">
+              {reg.full_name || "Sem nome"}
+            </p>
+            {statusBadge(reg.status)}
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
               {reg.phone && (
                 <span className="flex items-center gap-1">
@@ -202,23 +200,25 @@ export default function AdminRegistrosPage() {
       </div>
 
       <Tabs defaultValue="pending">
-        <TabsList>
-          <TabsTrigger value="pending" className="gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
-            Pendentes
+        <TabsList className="w-full grid grid-cols-3">
+          <TabsTrigger value="pending" className="gap-1 text-xs px-1.5">
+            <Clock className="h-3 w-3 shrink-0" />
+            <span className="truncate">Pendentes</span>
             {pending.length > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-xs">
+              <Badge variant="secondary" className="h-4 min-w-4 px-1 text-[10px] leading-none">
                 {pending.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="approved" className="gap-1.5">
-            <UserCheck className="h-3.5 w-3.5" />
-            Aprovados ({approved.length})
+          <TabsTrigger value="approved" className="gap-1 text-xs px-1.5">
+            <UserCheck className="h-3 w-3 shrink-0" />
+            <span className="truncate">Aprovados</span>
+            <span className="text-[10px]">({approved.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="rejected" className="gap-1.5">
-            <UserX className="h-3.5 w-3.5" />
-            Rejeitados ({rejected.length})
+          <TabsTrigger value="rejected" className="gap-1 text-xs px-1.5">
+            <UserX className="h-3 w-3 shrink-0" />
+            <span className="truncate">Rejeitados</span>
+            <span className="text-[10px]">({rejected.length})</span>
           </TabsTrigger>
         </TabsList>
 
