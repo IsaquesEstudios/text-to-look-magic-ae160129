@@ -144,7 +144,7 @@ const panelChildren: RouteRecord[] = [
 export const routes: RouteRecord[] = [
   {
     path: "/",
-    element: <App />,
+    element: <HydrationErrorBoundary><App /></HydrationErrorBoundary>,
     children: [
       { index: true, element: <SuspenseWrapper><Index /></SuspenseWrapper> },
       ...generateLanguageRoutes("", Index),
