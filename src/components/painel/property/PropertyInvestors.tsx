@@ -86,6 +86,8 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
       return data.filter((p) => !adminIds.has(p.user_id));
     },
     enabled: isAdmin && isLinking,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const linkMutation = useMutation({
