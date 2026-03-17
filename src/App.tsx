@@ -51,20 +51,29 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
 // Root redirect handler
 const RootRedirect = () => {
   const location = useLocation();
-  const isNative = Capacitor.isNativePlatform();
-  const target = isNative ? "/auth" : "/pt";
-  
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if (location.pathname === "/") {
+    setMounted(true);
+  }, []);
+
+  const target = mounted && Capacitor.isNativePlatform() ? "/auth" : "/pt";
+
+  useEffect(() => {
+    if (mounted && location.pathname === "/") {
       window.location.replace(target);
     }
-  }, [location.pathname, target]);
-  
-  if (location.pathname === "/") {
-    return <Navigate to={target} replace />;
+  }, [mounted, location.pathname, target]);
+
+  if (location.pathname !== "/") {
+    return null;
   }
-  
-  return null;
+
+  if (!mounted) {
+    return <PageLoader />;
+  }
+
+  return <Navigate to={target} replace />;
 };
 
 const App = () => {
