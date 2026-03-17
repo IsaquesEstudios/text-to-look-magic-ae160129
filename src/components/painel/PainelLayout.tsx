@@ -83,7 +83,7 @@ export function PainelLayout() {
     }
     // If user is pending approval, redirect to auth (which shows pending screen)
     if (profile && profile.status !== 'approved' && !isAdmin) {
-      navigate("/auth", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [isLoading, user, profile, navigate, signOut, isAdmin]);
 
