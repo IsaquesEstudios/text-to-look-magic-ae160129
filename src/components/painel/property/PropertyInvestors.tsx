@@ -314,7 +314,12 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
                 <span className="font-medium text-foreground">Total debitado</span>
                 <span className="font-bold text-foreground">${formatUSD(currentTotalDeduction)}</span>
               </div>
-              {currentTotalDeduction > userMaxCredits && (
+              {currentAmount > maxLinkableByRemaining && maxLinkableByRemaining >= 0 && (
+                <p className="text-destructive font-medium mt-1">
+                  ⚠ Valor excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
+                </p>
+              )}
+              {currentAmount <= maxLinkableByRemaining && currentTotalDeduction > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
                 </p>
