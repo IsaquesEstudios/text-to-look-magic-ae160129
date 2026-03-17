@@ -157,7 +157,8 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
   const maxLinkableByCredits = totalProject > 0
     ? Math.floor((userMaxCredits / (1 + serviceFee / totalProject)) * 100) / 100
     : userMaxCredits;
-  const maxLinkable = maxLinkableByCredits;
+  const maxLinkableByRemaining = Math.max(remaining, 0);
+  const maxLinkable = Math.min(maxLinkableByCredits, maxLinkableByRemaining);
 
   return (
     <div>
@@ -313,7 +314,12 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
                 <span className="font-medium text-foreground">Total debitado</span>
                 <span className="font-bold text-foreground">${formatUSD(currentTotalDeduction)}</span>
               </div>
-              {currentTotalDeduction > userMaxCredits && (
+              {currentAmount > maxLinkableByRemaining && maxLinkableByRemaining >= 0 && (
+                <p className="text-destructive font-medium mt-1">
+                  ⚠ Valor excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
+                </p>
+              )}
+              {currentAmount <= maxLinkableByRemaining && currentTotalDeduction > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
                 </p>
@@ -328,6 +334,7 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
               disabled={
                 !selectedUserId ||
                 currentAmount <= 0 ||
+                currentAmount > maxLinkableByRemaining ||
                 currentTotalDeduction > userMaxCredits ||
                 linkMutation.isPending
               }
