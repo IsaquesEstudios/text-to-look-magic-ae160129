@@ -1,10 +1,9 @@
-import { Suspense, lazy, useEffect, useState } from "react";
-import discoveryLogo from "@/assets/discovery-logo.png";
-import type { RouteRecord } from "vite-react-ssg";
+import { Suspense, lazy } from "react";
+import type { RouteObject } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { AdminGuard } from "@/components/painel/AdminGuard";
-import { HydrationErrorBoundary } from "@/components/ErrorBoundary";
-import { translations, Language } from "@/i18n";
-import { fetchAllBlogSlugs } from "@/lib/blog";
+import { Language } from "@/i18n";
+import discoveryLogo from "@/assets/discovery-logo.png";
 import {
   DashboardSkeleton,
   AuctionsSkeleton,
@@ -17,9 +16,7 @@ import {
   ReceiptsSkeleton,
   ContractsSkeleton,
   ProfileSkeleton,
-  GenericPanelSkeleton,
 } from "@/components/painel/PanelSkeletons";
-import App from "./App";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -32,6 +29,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+const Layout = lazy(() => import("./components/layout/Layout").then(m => ({ default: m.default ?? m.Layout })));
 
 // Legal pages
 const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
@@ -40,7 +38,7 @@ const CookiePolicy = lazy(() => import("./pages/legal/CookiePolicy"));
 const RefundPolicy = lazy(() => import("./pages/legal/RefundPolicy"));
 const RiskDisclosure = lazy(() => import("./pages/legal/RiskDisclosure"));
 
-// Panel pages (client-only)
+// Panel pages
 const Painel = lazy(() => import("./pages/Painel"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const PropertyNovidadesPage = lazy(() => import("./pages/painel/PropertyNovidadesPage"));
@@ -49,7 +47,6 @@ const UserPropriedadesPage = lazy(() => import("./pages/painel/UserPropriedadesP
 const UserExtrato = lazy(() => import("./pages/painel/UserExtrato"));
 const AdminDashboardPage = lazy(() => import("./pages/painel/AdminDashboardPage"));
 const AdminImoveisPage = lazy(() => import("./pages/painel/AdminImoveisPage"));
-
 const AdminUsersPage = lazy(() => import("./pages/painel/AdminUsersPage"));
 const AdminRegistrosPage = lazy(() => import("./pages/painel/AdminRegistrosPage"));
 const AdminAtividadesPage = lazy(() => import("./pages/painel/AdminAtividadesPage"));
@@ -58,12 +55,12 @@ const AdminConfigPage = lazy(() => import("./pages/painel/AdminConfigPage"));
 const AdminLeiloesPage = lazy(() => import("./pages/painel/AdminLeiloesPage"));
 const UserLeiloesPage = lazy(() => import("./pages/painel/UserLeiloesPage"));
 const LeilaoDetailPage = lazy(() => import("./pages/painel/LeilaoDetailPage"));
-
 const UserComprovantesPage = lazy(() => import("./pages/painel/UserComprovantesPage"));
 const UserContratosPage = lazy(() => import("./pages/painel/UserContratosPage"));
 const UserProfilePage = lazy(() => import("./pages/painel/UserProfilePage"));
+const UserImoveis = lazy(() => import("./pages/painel/UserImoveis"));
+const UserTerrenosPage = lazy(() => import("./pages/painel/UserTerrenosPage"));
 
-// PainelLayout is the persistent layout for all /painel/* routes
 const PainelLayoutModule = lazy(() =>
   import("./components/painel/PainelLayout").then((m) => ({ default: m.PainelLayout }))
 );
@@ -75,7 +72,7 @@ const PageLoader = () => (
   </div>
 );
 
-const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
+const S = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<PageLoader />}>{children}</Suspense>
 );
 
@@ -83,49 +80,18 @@ const PS = ({ children, fallback }: { children: React.ReactNode; fallback: React
   <Suspense fallback={fallback}>{children}</Suspense>
 );
 
-const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <PageLoader />;
-  return <>{children}</>;
-};
-
 const languages: Language[] = ["pt", "en", "es"];
 
 const generateLanguageRoutes = (
   path: string,
   Component: React.LazyExoticComponent<() => JSX.Element>
-): RouteRecord[] =>
+): RouteObject[] =>
   languages.map((lang) => ({
     path: path ? `${lang}/${path}` : lang,
-    element: <SuspenseWrapper><Component /></SuspenseWrapper>,
+    element: <S><Component /></S>,
   }));
 
-const generateBlogPostRoutes = (): RouteRecord[] =>
-  languages.map((lang) => ({
-    path: `${lang}/blog/:slug`,
-    element: <SuspenseWrapper><BlogPost /></SuspenseWrapper>,
-    getStaticPaths: async () => {
-      try {
-        const dbSlugs = await fetchAllBlogSlugs();
-        const langSlugs = dbSlugs.filter((s) => s.language === lang).map((s) => `/${lang}/blog/${s.slug}`);
-        if (langSlugs.length > 0) {
-          const translationSlugs = translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
-          return [...new Set([...langSlugs, ...translationSlugs])];
-        }
-      } catch (e) {
-        console.warn(`SSG: Failed to fetch blog slugs for ${lang}`, e);
-      }
-      return translations[lang].blog.posts.map((post) => `/${lang}/blog/${post.slug}`);
-    },
-  }));
-
-// Panel child routes — rendered inside PainelLayout's <Outlet />
-const panelChildren: RouteRecord[] = [
+const panelChildren: RouteObject[] = [
   { index: true, element: <PS fallback={<DashboardSkeleton />}><Painel /></PS> },
   { path: "meus-projetos", element: <PS fallback={<PropertiesSkeleton />}><UserPropriedadesPage /></PS> },
   { path: "extrato", element: <PS fallback={<StatementSkeleton />}><UserExtrato /></PS> },
@@ -133,7 +99,6 @@ const panelChildren: RouteRecord[] = [
   { path: "imovel/:id/novidades", element: <PS fallback={<PropertySubPageSkeleton />}><PropertyNovidadesPage /></PS> },
   { path: "imovel/:id/gastos", element: <PS fallback={<PropertySubPageSkeleton />}><PropertyGastosPage /></PS> },
   { path: "propriedades", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminImoveisPage /></AdminGuard></PS> },
-  
   { path: "usuarios", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminUsersPage /></AdminGuard></PS> },
   { path: "registros", element: <PS fallback={<AdminListSkeleton />}><AdminGuard><AdminRegistrosPage /></AdminGuard></PS> },
   { path: "usuarios/:userId", element: <PS fallback={<ProfileSkeleton />}><AdminGuard><AdminUserProfilePage /></AdminGuard></PS> },
@@ -147,45 +112,42 @@ const panelChildren: RouteRecord[] = [
   { path: "informacoes", element: <PS fallback={<ProfileSkeleton />}><UserProfilePage /></PS> },
 ];
 
-export const routes: RouteRecord[] = [
+export const routes: RouteObject[] = [
+  // Public pages (with layout)
+  ...generateLanguageRoutes("", Index),
+  ...generateLanguageRoutes("terrenos", Terrenos),
+  ...generateLanguageRoutes("casas", Casas),
+  ...generateLanguageRoutes("imoveis", Imoveis),
+  ...generateLanguageRoutes("sobre", Sobre),
+  ...generateLanguageRoutes("contato", Contato),
+  ...generateLanguageRoutes("blog", Blog),
+  ...languages.map((lang): RouteObject => ({
+    path: `${lang}/blog/:slug`,
+    element: <S><BlogPost /></S>,
+  })),
+  ...generateLanguageRoutes("privacidade", PrivacyPolicy),
+  ...generateLanguageRoutes("termos", TermsOfUse),
+  ...generateLanguageRoutes("cookies", CookiePolicy),
+  ...generateLanguageRoutes("reembolso", RefundPolicy),
+  ...generateLanguageRoutes("aviso-de-risco", RiskDisclosure),
+
+  // Legacy routes
+  { path: "terrenos", element: <S><Terrenos /></S> },
+  { path: "casas", element: <S><Casas /></S> },
+  { path: "sobre", element: <S><Sobre /></S> },
+  { path: "contato", element: <S><Contato /></S> },
+  { path: "blog", element: <S><Blog /></S> },
+
+  // Auth
+  { path: "auth", element: <S><Auth /></S> },
+
+  // Panel
   {
-    path: "/",
-    element: <HydrationErrorBoundary><App /></HydrationErrorBoundary>,
-    children: [
-      { index: true, element: <SuspenseWrapper><Index /></SuspenseWrapper> },
-      ...generateLanguageRoutes("", Index),
-      ...generateLanguageRoutes("terrenos", Terrenos),
-      ...generateLanguageRoutes("casas", Casas),
-      ...generateLanguageRoutes("imoveis", Imoveis),
-      ...generateLanguageRoutes("sobre", Sobre),
-      ...generateLanguageRoutes("contato", Contato),
-      ...generateLanguageRoutes("blog", Blog),
-      ...generateBlogPostRoutes(),
-      ...generateLanguageRoutes("privacidade", PrivacyPolicy),
-      ...generateLanguageRoutes("termos", TermsOfUse),
-      ...generateLanguageRoutes("cookies", CookiePolicy),
-      ...generateLanguageRoutes("reembolso", RefundPolicy),
-      ...generateLanguageRoutes("aviso-de-risco", RiskDisclosure),
-
-      // Legacy routes
-      { path: "terrenos", element: <SuspenseWrapper><Terrenos /></SuspenseWrapper> },
-      { path: "casas", element: <SuspenseWrapper><Casas /></SuspenseWrapper> },
-      { path: "sobre", element: <SuspenseWrapper><Sobre /></SuspenseWrapper> },
-      { path: "contato", element: <SuspenseWrapper><Contato /></SuspenseWrapper> },
-      { path: "blog", element: <SuspenseWrapper><Blog /></SuspenseWrapper> },
-
-      // Auth
-      { path: "auth", element: <ClientOnly><SuspenseWrapper><Auth /></SuspenseWrapper></ClientOnly> },
-
-      // Panel — persistent layout with nested children
-      {
-        path: "painel",
-        element: <ClientOnly><SuspenseWrapper><PainelLayoutModule /></SuspenseWrapper></ClientOnly>,
-        children: panelChildren,
-      },
-
-      // 404
-      { path: "*", element: <SuspenseWrapper><NotFound /></SuspenseWrapper> },
-    ],
+    path: "painel",
+    element: <S><PainelLayoutModule /></S>,
+    children: panelChildren,
   },
+
+  // 404
+  { path: "*", element: <S><NotFound /></S> },
 ];

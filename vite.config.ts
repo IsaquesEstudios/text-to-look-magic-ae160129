@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -17,14 +16,5 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  // SSG Configuration
-  ssgOptions: {
-    script: "defer", // Critical: avoids race condition with manifest
-    formatting: "minify",
-    dirStyle: "nested",
-  },
-  ssr: {
-    noExternal: ["@tanstack/react-query"],
   },
 }));
