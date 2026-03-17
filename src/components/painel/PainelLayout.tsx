@@ -73,7 +73,7 @@ export function PainelLayout() {
   useEffect(() => {
     if (isLoading) return;
     if (!user) {
-      navigate("/auth", { replace: true });
+      navigate("/", { replace: true });
       return;
     }
     // If user exists in auth but has no profile (deleted/orphan account), sign out
