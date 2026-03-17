@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import type { RouteRecord } from "vite-react-ssg";
 import { AdminGuard } from "@/components/painel/AdminGuard";
+import { HydrationErrorBoundary } from "@/components/ErrorBoundary";
 import { translations, Language } from "@/i18n";
 import { fetchAllBlogSlugs } from "@/lib/blog";
 import {
@@ -143,7 +144,7 @@ const panelChildren: RouteRecord[] = [
 export const routes: RouteRecord[] = [
   {
     path: "/",
-    element: <App />,
+    element: <HydrationErrorBoundary><App /></HydrationErrorBoundary>,
     children: [
       { index: true, element: <SuspenseWrapper><Index /></SuspenseWrapper> },
       ...generateLanguageRoutes("", Index),

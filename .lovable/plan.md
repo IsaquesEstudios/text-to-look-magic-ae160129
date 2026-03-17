@@ -1,32 +1,44 @@
 
 
-## Diagnosis
+# Melhorias no Painel do Investidor
 
-The error **"Falha ao executar 'insertBefore' em 'Node'"** (Failed to execute 'insertBefore' on 'Node': The node before which the new node is to be inserted is not a child of this node) is a **DOM hydration mismatch** error. This happens when:
+## 1. Corrigir bug de calculo em "Meus Imoveis" (UserImoveis.tsx)
 
-1. The app uses **SSG (vite-react-ssg)** which pre-renders HTML on the server
-2. When React tries to **hydrate** the pre-rendered HTML in the browser, the DOM has been modified by something external (browser extensions, translation tools, ad blockers, etc.)
-3. React expects the DOM to match its virtual DOM exactly, and when it doesn't, this error occurs
+A pagina usa `purchase_price` e `estimated_return_pct` para calcular valores. Sera atualizada para usar a formula correta:
+- **Total do Projeto** = `estimated_auction_value` + `estimated_renovation_cost`
+- **Valor de Venda** = `estimated_sale_value`
+- **ROI** = `((Venda - Total) / Total) * 100`
+- **Retorno estimado do usuario** = participacao proporcional sobre a margem de lucro
 
-This is especially common on **mobile browsers** (like the user's Android Chrome) where:
-- Google Translate auto-translates the page, modifying DOM nodes
-- Browser extensions inject elements
-- Font/accessibility features modify text nodes
+## 2. Resumo do portfolio no Dashboard (UserDashboard.tsx)
 
-## Root Cause
+Adicionar dois novos KPIs na grade de estatisticas do dashboard, calculados a partir dos `shares` e `properties`:
+- **Total Investido**: soma de todos os `amount_paid` do usuario
+- **Retorno Estimado Total**: soma dos retornos proporcionais de cada imovel
 
-The project uses `ViteReactSSG` for static site generation. The SSG pre-renders pages as HTML, and React hydrates them on the client. If any browser feature (especially Google Translate or similar) modifies the DOM between the HTML load and React hydration, this crash occurs.
+Substituir o card generico "Leiloes" por esses dois KPIs mais uteis, mantendo o link para leiloes em outro local.
 
-## Plan
+## 3. Porcentagem de participacao nos cards de imoveis
 
-1. **Add `translate="no"` attribute to the root HTML element** in `index.html` to prevent Google Translate from modifying the DOM before hydration (the app already has its own i18n system)
+Em **UserImoveis.tsx**, exibir a % de participacao do usuario em cada imovel (calculado como `totalPaid / totalProject * 100`).
 
-2. **Wrap the app in a React Error Boundary** that catches this specific DOM error gracefully and forces a full client-side re-render instead of showing a crash screen. This way even if some extension modifies the DOM, the user gets a working page instead of an error.
+Em **UserLeiloesPage.tsx**, nos cards de imoveis onde o usuario tem depositos, mostrar a participacao relativa.
 
-3. **Add `suppressHydrationWarnings`** on the root element to make React more tolerant of minor DOM mismatches.
+## 4. Extrato mais descritivo
 
-### Files to modify:
-- `index.html` -- add `translate="no"` to `<html>` tag
-- `src/App.tsx` or create `src/components/ErrorBoundary.tsx` -- add error boundary that catches DOM errors and retries rendering
-- `src/routes.tsx` -- wrap root layout with the error boundary
+No **UserDashboard.tsx**, melhorar os titulos do historico recente para incluir o tipo `refund` como "Estorno" e exibir valores negativos/positivos com cores distintas.
+
+---
+
+### Detalhes tecnicos
+
+**Arquivo: `src/pages/painel/UserImoveis.tsx`**
+- Linhas 76-80: substituir calculo por formula dinamica usando `estimated_auction_value`, `estimated_renovation_cost`, `estimated_sale_value`
+- Linha 132-134: atualizar badge de ROI
+- Adicionar badge com % de participacao
+
+**Arquivo: `src/components/painel/UserDashboard.tsx`**
+- Linhas 133-134: calcular `totalInvested` e `totalEstimatedReturn` a partir dos shares
+- Linhas 157-191: reorganizar grid de KPIs para incluir Total Investido e Retorno Estimado
+- Linhas 40-47: adicionar mapeamento para tipo `refund` -> "Estorno" e colorir valores
 
