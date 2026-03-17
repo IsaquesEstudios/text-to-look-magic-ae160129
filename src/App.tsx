@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useRoutes } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Suspense, useEffect, useState } from "react";
 import { Loader2, WifiOff } from "lucide-react";
@@ -12,19 +12,18 @@ import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { InstallPWABanner } from "@/components/InstallPWABanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { routes } from "./routes";
 
-// Optimized QueryClient for SSG
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
     },
   },
 });
 
-// Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-background">
     <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
@@ -32,7 +31,6 @@ const PageLoader = () => (
   </div>
 );
 
-// Offline screen component
 const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-[#141414] text-white px-8"
     style={{ paddingTop: 'env(safe-area-inset-top, 2rem)', paddingBottom: 'env(safe-area-inset-bottom, 2rem)' }}>
@@ -48,31 +46,8 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
   </div>
 );
 
-// Root redirect handler
 const RootRedirect = () => {
-  const location = useLocation();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const target = mounted && Capacitor.isNativePlatform() ? "/auth" : "/pt";
-
-  useEffect(() => {
-    if (mounted && location.pathname === "/") {
-      window.location.replace(target);
-    }
-  }, [mounted, location.pathname, target]);
-
-  if (location.pathname !== "/") {
-    return null;
-  }
-
-  if (!mounted) {
-    return <PageLoader />;
-  }
-
+  const target = Capacitor.isNativePlatform() ? "/auth" : "/pt";
   return <Navigate to={target} replace />;
 };
 
@@ -80,22 +55,21 @@ const App = () => {
   const location = useLocation();
   const { isOnline, checkConnection } = useOnlineStatus();
   const auth = useAuthInternal();
+  const routeElement = useRoutes(routes);
 
   if (!isOnline) {
     return <OfflineScreen onRetry={checkConnection} />;
   }
-  
-  // Handle root redirect
+
   if (location.pathname === "/") {
     return <RootRedirect />;
   }
-  
-  // Handle legacy routes redirect
+
   const legacyRoutes = ["/terrenos", "/casas", "/sobre", "/contato", "/blog"];
   if (legacyRoutes.includes(location.pathname)) {
     return <Navigate to={`/pt${location.pathname}`} replace />;
   }
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={auth}>
@@ -104,9 +78,7 @@ const App = () => {
           <Sonner />
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
-            <div suppressHydrationWarning>
-              <Outlet />
-            </div>
+            {routeElement}
           </Suspense>
           <CookieConsentBanner />
           <InstallPWABanner />

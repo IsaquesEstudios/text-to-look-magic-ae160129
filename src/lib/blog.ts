@@ -1,4 +1,4 @@
-import { supabaseSSR } from "./supabase-ssr";
+import { supabase as supabaseSSR } from "@/integrations/supabase/client";
 import { Language } from "@/i18n";
 
 // Type definition for blog post from database
