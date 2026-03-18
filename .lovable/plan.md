@@ -1,35 +1,44 @@
 
 
-## Plan: Create Public Account Deletion Request Page
+# Melhorias no Painel do Investidor
 
-### What
-A public page at `/excluir-conta` with:
-- Discovery logo
-- Explanation of the deletion process (what happens, timeline)
-- Email input form to submit a deletion request
-- Confirmation message after submission
-- Bilingual support (PT/EN)
+## 1. Corrigir bug de calculo em "Meus Imoveis" (UserImoveis.tsx)
 
-### Implementation
+A pagina usa `purchase_price` e `estimated_return_pct` para calcular valores. Sera atualizada para usar a formula correta:
+- **Total do Projeto** = `estimated_auction_value` + `estimated_renovation_cost`
+- **Valor de Venda** = `estimated_sale_value`
+- **ROI** = `((Venda - Total) / Total) * 100`
+- **Retorno estimado do usuario** = participacao proporcional sobre a margem de lucro
 
-**1. Create `src/pages/ExcluirConta.tsx`**
-- Public page (no auth required)
-- Discovery logo at top
-- Card with explanation of the process:
-  - What data will be deleted
-  - Timeline (up to 30 days)
-  - How the user will be notified
-- Simple form: email input + submit button
-- On submit: insert into a new `account_deletion_requests` table and show success message
-- Clean, professional design matching the app's style
+## 2. Resumo do portfolio no Dashboard (UserDashboard.tsx)
 
-**2. Create database table `account_deletion_requests`**
-- Columns: `id`, `email`, `status` (default 'pending'), `created_at`
-- RLS: public INSERT (no auth needed), admin SELECT
+Adicionar dois novos KPIs na grade de estatisticas do dashboard, calculados a partir dos `shares` e `properties`:
+- **Total Investido**: soma de todos os `amount_paid` do usuario
+- **Retorno Estimado Total**: soma dos retornos proporcionais de cada imovel
 
-**3. Add route to `src/routes.tsx`**
-- Add `/excluir-conta` as a public route pointing to the new page
+Substituir o card generico "Leiloes" por esses dois KPIs mais uteis, mantendo o link para leiloes em outro local.
 
-### Delete Account URL for Google Play
-The final URL will be: `https://text-to-look-magic.lovable.app/excluir-conta`
+## 3. Porcentagem de participacao nos cards de imoveis
+
+Em **UserImoveis.tsx**, exibir a % de participacao do usuario em cada imovel (calculado como `totalPaid / totalProject * 100`).
+
+Em **UserLeiloesPage.tsx**, nos cards de imoveis onde o usuario tem depositos, mostrar a participacao relativa.
+
+## 4. Extrato mais descritivo
+
+No **UserDashboard.tsx**, melhorar os titulos do historico recente para incluir o tipo `refund` como "Estorno" e exibir valores negativos/positivos com cores distintas.
+
+---
+
+### Detalhes tecnicos
+
+**Arquivo: `src/pages/painel/UserImoveis.tsx`**
+- Linhas 76-80: substituir calculo por formula dinamica usando `estimated_auction_value`, `estimated_renovation_cost`, `estimated_sale_value`
+- Linha 132-134: atualizar badge de ROI
+- Adicionar badge com % de participacao
+
+**Arquivo: `src/components/painel/UserDashboard.tsx`**
+- Linhas 133-134: calcular `totalInvested` e `totalEstimatedReturn` a partir dos shares
+- Linhas 157-191: reorganizar grid de KPIs para incluir Total Investido e Retorno Estimado
+- Linhas 40-47: adicionar mapeamento para tipo `refund` -> "Estorno" e colorir valores
 
