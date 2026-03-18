@@ -18,6 +18,7 @@ import {
 
 // Lazy load pages
 const Auth = lazy(() => import("./pages/Auth"));
+const ExcluirConta = lazy(() => import("./pages/ExcluirConta"));
 
 // Panel pages
 const Painel = lazy(() => import("./pages/Painel"));
