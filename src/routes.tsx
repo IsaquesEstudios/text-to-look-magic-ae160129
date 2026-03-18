@@ -83,6 +83,7 @@ const panelChildren: RouteObject[] = [
 export const routes: RouteObject[] = [
   // Auth is the homepage
   { path: "/", element: <S><Auth /></S> },
+  { path: "/excluir-conta", element: <S><ExcluirConta /></S> },
 
   // Panel
   {
