@@ -228,7 +228,7 @@ export default function AdminUserProfilePage() {
       refetchImages();
       toast({ title: p.imagesSent });
     } catch (err: any) {
-      toast({ title: p.sendError, description: err.message, variant: "destructive" });
+      toast({ title: p.sendError, description: p.unexpectedError, variant: "destructive" });
     } finally {
       setUploading(false);
       e.target.value = "";
