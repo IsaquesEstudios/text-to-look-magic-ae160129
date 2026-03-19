@@ -274,7 +274,7 @@ export default function AdminUserProfilePage() {
 
   if (!profile) return <p className="text-center text-muted-foreground py-16">Usuário não encontrado.</p>;
 
-  const credits = Number(profile.credits) || 0;
+  
 
   return (
     <div className="space-y-4">
