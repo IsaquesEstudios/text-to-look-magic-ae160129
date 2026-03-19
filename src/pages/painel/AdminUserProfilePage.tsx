@@ -278,9 +278,23 @@ export default function AdminUserProfilePage() {
   };
 
   const credits = Number(profile?.credits) || 0;
-  const linkedProperties = userShares ?? [];
+
+  // Consolidate multiple shares in the same property
+  const consolidatedShares = (() => {
+    const map = new Map<string, { property_id: string; total_paid: number; property?: { id: string; title: string; type: string } }>();
+    for (const s of userShares ?? []) {
+      const existing = map.get(s.property_id);
+      if (existing) {
+        existing.total_paid += Number(s.amount_paid);
+      } else {
+        map.set(s.property_id, { property_id: s.property_id, total_paid: Number(s.amount_paid), property: s.property });
+      }
+    }
+    return Array.from(map.values());
+  })();
+
   const hasBalance = credits > 0;
-  const hasLinkedProperties = linkedProperties.length > 0;
+  const hasLinkedProperties = consolidatedShares.length > 0;
 
   if (isLoading) {
     return (
@@ -348,16 +362,16 @@ export default function AdminUserProfilePage() {
                     </AlertDescription>
                   </Alert>
                 )}
-                {hasLinkedProperties && (
+                 {hasLinkedProperties && (
                   <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>{p.linkedPropertiesTitle}</AlertTitle>
                     <AlertDescription>
-                      {p.linkedPropertiesWarning.replace("{count}", String(linkedProperties.length))}
+                      {p.linkedPropertiesWarning.replace("{count}", String(consolidatedShares.length))}
                       <ul className="list-disc pl-4 mt-1 space-y-0.5">
-                        {linkedProperties.map(s => (
-                          <li key={s.id}>
-                            {s.property?.title || p.propertiesLabel} — ${Number(s.amount_paid).toLocaleString("en-US")}
+                        {consolidatedShares.map(s => (
+                          <li key={s.property_id}>
+                            {s.property?.title || p.propertiesLabel} — ${s.total_paid.toLocaleString("en-US")}
                           </li>
                         ))}
                       </ul>
