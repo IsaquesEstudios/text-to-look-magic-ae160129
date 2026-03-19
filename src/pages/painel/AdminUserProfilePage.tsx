@@ -45,6 +45,8 @@ export default function AdminUserProfilePage() {
   const [creditDisplayAmount, setCreditDisplayAmount] = useState("");
   const [savingCredits, setSavingCredits] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["admin-user-profile", userId],
