@@ -138,6 +138,56 @@ export default function LeilaoDetailPage() {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
+  const updateItemMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingItemId) return;
+      const { error } = await supabase.from("auction_items").update({
+        title: editItemForm.title.trim(),
+        type: editItemForm.type === "house" ? "casa" : "terreno",
+        location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
+        state_code: editItemForm.state_code || null,
+        estimated_auction_value: parseFloat(editItemForm.estimated_auction_value) || 0,
+        estimated_renovation_cost: parseFloat(editItemForm.estimated_renovation_cost) || 0,
+        estimated_sale_value: parseFloat(editItemForm.estimated_sale_value) || 0,
+        estimated_timeline: editItemForm.estimated_timeline.trim(),
+        status: editItemForm.status,
+        cover_image_url: editItemForm.coverImage,
+        image_url: editItemForm.coverImage,
+        gallery_images: editItemForm.galleryImages,
+        description: editItemForm.estimated_timeline.trim() || null,
+      }).eq("id", editingItemId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      toast({ title: "Imóvel atualizado!" });
+      setEditingItemId(null);
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const startEditingItem = (item: any) => {
+    const loc = item.location || "";
+    const city = item.state_code ? loc.replace(`, ${item.state_code}`, "").trim() : loc;
+    setEditItemForm({
+      type: item.type === "terreno" ? "land" : "house",
+      title: item.title || "",
+      location: city,
+      state_code: item.state_code || "",
+      estimated_auction_value: String(item.estimated_auction_value || ""),
+      estimated_renovation_cost: String(item.estimated_renovation_cost || ""),
+      estimated_return_pct: "",
+      estimated_sale_value: String(item.estimated_sale_value || ""),
+      estimated_timeline: item.estimated_timeline || "",
+      total_shares: "1",
+      share_price: "",
+      status: item.status || "available",
+      coverImage: item.cover_image_url || item.image_url || null,
+      galleryImages: item.gallery_images || [],
+    });
+    setEditingItemId(item.id);
+  };
+
   const addPropertyMutation = useMutation({
     mutationFn: async () => {
       for (const pForm of newPropertyForms) {
