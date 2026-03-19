@@ -373,8 +373,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
       invalidateAll();
       onClose();
-    } catch (error) {
-      toast({ title: p.error, description: getFriendlyErrorMessage(error), variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: p.error, description: error?.message ?? p.unexpectedError, variant: "destructive" });
     } finally {
       setLoading(false);
     }
