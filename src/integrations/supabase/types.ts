@@ -73,34 +73,58 @@ export type Database = {
       auction_items: {
         Row: {
           auction_id: string
+          cover_image_url: string | null
           created_at: string
           description: string | null
+          estimated_auction_value: number | null
+          estimated_renovation_cost: number | null
+          estimated_sale_value: number | null
+          estimated_timeline: string | null
+          gallery_images: string[] | null
           id: string
           image_url: string | null
           location: string | null
           property_id: string | null
+          state_code: string | null
+          status: string | null
           title: string
           type: string
         }
         Insert: {
           auction_id: string
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          estimated_auction_value?: number | null
+          estimated_renovation_cost?: number | null
+          estimated_sale_value?: number | null
+          estimated_timeline?: string | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           location?: string | null
           property_id?: string | null
+          state_code?: string | null
+          status?: string | null
           title: string
           type?: string
         }
         Update: {
           auction_id?: string
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          estimated_auction_value?: number | null
+          estimated_renovation_cost?: number | null
+          estimated_sale_value?: number | null
+          estimated_timeline?: string | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           location?: string | null
           property_id?: string | null
+          state_code?: string | null
+          status?: string | null
           title?: string
           type?: string
         }
