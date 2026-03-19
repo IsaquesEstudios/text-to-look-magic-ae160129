@@ -222,7 +222,7 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-destructive"
-                  onClick={() => unlinkMutation.mutate(inv.shareIds)}
+                  onClick={() => unlinkMutation.mutate(inv.userId)}
                   disabled={unlinkMutation.isPending}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
