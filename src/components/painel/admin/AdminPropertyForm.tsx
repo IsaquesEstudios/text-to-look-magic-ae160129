@@ -363,7 +363,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           if (error) {
             toast({
               title: p.error,
-              description: getFriendlyErrorMessage(error),
+              description: error.message,
               variant: "destructive",
             });
           }
