@@ -340,8 +340,12 @@ export type Database = {
           country: string | null
           created_at: string
           credits: number
+          ein: string | null
           full_name: string | null
           id: string
+          itin_ssn: string | null
+          passport: string | null
+          person_type: string | null
           phone: string | null
           postal_code: string | null
           preferred_language: string
@@ -361,8 +365,12 @@ export type Database = {
           country?: string | null
           created_at?: string
           credits?: number
+          ein?: string | null
           full_name?: string | null
           id?: string
+          itin_ssn?: string | null
+          passport?: string | null
+          person_type?: string | null
           phone?: string | null
           postal_code?: string | null
           preferred_language?: string
@@ -382,8 +390,12 @@ export type Database = {
           country?: string | null
           created_at?: string
           credits?: number
+          ein?: string | null
           full_name?: string | null
           id?: string
+          itin_ssn?: string | null
+          passport?: string | null
+          person_type?: string | null
           phone?: string | null
           postal_code?: string | null
           preferred_language?: string
