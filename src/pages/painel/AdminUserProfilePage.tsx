@@ -53,6 +53,21 @@ export default function AdminUserProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    full_name: "",
+    phone: "",
+    whatsapp: "",
+    country: "",
+    postal_code: "",
+    address_street: "",
+    address_number: "",
+    address_complement: "",
+    address_neighborhood: "",
+    address_city: "",
+    address_state: "",
+  });
 
   const dateLoc = dateLocaleMap[lang] || ptBR;
 
