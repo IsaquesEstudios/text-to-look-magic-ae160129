@@ -300,7 +300,6 @@ export default function Auth() {
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
                 ))}
               </div>
-              </div>
             )}
           </CardHeader>
           <CardContent>
