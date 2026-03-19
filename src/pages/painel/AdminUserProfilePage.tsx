@@ -499,62 +499,134 @@ export default function AdminUserProfilePage() {
         </CardHeader>
         <CardContent>
           {editingProfile ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              {([
-                ["full_name", p.fullName],
-                ["phone", p.phone],
-                ["whatsapp", "WhatsApp"],
-                ["country", p.country],
-                ["postal_code", p.postalCode],
-                ["address_street", p.street],
-                ["address_number", p.numberLabel],
-                ["address_complement", p.complement],
-                ["address_neighborhood", p.neighborhood],
-                ["address_city", p.city],
-                ["address_state", p.state],
-              ] as [keyof typeof profileForm, string][]).map(([key, label]) => (
-                <div key={key} className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{label}</Label>
-                  <Input
-                    value={profileForm[key]}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, [key]: e.target.value }))}
-                    className="h-9"
-                  />
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                {([
+                  ["full_name", p.fullName],
+                  ["phone", p.phone],
+                  ["whatsapp", "WhatsApp"],
+                  ["country", p.country],
+                  ["postal_code", p.postalCode],
+                  ["address_street", p.street],
+                  ["address_number", p.numberLabel],
+                  ["address_complement", p.complement],
+                  ["address_neighborhood", p.neighborhood],
+                  ["address_city", p.city],
+                  ["address_state", p.state],
+                ] as [keyof typeof profileForm, string][]).map(([key, label]) => (
+                  <div key={key} className="flex flex-col gap-1">
+                    <Label className="text-xs text-muted-foreground">{label}</Label>
+                    <Input
+                      value={profileForm[key] as string}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, [key]: e.target.value }))}
+                      className="h-9"
+                    />
+                  </div>
+                ))}
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
+                  <span className="text-foreground mt-2">
+                    {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
+                  </span>
                 </div>
-              ))}
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
-                <span className="text-foreground mt-2">
-                  {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
-                </span>
+              </div>
+
+              <div className="border-t border-border/50 pt-4 space-y-3">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs text-muted-foreground">Tipo de pessoa</Label>
+                  <Select value={profileForm.person_type} onValueChange={(v: "individual" | "business") => setProfileForm(prev => ({ ...prev, person_type: v }))}>
+                    <SelectTrigger className="h-9 w-full sm:w-64">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="individual">Pessoa Física</SelectItem>
+                      <SelectItem value="business">Pessoa Jurídica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {profileForm.person_type === "individual" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    <div className="flex flex-col gap-1">
+                      <Label className="text-xs text-muted-foreground">ITIN/SSN</Label>
+                      <Input value={profileForm.itin_ssn} onChange={(e) => setProfileForm(prev => ({ ...prev, itin_ssn: e.target.value }))} className="h-9" maxLength={20} />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Label className="text-xs text-muted-foreground">Passaporte</Label>
+                      <Input value={profileForm.passport} onChange={(e) => setProfileForm(prev => ({ ...prev, passport: e.target.value }))} className="h-9" maxLength={30} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    <div className="flex flex-col gap-1">
+                      <Label className="text-xs text-muted-foreground">EIN</Label>
+                      <Input value={profileForm.ein} onChange={(e) => setProfileForm(prev => ({ ...prev, ein: e.target.value }))} className="h-9" maxLength={20} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              {[
-                [p.fullName, profile.full_name],
-                [p.phone, profile.phone],
-                ["WhatsApp", profile.whatsapp],
-                [p.country, profile.country],
-                [p.postalCode, profile.postal_code],
-                [p.street, profile.address_street],
-                [p.numberLabel, profile.address_number],
-                [p.complement, profile.address_complement],
-                [p.neighborhood, profile.address_neighborhood],
-                [p.city, profile.address_city],
-                [p.state, profile.address_state],
-              ].map(([label, value]) => (
-                <div key={label as string} className="flex flex-col gap-0.5">
-                  <span className="text-muted-foreground text-xs">{label}</span>
-                  <span className="text-foreground">{(value as string) || "—"}</span>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                {[
+                  [p.fullName, profile.full_name],
+                  [p.phone, profile.phone],
+                  ["WhatsApp", profile.whatsapp],
+                  [p.country, profile.country],
+                  [p.postalCode, profile.postal_code],
+                  [p.street, profile.address_street],
+                  [p.numberLabel, profile.address_number],
+                  [p.complement, profile.address_complement],
+                  [p.neighborhood, profile.address_neighborhood],
+                  [p.city, profile.address_city],
+                  [p.state, profile.address_state],
+                ].map(([label, value]) => (
+                  <div key={label as string} className="flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">{label}</span>
+                    <span className="text-foreground">{(value as string) || "—"}</span>
+                  </div>
+                ))}
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
+                  <span className="text-foreground">
+                    {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
+                  </span>
                 </div>
-              ))}
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
-                <span className="text-foreground">
-                  {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
-                </span>
               </div>
+
+              {(() => {
+                const pr = profile as any;
+                const personType = pr.person_type || "individual";
+                return (
+                  <div className="border-t border-border/50 pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-muted-foreground text-xs">Tipo de pessoa</span>
+                        <span className="text-foreground">
+                          {personType === "business" ? "Pessoa Jurídica" : "Pessoa Física"}
+                        </span>
+                      </div>
+                      {personType === "individual" ? (
+                        <>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-muted-foreground text-xs">ITIN/SSN</span>
+                            <span className="text-foreground">{pr.itin_ssn || "—"}</span>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-muted-foreground text-xs">Passaporte</span>
+                            <span className="text-foreground">{pr.passport || "—"}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-muted-foreground text-xs">EIN</span>
+                          <span className="text-foreground">{pr.ein || "—"}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </CardContent>
