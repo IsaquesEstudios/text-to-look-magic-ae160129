@@ -32,6 +32,9 @@ import {
   Trash2,
   Gavel,
   UserX,
+  Pencil,
+  Save,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
