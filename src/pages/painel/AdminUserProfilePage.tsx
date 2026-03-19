@@ -4,6 +4,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +30,7 @@ import {
   ArrowUpRight,
   Trash2,
   Gavel,
+  UserX,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -32,6 +45,8 @@ export default function AdminUserProfilePage() {
   const [creditDisplayAmount, setCreditDisplayAmount] = useState("");
   const [savingCredits, setSavingCredits] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["admin-user-profile", userId],
@@ -97,6 +112,26 @@ export default function AdminUserProfilePage() {
         g.total += Number(d.amount);
       }
       return Array.from(grouped.values());
+    },
+    enabled: !!userId && !!user && isAdmin,
+  });
+
+  const { data: userShares } = useQuery({
+    queryKey: ["admin-user-shares", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shares")
+        .select("id, property_id, amount_paid")
+        .eq("user_id", userId!);
+      if (error) throw error;
+      if (!data || data.length === 0) return [];
+      const propertyIds = [...new Set(data.map(s => s.property_id))];
+      const { data: props } = await supabase
+        .from("properties")
+        .select("id, title, type")
+        .in("id", propertyIds);
+      const propMap = new Map((props ?? []).map(p => [p.id, p]));
+      return data.map(s => ({ ...s, property: propMap.get(s.property_id) }));
     },
     enabled: !!userId && !!user && isAdmin,
   });
@@ -194,6 +229,41 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userId) return;
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ user_id: userId }),
+        }
+      );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Erro ao excluir");
+      toast({ title: "Usuário excluído com sucesso" });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
+      navigate("/painel/usuarios");
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const credits = Number(profile?.credits) || 0;
+  const linkedProperties = userShares ?? [];
+  const hasBalance = credits > 0;
+  const hasLinkedProperties = linkedProperties.length > 0;
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
@@ -204,7 +274,7 @@ export default function AdminUserProfilePage() {
 
   if (!profile) return <p className="text-center text-muted-foreground py-16">Usuário não encontrado.</p>;
 
-  const credits = Number(profile.credits) || 0;
+  
 
   return (
     <div className="space-y-4">
@@ -223,11 +293,78 @@ export default function AdminUserProfilePage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">{userId}</p>
         </div>
-        <Badge variant="outline" className="border-primary/30 text-primary text-base px-4 py-1.5">
-          <DollarSign className="h-4 w-4 mr-1" />
-          {credits.toLocaleString("en-US")}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="border-primary/30 text-primary text-base px-4 py-1.5">
+            <DollarSign className="h-4 w-4 mr-1" />
+            {credits.toLocaleString("en-US")}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <UserX className="h-4 w-4" />
+            Excluir
+          </Button>
+        </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Excluir Usuário
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Tem certeza que deseja excluir a conta de{" "}
+                  <strong>{profile.full_name || "este usuário"}</strong>? Esta ação é irreversível.
+                </p>
+                {hasBalance && (
+                  <Alert variant="destructive" className="border-yellow-500/50 text-yellow-600 [&>svg]:text-yellow-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Saldo em conta</AlertTitle>
+                    <AlertDescription>
+                      Este usuário possui <strong>${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong> em créditos. O saldo será perdido permanentemente.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {hasLinkedProperties && (
+                  <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Vínculos a propriedades</AlertTitle>
+                    <AlertDescription>
+                      Este usuário está vinculado a {linkedProperties.length} propriedade{linkedProperties.length > 1 ? "s" : ""}:
+                      <ul className="list-disc pl-4 mt-1 space-y-0.5">
+                        {linkedProperties.map(s => (
+                          <li key={s.id}>
+                            {s.property?.title || "Propriedade"} — ${Number(s.amount_paid).toLocaleString("en-US")}
+                          </li>
+                        ))}
+                      </ul>
+                      Todos os vínculos serão removidos permanentemente.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Excluir permanentemente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
