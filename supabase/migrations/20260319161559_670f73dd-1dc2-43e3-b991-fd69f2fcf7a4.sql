@@ -1,0 +1,1 @@
+ALTER TABLE properties ALTER COLUMN estimated_return_pct TYPE numeric(7,2);

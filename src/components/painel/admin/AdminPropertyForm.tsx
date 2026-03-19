@@ -23,7 +23,7 @@ interface InvestorToLink {
 }
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
-const MAX_PROPERTY_ROI = 999.99;
+const MAX_PROPERTY_ROI = 99_999.99;
 
 const currencySchema = z.coerce.number().min(0).max(MAX_PROPERTY_AMOUNT);
 
