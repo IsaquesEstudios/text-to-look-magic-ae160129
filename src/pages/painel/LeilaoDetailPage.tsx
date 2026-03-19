@@ -142,10 +142,14 @@ export default function LeilaoDetailPage() {
     mutationFn: async () => {
       if (!editingItemId) return;
       const item = items?.find((i) => i.id === editingItemId);
+      const resolvedTitle =
+        editItemForm.title.trim() ||
+        (editItemForm.type === "house" ? "Imóvel do leilão" : "Terreno do leilão");
+      const resolvedLocation = `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`;
       const updatedData = {
-        title: editItemForm.title.trim(),
+        title: resolvedTitle,
         type: editItemForm.type === "house" ? "casa" : "terreno",
-        location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
+        location: resolvedLocation,
         state_code: editItemForm.state_code || null,
         estimated_auction_value: parseFloat(editItemForm.estimated_auction_value) || 0,
         estimated_renovation_cost: parseFloat(editItemForm.estimated_renovation_cost) || 0,
@@ -160,7 +164,6 @@ export default function LeilaoDetailPage() {
       const { error } = await supabase.from("auction_items").update(updatedData).eq("id", editingItemId);
       if (error) throw error;
 
-      // If a property is already linked, sync changes to it
       if (item?.property_id) {
         const auctionVal = parseFloat(editItemForm.estimated_auction_value) || 0;
         const renovationVal = parseFloat(editItemForm.estimated_renovation_cost) || 0;
@@ -169,9 +172,9 @@ export default function LeilaoDetailPage() {
         const roi = totalProjeto > 0 ? ((saleVal - totalProjeto) / totalProjeto) * 100 : 0;
 
         const { error: propError } = await supabase.from("properties").update({
-          title: editItemForm.title.trim(),
+          title: resolvedTitle,
           type: editItemForm.type === "house" ? "house" : "land",
-          location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
+          location: resolvedLocation,
           state_code: editItemForm.state_code || null,
           estimated_auction_value: auctionVal,
           estimated_renovation_cost: renovationVal,
@@ -197,9 +200,10 @@ export default function LeilaoDetailPage() {
   const startEditingItem = (item: any) => {
     const loc = item.location || "";
     const city = item.state_code ? loc.replace(`, ${item.state_code}`, "").trim() : loc;
+    const fallbackTitle = item.title?.trim() || (item.type === "terreno" ? "Terreno do leilão" : "Imóvel do leilão");
     setEditItemForm({
       type: item.type === "terreno" ? "land" : "house",
-      title: item.title || "",
+      title: fallbackTitle,
       location: city,
       state_code: item.state_code || "",
       estimated_auction_value: String(item.estimated_auction_value || ""),
