@@ -334,7 +334,7 @@ export default function AdminUserProfilePage() {
         })
         .eq("user_id", userId);
       if (error) throw error;
-      toast({ title: p.saved || "Salvo com sucesso" });
+      toast({ title: "Perfil atualizado" });
       setEditingProfile(false);
       queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
