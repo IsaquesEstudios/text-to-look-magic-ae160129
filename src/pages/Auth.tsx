@@ -290,7 +290,9 @@ export default function Auth() {
                   ? a.signupDescription
                   : step === 2
                     ? a.chooseLanguageDescription
-                    : a.completeProfile}
+                    : step === 3
+                      ? a.completeProfile
+                      : (a as any).personTypeDescription}
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
