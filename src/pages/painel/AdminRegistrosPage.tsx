@@ -82,6 +82,23 @@ export default function AdminRegistrosPage() {
     },
   });
 
+  const dismissRegistration = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ registration_dismissed: true } as any)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
+      toast({ title: "Registro ocultado", description: "O registro foi removido da lista." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    },
+  });
+
   const pending = registrations?.filter(r => r.status === "pending") ?? [];
   const approved = registrations?.filter(r => r.status === "approved") ?? [];
   const rejected = registrations?.filter(r => r.status === "rejected") ?? [];
