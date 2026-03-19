@@ -379,7 +379,7 @@ export default function LeilaoDetailPage() {
                     )}
                     {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
                   </div>
-                  {isAdmin && auction.status !== "finished" && (
+                  {isAdmin && (
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <Button
                         variant="ghost"
@@ -389,15 +389,17 @@ export default function LeilaoDetailPage() {
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                        onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
-                        disabled={removeItemMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {auction.status !== "finished" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
+                          disabled={removeItemMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
