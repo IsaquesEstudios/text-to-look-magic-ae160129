@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft, Check, Clock, LogOut, ShieldX, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check, Clock, LogOut, ShieldX, Mail, User, Building2 } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
