@@ -333,7 +333,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
 
               {/* Financial summary from auction_item data */}
               {totalProject > 0 && (
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div className="rounded-lg bg-secondary/20 p-2 text-center">
                     <p className="text-muted-foreground">Est. Arremate</p>
                     <p className="font-semibold">${formatUSD(auctionVal)}</p>
@@ -341,6 +341,10 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                   <div className="rounded-lg bg-secondary/20 p-2 text-center">
                     <p className="text-muted-foreground">Est. Reforma</p>
                     <p className="font-semibold">${formatUSD(renovationVal)}</p>
+                  </div>
+                  <div className="rounded-lg bg-primary/10 p-2 text-center border border-primary/20">
+                    <p className="text-muted-foreground">Est. Total</p>
+                    <p className="font-semibold text-primary">${formatUSD(totalProject)}</p>
                   </div>
                   <div className="rounded-lg bg-secondary/20 p-2 text-center">
                     <p className="text-muted-foreground">Est. Venda</p>
