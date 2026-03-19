@@ -141,7 +141,8 @@ export default function LeilaoDetailPage() {
   const updateItemMutation = useMutation({
     mutationFn: async () => {
       if (!editingItemId) return;
-      const { error } = await supabase.from("auction_items").update({
+      const item = items?.find((i) => i.id === editingItemId);
+      const updatedData = {
         title: editItemForm.title.trim(),
         type: editItemForm.type === "house" ? "casa" : "terreno",
         location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
@@ -155,11 +156,38 @@ export default function LeilaoDetailPage() {
         image_url: editItemForm.coverImage,
         gallery_images: editItemForm.galleryImages,
         description: editItemForm.estimated_timeline.trim() || null,
-      }).eq("id", editingItemId);
+      };
+      const { error } = await supabase.from("auction_items").update(updatedData).eq("id", editingItemId);
       if (error) throw error;
+
+      // If a property is already linked, sync changes to it
+      if (item?.property_id) {
+        const auctionVal = parseFloat(editItemForm.estimated_auction_value) || 0;
+        const renovationVal = parseFloat(editItemForm.estimated_renovation_cost) || 0;
+        const saleVal = parseFloat(editItemForm.estimated_sale_value) || 0;
+        const totalProjeto = auctionVal + renovationVal;
+        const roi = totalProjeto > 0 ? ((saleVal - totalProjeto) / totalProjeto) * 100 : 0;
+
+        const { error: propError } = await supabase.from("properties").update({
+          title: editItemForm.title.trim(),
+          type: editItemForm.type === "house" ? "house" : "land",
+          location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
+          state_code: editItemForm.state_code || null,
+          estimated_auction_value: auctionVal,
+          estimated_renovation_cost: renovationVal,
+          estimated_sale_value: saleVal,
+          estimated_return_pct: Math.min(roi, 99999.99),
+          estimated_timeline: editItemForm.estimated_timeline.trim(),
+          status: editItemForm.status,
+          cover_image_url: editItemForm.coverImage,
+        }).eq("id", item.property_id);
+        if (propError) throw propError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["user-properties"] });
       toast({ title: "Imóvel atualizado!" });
       setEditingItemId(null);
     },
@@ -343,7 +371,7 @@ export default function LeilaoDetailPage() {
                       size="sm"
                       className="gap-2"
                       onClick={() => updateItemMutation.mutate()}
-                      disabled={!editItemForm.title || updateItemMutation.isPending}
+                      disabled={!editItemForm.title.trim() || updateItemMutation.isPending}
                     >
                       <Save className="h-4 w-4" />
                       {updateItemMutation.isPending ? "Salvando..." : "Salvar"}
