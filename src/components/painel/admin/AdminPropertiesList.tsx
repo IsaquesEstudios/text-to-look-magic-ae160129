@@ -58,6 +58,12 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {properties.map((property) => {
         const status = statusLabels[property.status] || statusLabels.available;
+        const auction = Number(property.estimated_auction_value || 0);
+        const renovation = Number(property.estimated_renovation_cost || 0);
+        const serviceFee = property.type === "house" ? 5000 : 500;
+        const totalProject = auction + serviceFee + renovation + renovation * 0.12;
+        const sale = Number(property.estimated_sale_value || 0);
+        const roi = totalProject > 0 ? ((sale - totalProject) / totalProject) * 100 : 0;
         return (
           <Card
             key={property.id}
@@ -109,25 +115,25 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
                   <p className="font-semibold text-foreground">
-                    ${Number(property.estimated_auction_value || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    ${auction.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
                   <p className="font-semibold text-foreground">
-                    ${Number(property.estimated_renovation_cost || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    ${renovation.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total</p>
                   <p className="font-semibold text-foreground">
-                    ${Number(property.purchase_price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    ${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
-                  <p className="font-semibold text-primary">
-                    {Number(property.estimated_return_pct)}%
+                  <p className={`font-semibold ${roi > 0 ? "text-primary" : roi < 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                    {roi.toFixed(1)}%
                   </p>
                 </div>
               </div>
