@@ -66,11 +66,67 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
         const roi = totalProject > 0 ? ((sale - totalProject) / totalProject) * 100 : 0;
         return (
           <Card
-...
+            key={property.id}
+            className="group border-border/30 bg-card/40 overflow-hidden hover:bg-card/70 transition-all duration-300"
+          >
+            <div className="aspect-[16/10] relative bg-secondary/50">
+              {property.cover_image_url ? (
+                <img
+                  src={property.cover_image_url}
+                  alt={property.title}
+                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  {property.type === "house" ? (
+                    <Home className="h-10 w-10 text-muted-foreground/20" />
+                  ) : (
+                    <TreePine className="h-10 w-10 text-muted-foreground/20" />
+                  )}
+                </div>
+              )}
+              <div className="absolute top-3 right-3">
+                <Badge variant={status.variant} className="text-xs font-medium shadow-sm">
+                  {status.label}
+                </Badge>
+              </div>
+            </div>
+
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground truncate">{property.title}</h3>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{property.location}</span>
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary flex-shrink-0"
+                  onClick={() => onEdit(property.id)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
                 <div>
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
-...
+                  <p className="font-semibold text-foreground">
+                    ${auction.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
+                  <p className="font-semibold text-foreground">
+                    ${renovation.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total</p>
+                  <p className="font-semibold text-foreground">
                     ${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
