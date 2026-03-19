@@ -396,15 +396,6 @@ export default function AdminUserProfilePage() {
             <DollarSign className="h-4 w-4 mr-1" />
             {credits.toLocaleString("en-US")}
           </Badge>
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            <UserX className="h-4 w-4" />
-            {p.deleteUser}
-          </Button>
         </div>
       </div>
 
@@ -467,12 +458,7 @@ export default function AdminUserProfilePage() {
       <Card className="bg-card/50 border-border/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">{p.profileInfo}</CardTitle>
-          {!editingProfile ? (
-            <Button variant="ghost" size="sm" onClick={startEditingProfile} className="gap-1.5">
-              <Pencil className="h-3.5 w-3.5" />
-              Editar
-            </Button>
-          ) : (
+          {editingProfile && (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => setEditingProfile(false)} disabled={savingProfile}>
                 <X className="h-3.5 w-3.5" />
@@ -748,6 +734,27 @@ export default function AdminUserProfilePage() {
           {p.uploadingImages}
         </div>
       )}
+
+      <div className="flex gap-3 pt-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={startEditingProfile}
+          className="gap-1.5"
+        >
+          <Pencil className="h-4 w-4" />
+          Editar perfil
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
+          onClick={() => setShowDeleteDialog(true)}
+        >
+          <UserX className="h-4 w-4" />
+          {p.deleteUser}
+        </Button>
+      </div>
     </div>
   );
 }
