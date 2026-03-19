@@ -39,6 +39,8 @@ export default function UserProfilePage() {
     country: "", address_street: "", address_number: "", address_complement: "",
     address_neighborhood: "", address_city: "", address_state: "", postal_code: "",
     preferred_language: "pt",
+    person_type: "individual" as "individual" | "business",
+    itin_ssn: "", passport: "", ein: "",
   });
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
