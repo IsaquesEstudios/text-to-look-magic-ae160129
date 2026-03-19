@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import {
   ArrowLeft,
   Upload,
@@ -33,13 +34,18 @@ import {
   UserX,
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, enUS, es } from "date-fns/locale";
+
+const MAX_CREDITS = 99_999_999.99;
+
+const dateLocaleMap: Record<string, any> = { pt: ptBR, en: enUS, es };
 
 export default function AdminUserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { p, lang } = usePanelTranslation();
   const queryClient = useQueryClient();
   const [creditRawAmount, setCreditRawAmount] = useState(0);
   const [creditDisplayAmount, setCreditDisplayAmount] = useState("");
@@ -47,6 +53,8 @@ export default function AdminUserProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const dateLoc = dateLocaleMap[lang] || ptBR;
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["admin-user-profile", userId],
@@ -143,15 +151,25 @@ export default function AdminUserProfilePage() {
     if (!userId || creditRawAmount === 0 || !user) return;
     const amount = creditRawAmount / 100;
     if (amount <= 0) {
-      toast({ title: "Valor inválido", variant: "destructive" });
+      toast({ title: p.invalidValue, variant: "destructive" });
+      return;
+    }
+    if (amount > MAX_CREDITS) {
+      toast({ title: p.maxValueExceeded, variant: "destructive" });
       return;
     }
     setSavingCredits(true);
     try {
       const currentCredits = Number(profile?.credits) || 0;
+      const newTotal = currentCredits + amount;
+      if (newTotal > MAX_CREDITS) {
+        toast({ title: p.maxValueExceeded, variant: "destructive" });
+        setSavingCredits(false);
+        return;
+      }
       const { error: profileError } = await supabase
         .from("profiles")
-        .update({ credits: currentCredits + amount })
+        .update({ credits: newTotal })
         .eq("user_id", userId);
       if (profileError) throw profileError;
 
@@ -161,19 +179,19 @@ export default function AdminUserProfilePage() {
           user_id: userId,
           amount,
           type: "deposit",
-          description: `Crédito adicionado pelo admin`,
+          description: p.creditAddedByAdmin,
           created_by: user.id,
         });
       if (txError) throw txError;
 
-      toast({ title: `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} adicionados com sucesso!` });
+      toast({ title: `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${p.creditsAdded}` });
       setCreditRawAmount(0);
       setCreditDisplayAmount("");
       queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
     } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
+      toast({ title: p.error, description: err.message, variant: "destructive" });
     } finally {
       setSavingCredits(false);
     }
@@ -208,9 +226,9 @@ export default function AdminUserProfilePage() {
         });
       }
       refetchImages();
-      toast({ title: "Imagens enviadas!" });
+      toast({ title: p.imagesSent });
     } catch (err: any) {
-      toast({ title: "Erro ao enviar", description: err.message, variant: "destructive" });
+      toast({ title: p.sendError, description: err.message, variant: "destructive" });
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -223,7 +241,7 @@ export default function AdminUserProfilePage() {
       .delete()
       .eq("id", imageId);
     if (error) {
-      toast({ title: "Erro ao remover", variant: "destructive" });
+      toast({ title: p.removeError, variant: "destructive" });
     } else {
       refetchImages();
     }
@@ -246,13 +264,13 @@ export default function AdminUserProfilePage() {
         }
       );
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Erro ao excluir");
-      toast({ title: "Usuário excluído com sucesso" });
+      if (!res.ok) throw new Error(result.error || p.error);
+      toast({ title: p.userDeleted });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
       navigate("/painel/usuarios");
     } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
+      toast({ title: p.error, description: err.message, variant: "destructive" });
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);
@@ -272,9 +290,7 @@ export default function AdminUserProfilePage() {
     );
   }
 
-  if (!profile) return <p className="text-center text-muted-foreground py-16">Usuário não encontrado.</p>;
-
-  
+  if (!profile) return <p className="text-center text-muted-foreground py-16">{p.userNotFound}</p>;
 
   return (
     <div className="space-y-4">
@@ -283,13 +299,13 @@ export default function AdminUserProfilePage() {
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Voltar para Usuários
+        {p.backToUsers}
       </button>
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
-            {profile.full_name || "Sem nome"}
+            {profile.full_name || p.noName}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">{userId}</p>
         </div>
@@ -305,7 +321,7 @@ export default function AdminUserProfilePage() {
             onClick={() => setShowDeleteDialog(true)}
           >
             <UserX className="h-4 w-4" />
-            Excluir
+            {p.deleteUser}
           </Button>
         </div>
       </div>
@@ -315,37 +331,37 @@ export default function AdminUserProfilePage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              Excluir Usuário
+              {p.deleteUserTitle}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
                 <p>
-                  Tem certeza que deseja excluir a conta de{" "}
-                  <strong>{profile.full_name || "este usuário"}</strong>? Esta ação é irreversível.
+                  {p.deleteUserConfirm}{" "}
+                  <strong>{profile.full_name || p.noName}</strong>? {p.deleteUserIrreversible}
                 </p>
                 {hasBalance && (
                   <Alert variant="destructive" className="border-yellow-500/50 text-yellow-600 [&>svg]:text-yellow-600">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Saldo em conta</AlertTitle>
+                    <AlertTitle>{p.balanceWarningTitle}</AlertTitle>
                     <AlertDescription>
-                      Este usuário possui <strong>${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong> em créditos. O saldo será perdido permanentemente.
+                      {p.balanceWarning.replace("{amount}", `$${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}`)}
                     </AlertDescription>
                   </Alert>
                 )}
                 {hasLinkedProperties && (
                   <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Vínculos a propriedades</AlertTitle>
+                    <AlertTitle>{p.linkedPropertiesTitle}</AlertTitle>
                     <AlertDescription>
-                      Este usuário está vinculado a {linkedProperties.length} propriedade{linkedProperties.length > 1 ? "s" : ""}:
+                      {p.linkedPropertiesWarning.replace("{count}", String(linkedProperties.length))}
                       <ul className="list-disc pl-4 mt-1 space-y-0.5">
                         {linkedProperties.map(s => (
                           <li key={s.id}>
-                            {s.property?.title || "Propriedade"} — ${Number(s.amount_paid).toLocaleString("en-US")}
+                            {s.property?.title || p.propertiesLabel} — ${Number(s.amount_paid).toLocaleString("en-US")}
                           </li>
                         ))}
                       </ul>
-                      Todos os vínculos serão removidos permanentemente.
+                      {p.linkedPropertiesRemoved}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -353,14 +369,14 @@ export default function AdminUserProfilePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{p.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteUser}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              Excluir permanentemente
+              {p.deletePermanently}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -368,22 +384,22 @@ export default function AdminUserProfilePage() {
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
-          <CardTitle className="text-base">Informações do Perfil</CardTitle>
+          <CardTitle className="text-base">{p.profileInfo}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
             {[
-              ["Nome completo", profile.full_name],
-              ["Telefone", profile.phone],
+              [p.fullName, profile.full_name],
+              [p.phone, profile.phone],
               ["WhatsApp", profile.whatsapp],
-              ["País", profile.country],
-              ["CEP / Postal Code", profile.postal_code],
-              ["Rua", profile.address_street],
-              ["Número", profile.address_number],
-              ["Complemento", profile.address_complement],
-              ["Bairro", profile.address_neighborhood],
-              ["Cidade", profile.address_city],
-              ["Estado", profile.address_state],
+              [p.country, profile.country],
+              [p.postalCode, profile.postal_code],
+              [p.street, profile.address_street],
+              [p.numberLabel, profile.address_number],
+              [p.complement, profile.address_complement],
+              [p.neighborhood, profile.address_neighborhood],
+              [p.city, profile.address_city],
+              [p.state, profile.address_state],
             ].map(([label, value]) => (
               <div key={label as string} className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">{label}</span>
@@ -391,9 +407,9 @@ export default function AdminUserProfilePage() {
               </div>
             ))}
             <div className="flex flex-col gap-0.5">
-              <span className="text-muted-foreground text-xs">Cadastrado em</span>
+              <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
               <span className="text-foreground">
-                {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
               </span>
             </div>
           </div>
@@ -402,12 +418,12 @@ export default function AdminUserProfilePage() {
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
-          <CardTitle className="text-base">Adicionar Créditos</CardTitle>
+          <CardTitle className="text-base">{p.addCredits}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3 items-end">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="credits">Valor ($)</Label>
+              <Label htmlFor="credits">{p.valueLabel}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
                 <Input
@@ -418,11 +434,13 @@ export default function AdminUserProfilePage() {
                   onChange={(e) => {
                     const input = e.target.value.replace(/[^0-9]/g, "");
                     const cents = parseInt(input || "0", 10);
-                    setCreditRawAmount(cents);
-                    if (cents === 0) {
+                    // Cap at max value in cents
+                    const cappedCents = Math.min(cents, MAX_CREDITS * 100);
+                    setCreditRawAmount(cappedCents);
+                    if (cappedCents === 0) {
                       setCreditDisplayAmount("");
                     } else {
-                      setCreditDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                      setCreditDisplayAmount((cappedCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                     }
                   }}
                   placeholder="0.00"
@@ -436,7 +454,7 @@ export default function AdminUserProfilePage() {
               className="h-10"
             >
               {savingCredits && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              Adicionar
+              {p.add}
             </Button>
           </div>
         </CardContent>
@@ -446,13 +464,13 @@ export default function AdminUserProfilePage() {
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Gavel className="h-4 w-4 text-primary" />
-            Leilões Investidos
+            {p.auctionsInvested}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {!auctionInvestments || auctionInvestments.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhum investimento em leilões
+              {p.noAuctionInvestments}
             </p>
           ) : (
             <div className="space-y-4">
@@ -460,10 +478,10 @@ export default function AdminUserProfilePage() {
                 <div key={item.auction?.id || Math.random()} className="border border-border/50 rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-foreground">{item.auction?.title || "Leilão"}</p>
+                      <p className="font-medium text-foreground">{item.auction?.title || p.auctionsTitle}</p>
                       <p className="text-xs text-muted-foreground">
                         {item.auction?.scheduled_start
-                          ? format(new Date(item.auction.scheduled_start), "dd MMM yyyy", { locale: ptBR })
+                          ? format(new Date(item.auction.scheduled_start), "dd MMM yyyy", { locale: dateLoc })
                           : "—"}
                       </p>
                     </div>
@@ -472,7 +490,7 @@ export default function AdminUserProfilePage() {
                         Total: ${item.total.toLocaleString("en-US")}
                       </Badge>
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        {item.deposits.length} depósito{item.deposits.length !== 1 ? "s" : ""}
+                        {item.deposits.length} {p.depositsCount}
                       </p>
                     </div>
                   </div>
@@ -480,7 +498,7 @@ export default function AdminUserProfilePage() {
                     {item.deposits.map((d: any) => (
                       <div key={d.id} className="flex items-center justify-between text-sm py-1 px-2 rounded hover:bg-muted/50">
                         <span className="text-muted-foreground">
-                          {format(new Date(d.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {format(new Date(d.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
                         </span>
                         <span className="font-medium text-foreground">${Number(d.amount).toLocaleString("en-US")}</span>
                       </div>
@@ -497,13 +515,13 @@ export default function AdminUserProfilePage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <ArrowDownLeft className="h-4 w-4 text-primary" />
-            Pagamentos Recebidos do Cliente
+            {p.paymentsReceived}
           </CardTitle>
           <label className="cursor-pointer">
             <Button variant="outline" size="sm" className="gap-2" asChild>
               <span>
                 <Upload className="h-3.5 w-3.5" />
-                Enviar
+                {p.send}
               </span>
             </Button>
             <input
@@ -518,7 +536,7 @@ export default function AdminUserProfilePage() {
         <CardContent>
           {receivedImages.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              Nenhum comprovante enviado
+              {p.noReceipts}
             </p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -533,7 +551,7 @@ export default function AdminUserProfilePage() {
                   </button>
                   <div className="absolute bottom-0 left-0 right-0 bg-background/70 px-2 py-1">
                     <p className="text-[10px] text-muted-foreground truncate">
-                      {new Date(img.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(img.created_at).toLocaleDateString(lang === "pt" ? "pt-BR" : lang === "es" ? "es-ES" : "en-US")}
                     </p>
                   </div>
                 </div>
@@ -547,13 +565,13 @@ export default function AdminUserProfilePage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-            Pagamentos Feitos para o Cliente
+            {p.paymentsSent}
           </CardTitle>
           <label className="cursor-pointer">
             <Button variant="outline" size="sm" className="gap-2" asChild>
               <span>
                 <Upload className="h-3.5 w-3.5" />
-                Enviar
+                {p.send}
               </span>
             </Button>
             <input
@@ -568,7 +586,7 @@ export default function AdminUserProfilePage() {
         <CardContent>
           {sentImages.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              Nenhum comprovante enviado
+              {p.noReceipts}
             </p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -583,7 +601,7 @@ export default function AdminUserProfilePage() {
                   </button>
                   <div className="absolute bottom-0 left-0 right-0 bg-background/70 px-2 py-1">
                     <p className="text-[10px] text-muted-foreground truncate">
-                      {new Date(img.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(img.created_at).toLocaleDateString(lang === "pt" ? "pt-BR" : lang === "es" ? "es-ES" : "en-US")}
                     </p>
                   </div>
                 </div>
@@ -596,7 +614,7 @@ export default function AdminUserProfilePage() {
       {uploading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Enviando imagens...
+          {p.uploadingImages}
         </div>
       )}
     </div>
