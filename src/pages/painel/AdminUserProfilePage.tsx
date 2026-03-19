@@ -295,6 +295,56 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const startEditingProfile = () => {
+    if (!profile) return;
+    setProfileForm({
+      full_name: profile.full_name || "",
+      phone: profile.phone || "",
+      whatsapp: profile.whatsapp || "",
+      country: profile.country || "",
+      postal_code: profile.postal_code || "",
+      address_street: profile.address_street || "",
+      address_number: profile.address_number || "",
+      address_complement: profile.address_complement || "",
+      address_neighborhood: profile.address_neighborhood || "",
+      address_city: profile.address_city || "",
+      address_state: profile.address_state || "",
+    });
+    setEditingProfile(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!userId) return;
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profileForm.full_name || null,
+          phone: profileForm.phone || null,
+          whatsapp: profileForm.whatsapp || null,
+          country: profileForm.country || null,
+          postal_code: profileForm.postal_code || null,
+          address_street: profileForm.address_street || null,
+          address_number: profileForm.address_number || null,
+          address_complement: profileForm.address_complement || null,
+          address_neighborhood: profileForm.address_neighborhood || null,
+          address_city: profileForm.address_city || null,
+          address_state: profileForm.address_state || null,
+        })
+        .eq("user_id", userId);
+      if (error) throw error;
+      toast({ title: p.saved || "Salvo com sucesso" });
+      setEditingProfile(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch {
+      toast({ title: p.error, description: p.unexpectedError, variant: "destructive" });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   const credits = Number(profile?.credits) || 0;
 
   // Consolidate multiple shares in the same property
