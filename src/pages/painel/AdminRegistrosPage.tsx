@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, Loader2, Clock, UserCheck, UserX, Mail, Phone, MapPin, Globe } from "lucide-react";
+import { Check, X, Loader2, Clock, UserCheck, UserX, Phone, MapPin, Globe, EyeOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
