@@ -68,6 +68,8 @@ export default function LeilaoDetailPage() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", scheduled_start: "" });
   const [newPropertyForms, setNewPropertyForms] = useState<AuctionPropertyData[]>([]);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editItemForm, setEditItemForm] = useState<AuctionPropertyData>({ ...emptyPropertyData });
   const [showAddProperty, setShowAddProperty] = useState(false);
 
   const { data: auction } = useQuery({
