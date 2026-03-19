@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, Loader2, Clock, UserCheck, UserX, Mail, Phone, MapPin, Globe } from "lucide-react";
+import { Check, X, Loader2, Clock, UserCheck, UserX, Phone, MapPin, Globe, EyeOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -37,7 +37,7 @@ export default function AdminRegistrosPage() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at")
+        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at, registration_dismissed")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
@@ -50,7 +50,7 @@ export default function AdminRegistrosPage() {
       const adminIds = new Set((adminRoles ?? []).map(r => r.user_id));
 
       // Filter out admin users
-      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id));
+      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id) && !p.registration_dismissed);
 
       return nonAdminProfiles.map(p => ({
         ...p,
@@ -76,6 +76,23 @@ export default function AdminRegistrosPage() {
           ? "O usuário agora pode acessar a plataforma."
           : "O acesso do usuário foi negado.",
       });
+    },
+    onError: (error: any) => {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const dismissRegistration = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ registration_dismissed: true } as any)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
+      toast({ title: "Registro ocultado", description: "O registro foi removido da lista." });
     },
     onError: (error: any) => {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -166,7 +183,7 @@ export default function AdminRegistrosPage() {
               </div>
             )}
             {!showActions && reg.status === "rejected" && (
-              <div className="pt-1.5">
+              <div className="flex items-center gap-2 pt-1.5">
                 <Button
                   size="sm"
                   variant="outline"
@@ -175,6 +192,28 @@ export default function AdminRegistrosPage() {
                   disabled={updateStatus.isPending}
                 >
                   <Check className="h-3.5 w-3.5" /> Aprovar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
+                  onClick={() => dismissRegistration.mutate(reg.user_id)}
+                  disabled={dismissRegistration.isPending}
+                >
+                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
+                </Button>
+              </div>
+            )}
+            {!showActions && reg.status === "approved" && (
+              <div className="pt-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
+                  onClick={() => dismissRegistration.mutate(reg.user_id)}
+                  disabled={dismissRegistration.isPending}
+                >
+                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
                 </Button>
               </div>
             )}
