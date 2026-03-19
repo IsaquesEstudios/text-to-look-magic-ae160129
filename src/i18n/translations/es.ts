@@ -586,6 +586,7 @@ export const es = {
     maxValueExceeded: "Valor máximo permitido: $99.999.999,99",
     creditsAdded: "agregados con éxito!",
     error: "Error",
+    unexpectedError: "Ocurrió un error inesperado. Inténtalo de nuevo.",
     auctionsInvested: "Subastas Invertidas",
     noAuctionInvestments: "Sin inversiones en subastas",
     depositsCount: "depósito(s)",
