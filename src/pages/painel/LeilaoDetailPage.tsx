@@ -68,6 +68,8 @@ export default function LeilaoDetailPage() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", scheduled_start: "" });
   const [newPropertyForms, setNewPropertyForms] = useState<AuctionPropertyData[]>([]);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editItemForm, setEditItemForm] = useState<AuctionPropertyData>({ ...emptyPropertyData });
   const [showAddProperty, setShowAddProperty] = useState(false);
 
   const { data: auction } = useQuery({
@@ -135,6 +137,56 @@ export default function LeilaoDetailPage() {
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
+
+  const updateItemMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingItemId) return;
+      const { error } = await supabase.from("auction_items").update({
+        title: editItemForm.title.trim(),
+        type: editItemForm.type === "house" ? "casa" : "terreno",
+        location: `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`,
+        state_code: editItemForm.state_code || null,
+        estimated_auction_value: parseFloat(editItemForm.estimated_auction_value) || 0,
+        estimated_renovation_cost: parseFloat(editItemForm.estimated_renovation_cost) || 0,
+        estimated_sale_value: parseFloat(editItemForm.estimated_sale_value) || 0,
+        estimated_timeline: editItemForm.estimated_timeline.trim(),
+        status: editItemForm.status,
+        cover_image_url: editItemForm.coverImage,
+        image_url: editItemForm.coverImage,
+        gallery_images: editItemForm.galleryImages,
+        description: editItemForm.estimated_timeline.trim() || null,
+      }).eq("id", editingItemId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
+      toast({ title: "Imóvel atualizado!" });
+      setEditingItemId(null);
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const startEditingItem = (item: any) => {
+    const loc = item.location || "";
+    const city = item.state_code ? loc.replace(`, ${item.state_code}`, "").trim() : loc;
+    setEditItemForm({
+      type: item.type === "terreno" ? "land" : "house",
+      title: item.title || "",
+      location: city,
+      state_code: item.state_code || "",
+      estimated_auction_value: String(item.estimated_auction_value || ""),
+      estimated_renovation_cost: String(item.estimated_renovation_cost || ""),
+      estimated_return_pct: "",
+      estimated_sale_value: String(item.estimated_sale_value || ""),
+      estimated_timeline: item.estimated_timeline || "",
+      total_shares: "1",
+      share_price: "",
+      status: item.status || "available",
+      coverImage: item.cover_image_url || item.image_url || null,
+      galleryImages: item.gallery_images || [],
+    });
+    setEditingItemId(item.id);
+  };
 
   const addPropertyMutation = useMutation({
     mutationFn: async () => {
@@ -278,7 +330,30 @@ export default function LeilaoDetailPage() {
           )}
           {items && items.length > 0 && (
             <div className="grid gap-3">
-              {items.map((item) => (
+              {items.map((item) => editingItemId === item.id ? (
+                <div key={item.id} className="space-y-4">
+                  <AuctionPropertyForm
+                    index={0}
+                    data={editItemForm}
+                    onChange={setEditItemForm}
+                    onRemove={() => setEditingItemId(null)}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => updateItemMutation.mutate()}
+                      disabled={!editItemForm.title || updateItemMutation.isPending}
+                    >
+                      <Save className="h-4 w-4" />
+                      {updateItemMutation.isPending ? "Salvando..." : "Salvar"}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditingItemId(null)} className="gap-2">
+                      <X className="h-4 w-4" /> Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
                 <div
                   key={item.id}
                   className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
@@ -305,15 +380,25 @@ export default function LeilaoDetailPage() {
                     {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
                   </div>
                   {isAdmin && auction.status !== "finished" && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive flex-shrink-0"
-                      onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
-                      disabled={removeItemMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => { e.stopPropagation(); startEditingItem(item); }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
+                        disabled={removeItemMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))}
