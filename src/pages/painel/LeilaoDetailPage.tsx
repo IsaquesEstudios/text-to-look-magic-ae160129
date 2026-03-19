@@ -200,9 +200,10 @@ export default function LeilaoDetailPage() {
   const startEditingItem = (item: any) => {
     const loc = item.location || "";
     const city = item.state_code ? loc.replace(`, ${item.state_code}`, "").trim() : loc;
+    const fallbackTitle = item.title?.trim() || (item.type === "terreno" ? "Terreno do leilão" : "Imóvel do leilão");
     setEditItemForm({
       type: item.type === "terreno" ? "land" : "house",
-      title: item.title || "",
+      title: fallbackTitle,
       location: city,
       state_code: item.state_code || "",
       estimated_auction_value: String(item.estimated_auction_value || ""),
