@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +22,25 @@ interface InvestorToLink {
   displayAmount: string;
 }
 
+const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
+const MAX_PROPERTY_ROI = 999.99;
+
+const currencySchema = z.coerce.number().min(0).max(MAX_PROPERTY_AMOUNT);
+
+const propertyFormSchema = z.object({
+  type: z.enum(["house", "land"]),
+  title: z.string().trim().min(1).max(200),
+  location: z.string().trim().min(1).max(200),
+  state_code: z.string().trim().min(1).max(10),
+  total_shares: z.coerce.number().int().min(1).max(1_000_000),
+  share_price: currencySchema,
+  status: z.string().trim().min(1).max(50),
+  estimated_auction_value: currencySchema,
+  estimated_renovation_cost: currencySchema,
+  estimated_sale_value: currencySchema,
+  estimated_timeline: z.string().trim().max(100),
+});
+
 function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -30,6 +51,7 @@ function getServiceFee(type: string): number {
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { user } = useAuth();
+  const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
@@ -86,33 +108,42 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         .select("user_id")
         .eq("role", "admin");
       const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
-      return data.filter((p) => !adminIds.has(p.user_id));
+      return data.filter((profile) => !adminIds.has(profile.user_id));
     },
     enabled: !propertyId,
   });
 
-  const totalProjeto =
-    (parseFloat(form.estimated_auction_value) || 0) +
-    (parseFloat(form.estimated_renovation_cost) || 0);
-
+  const auctionValue = parseFloat(form.estimated_auction_value) || 0;
+  const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
+  const totalProjeto = auctionValue + renovationCost;
   const serviceFee = getServiceFee(form.type);
+  const renovationServiceFee = renovationCost * 0.12;
+  const totalProjetoComTaxas = totalProjeto + serviceFee + renovationServiceFee;
 
   // Calculate already-added amounts per investor
-  const totalLinked = investorsToLink.reduce((s, inv) => s + inv.rawAmount / 100, 0);
+  const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
   const remaining = totalProjeto - totalLinked;
 
   // Build a map of credits already "reserved" by pending links
   const reservedCredits = new Map<string, number>();
-  for (const inv of investorsToLink) {
-    const amount = inv.rawAmount / 100;
+  for (const investor of investorsToLink) {
+    const amount = investor.rawAmount / 100;
     const fee = totalProjeto > 0 ? Math.min(Math.round((amount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
-    reservedCredits.set(inv.userId, (reservedCredits.get(inv.userId) ?? 0) + amount + fee);
+    reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
   }
 
   const getAvailableCredits = (userId: string) => {
-    const inv = investorsWithCredits?.find((i) => i.user_id === userId);
-    if (!inv) return 0;
-    return Number(inv.credits) - (reservedCredits.get(userId) ?? 0);
+    const investor = investorsWithCredits?.find((item) => item.user_id === userId);
+    if (!investor) return 0;
+    return Number(investor.credits) - (reservedCredits.get(userId) ?? 0);
+  };
+
+  const getFriendlyErrorMessage = (error: unknown) => {
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error ?? "").toLowerCase();
+    if (message.includes("numeric field overflow")) {
+      return p.maxValueExceeded;
+    }
+    return p.unexpectedError;
   };
 
   // Current link preview
@@ -136,10 +167,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   };
 
   const removeInvestorFromList = (index: number) => {
-    setInvestorsToLink((prev) => prev.filter((_, i) => i !== index));
+    setInvestorsToLink((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   };
 
-  // Load existing property
   useEffect(() => {
     if (!propertyId) return;
     const load = async () => {
@@ -149,26 +179,26 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       ]);
 
       if (propRes.data) {
-        const p = propRes.data;
+        const property = propRes.data;
         setForm({
-          type: p.type as "house" | "land",
-          title: p.title,
-          location: p.location,
-          state_code: p.state_code ?? "",
-          total_shares: String(p.total_shares),
-          share_price: String(p.share_price),
-          status: p.status,
-          estimated_auction_value: String(p.estimated_auction_value ?? 0),
-          estimated_renovation_cost: String(p.estimated_renovation_cost ?? 0),
-          estimated_return_pct: String(p.estimated_return_pct ?? 0),
-          estimated_sale_value: String(p.estimated_sale_value ?? 0),
-          estimated_timeline: p.estimated_timeline ?? "",
+          type: property.type as "house" | "land",
+          title: property.title,
+          location: property.location,
+          state_code: property.state_code ?? "",
+          total_shares: String(property.total_shares),
+          share_price: String(property.share_price),
+          status: property.status,
+          estimated_auction_value: String(property.estimated_auction_value ?? 0),
+          estimated_renovation_cost: String(property.estimated_renovation_cost ?? 0),
+          estimated_return_pct: String(property.estimated_return_pct ?? 0),
+          estimated_sale_value: String(property.estimated_sale_value ?? 0),
+          estimated_timeline: property.estimated_timeline ?? "",
         });
-        setCoverImage(p.cover_image_url);
+        setCoverImage(property.cover_image_url);
       }
 
       if (imgRes.data) {
-        setGalleryImages(imgRes.data.map((i) => i.image_url));
+        setGalleryImages(imgRes.data.map((image) => image.image_url));
       }
     };
     load();
@@ -211,7 +241,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   };
 
   const removeGalleryImage = (index: number) => {
-    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+    setGalleryImages((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   };
 
   const invalidateAll = () => {
@@ -229,29 +259,64 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    const parsedForm = propertyFormSchema.safeParse({
+      type: form.type,
+      title: form.title,
+      location: form.location,
+      state_code: form.state_code,
+      total_shares: form.total_shares,
+      share_price: form.share_price || 0,
+      status: form.status,
+      estimated_auction_value: form.estimated_auction_value || 0,
+      estimated_renovation_cost: form.estimated_renovation_cost || 0,
+      estimated_sale_value: form.estimated_sale_value || 0,
+      estimated_timeline: form.estimated_timeline,
+    });
+
+    if (!parsedForm.success) {
+      toast({ title: p.error, description: p.invalidValue, variant: "destructive" });
+      return;
+    }
+
+    const validated = parsedForm.data;
+    const validatedServiceFee = getServiceFee(validated.type);
+    const validatedRenovationFee = validated.estimated_renovation_cost * 0.12;
+    const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
+    const validatedTotalProjetoComTaxas = validatedTotalProjeto + validatedServiceFee + validatedRenovationFee;
+    const calculatedReturn = validatedTotalProjetoComTaxas > 0
+      ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas) / validatedTotalProjetoComTaxas) * 100
+      : 0;
+
+    if (
+      validatedTotalProjetoComTaxas > MAX_PROPERTY_AMOUNT ||
+      !Number.isFinite(calculatedReturn) ||
+      Math.abs(calculatedReturn) > MAX_PROPERTY_ROI
+    ) {
+      toast({ title: p.error, description: p.maxValueExceeded, variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const saleValue = parseFloat(form.estimated_sale_value) || 0;
-      const calculatedReturn = totalProjeto > 0 ? ((saleValue - totalProjeto) / totalProjeto) * 100 : 0;
-
       const propertyData = {
-        type: form.type,
-        title: form.title.trim(),
-        location: form.location.trim(),
-        state_code: form.state_code || null,
-        purchase_price: totalProjeto,
-        estimated_return_pct: Math.round(calculatedReturn * 10) / 10,
-        total_shares: parseInt(form.total_shares) || 1,
-        share_price: parseFloat(form.share_price) || 0,
-        available_shares: parseInt(form.total_shares) || 1,
-        status: form.status,
+        type: validated.type,
+        title: validated.title.trim(),
+        location: validated.location.trim(),
+        state_code: validated.state_code || null,
+        purchase_price: validatedTotalProjetoComTaxas,
+        estimated_return_pct: Math.round(calculatedReturn * 100) / 100,
+        total_shares: validated.total_shares,
+        share_price: validated.share_price,
+        available_shares: validated.total_shares,
+        status: validated.status,
         cover_image_url: coverImage,
         created_by: user.id,
-        estimated_auction_value: parseFloat(form.estimated_auction_value) || 0,
-        estimated_renovation_cost: parseFloat(form.estimated_renovation_cost) || 0,
-        estimated_sale_value: saleValue,
-        estimated_timeline: form.estimated_timeline.trim(),
+        estimated_auction_value: validated.estimated_auction_value,
+        estimated_renovation_cost: validated.estimated_renovation_cost,
+        estimated_sale_value: validated.estimated_sale_value,
+        estimated_timeline: validated.estimated_timeline.trim(),
       };
 
       let propId = propertyId;
@@ -272,35 +337,33 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         propId = data.id;
       }
 
-      // Sync gallery images
       if (propId) {
         await supabase.from("property_images").delete().eq("property_id", propId);
         if (galleryImages.length > 0) {
           await supabase.from("property_images").insert(
-            galleryImages.map((url, i) => ({
+            galleryImages.map((url, index) => ({
               property_id: propId!,
               image_url: url,
-              sort_order: i,
+              sort_order: index,
             }))
           );
         }
       }
 
-      // Link investors (only for new properties)
       if (propId && !propertyId && investorsToLink.length > 0) {
-        for (const inv of investorsToLink) {
-          const amount = inv.rawAmount / 100;
+        for (const investor of investorsToLink) {
+          const amount = investor.rawAmount / 100;
           const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
             p_property_id: propId,
-            p_user_id: inv.userId,
+            p_user_id: investor.userId,
             p_amount: amount,
-            p_property_type: form.type,
-            p_property_title: form.title.trim(),
+            p_property_type: validated.type,
+            p_property_title: validated.title.trim(),
           });
           if (error) {
             toast({
-              title: "Erro ao vincular investidor",
-              description: error.message,
+              title: p.error,
+              description: getFriendlyErrorMessage(error),
               variant: "destructive",
             });
           }
@@ -310,8 +373,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
       invalidateAll();
       onClose();
-    } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({ title: p.error, description: getFriendlyErrorMessage(error), variant: "destructive" });
     } finally {
       setLoading(false);
     }
