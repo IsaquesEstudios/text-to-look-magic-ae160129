@@ -138,13 +138,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     return Number(investor.credits) - (reservedCredits.get(userId) ?? 0);
   };
 
-  const getFriendlyErrorMessage = (error: unknown) => {
-    const message = error instanceof Error ? error.message.toLowerCase() : String(error ?? "").toLowerCase();
-    if (message.includes("numeric field overflow")) {
-      return p.maxValueExceeded;
-    }
-    return p.unexpectedError;
-  };
 
   // Current link preview
   const currentAmount = linkRawAmount / 100;
@@ -363,7 +356,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           if (error) {
             toast({
               title: p.error,
-              description: getFriendlyErrorMessage(error),
+              description: error.message,
               variant: "destructive",
             });
           }
@@ -373,8 +366,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
       invalidateAll();
       onClose();
-    } catch (error) {
-      toast({ title: p.error, description: getFriendlyErrorMessage(error), variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: p.error, description: error?.message ?? p.unexpectedError, variant: "destructive" });
     } finally {
       setLoading(false);
     }
