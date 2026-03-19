@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +32,9 @@ import {
   Trash2,
   Gavel,
   UserX,
+  Pencil,
+  Save,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
@@ -53,6 +56,21 @@ export default function AdminUserProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    full_name: "",
+    phone: "",
+    whatsapp: "",
+    country: "",
+    postal_code: "",
+    address_street: "",
+    address_number: "",
+    address_complement: "",
+    address_neighborhood: "",
+    address_city: "",
+    address_state: "",
+  });
 
   const dateLoc = dateLocaleMap[lang] || ptBR;
 
@@ -277,6 +295,56 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const startEditingProfile = () => {
+    if (!profile) return;
+    setProfileForm({
+      full_name: profile.full_name || "",
+      phone: profile.phone || "",
+      whatsapp: profile.whatsapp || "",
+      country: profile.country || "",
+      postal_code: profile.postal_code || "",
+      address_street: profile.address_street || "",
+      address_number: profile.address_number || "",
+      address_complement: profile.address_complement || "",
+      address_neighborhood: profile.address_neighborhood || "",
+      address_city: profile.address_city || "",
+      address_state: profile.address_state || "",
+    });
+    setEditingProfile(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!userId) return;
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profileForm.full_name || null,
+          phone: profileForm.phone || null,
+          whatsapp: profileForm.whatsapp || null,
+          country: profileForm.country || null,
+          postal_code: profileForm.postal_code || null,
+          address_street: profileForm.address_street || null,
+          address_number: profileForm.address_number || null,
+          address_complement: profileForm.address_complement || null,
+          address_neighborhood: profileForm.address_neighborhood || null,
+          address_city: profileForm.address_city || null,
+          address_state: profileForm.address_state || null,
+        })
+        .eq("user_id", userId);
+      if (error) throw error;
+      toast({ title: "Perfil atualizado" });
+      setEditingProfile(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch {
+      toast({ title: p.error, description: p.unexpectedError, variant: "destructive" });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   const credits = Number(profile?.credits) || 0;
 
   // Consolidate multiple shares in the same property
@@ -397,36 +465,85 @@ export default function AdminUserProfilePage() {
       </AlertDialog>
 
       <Card className="bg-card/50 border-border/50">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">{p.profileInfo}</CardTitle>
+          {!editingProfile ? (
+            <Button variant="ghost" size="sm" onClick={startEditingProfile} className="gap-1.5">
+              <Pencil className="h-3.5 w-3.5" />
+              Editar
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setEditingProfile(false)} disabled={savingProfile}>
+                <X className="h-3.5 w-3.5" />
+              </Button>
+              <Button size="sm" onClick={handleSaveProfile} disabled={savingProfile} className="gap-1.5">
+                {savingProfile ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Salvar
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-            {[
-              [p.fullName, profile.full_name],
-              [p.phone, profile.phone],
-              ["WhatsApp", profile.whatsapp],
-              [p.country, profile.country],
-              [p.postalCode, profile.postal_code],
-              [p.street, profile.address_street],
-              [p.numberLabel, profile.address_number],
-              [p.complement, profile.address_complement],
-              [p.neighborhood, profile.address_neighborhood],
-              [p.city, profile.address_city],
-              [p.state, profile.address_state],
-            ].map(([label, value]) => (
-              <div key={label as string} className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">{label}</span>
-                <span className="text-foreground">{(value as string) || "—"}</span>
+          {editingProfile ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              {([
+                ["full_name", p.fullName],
+                ["phone", p.phone],
+                ["whatsapp", "WhatsApp"],
+                ["country", p.country],
+                ["postal_code", p.postalCode],
+                ["address_street", p.street],
+                ["address_number", p.numberLabel],
+                ["address_complement", p.complement],
+                ["address_neighborhood", p.neighborhood],
+                ["address_city", p.city],
+                ["address_state", p.state],
+              ] as [keyof typeof profileForm, string][]).map(([key, label]) => (
+                <div key={key} className="flex flex-col gap-1">
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  <Input
+                    value={profileForm[key]}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, [key]: e.target.value }))}
+                    className="h-9"
+                  />
+                </div>
+              ))}
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
+                <span className="text-foreground mt-2">
+                  {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
+                </span>
               </div>
-            ))}
-            <div className="flex flex-col gap-0.5">
-              <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
-              <span className="text-foreground">
-                {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
-              </span>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              {[
+                [p.fullName, profile.full_name],
+                [p.phone, profile.phone],
+                ["WhatsApp", profile.whatsapp],
+                [p.country, profile.country],
+                [p.postalCode, profile.postal_code],
+                [p.street, profile.address_street],
+                [p.numberLabel, profile.address_number],
+                [p.complement, profile.address_complement],
+                [p.neighborhood, profile.address_neighborhood],
+                [p.city, profile.address_city],
+                [p.state, profile.address_state],
+              ].map(([label, value]) => (
+                <div key={label as string} className="flex flex-col gap-0.5">
+                  <span className="text-muted-foreground text-xs">{label}</span>
+                  <span className="text-foreground">{(value as string) || "—"}</span>
+                </div>
+              ))}
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">{p.registeredAt}</span>
+                <span className="text-foreground">
+                  {format(new Date(profile.created_at), "dd/MM/yyyy HH:mm", { locale: dateLoc })}
+                </span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
