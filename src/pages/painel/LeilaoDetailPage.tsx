@@ -330,7 +330,30 @@ export default function LeilaoDetailPage() {
           )}
           {items && items.length > 0 && (
             <div className="grid gap-3">
-              {items.map((item) => (
+              {items.map((item) => editingItemId === item.id ? (
+                <div key={item.id} className="space-y-4">
+                  <AuctionPropertyForm
+                    index={0}
+                    data={editItemForm}
+                    onChange={setEditItemForm}
+                    onRemove={() => setEditingItemId(null)}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => updateItemMutation.mutate()}
+                      disabled={!editItemForm.title || updateItemMutation.isPending}
+                    >
+                      <Save className="h-4 w-4" />
+                      {updateItemMutation.isPending ? "Salvando..." : "Salvar"}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditingItemId(null)} className="gap-2">
+                      <X className="h-4 w-4" /> Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
                 <div
                   key={item.id}
                   className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
@@ -357,15 +380,25 @@ export default function LeilaoDetailPage() {
                     {item.description && <p className="text-xs text-muted-foreground mt-1">{item.description}</p>}
                   </div>
                   {isAdmin && auction.status !== "finished" && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive flex-shrink-0"
-                      onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
-                      disabled={removeItemMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => { e.stopPropagation(); startEditingItem(item); }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={(e) => { e.stopPropagation(); removeItemMutation.mutate(item.id); }}
+                        disabled={removeItemMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))}
