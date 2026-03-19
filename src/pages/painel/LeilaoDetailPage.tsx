@@ -281,7 +281,7 @@ export default function LeilaoDetailPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${isAdmin && item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
+                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
                   onClick={() => {
                     if (isAdmin && item.property_id) navigate(`/painel/imovel/${item.property_id}`);
                   }}
