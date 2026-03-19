@@ -281,7 +281,7 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
+              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : step === 3 ? a.yourInfo : (a as any).personTypeTitle}
             </CardTitle>
             <CardDescription>
               {isLogin
