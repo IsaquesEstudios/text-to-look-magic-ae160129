@@ -27,6 +27,9 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
 
       return { arremate, reforma, investido, venda, roi };
     },
+    refetchOnMount: "always",
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) {
@@ -54,8 +57,6 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
           { label: "Estimativa de Vendas", value: kpis?.venda ?? 0, icon: TrendingUp },
           { label: "ROI Estimado", value: roi, icon: Percent, isPercentage: true, colorClass: roiColor },
         ];
-
-
 
   const fmt = (value: number) => {
     const { compact, full } = formatCurrencySmart(value);
@@ -106,6 +107,9 @@ export default function AdminImoveisPage() {
         land: list.filter((p) => p.type === "land").length,
       };
     },
+    refetchOnMount: "always",
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const handleEdit = (id: string) => {

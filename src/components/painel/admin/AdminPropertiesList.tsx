@@ -35,6 +35,9 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
       if (error) throw error;
       return data;
     },
+    refetchOnMount: "always",
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) {

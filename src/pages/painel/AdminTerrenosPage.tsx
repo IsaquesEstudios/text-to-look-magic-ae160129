@@ -27,6 +27,9 @@ function TerrenosKPIs() {
         venda: props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0),
       };
     },
+    refetchOnMount: "always",
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) {
