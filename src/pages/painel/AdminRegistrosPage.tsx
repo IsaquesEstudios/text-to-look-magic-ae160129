@@ -50,7 +50,7 @@ export default function AdminRegistrosPage() {
       const adminIds = new Set((adminRoles ?? []).map(r => r.user_id));
 
       // Filter out admin users
-      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id));
+      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id) && !p.registration_dismissed);
 
       return nonAdminProfiles.map(p => ({
         ...p,
