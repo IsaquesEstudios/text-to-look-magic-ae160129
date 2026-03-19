@@ -756,6 +756,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_delete_property: {
+        Args: { p_property_id: string }
+        Returns: undefined
+      }
       admin_link_investor_to_property: {
         Args: {
           p_amount: number
