@@ -270,7 +270,7 @@ export default function AdminUserProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
       navigate("/painel/usuarios");
     } catch (err: any) {
-      toast({ title: p.error, description: err.message, variant: "destructive" });
+      toast({ title: p.error, description: p.unexpectedError, variant: "destructive" });
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);

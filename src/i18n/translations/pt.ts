@@ -595,6 +595,7 @@ export const pt = {
     maxValueExceeded: "Valor máximo permitido: $99.999.999,99",
     creditsAdded: "adicionados com sucesso!",
     error: "Erro",
+    unexpectedError: "Ocorreu um erro inesperado. Tente novamente.",
     auctionsInvested: "Leilões Investidos",
     noAuctionInvestments: "Nenhum investimento em leilões",
     depositsCount: "depósito(s)",
