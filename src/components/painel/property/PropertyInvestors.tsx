@@ -117,14 +117,20 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
   });
 
   const unlinkMutation = useMutation({
-    mutationFn: async (shareIds: string[]) => {
-      const { error } = await supabase.from("shares").delete().in("id", shareIds);
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase.rpc("admin_unlink_investor" as any, {
+        p_property_id: propertyId,
+        p_user_id: userId,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["property-investors", propertyId] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
-      toast({ title: "Vínculo removido" });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties-kpis"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-portfolio-counts"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: "Vínculo removido e créditos restituídos" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -216,7 +222,7 @@ export function PropertyInvestors({ propertyId, totalProject, propertyType, prop
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-destructive"
-                  onClick={() => unlinkMutation.mutate(inv.shareIds)}
+                  onClick={() => unlinkMutation.mutate(inv.userId)}
                   disabled={unlinkMutation.isPending}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
