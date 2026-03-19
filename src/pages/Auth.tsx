@@ -296,9 +296,10 @@ export default function Auth() {
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
-                {[1, 2, 3].map((s) => (
+                {[1, 2, 3, 4].map((s) => (
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
                 ))}
+              </div>
               </div>
             )}
           </CardHeader>
