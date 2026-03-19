@@ -362,16 +362,16 @@ export default function AdminUserProfilePage() {
                     </AlertDescription>
                   </Alert>
                 )}
-                {hasLinkedProperties && (
+                 {hasLinkedProperties && (
                   <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>{p.linkedPropertiesTitle}</AlertTitle>
                     <AlertDescription>
-                      {p.linkedPropertiesWarning.replace("{count}", String(linkedProperties.length))}
+                      {p.linkedPropertiesWarning.replace("{count}", String(consolidatedShares.length))}
                       <ul className="list-disc pl-4 mt-1 space-y-0.5">
-                        {linkedProperties.map(s => (
-                          <li key={s.id}>
-                            {s.property?.title || p.propertiesLabel} — ${Number(s.amount_paid).toLocaleString("en-US")}
+                        {consolidatedShares.map(s => (
+                          <li key={s.property_id}>
+                            {s.property?.title || p.propertiesLabel} — ${s.total_paid.toLocaleString("en-US")}
                           </li>
                         ))}
                       </ul>
