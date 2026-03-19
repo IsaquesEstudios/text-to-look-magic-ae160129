@@ -70,6 +70,8 @@ export default function UserProfilePage() {
         address_neighborhood: pr.address_neighborhood ?? "", address_city: pr.address_city ?? "",
         address_state: pr.address_state ?? "", postal_code: pr.postal_code ?? "",
         preferred_language: pr.preferred_language ?? "pt",
+        person_type: pr.person_type ?? "individual",
+        itin_ssn: pr.itin_ssn ?? "", passport: pr.passport ?? "", ein: pr.ein ?? "",
       });
       const rawPhone = (pr.phone ?? "").trim();
       const rawWhatsapp = (pr.whatsapp ?? "").trim();
