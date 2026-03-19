@@ -84,6 +84,12 @@ export default function Auth() {
   const [postalCode, setPostalCode] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
+  // Step 4 fields
+  const [personType, setPersonType] = useState<"individual" | "business">("individual");
+  const [itinSsn, setItinSsn] = useState("");
+  const [passport, setPassport] = useState("");
+  const [ein, setEin] = useState("");
+
   const { toast } = useToast();
   const a = translations[preferredLanguage].auth;
   const labels = getCountryLabels(country);
