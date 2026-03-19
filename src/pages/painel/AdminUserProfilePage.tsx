@@ -229,6 +229,41 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userId) return;
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ user_id: userId }),
+        }
+      );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Erro ao excluir");
+      toast({ title: "Usuário excluído com sucesso" });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
+      navigate("/painel/usuarios");
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const credits = Number(profile?.credits) || 0;
+  const linkedProperties = userShares ?? [];
+  const hasBalance = credits > 0;
+  const hasLinkedProperties = linkedProperties.length > 0;
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
