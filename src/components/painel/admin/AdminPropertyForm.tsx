@@ -138,13 +138,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     return Number(investor.credits) - (reservedCredits.get(userId) ?? 0);
   };
 
-  const getFriendlyErrorMessage = (error: unknown) => {
-    const message = error instanceof Error ? error.message.toLowerCase() : String(error ?? "").toLowerCase();
-    if (message.includes("numeric field overflow")) {
-      return p.maxValueExceeded;
-    }
-    return p.unexpectedError;
-  };
 
   // Current link preview
   const currentAmount = linkRawAmount / 100;
