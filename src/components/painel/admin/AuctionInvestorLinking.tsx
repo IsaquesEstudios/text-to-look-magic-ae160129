@@ -342,9 +342,9 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                     <p className="text-muted-foreground">Est. Reforma</p>
                     <p className="font-semibold">${formatUSD(renovationVal)}</p>
                   </div>
-                  <div className="rounded-lg bg-primary/10 p-2 text-center border border-primary/20">
+                  <div className="rounded-lg bg-secondary/20 p-2 text-center">
                     <p className="text-muted-foreground">Est. Total</p>
-                    <p className="font-semibold text-primary">${formatUSD(totalProject)}</p>
+                    <p className="font-semibold">${formatUSD(totalProject)}</p>
                   </div>
                   <div className="rounded-lg bg-secondary/20 p-2 text-center">
                     <p className="text-muted-foreground">Est. Venda</p>
