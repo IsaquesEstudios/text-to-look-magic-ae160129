@@ -260,9 +260,9 @@ export default function AdminLeiloesPage() {
               <Label>Descrição</Label>
               <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Detalhes do leilão..." />
             </div>
-            <div>
-              <Label>Data e Hora do Leilão *</Label>
-              <Input type="datetime-local" value={form.scheduled_start} onChange={(e) => setForm({ ...form, scheduled_start: e.target.value })} />
+            <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 space-y-2">
+              <Label className="text-primary font-semibold">Data e Hora do Leilão *</Label>
+              <Input type="datetime-local" value={form.scheduled_start} onChange={(e) => setForm({ ...form, scheduled_start: e.target.value })} className="border-primary/30" />
               {form.scheduled_start && (
                 <p className="text-xs text-muted-foreground">
                   Prazo máximo para investimento: {format(new Date(new Date(form.scheduled_start).getTime() - 2 * 24 * 60 * 60 * 1000), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })} (2 dias antes)
