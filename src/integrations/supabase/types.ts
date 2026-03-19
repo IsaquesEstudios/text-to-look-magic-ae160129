@@ -770,6 +770,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_unlink_investor: {
+        Args: { p_property_id: string; p_user_id: string }
+        Returns: undefined
+      }
       auto_finish_expired_auctions: { Args: never; Returns: undefined }
       check_login_rate_limit: { Args: { p_email: string }; Returns: boolean }
       check_name_available: { Args: { p_name: string }; Returns: boolean }
