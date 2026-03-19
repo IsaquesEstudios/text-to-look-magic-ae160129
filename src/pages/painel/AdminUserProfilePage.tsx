@@ -70,6 +70,10 @@ export default function AdminUserProfilePage() {
     address_neighborhood: "",
     address_city: "",
     address_state: "",
+    person_type: "individual" as "individual" | "business",
+    itin_ssn: "",
+    passport: "",
+    ein: "",
   });
 
   const dateLoc = dateLocaleMap[lang] || ptBR;
