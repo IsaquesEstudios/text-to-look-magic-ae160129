@@ -212,8 +212,11 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-shares"] });
+      queryClient.invalidateQueries({ queryKey: ["auction-items"] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties-kpis"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-portfolio-counts"] });
       queryClient.invalidateQueries({ queryKey: ["property-investors"] });
       queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
       queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
