@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,14 @@ interface AuctionItem {
   type: string;
   location: string | null;
   image_url: string | null;
+  state_code?: string | null;
+  estimated_auction_value?: number | null;
+  estimated_renovation_cost?: number | null;
+  estimated_sale_value?: number | null;
+  estimated_timeline?: string | null;
+  status?: string | null;
+  cover_image_url?: string | null;
+  gallery_images?: string[] | null;
 }
 
 interface Props {
@@ -31,15 +40,16 @@ function getServiceFee(type: string): number {
 }
 
 export default function AuctionInvestorLinking({ auctionId, items }: Props) {
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [linkingPropertyId, setLinkingPropertyId] = useState<string | null>(null);
+  const [linkingItemId, setLinkingItemId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [linkRawAmount, setLinkRawAmount] = useState(0);
   const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
 
-  const propertyItems = items.filter((item) => item.property_id);
-  const propertyIds = propertyItems.map((item) => item.property_id!);
+  // Get property IDs for items that already have properties created
+  const propertyIds = items.map((item) => item.property_id).filter(Boolean) as string[];
 
   const { data: existingShares } = useQuery({
     queryKey: ["auction-shares", propertyIds],
@@ -55,28 +65,14 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
     enabled: propertyIds.length > 0,
   });
 
-  const { data: properties } = useQuery({
-    queryKey: ["auction-properties-detail", propertyIds],
-    queryFn: async () => {
-      if (propertyIds.length === 0) return [];
-      const { data, error } = await supabase
-        .from("properties")
-        .select("id, estimated_auction_value, estimated_renovation_cost, estimated_return_pct, title, type")
-        .in("id", propertyIds);
-      if (error) throw error;
-      return data;
-    },
-    enabled: propertyIds.length > 0,
-  });
-
   const { data: investorsWithCredits } = useQuery({
     queryKey: ["investors-with-credits-linking"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, credits")
-        .gt("credits", 0)
-        .order("credits", { ascending: false });
+        .eq("status", "approved")
+        .order("full_name");
       if (error) throw error;
       const { data: adminRoles } = await supabase
         .from("user_roles")
@@ -117,26 +113,82 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   }));
 
   const linkMutation = useMutation({
-    mutationFn: async ({ propertyId, userId, amount, propertyType, propertyTitle }: {
-      propertyId: string;
+    mutationFn: async ({ item, userId, amount }: {
+      item: AuctionItem;
       userId: string;
       amount: number;
-      propertyType: string;
-      propertyTitle: string;
     }) => {
+      let propertyId = item.property_id;
+
+      // If property doesn't exist yet, create it from auction_item data
+      if (!propertyId) {
+        const auctionVal = Number(item.estimated_auction_value) || 0;
+        const renovationVal = Number(item.estimated_renovation_cost) || 0;
+        const saleVal = Number(item.estimated_sale_value) || 0;
+        const totalProjeto = auctionVal + renovationVal;
+        const roi = totalProjeto > 0 ? ((saleVal - totalProjeto) / totalProjeto) * 100 : 0;
+        const propType = item.type === "terreno" ? "land" : "house";
+
+        const { data: prop, error: propError } = await supabase
+          .from("properties")
+          .insert({
+            type: propType,
+            title: item.title,
+            location: item.location || "",
+            state_code: item.state_code || null,
+            purchase_price: totalProjeto,
+            estimated_auction_value: auctionVal,
+            estimated_renovation_cost: renovationVal,
+            estimated_return_pct: Math.min(roi, 99999.99),
+            estimated_sale_value: saleVal,
+            total_shares: 1,
+            share_price: 0,
+            available_shares: 1,
+            status: item.status || "available",
+            cover_image_url: item.cover_image_url || item.image_url || null,
+            estimated_timeline: item.estimated_timeline || "",
+            created_by: user!.id,
+          })
+          .select("id")
+          .single();
+        if (propError) throw propError;
+
+        propertyId = prop.id;
+
+        // Create gallery images
+        const gallery = item.gallery_images ?? [];
+        if (gallery.length > 0) {
+          await supabase.from("property_images").insert(
+            gallery.map((url, i) => ({
+              property_id: propertyId!,
+              image_url: url,
+              sort_order: i,
+            }))
+          );
+        }
+
+        // Update auction_item to link to the new property
+        await supabase.from("auction_items").update({ property_id: propertyId }).eq("id", item.id);
+      }
+
+      // Now link the investor via RPC
+      const propType = item.type === "terreno" ? "land" : "house";
       const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
         p_property_id: propertyId,
         p_user_id: userId,
         p_amount: amount,
-        p_property_type: propertyType,
-        p_property_title: propertyTitle,
+        p_property_type: propType,
+        p_property_title: item.title,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
+      queryClient.invalidateQueries({ queryKey: ["auction-shares"] });
+      queryClient.invalidateQueries({ queryKey: ["auction-items"] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-properties-kpis"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-portfolio-counts"] });
       queryClient.invalidateQueries({ queryKey: ["property-investors"] });
       queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
       queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
@@ -145,7 +197,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       setSelectedUserId("");
       setLinkRawAmount(0);
       setLinkDisplayAmount("");
-      setLinkingPropertyId(null);
+      setLinkingItemId(null);
     },
     onError: (e: Error) => toast({ title: "Erro ao vincular", description: e.message, variant: "destructive" }),
   });
@@ -156,7 +208,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auction-shares", propertyIds] });
+      queryClient.invalidateQueries({ queryKey: ["auction-shares"] });
       queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       queryClient.invalidateQueries({ queryKey: ["property-investors"] });
@@ -168,7 +220,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
-  if (propertyItems.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
     <Card className="bg-card/50 border-border/50">
@@ -180,13 +232,13 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Investors with available credits */}
-        {investors.length > 0 && (
+        {investors.filter((i) => i.credits > 0).length > 0 && (
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-              Investidores com Saldo ({investors.length})
+              Investidores com Saldo ({investors.filter((i) => i.credits > 0).length})
             </p>
             <div className="grid gap-2">
-              {investors.map((inv) => (
+              {investors.filter((i) => i.credits > 0).map((inv) => (
                 <div key={inv.user_id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/30 text-sm">
                   <span className="font-medium">{inv.name}</span>
                   <div className="flex items-center gap-3 text-right">
@@ -211,19 +263,20 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
           </div>
         )}
 
-        {/* Per-property linking */}
-        {propertyItems.map((item) => {
-          const propDetail = properties?.find((p) => p.id === item.property_id);
-          const totalProject = (propDetail?.estimated_auction_value ?? 0) + (propDetail?.estimated_renovation_cost ?? 0);
-          const propertyType = propDetail?.type ?? item.type;
-          const serviceFee = getServiceFee(propertyType);
-          const linkedShares = existingShares?.filter((s) => s.property_id === item.property_id) ?? [];
+        {/* Per-item linking */}
+        {items.map((item) => {
+          const auctionVal = Number(item.estimated_auction_value) || 0;
+          const renovationVal = Number(item.estimated_renovation_cost) || 0;
+          const totalProject = auctionVal + renovationVal;
+          const serviceFee = getServiceFee(item.type);
+          const linkedShares = item.property_id
+            ? (existingShares?.filter((s) => s.property_id === item.property_id) ?? [])
+            : [];
           const totalLinked = linkedShares.reduce((sum, s) => sum + Number(s.amount_paid), 0);
           const remaining = totalProject - totalLinked;
-          const isFullyCovered = remaining <= 0;
-          const isLinking = linkingPropertyId === item.property_id;
+          const isFullyCovered = remaining <= 0 && totalProject > 0;
+          const isLinking = linkingItemId === item.id;
 
-          // Calculate total fees already charged (proportional)
           const totalFeeCharged = totalProject > 0
             ? linkedShares.reduce((sum, s) => sum + (Number(s.amount_paid) / totalProject) * serviceFee, 0)
             : 0;
@@ -233,12 +286,10 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
           const selectedInvestor = investors.find((inv) => inv.user_id === selectedUserId);
           const userMaxCredits = selectedInvestor?.credits ?? 0;
 
-          // Current link amount
           const currentAmount = linkRawAmount / 100;
           const currentFeeShare = totalProject > 0 ? Math.round((currentAmount / totalProject) * serviceFee * 100) / 100 : 0;
           const currentTotalDeduction = currentAmount + currentFeeShare;
 
-          // Max linkable considering fee
           const maxLinkableByRemaining = remaining;
           const maxLinkableByCredits = totalProject > 0
             ? Math.floor((userMaxCredits / (1 + serviceFee / totalProject)) * 100) / 100
@@ -265,24 +316,45 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                       <MapPin className="h-3 w-3" /> {item.location}
                     </p>
                   )}
+                  {!item.property_id && (
+                    <Badge variant="outline" className="text-[10px] mt-1">Aguardando vínculo</Badge>
+                  )}
                 </div>
                 {isFullyCovered ? (
                   <Badge className="bg-discovery-green text-primary-foreground gap-1">
                     <CheckCircle className="h-3 w-3" /> Coberto
                   </Badge>
-                ) : (
+                ) : totalProject > 0 ? (
                   <Badge variant="outline">
                     Falta ${formatUSD(remaining)}
                   </Badge>
-                )}
+                ) : null}
               </div>
+
+              {/* Financial summary from auction_item data */}
+              {totalProject > 0 && (
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="rounded-lg bg-secondary/20 p-2 text-center">
+                    <p className="text-muted-foreground">Est. Arremate</p>
+                    <p className="font-semibold">${formatUSD(auctionVal)}</p>
+                  </div>
+                  <div className="rounded-lg bg-secondary/20 p-2 text-center">
+                    <p className="text-muted-foreground">Est. Reforma</p>
+                    <p className="font-semibold">${formatUSD(renovationVal)}</p>
+                  </div>
+                  <div className="rounded-lg bg-secondary/20 p-2 text-center">
+                    <p className="text-muted-foreground">Est. Venda</p>
+                    <p className="font-semibold">${formatUSD(Number(item.estimated_sale_value) || 0)}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Service fee info */}
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 text-xs">
                 <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
                 <span className="text-muted-foreground">
                   Taxa de serviço: <span className="font-semibold text-foreground">${formatUSD(serviceFee)}</span>
-                  {" "}({propertyType === "land" || propertyType === "terreno" ? "terreno" : "casa"})
+                  {" "}({item.type === "terreno" || item.type === "land" ? "terreno" : "casa"})
                   {totalFeeCharged > 0 && (
                     <> — Cobrado até agora: <span className="font-semibold text-foreground">${formatUSD(totalFeeCharged)}</span></>
                   )}
@@ -307,7 +379,6 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
 
               {/* Linked investors */}
               {linkedShares.length > 0 && (() => {
-                // Group shares by user
                 const grouped = new Map<string, { userId: string; totalPaid: number; shareIds: string[] }>();
                 for (const share of linkedShares) {
                   const existing = grouped.get(share.user_id);
@@ -323,14 +394,15 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                   }
                 }
 
+                const saleVal = Number(item.estimated_sale_value) || 0;
+                const roi = totalProject > 0 ? ((saleVal - totalProject) / totalProject) * 100 : 0;
+
                 return (
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">Investidores vinculados:</p>
                     {[...grouped.values()].map((g) => {
                       const pct = totalProject > 0 ? ((g.totalPaid / totalProject) * 100).toFixed(1) : "0";
-                      const estReturn = propDetail?.estimated_return_pct
-                        ? g.totalPaid * (propDetail.estimated_return_pct / 100)
-                        : 0;
+                      const estReturn = roi > 0 ? g.totalPaid * (roi / 100) : 0;
                       const shareFee = totalProject > 0
                         ? Math.round((g.totalPaid / totalProject) * serviceFee * 100) / 100
                         : 0;
@@ -439,6 +511,11 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                               ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
                             </p>
                           )}
+                          {!item.property_id && (
+                            <p className="text-primary font-medium mt-1">
+                              ℹ A propriedade será criada automaticamente ao vincular
+                            </p>
+                          )}
                         </div>
                       )}
 
@@ -456,18 +533,16 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                           onClick={() => {
                             if (currentAmount <= 0) return;
                             linkMutation.mutate({
-                              propertyId: item.property_id!,
+                              item,
                               userId: selectedUserId,
                               amount: currentAmount,
-                              propertyType: propertyType,
-                              propertyTitle: propDetail?.title ?? item.title,
                             });
                           }}
                         >
                           <UserPlus className="h-4 w-4" />
                           {linkMutation.isPending ? "Vinculando..." : "Vincular"}
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => { setLinkingPropertyId(null); setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
+                        <Button variant="ghost" size="sm" onClick={() => { setLinkingItemId(null); setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
                           Cancelar
                         </Button>
                       </div>
@@ -477,7 +552,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                       variant="outline"
                       size="sm"
                       className="gap-2 w-full"
-                      onClick={() => setLinkingPropertyId(item.property_id)}
+                      onClick={() => setLinkingItemId(item.id)}
                     >
                       <UserPlus className="h-4 w-4" /> Vincular Investidor
                     </Button>

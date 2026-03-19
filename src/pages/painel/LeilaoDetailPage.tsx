@@ -139,51 +139,22 @@ export default function LeilaoDetailPage() {
   const addPropertyMutation = useMutation({
     mutationFn: async () => {
       for (const pForm of newPropertyForms) {
-        const totalProjeto = (parseFloat(pForm.estimated_auction_value) || 0) + (parseFloat(pForm.estimated_renovation_cost) || 0);
-
-        const { data: prop, error: propError } = await supabase
-          .from("properties")
-          .insert({
-            type: pForm.type,
-            title: pForm.title.trim(),
-            location: pForm.location.trim(),
-            state_code: pForm.state_code || null,
-            purchase_price: totalProjeto,
-            estimated_auction_value: parseFloat(pForm.estimated_auction_value) || 0,
-            estimated_renovation_cost: parseFloat(pForm.estimated_renovation_cost) || 0,
-            estimated_return_pct: parseFloat(pForm.estimated_return_pct) || 0,
-            estimated_sale_value: parseFloat(pForm.estimated_sale_value) || 0,
-            total_shares: parseInt(pForm.total_shares) || 1,
-            share_price: parseFloat(pForm.share_price) || 0,
-            available_shares: parseInt(pForm.total_shares) || 1,
-            status: pForm.status,
-            cover_image_url: pForm.coverImage,
-            estimated_timeline: pForm.estimated_timeline.trim(),
-            created_by: user!.id,
-          })
-          .select("id")
-          .single();
-        if (propError) throw propError;
-
-        if (pForm.galleryImages.length > 0) {
-          await supabase.from("property_images").insert(
-            pForm.galleryImages.map((url, i) => ({
-              property_id: prop.id,
-              image_url: url,
-              sort_order: i,
-            }))
-          );
-        }
-
         const { error: itemError } = await supabase.from("auction_items").insert({
           auction_id: id!,
-          property_id: prop.id,
           title: pForm.title.trim(),
           type: pForm.type === "house" ? "casa" : "terreno",
           location: `${pForm.location.trim()}${pForm.state_code ? `, ${pForm.state_code}` : ""}`,
           description: pForm.estimated_timeline.trim() || null,
           image_url: pForm.coverImage,
-        });
+          state_code: pForm.state_code || null,
+          estimated_auction_value: parseFloat(pForm.estimated_auction_value) || 0,
+          estimated_renovation_cost: parseFloat(pForm.estimated_renovation_cost) || 0,
+          estimated_sale_value: parseFloat(pForm.estimated_sale_value) || 0,
+          estimated_timeline: pForm.estimated_timeline.trim(),
+          status: pForm.status,
+          cover_image_url: pForm.coverImage,
+          gallery_images: pForm.galleryImages,
+        } as any);
         if (itemError) throw itemError;
       }
     },
@@ -310,7 +281,7 @@ export default function LeilaoDetailPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${isAdmin && item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
+                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
                   onClick={() => {
                     if (isAdmin && item.property_id) navigate(`/painel/imovel/${item.property_id}`);
                   }}
