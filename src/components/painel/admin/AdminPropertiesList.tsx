@@ -116,25 +116,31 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Arremate</p>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Arremate <span className="text-muted-foreground/40">Est.</span></p>
                   <p className="font-semibold text-foreground">
                     ${auction.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Reforma</p>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Reforma <span className="text-muted-foreground/40">Est.</span></p>
                   <p className="font-semibold text-foreground">
                     ${renovation.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total</p>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Total <span className="text-muted-foreground/40">Est.</span></p>
                   <p className="font-semibold text-foreground">
                     ${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno</p>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Venda <span className="text-muted-foreground/40">Est.</span></p>
+                  <p className="font-semibold text-foreground">
+                    ${sale.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground/60">Retorno <span className="text-muted-foreground/40">Est.</span></p>
                   <p className={`font-semibold ${roi > 0 ? "text-primary" : roi < 0 ? "text-destructive" : "text-muted-foreground"}`}>
                     {roi.toFixed(1)}%
                   </p>
