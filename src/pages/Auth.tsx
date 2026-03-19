@@ -282,7 +282,7 @@ export default function Auth() {
             <CardContent className="flex justify-center">
               <Button
                 variant="outline"
-                onClick={async () => { await signOut(); navigate("/"); }}
+                onClick={async () => { await signOut(); window.location.href = "/"; }}
                 className="gap-2"
               >
                 <LogOut className="h-4 w-4" />
