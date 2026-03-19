@@ -37,7 +37,7 @@ export default function AdminRegistrosPage() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at")
+        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at, registration_dismissed")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
