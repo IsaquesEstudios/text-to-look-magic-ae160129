@@ -183,7 +183,7 @@ export default function AdminRegistrosPage() {
               </div>
             )}
             {!showActions && reg.status === "rejected" && (
-              <div className="pt-1.5">
+              <div className="flex items-center gap-2 pt-1.5">
                 <Button
                   size="sm"
                   variant="outline"
@@ -192,6 +192,28 @@ export default function AdminRegistrosPage() {
                   disabled={updateStatus.isPending}
                 >
                   <Check className="h-3.5 w-3.5" /> Aprovar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
+                  onClick={() => dismissRegistration.mutate(reg.user_id)}
+                  disabled={dismissRegistration.isPending}
+                >
+                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
+                </Button>
+              </div>
+            )}
+            {!showActions && reg.status === "approved" && (
+              <div className="pt-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
+                  onClick={() => dismissRegistration.mutate(reg.user_id)}
+                  disabled={dismissRegistration.isPending}
+                >
+                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
                 </Button>
               </div>
             )}
