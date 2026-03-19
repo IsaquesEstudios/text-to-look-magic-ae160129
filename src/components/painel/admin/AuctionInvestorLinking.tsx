@@ -203,8 +203,11 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   });
 
   const unlinkMutation = useMutation({
-    mutationFn: async (shareIds: string[]) => {
-      const { error } = await supabase.from("shares").delete().in("id", shareIds);
+    mutationFn: async ({ propertyId, userId }: { propertyId: string; userId: string }) => {
+      const { error } = await supabase.rpc("admin_unlink_investor" as any, {
+        p_property_id: propertyId,
+        p_user_id: userId,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -215,7 +218,8 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
       queryClient.invalidateQueries({ queryKey: ["user-shares-houses"] });
       queryClient.invalidateQueries({ queryKey: ["user-shares-land"] });
       queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
-      toast({ title: "Vínculo removido" });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: "Vínculo removido e créditos restituídos" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
