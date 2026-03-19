@@ -9,6 +9,8 @@ export function AdminUsersList() {
   const navigate = useNavigate();
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-users"],
+    refetchOnMount: "always",
+    staleTime: 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
