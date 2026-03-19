@@ -458,12 +458,7 @@ export default function AdminUserProfilePage() {
       <Card className="bg-card/50 border-border/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">{p.profileInfo}</CardTitle>
-          {!editingProfile ? (
-            <Button variant="ghost" size="sm" onClick={startEditingProfile} className="gap-1.5">
-              <Pencil className="h-3.5 w-3.5" />
-              Editar
-            </Button>
-          ) : (
+          {editingProfile && (
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => setEditingProfile(false)} disabled={savingProfile}>
                 <X className="h-3.5 w-3.5" />
