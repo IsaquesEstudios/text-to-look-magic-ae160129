@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, Loader2, Clock, UserCheck, UserX, Phone, MapPin, Globe, EyeOff } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { Check, X, Loader2, Clock, UserCheck, UserX, Phone, MapPin, Globe, Search } from "lucide-react";
+import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -29,6 +31,9 @@ type Registration = {
 export default function AdminRegistrosPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [searchPending, setSearchPending] = useState("");
+  const [searchApproved, setSearchApproved] = useState("");
+  const [searchRejected, setSearchRejected] = useState("");
 
   const { data: registrations, isLoading } = useQuery({
     queryKey: ["admin-registrations"],
@@ -37,24 +42,21 @@ export default function AdminRegistrosPage() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at, registration_dismissed")
+        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
-      // Get emails from auth via edge function or just show user_id
-      // We'll get emails from a simple approach: check user_roles for admin exclusion
       const { data: adminRoles } = await supabase
         .from("user_roles")
         .select("user_id")
         .eq("role", "admin" as any);
       const adminIds = new Set((adminRoles ?? []).map(r => r.user_id));
 
-      // Filter out admin users
-      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id) && !p.registration_dismissed);
+      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id));
 
       return nonAdminProfiles.map(p => ({
         ...p,
-        email: "", // We'll show user_id since we can't access auth.users directly
+        email: "",
       })) as Registration[];
     },
   });
@@ -82,22 +84,28 @@ export default function AdminRegistrosPage() {
     },
   });
 
-  const dismissRegistration = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ registration_dismissed: true } as any)
-        .eq("user_id", userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
-      toast({ title: "Registro ocultado", description: "O registro foi removido da lista." });
-    },
-    onError: (error: any) => {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    },
-  });
+  const filterBySearch = (list: Registration[], query: string) => {
+    if (!query.trim()) return list;
+    const q = query.toLowerCase();
+    return list.filter(r =>
+      (r.full_name || "").toLowerCase().includes(q) ||
+      (r.phone || "").toLowerCase().includes(q) ||
+      (r.country || "").toLowerCase().includes(q) ||
+      (r.address_city || "").toLowerCase().includes(q) ||
+      (r.address_state || "").toLowerCase().includes(q)
+    );
+  };
+
+  // Group by date
+  const groupByDate = (list: Registration[]) => {
+    const groups: Record<string, Registration[]> = {};
+    list.forEach(r => {
+      const dateKey = format(new Date(r.created_at), "dd/MM/yyyy");
+      if (!groups[dateKey]) groups[dateKey] = [];
+      groups[dateKey].push(r);
+    });
+    return Object.entries(groups);
+  };
 
   const pending = registrations?.filter(r => r.status === "pending") ?? [];
   const approved = registrations?.filter(r => r.status === "approved") ?? [];
@@ -193,28 +201,6 @@ export default function AdminRegistrosPage() {
                 >
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
-                  onClick={() => dismissRegistration.mutate(reg.user_id)}
-                  disabled={dismissRegistration.isPending}
-                >
-                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
-                </Button>
-              </div>
-            )}
-            {!showActions && reg.status === "approved" && (
-              <div className="pt-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-muted-foreground border-border/50 hover:bg-secondary gap-1 h-8 text-xs"
-                  onClick={() => dismissRegistration.mutate(reg.user_id)}
-                  disabled={dismissRegistration.isPending}
-                >
-                  <EyeOff className="h-3.5 w-3.5" /> Ocultar
-                </Button>
               </div>
             )}
           </div>
@@ -223,6 +209,35 @@ export default function AdminRegistrosPage() {
     </Card>
   );
 
+  const SearchInput = ({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) => (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 pointer-events-none" />
+      <Input
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder || "Buscar por nome, cidade, país..."}
+        className="pl-9 h-9 text-sm bg-secondary/30 border-border/30"
+      />
+    </div>
+  );
+
+  const DateGroupedList = ({ items, showActions }: { items: Registration[]; showActions: boolean }) => {
+    const groups = groupByDate(items);
+    if (groups.length === 0) return null;
+    return (
+      <div className="space-y-5">
+        {groups.map(([date, regs]) => (
+          <div key={date} className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">{date}</p>
+            <div className="space-y-2">
+              {regs.map(reg => <RegistrationCard key={reg.id} reg={reg} showActions={showActions} />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
@@ -230,6 +245,10 @@ export default function AdminRegistrosPage() {
       </div>
     );
   }
+
+  const filteredPending = filterBySearch(pending, searchPending);
+  const filteredApproved = filterBySearch(approved, searchApproved);
+  const filteredRejected = filterBySearch(rejected, searchRejected);
 
   return (
     <div className="space-y-4">
@@ -262,33 +281,36 @@ export default function AdminRegistrosPage() {
         </TabsList>
 
         <TabsContent value="pending" className="space-y-3 mt-4">
-          {pending.length === 0 ? (
+          {pending.length > 0 && <SearchInput value={searchPending} onChange={setSearchPending} />}
+          {filteredPending.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <UserCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Nenhum registro pendente</p>
+              <p className="text-sm">{searchPending ? "Nenhum resultado encontrado" : "Nenhum registro pendente"}</p>
             </div>
           ) : (
-            pending.map(reg => <RegistrationCard key={reg.id} reg={reg} showActions />)
+            <DateGroupedList items={filteredPending} showActions />
           )}
         </TabsContent>
 
         <TabsContent value="approved" className="space-y-3 mt-4">
-          {approved.length === 0 ? (
+          {approved.length > 0 && <SearchInput value={searchApproved} onChange={setSearchApproved} />}
+          {filteredApproved.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <p className="text-sm">Nenhum usuário aprovado ainda</p>
+              <p className="text-sm">{searchApproved ? "Nenhum resultado encontrado" : "Nenhum usuário aprovado ainda"}</p>
             </div>
           ) : (
-            approved.map(reg => <RegistrationCard key={reg.id} reg={reg} showActions={false} />)
+            <DateGroupedList items={filteredApproved} showActions={false} />
           )}
         </TabsContent>
 
         <TabsContent value="rejected" className="space-y-3 mt-4">
-          {rejected.length === 0 ? (
+          {rejected.length > 0 && <SearchInput value={searchRejected} onChange={setSearchRejected} />}
+          {filteredRejected.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <p className="text-sm">Nenhum usuário rejeitado</p>
+              <p className="text-sm">{searchRejected ? "Nenhum resultado encontrado" : "Nenhum usuário rejeitado"}</p>
             </div>
           ) : (
-            rejected.map(reg => <RegistrationCard key={reg.id} reg={reg} showActions={false} />)
+            <DateGroupedList items={filteredRejected} showActions={false} />
           )}
         </TabsContent>
       </Tabs>
