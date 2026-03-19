@@ -39,6 +39,8 @@ export default function UserProfilePage() {
     country: "", address_street: "", address_number: "", address_complement: "",
     address_neighborhood: "", address_city: "", address_state: "", postal_code: "",
     preferred_language: "pt",
+    person_type: "individual" as "individual" | "business",
+    itin_ssn: "", passport: "", ein: "",
   });
   const [differentWhatsapp, setDifferentWhatsapp] = useState(false);
 
@@ -68,6 +70,8 @@ export default function UserProfilePage() {
         address_neighborhood: pr.address_neighborhood ?? "", address_city: pr.address_city ?? "",
         address_state: pr.address_state ?? "", postal_code: pr.postal_code ?? "",
         preferred_language: pr.preferred_language ?? "pt",
+        person_type: pr.person_type ?? "individual",
+        itin_ssn: pr.itin_ssn ?? "", passport: pr.passport ?? "", ein: pr.ein ?? "",
       });
       const rawPhone = (pr.phone ?? "").trim();
       const rawWhatsapp = (pr.whatsapp ?? "").trim();
@@ -87,6 +91,10 @@ export default function UserProfilePage() {
         address_neighborhood: form.address_neighborhood.trim() || null, address_city: form.address_city.trim() || null,
         address_state: form.address_state.trim() || null, postal_code: form.postal_code.trim() || null,
         preferred_language: form.preferred_language,
+        person_type: form.person_type,
+        itin_ssn: form.itin_ssn.trim() || null,
+        passport: form.passport.trim() || null,
+        ein: form.ein.trim() || null,
       } as any).eq("user_id", user!.id);
       if (error) throw error;
     },
@@ -211,6 +219,43 @@ export default function UserProfilePage() {
               <Input value={form.address_state} onChange={(e) => update("address_state", e.target.value)} placeholder={p.statePlaceholder} maxLength={50} />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4 text-primary" />Tipo de Pessoa</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Select value={form.person_type} onValueChange={(v: "individual" | "business") => update("person_type", v)}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="individual">Pessoa Física</SelectItem>
+              <SelectItem value="business">Pessoa Jurídica</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {form.person_type === "individual" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>ITIN/SSN</Label>
+                <Input value={form.itin_ssn} onChange={(e) => update("itin_ssn", e.target.value)} placeholder="000-00-0000" maxLength={20} />
+              </div>
+              <div className="space-y-2">
+                <Label>Passaporte</Label>
+                <Input value={form.passport} onChange={(e) => update("passport", e.target.value)} placeholder="Nº do passaporte" maxLength={30} />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>EIN</Label>
+                <Input value={form.ein} onChange={(e) => update("ein", e.target.value)} placeholder="00-0000000" maxLength={20} />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
