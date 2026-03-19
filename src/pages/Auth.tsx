@@ -458,6 +458,95 @@ export default function Auth() {
                   <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
+                  <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(4)}>
+                    {a.next}
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {/* Step 4: person type & documents */}
+            {!isLogin && step === 4 && (
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div className="grid gap-3">
+                  {([{ value: "individual" as const, icon: User, label: (a as any).individual }, { value: "business" as const, icon: Building2, label: (a as any).business }]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setPersonType(opt.value)}
+                      className={`flex items-center gap-3 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                        personType === opt.value
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      <opt.icon className="h-5 w-5" />
+                      <span className="flex-1">{opt.label}</span>
+                      {personType === opt.value && <Check className="h-4 w-4 text-primary" />}
+                    </button>
+                  ))}
+                </div>
+
+                {personType === "individual" ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="itin-ssn">{(a as any).itinSsn}</Label>
+                      <Input
+                        id="itin-ssn"
+                        value={itinSsn}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
+                          let formatted = raw;
+                          if (raw.length > 5) formatted = `${raw.slice(0, 3)}-${raw.slice(3, 5)}-${raw.slice(5)}`;
+                          else if (raw.length > 3) formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
+                          setItinSsn(formatted);
+                        }}
+                        placeholder={(a as any).itinSsnPlaceholder}
+                        maxLength={11}
+                      />
+                      {itinSsn && itinSsn.replace(/\D/g, "").length !== 9 && (
+                        <p className="text-xs text-destructive">{(a as any).itinSsnInvalid}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="passport">{(a as any).passport}</Label>
+                      <Input
+                        id="passport"
+                        value={passport}
+                        onChange={(e) => setPassport(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}
+                        placeholder={(a as any).passportPlaceholder}
+                        maxLength={20}
+                      />
+                      {passport && (passport.length < 5 || passport.length > 20) && (
+                        <p className="text-xs text-destructive">{(a as any).passportInvalid}</p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="ein">{(a as any).ein}</Label>
+                    <Input
+                      id="ein"
+                      value={ein}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
+                        let formatted = raw;
+                        if (raw.length > 2) formatted = `${raw.slice(0, 2)}-${raw.slice(2)}`;
+                        setEin(formatted);
+                      }}
+                      placeholder={(a as any).einPlaceholder}
+                      maxLength={10}
+                    />
+                    {ein && ein.replace(/\D/g, "").length !== 9 && (
+                      <p className="text-xs text-destructive">{(a as any).einInvalid}</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={() => setStep(3)} className="gap-2">
+                    <ArrowLeft className="h-4 w-4" /> {a.back}
+                  </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
                     {loading && <Loader2 className="animate-spin" />}
                     {a.createAccountBtn}
