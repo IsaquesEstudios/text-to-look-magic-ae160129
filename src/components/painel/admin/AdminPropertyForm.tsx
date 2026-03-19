@@ -367,7 +367,12 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       invalidateAll();
       onClose();
     } catch (error: any) {
-      toast({ title: p.error, description: error?.message ?? p.unexpectedError, variant: "destructive" });
+      const raw = error?.message ?? p.unexpectedError;
+      let detail = raw;
+      if (raw.includes("numeric field overflow")) {
+        detail = `numeric field overflow — O valor calculado de purchase_price (${validatedTotalProjetoComTaxas.toFixed(2)}) ou estimated_return_pct (${calculatedReturn.toFixed(2)}) excede o limite da coluna no banco (numeric 12,2 / 5,2). Reduza os valores de arremate, reforma ou venda.`;
+      }
+      toast({ title: p.error, description: detail, variant: "destructive" });
     } finally {
       setLoading(false);
     }
