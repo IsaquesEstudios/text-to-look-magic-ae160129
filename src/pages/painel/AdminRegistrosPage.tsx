@@ -28,112 +28,72 @@ type Registration = {
   created_at: string;
 };
 
-export default function AdminRegistrosPage() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [searchPending, setSearchPending] = useState("");
-  const [searchApproved, setSearchApproved] = useState("");
-  const [searchRejected, setSearchRejected] = useState("");
+const langLabel = (code: string) => {
+  switch (code) {
+    case "pt": return "🇧🇷 Português";
+    case "en": return "🇺🇸 English";
+    case "es": return "🇪🇸 Español";
+    default: return code;
+  }
+};
 
-  const { data: registrations, isLoading } = useQuery({
-    queryKey: ["admin-registrations"],
-    refetchOnMount: "always",
-    staleTime: 0,
-    queryFn: async () => {
-      const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
+const statusBadge = (status: string) => {
+  switch (status) {
+    case "pending":
+      return <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
+    case "approved":
+      return <Badge variant="outline" className="text-green-500 border-green-500/30 gap-1"><UserCheck className="h-3 w-3" /> Aprovado</Badge>;
+    case "rejected":
+      return <Badge variant="outline" className="text-red-500 border-red-500/30 gap-1"><UserX className="h-3 w-3" /> Rejeitado</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
 
-      const { data: adminRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin" as any);
-      const adminIds = new Set((adminRoles ?? []).map(r => r.user_id));
+function filterBySearch(list: Registration[], query: string) {
+  if (!query.trim()) return list;
+  const q = query.toLowerCase();
+  return list.filter(r =>
+    (r.full_name || "").toLowerCase().includes(q) ||
+    (r.phone || "").toLowerCase().includes(q) ||
+    (r.country || "").toLowerCase().includes(q) ||
+    (r.address_city || "").toLowerCase().includes(q) ||
+    (r.address_state || "").toLowerCase().includes(q)
+  );
+}
 
-      const nonAdminProfiles = (profiles ?? []).filter(p => !adminIds.has(p.user_id));
-
-      return nonAdminProfiles.map(p => ({
-        ...p,
-        email: "",
-      })) as Registration[];
-    },
+function groupByDate(list: Registration[]) {
+  const groups: Record<string, Registration[]> = {};
+  list.forEach(r => {
+    const dateKey = format(new Date(r.created_at), "dd/MM/yyyy");
+    if (!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(r);
   });
+  return Object.entries(groups);
+}
 
-  const updateStatus = useMutation({
-    mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ status } as any)
-        .eq("user_id", userId);
-      if (error) throw error;
-    },
-    onSuccess: (_, { status }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      toast({
-        title: status === "approved" ? "Usuário aprovado" : "Usuário rejeitado",
-        description: status === "approved"
-          ? "O usuário agora pode acessar a plataforma."
-          : "O acesso do usuário foi negado.",
-      });
-    },
-    onError: (error: any) => {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    },
-  });
+function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 pointer-events-none" />
+      <Input
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder="Buscar por nome, cidade, país..."
+        className="pl-9 h-9 text-sm bg-secondary/30 border-border/30"
+      />
+    </div>
+  );
+}
 
-  const filterBySearch = (list: Registration[], query: string) => {
-    if (!query.trim()) return list;
-    const q = query.toLowerCase();
-    return list.filter(r =>
-      (r.full_name || "").toLowerCase().includes(q) ||
-      (r.phone || "").toLowerCase().includes(q) ||
-      (r.country || "").toLowerCase().includes(q) ||
-      (r.address_city || "").toLowerCase().includes(q) ||
-      (r.address_state || "").toLowerCase().includes(q)
-    );
-  };
+function RegistrationCard({ reg, onUpdateStatus, isPending }: {
+  reg: Registration;
+  onUpdateStatus: (userId: string, status: string) => void;
+  isPending: boolean;
+}) {
+  const showActions = reg.status === "pending";
 
-  // Group by date
-  const groupByDate = (list: Registration[]) => {
-    const groups: Record<string, Registration[]> = {};
-    list.forEach(r => {
-      const dateKey = format(new Date(r.created_at), "dd/MM/yyyy");
-      if (!groups[dateKey]) groups[dateKey] = [];
-      groups[dateKey].push(r);
-    });
-    return Object.entries(groups);
-  };
-
-  const pending = registrations?.filter(r => r.status === "pending") ?? [];
-  const approved = registrations?.filter(r => r.status === "approved") ?? [];
-  const rejected = registrations?.filter(r => r.status === "rejected") ?? [];
-
-  const langLabel = (code: string) => {
-    switch (code) {
-      case "pt": return "🇧🇷 Português";
-      case "en": return "🇺🇸 English";
-      case "es": return "🇪🇸 Español";
-      default: return code;
-    }
-  };
-
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
-      case "approved":
-        return <Badge variant="outline" className="text-green-500 border-green-500/30 gap-1"><UserCheck className="h-3 w-3" /> Aprovado</Badge>;
-      case "rejected":
-        return <Badge variant="outline" className="text-red-500 border-red-500/30 gap-1"><UserX className="h-3 w-3" /> Rejeitado</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const RegistrationCard = ({ reg, showActions }: { reg: Registration; showActions: boolean }) => (
+  return (
     <Card className="border-border/50 bg-card/80">
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-start gap-3">
@@ -170,35 +130,20 @@ export default function AdminRegistrosPage() {
             </p>
             {showActions && (
               <div className="flex items-center gap-2 pt-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
-                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
-                  disabled={updateStatus.isPending}
-                >
+                <Button size="sm" variant="outline" className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                  onClick={() => onUpdateStatus(reg.user_id, "approved")} disabled={isPending}>
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1 h-8 text-xs"
-                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "rejected" })}
-                  disabled={updateStatus.isPending}
-                >
+                <Button size="sm" variant="outline" className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1 h-8 text-xs"
+                  onClick={() => onUpdateStatus(reg.user_id, "rejected")} disabled={isPending}>
                   <X className="h-3.5 w-3.5" /> Rejeitar
                 </Button>
               </div>
             )}
             {!showActions && reg.status === "rejected" && (
               <div className="flex items-center gap-2 pt-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
-                  onClick={() => updateStatus.mutate({ userId: reg.user_id, status: "approved" })}
-                  disabled={updateStatus.isPending}
-                >
+                <Button size="sm" variant="outline" className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                  onClick={() => onUpdateStatus(reg.user_id, "approved")} disabled={isPending}>
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
               </div>
@@ -208,35 +153,95 @@ export default function AdminRegistrosPage() {
       </CardContent>
     </Card>
   );
+}
 
-  const SearchInput = ({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) => (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 pointer-events-none" />
-      <Input
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder || "Buscar por nome, cidade, país..."}
-        className="pl-9 h-9 text-sm bg-secondary/30 border-border/30"
-      />
+function DateGroupedList({ items, onUpdateStatus, isPending }: {
+  items: Registration[];
+  onUpdateStatus: (userId: string, status: string) => void;
+  isPending: boolean;
+}) {
+  const groups = groupByDate(items);
+  if (groups.length === 0) return null;
+  return (
+    <div className="space-y-5">
+      {groups.map(([date, regs]) => (
+        <div key={date} className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">{date}</p>
+          <div className="space-y-2">
+            {regs.map(reg => (
+              <RegistrationCard key={reg.id} reg={reg} onUpdateStatus={onUpdateStatus} isPending={isPending} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
+}
 
-  const DateGroupedList = ({ items, showActions }: { items: Registration[]; showActions: boolean }) => {
-    const groups = groupByDate(items);
-    if (groups.length === 0) return null;
-    return (
-      <div className="space-y-5">
-        {groups.map(([date, regs]) => (
-          <div key={date} className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">{date}</p>
-            <div className="space-y-2">
-              {regs.map(reg => <RegistrationCard key={reg.id} reg={reg} showActions={showActions} />)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+export default function AdminRegistrosPage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [searchPending, setSearchPending] = useState("");
+  const [searchApproved, setSearchApproved] = useState("");
+  const [searchRejected, setSearchRejected] = useState("");
+
+  const { data: registrations, isLoading } = useQuery({
+    queryKey: ["admin-registrations"],
+    refetchOnMount: "always",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data: profiles, error } = await supabase
+        .from("profiles")
+        .select("id, user_id, full_name, phone, whatsapp, country, address_city, address_state, postal_code, preferred_language, status, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin" as any);
+      const adminIds = new Set((adminRoles ?? []).map(r => r.user_id));
+
+      return (profiles ?? [])
+        .filter(p => !adminIds.has(p.user_id))
+        .map(p => ({ ...p, email: "" })) as Registration[];
+    },
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ status } as any)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { status }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast({
+        title: status === "approved" ? "Usuário aprovado" : "Usuário rejeitado",
+        description: status === "approved"
+          ? "O usuário agora pode acessar a plataforma."
+          : "O acesso do usuário foi negado.",
+      });
+    },
+    onError: (error: any) => {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleUpdateStatus = (userId: string, status: string) => {
+    updateStatus.mutate({ userId, status });
   };
+
+  const pending = registrations?.filter(r => r.status === "pending") ?? [];
+  const approved = registrations?.filter(r => r.status === "approved") ?? [];
+  const rejected = registrations?.filter(r => r.status === "rejected") ?? [];
+
+  const filteredPending = filterBySearch(pending, searchPending);
+  const filteredApproved = filterBySearch(approved, searchApproved);
+  const filteredRejected = filterBySearch(rejected, searchRejected);
 
   if (isLoading) {
     return (
@@ -245,10 +250,6 @@ export default function AdminRegistrosPage() {
       </div>
     );
   }
-
-  const filteredPending = filterBySearch(pending, searchPending);
-  const filteredApproved = filterBySearch(approved, searchApproved);
-  const filteredRejected = filterBySearch(rejected, searchRejected);
 
   return (
     <div className="space-y-4">
@@ -288,7 +289,7 @@ export default function AdminRegistrosPage() {
               <p className="text-sm">{searchPending ? "Nenhum resultado encontrado" : "Nenhum registro pendente"}</p>
             </div>
           ) : (
-            <DateGroupedList items={filteredPending} showActions />
+            <DateGroupedList items={filteredPending} onUpdateStatus={handleUpdateStatus} isPending={updateStatus.isPending} />
           )}
         </TabsContent>
 
@@ -299,7 +300,7 @@ export default function AdminRegistrosPage() {
               <p className="text-sm">{searchApproved ? "Nenhum resultado encontrado" : "Nenhum usuário aprovado ainda"}</p>
             </div>
           ) : (
-            <DateGroupedList items={filteredApproved} showActions={false} />
+            <DateGroupedList items={filteredApproved} onUpdateStatus={handleUpdateStatus} isPending={updateStatus.isPending} />
           )}
         </TabsContent>
 
@@ -310,7 +311,7 @@ export default function AdminRegistrosPage() {
               <p className="text-sm">{searchRejected ? "Nenhum resultado encontrado" : "Nenhum usuário rejeitado"}</p>
             </div>
           ) : (
-            <DateGroupedList items={filteredRejected} showActions={false} />
+            <DateGroupedList items={filteredRejected} onUpdateStatus={handleUpdateStatus} isPending={updateStatus.isPending} />
           )}
         </TabsContent>
       </Tabs>
