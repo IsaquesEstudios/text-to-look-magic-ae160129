@@ -302,6 +302,7 @@ export default function AdminUserProfilePage() {
 
   const startEditingProfile = () => {
     if (!profile) return;
+    const pr = profile as any;
     setProfileForm({
       full_name: profile.full_name || "",
       phone: profile.phone || "",
@@ -314,6 +315,10 @@ export default function AdminUserProfilePage() {
       address_neighborhood: profile.address_neighborhood || "",
       address_city: profile.address_city || "",
       address_state: profile.address_state || "",
+      person_type: pr.person_type || "individual",
+      itin_ssn: pr.itin_ssn || "",
+      passport: pr.passport || "",
+      ein: pr.ein || "",
     });
     setEditingProfile(true);
   };
