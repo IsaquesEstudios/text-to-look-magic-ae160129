@@ -342,8 +342,8 @@ export default function LeilaoDetailPage() {
                     <Button
                       size="sm"
                       className="gap-2"
-                      onClick={() => updateItemMutation.mutate()}
-                      disabled={!editItemForm.title || updateItemMutation.isPending}
+                      onClick={() => { console.log("editItemForm.title:", JSON.stringify(editItemForm.title), "isPending:", updateItemMutation.isPending); updateItemMutation.mutate(); }}
+                      disabled={!editItemForm.title.trim() || updateItemMutation.isPending}
                     >
                       <Save className="h-4 w-4" />
                       {updateItemMutation.isPending ? "Salvando..." : "Salvar"}
