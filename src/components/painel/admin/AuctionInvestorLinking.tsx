@@ -437,7 +437,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7 text-destructive"
-                              onClick={() => unlinkMutation.mutate(g.shareIds)}
+                              onClick={() => unlinkMutation.mutate({ propertyId: item.property_id!, userId: g.userId })}
                               disabled={unlinkMutation.isPending}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
