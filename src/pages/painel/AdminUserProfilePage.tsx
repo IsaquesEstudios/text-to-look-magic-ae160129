@@ -293,11 +293,78 @@ export default function AdminUserProfilePage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">{userId}</p>
         </div>
-        <Badge variant="outline" className="border-primary/30 text-primary text-base px-4 py-1.5">
-          <DollarSign className="h-4 w-4 mr-1" />
-          {credits.toLocaleString("en-US")}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="border-primary/30 text-primary text-base px-4 py-1.5">
+            <DollarSign className="h-4 w-4 mr-1" />
+            {credits.toLocaleString("en-US")}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <UserX className="h-4 w-4" />
+            Excluir
+          </Button>
+        </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Excluir Usuário
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Tem certeza que deseja excluir a conta de{" "}
+                  <strong>{profile.full_name || "este usuário"}</strong>? Esta ação é irreversível.
+                </p>
+                {hasBalance && (
+                  <Alert variant="destructive" className="border-yellow-500/50 text-yellow-600 [&>svg]:text-yellow-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Saldo em conta</AlertTitle>
+                    <AlertDescription>
+                      Este usuário possui <strong>${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong> em créditos. O saldo será perdido permanentemente.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {hasLinkedProperties && (
+                  <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Vínculos a propriedades</AlertTitle>
+                    <AlertDescription>
+                      Este usuário está vinculado a {linkedProperties.length} propriedade{linkedProperties.length > 1 ? "s" : ""}:
+                      <ul className="list-disc pl-4 mt-1 space-y-0.5">
+                        {linkedProperties.map(s => (
+                          <li key={s.id}>
+                            {s.property?.title || "Propriedade"} — ${Number(s.amount_paid).toLocaleString("en-US")}
+                          </li>
+                        ))}
+                      </ul>
+                      Todos os vínculos serão removidos permanentemente.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Excluir permanentemente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
