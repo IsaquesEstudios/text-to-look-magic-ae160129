@@ -116,6 +116,26 @@ export default function AdminUserProfilePage() {
     enabled: !!userId && !!user && isAdmin,
   });
 
+  const { data: userShares } = useQuery({
+    queryKey: ["admin-user-shares", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shares")
+        .select("id, property_id, amount_paid")
+        .eq("user_id", userId!);
+      if (error) throw error;
+      if (!data || data.length === 0) return [];
+      const propertyIds = [...new Set(data.map(s => s.property_id))];
+      const { data: props } = await supabase
+        .from("properties")
+        .select("id, title, type")
+        .in("id", propertyIds);
+      const propMap = new Map((props ?? []).map(p => [p.id, p]));
+      return data.map(s => ({ ...s, property: propMap.get(s.property_id) }));
+    },
+    enabled: !!userId && !!user && isAdmin,
+  });
+
   const receivedImages = paymentImages?.filter((img) => img.type === "received") ?? [];
   const sentImages = paymentImages?.filter((img) => img.type === "sent") ?? [];
 
