@@ -341,7 +341,11 @@ export default function AdminUserProfilePage() {
           address_neighborhood: profileForm.address_neighborhood || null,
           address_city: profileForm.address_city || null,
           address_state: profileForm.address_state || null,
-        })
+          person_type: profileForm.person_type,
+          itin_ssn: profileForm.itin_ssn || null,
+          passport: profileForm.passport || null,
+          ein: profileForm.ein || null,
+        } as any)
         .eq("user_id", userId);
       if (error) throw error;
       toast({ title: "Perfil atualizado" });
