@@ -181,6 +181,10 @@ export default function Auth() {
           address_state: addressState.trim() || null,
           postal_code: postalCode.trim() || null,
           preferred_language: preferredLanguage,
+          person_type: personType,
+          itin_ssn: personType === "individual" ? (itinSsn.trim() || null) : null,
+          passport: personType === "individual" ? (passport.trim() || null) : null,
+          ein: personType === "business" ? (ein.trim() || null) : null,
         } as any).eq("user_id", data.user.id);
       }
 
