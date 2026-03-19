@@ -222,6 +222,43 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4 text-primary" />Tipo de Pessoa</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Select value={form.person_type} onValueChange={(v: "individual" | "business") => update("person_type", v)}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="individual">Pessoa Física</SelectItem>
+              <SelectItem value="business">Pessoa Jurídica</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {form.person_type === "individual" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>ITIN/SSN</Label>
+                <Input value={form.itin_ssn} onChange={(e) => update("itin_ssn", e.target.value)} placeholder="000-00-0000" maxLength={20} />
+              </div>
+              <div className="space-y-2">
+                <Label>Passaporte</Label>
+                <Input value={form.passport} onChange={(e) => update("passport", e.target.value)} placeholder="Nº do passaporte" maxLength={30} />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>EIN</Label>
+                <Input value={form.ein} onChange={(e) => update("ein", e.target.value)} placeholder="00-0000000" maxLength={20} />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="gap-2">
         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         {p.saveChanges}
