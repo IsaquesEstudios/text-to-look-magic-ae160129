@@ -278,9 +278,23 @@ export default function AdminUserProfilePage() {
   };
 
   const credits = Number(profile?.credits) || 0;
-  const linkedProperties = userShares ?? [];
+
+  // Consolidate multiple shares in the same property
+  const consolidatedShares = (() => {
+    const map = new Map<string, { property_id: string; total_paid: number; property?: { id: string; title: string; type: string } }>();
+    for (const s of userShares ?? []) {
+      const existing = map.get(s.property_id);
+      if (existing) {
+        existing.total_paid += Number(s.amount_paid);
+      } else {
+        map.set(s.property_id, { property_id: s.property_id, total_paid: Number(s.amount_paid), property: s.property });
+      }
+    }
+    return Array.from(map.values());
+  })();
+
   const hasBalance = credits > 0;
-  const hasLinkedProperties = linkedProperties.length > 0;
+  const hasLinkedProperties = consolidatedShares.length > 0;
 
   if (isLoading) {
     return (
