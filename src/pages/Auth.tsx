@@ -30,12 +30,21 @@ export default function Auth() {
   const { user, isLoading, profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to panel if already logged in and approved
+  // Redirect recovery links to reset page before normal auth redirects
   useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get("type");
+    const accessToken = hashParams.get("access_token");
+
+    if (type === "recovery" && accessToken) {
+      navigate(`/reset-password${window.location.hash}`, { replace: true });
+      return;
+    }
+
     if (!isLoading && user && profile?.status === 'approved') {
       navigate("/painel", { replace: true });
     }
-    // If auth finished loading with no user, clear any stale session data
+
     if (!isLoading && !user) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) {
