@@ -41,6 +41,7 @@ const SENDER_DOMAIN = "notify.email.discoveryinvestimentos.com"
 const ROOT_DOMAIN = "email.discoveryinvestimentos.com"
 const FROM_DOMAIN = "email.discoveryinvestimentos.com" // Domain shown in From address (may be root or sender subdomain)
 const CUSTOM_SITE_URL = "https://app.discoveryinvestimentos.com"
+const CUSTOM_RESET_URL = `${CUSTOM_SITE_URL}/reset-password`
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
