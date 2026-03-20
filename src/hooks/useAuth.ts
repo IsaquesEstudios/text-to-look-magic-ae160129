@@ -74,8 +74,15 @@ export function useAuthInternal(): AuthState {
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         if (!isMounted) return;
+
+        // Intercept password recovery flow — redirect before app routes kick in
+        if (event === "PASSWORD_RECOVERY" && isBrowser && !window.location.pathname.startsWith("/reset-password")) {
+          window.location.href = "/reset-password";
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
 
