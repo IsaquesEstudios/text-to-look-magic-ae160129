@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { AdminContractForm } from "@/components/painel/admin/AdminContractForm";
+import { UserContractUploadForm } from "@/components/painel/UserContractUploadForm";
 
 export default function UserContratosPage() {
   const { user, isAdmin } = useAuth();
