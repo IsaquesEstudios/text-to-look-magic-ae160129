@@ -279,18 +279,22 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
+              {isForgotPassword
+                ? (a as any).forgotPasswordTitle
+                : isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
-              {isLogin
-                ? a.accessAccount
-                : step === 1
-                  ? a.signupDescription
-                  : step === 2
-                    ? a.chooseLanguageDescription
-                    : a.completeProfile}
+              {isForgotPassword
+                ? (a as any).forgotPasswordDescription
+                : isLogin
+                  ? a.accessAccount
+                  : step === 1
+                    ? a.signupDescription
+                    : step === 2
+                      ? a.chooseLanguageDescription
+                      : a.completeProfile}
             </CardDescription>
-            {!isLogin && (
+            {!isLogin && !isForgotPassword && (
               <div className="flex justify-center gap-2 pt-2">
                 {[1, 2, 3].map((s) => (
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
