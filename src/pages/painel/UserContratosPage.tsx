@@ -209,7 +209,7 @@ export default function UserContratosPage() {
                           onClick={() => openSignDialog(contract.id, contract.title, "admin")}
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />
-                          Assinar (Admin)
+                          Assinar
                         </Button>
                       )}
 
