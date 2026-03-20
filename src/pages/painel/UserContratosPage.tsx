@@ -109,16 +109,18 @@ export default function UserContratosPage() {
             {isAdmin ? "Gerencie contratos dos investidores" : "Contratos de investimento para assinatura"}
           </p>
         </div>
-        {isAdmin && (
-          <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl">
-            <PlusCircle className="h-4 w-4" />
-            Novo Contrato
-          </Button>
-        )}
+        <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl">
+          <PlusCircle className="h-4 w-4" />
+          Novo Contrato
+        </Button>
       </div>
 
-      {showForm && isAdmin && (
-        <AdminContractForm onClose={() => setShowForm(false)} />
+      {showForm && (
+        isAdmin ? (
+          <AdminContractForm onClose={() => setShowForm(false)} />
+        ) : (
+          <UserContractUploadForm userId={user!.id} onClose={() => setShowForm(false)} />
+        )
       )}
 
       {!contracts?.length ? (
