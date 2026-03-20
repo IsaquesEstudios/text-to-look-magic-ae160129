@@ -459,8 +459,9 @@ export default function Auth() {
                   <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
-                  <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(4)}>
-                    {a.next}
+                  <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
+                    {loading && <Loader2 className="animate-spin" />}
+                    {a.createAccountBtn}
                   </Button>
                 </div>
               </form>
