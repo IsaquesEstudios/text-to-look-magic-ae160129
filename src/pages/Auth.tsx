@@ -46,6 +46,7 @@ export default function Auth() {
   }, [user, isLoading, profile, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
