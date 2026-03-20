@@ -278,7 +278,7 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : step === 3 ? a.yourInfo : (a as any).personTypeTitle}
+              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
               {isLogin
@@ -287,13 +287,11 @@ export default function Auth() {
                   ? a.signupDescription
                   : step === 2
                     ? a.chooseLanguageDescription
-                    : step === 3
-                      ? a.completeProfile
-                      : (a as any).personTypeDescription}
+                    : a.completeProfile}
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
-                {[1, 2, 3, 4].map((s) => (
+                {[1, 2, 3].map((s) => (
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
                 ))}
               </div>
