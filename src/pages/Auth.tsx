@@ -505,14 +505,16 @@ export default function Auth() {
 
 
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => { setIsLogin(!isLogin); setStep(1); }}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                {isLogin ? a.noAccount : a.hasAccount}
-              </button>
-            </div>
+            {!isForgotPassword && (
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => { setIsLogin(!isLogin); setStep(1); }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {isLogin ? a.noAccount : a.hasAccount}
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
