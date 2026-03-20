@@ -20,6 +20,7 @@ import {
 const Auth = lazy(() => import("./pages/Auth"));
 const ExcluirConta = lazy(() => import("./pages/ExcluirConta"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AuthVerifyRedirect = lazy(() => import("./pages/AuthVerifyRedirect"));
 
 // Panel pages
 const Painel = lazy(() => import("./pages/Painel"));
@@ -85,6 +86,7 @@ export const routes: RouteObject[] = [
   // Auth is the homepage
   { path: "/", element: <S><Auth /></S> },
   { path: "/reset-password", element: <S><ResetPassword /></S> },
+  { path: "/auth/v1/verify", element: <S><AuthVerifyRedirect /></S> },
   { path: "/excluir-conta", element: <S><ExcluirConta /></S> },
 
   // Panel

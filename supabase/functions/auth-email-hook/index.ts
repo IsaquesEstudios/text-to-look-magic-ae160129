@@ -220,21 +220,19 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Build template props from payload.data (HookData structure)
-  // Rewrite confirmation URL and nested redirect_to to use the custom domain
-  let confirmationUrl = payload.data.url || ''
-  if (confirmationUrl && CUSTOM_SITE_URL) {
+  // Keep the verification URL on the auth backend and rewrite only redirect_to
+  let confirmationUrl = payload.data.url || CUSTOM_RESET_URL
+  if (confirmationUrl) {
     try {
       const parsed = new URL(confirmationUrl)
-      const custom = new URL(CUSTOM_SITE_URL)
-      parsed.protocol = custom.protocol
-      parsed.host = custom.host
-
       const redirectTo = parsed.searchParams.get('redirect_to')
+
       if (redirectTo) {
         const redirectUrl = new URL(redirectTo)
-        redirectUrl.protocol = custom.protocol
-        redirectUrl.host = custom.host
-        redirectUrl.pathname = '/reset-password'
+        const customReset = new URL(CUSTOM_RESET_URL)
+        redirectUrl.protocol = customReset.protocol
+        redirectUrl.host = customReset.host
+        redirectUrl.pathname = customReset.pathname
         redirectUrl.search = ''
         redirectUrl.hash = ''
         parsed.searchParams.set('redirect_to', redirectUrl.toString())
