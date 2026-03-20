@@ -219,11 +219,23 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Build template props from payload.data (HookData structure)
+  // Rewrite confirmation URL to use the custom domain
+  let confirmationUrl = payload.data.url || ''
+  if (confirmationUrl && CUSTOM_SITE_URL) {
+    try {
+      const parsed = new URL(confirmationUrl)
+      const custom = new URL(CUSTOM_SITE_URL)
+      parsed.protocol = custom.protocol
+      parsed.host = custom.host
+      confirmationUrl = parsed.toString()
+    } catch { /* keep original */ }
+  }
+
   const templateProps = {
     siteName: SITE_NAME,
-    siteUrl: `https://${ROOT_DOMAIN}`,
+    siteUrl: CUSTOM_SITE_URL,
     recipient: payload.data.email,
-    confirmationUrl: payload.data.url,
+    confirmationUrl,
     token: payload.data.token,
     email: payload.data.email,
     newEmail: payload.data.new_email,

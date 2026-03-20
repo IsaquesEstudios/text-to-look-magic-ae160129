@@ -59,7 +59,9 @@ export default function ResetPassword() {
 
       setSuccess(true);
       await supabase.auth.signOut();
-      setTimeout(() => navigate("/", { replace: true }), 2500);
+      setTimeout(() => {
+        window.location.href = "https://app.discoveryinvestimentos.com/";
+      }, 2500);
     } catch (error: any) {
       toast({ title: (a as any).error, description: error.message, variant: "destructive" });
     } finally {
