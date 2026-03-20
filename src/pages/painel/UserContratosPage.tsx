@@ -201,7 +201,7 @@ export default function UserContratosPage() {
                         </Button>
                       )}
 
-                      {isAdmin && contract.user_signed_at && !contract.admin_signed_at && (
+                      {isAdmin && !contract.admin_signed_at && (
                         <Button
                           variant="cta"
                           size="sm"
