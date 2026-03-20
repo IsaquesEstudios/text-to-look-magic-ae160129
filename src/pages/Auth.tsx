@@ -46,6 +46,7 @@ export default function Auth() {
   }, [user, isLoading, profile, navigate]);
 
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -278,18 +279,22 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
+              {isForgotPassword
+                ? (a as any).forgotPasswordTitle
+                : isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
-              {isLogin
-                ? a.accessAccount
-                : step === 1
-                  ? a.signupDescription
-                  : step === 2
-                    ? a.chooseLanguageDescription
-                    : a.completeProfile}
+              {isForgotPassword
+                ? (a as any).forgotPasswordDescription
+                : isLogin
+                  ? a.accessAccount
+                  : step === 1
+                    ? a.signupDescription
+                    : step === 2
+                      ? a.chooseLanguageDescription
+                      : a.completeProfile}
             </CardDescription>
-            {!isLogin && (
+            {!isLogin && !isForgotPassword && (
               <div className="flex justify-center gap-2 pt-2">
                 {[1, 2, 3].map((s) => (
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
@@ -298,8 +303,40 @@ export default function Auth() {
             )}
           </CardHeader>
           <CardContent>
+            {/* Forgot password form */}
+            {isForgotPassword && (
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                try {
+                  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  });
+                  if (error) throw error;
+                  toast({ title: (a as any).resetLinkSent, description: (a as any).resetLinkSentDescription });
+                  setIsForgotPassword(false);
+                } catch (error: any) {
+                  toast({ title: a.error, description: error.message, variant: "destructive" });
+                } finally {
+                  setLoading(false);
+                }
+              }} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">{a.email}</Label>
+                  <Input id="forgot-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required maxLength={255} />
+                </div>
+                <Button type="submit" variant="cta" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="animate-spin" />}
+                  {(a as any).sendResetLink}
+                </Button>
+                <button type="button" onClick={() => setIsForgotPassword(false)} className="w-full text-sm text-muted-foreground hover:text-primary transition-colors">
+                  {(a as any).backToLogin ?? "Voltar ao login"}
+                </button>
+              </form>
+            )}
+
             {/* Step 1: credentials */}
-            {(isLogin || step === 1) && (
+            {!isForgotPassword && (isLogin || step === 1) && (
               <form onSubmit={handleStep1} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-2">
@@ -319,6 +356,11 @@ export default function Auth() {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
+                  {isLogin && (
+                    <button type="button" onClick={() => setIsForgotPassword(true)} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                      {(a as any).forgotPassword}
+                    </button>
+                  )}
                 </div>
                 {isLogin && (
                   <div className="space-y-2 rounded-lg border border-border bg-muted/50 p-3">
@@ -463,14 +505,16 @@ export default function Auth() {
 
 
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => { setIsLogin(!isLogin); setStep(1); }}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                {isLogin ? a.noAccount : a.hasAccount}
-              </button>
-            </div>
+            {!isForgotPassword && (
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => { setIsLogin(!isLogin); setStep(1); }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {isLogin ? a.noAccount : a.hasAccount}
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

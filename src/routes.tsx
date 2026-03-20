@@ -19,6 +19,7 @@ import {
 // Lazy load pages
 const Auth = lazy(() => import("./pages/Auth"));
 const ExcluirConta = lazy(() => import("./pages/ExcluirConta"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Panel pages
 const Painel = lazy(() => import("./pages/Painel"));
@@ -83,6 +84,7 @@ const panelChildren: RouteObject[] = [
 export const routes: RouteObject[] = [
   // Auth is the homepage
   { path: "/", element: <S><Auth /></S> },
+  { path: "/reset-password", element: <S><ResetPassword /></S> },
   { path: "/excluir-conta", element: <S><ExcluirConta /></S> },
 
   // Panel
