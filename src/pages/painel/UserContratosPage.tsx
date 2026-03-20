@@ -213,7 +213,7 @@ export default function UserContratosPage() {
                         </Button>
                       )}
 
-                      {isAdmin && (
+                      {(isAdmin || contract.user_id === user?.id) && (
                         <Button
                           variant="ghost"
                           size="sm"
