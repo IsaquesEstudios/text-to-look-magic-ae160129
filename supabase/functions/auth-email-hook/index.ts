@@ -220,29 +220,24 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Build template props from payload.data (HookData structure)
-  // Keep the verification URL on the auth backend and rewrite only redirect_to
-  let confirmationUrl = payload.data.url || CUSTOM_RESET_URL
+  // Rewrite only the redirect_to inside the Supabase verification URL
+  // so after token exchange the user lands on app.discoveryinvestimentos.com
+  let confirmationUrl = payload.data.url || ''
   if (confirmationUrl) {
     try {
       const parsed = new URL(confirmationUrl)
-      const redirectTo = parsed.searchParams.get('redirect_to')
 
-      if (redirectTo) {
-        const redirectUrl = new URL(redirectTo)
-        const customReset = new URL(CUSTOM_RESET_URL)
-        redirectUrl.protocol = customReset.protocol
-        redirectUrl.host = customReset.host
-        redirectUrl.pathname = customReset.pathname
-        redirectUrl.search = ''
-        redirectUrl.hash = ''
-        parsed.searchParams.set('redirect_to', redirectUrl.toString())
-      } else {
-        parsed.searchParams.set('redirect_to', CUSTOM_RESET_URL)
-      }
+      // Determine the correct post-verification destination
+      const isRecovery = emailType === 'recovery'
+      const destination = isRecovery ? CUSTOM_RESET_URL : CUSTOM_SITE_URL
 
+      // Always set redirect_to to the custom domain
+      parsed.searchParams.set('redirect_to', destination)
       confirmationUrl = parsed.toString()
-    } catch {
-      confirmationUrl = payload.data.url || CUSTOM_RESET_URL
+
+      console.log('Rewritten confirmationUrl', { emailType, destination, original: payload.data.url, rewritten: confirmationUrl })
+    } catch (e) {
+      console.error('Failed to rewrite confirmationUrl', { error: e, url: payload.data.url })
     }
   }
 
