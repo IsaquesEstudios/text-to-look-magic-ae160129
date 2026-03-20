@@ -152,25 +152,6 @@ export default function Auth() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate document fields
-    if (personType === "individual") {
-      const ssnDigits = itinSsn.replace(/\D/g, "");
-      if (ssnDigits.length !== 9) {
-        toast({ title: a.error, description: (a as any).itinSsnInvalid, variant: "destructive" });
-        return;
-      }
-      if (passport && (passport.length < 5 || passport.length > 20)) {
-        toast({ title: a.error, description: (a as any).passportInvalid, variant: "destructive" });
-        return;
-      }
-    } else {
-      const einDigits = ein.replace(/\D/g, "");
-      if (einDigits.length !== 9) {
-        toast({ title: a.error, description: (a as any).einInvalid, variant: "destructive" });
-        return;
-      }
-    }
-
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
