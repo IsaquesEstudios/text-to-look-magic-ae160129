@@ -86,6 +86,7 @@ export const routes: RouteObject[] = [
   // Auth is the homepage
   { path: "/", element: <S><Auth /></S> },
   { path: "/reset-password", element: <S><ResetPassword /></S> },
+  { path: "/auth/v1/verify", element: <S><AuthVerifyRedirect /></S> },
   { path: "/excluir-conta", element: <S><ExcluirConta /></S> },
 
   // Panel
