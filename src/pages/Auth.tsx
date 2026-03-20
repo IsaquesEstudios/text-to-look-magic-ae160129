@@ -319,7 +319,7 @@ export default function Auth() {
                 setLoading(true);
                 try {
                   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: `${window.location.origin}/reset-password`,
+                    redirectTo: `https://app.discoveryinvestimentos.com/reset-password`,
                   });
                   if (error) throw error;
                   toast({ title: (a as any).resetLinkSent, description: (a as any).resetLinkSentDescription });
