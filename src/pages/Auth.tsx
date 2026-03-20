@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, ArrowLeft, Check, Clock, LogOut, ShieldX, Mail, User, Building2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check, Clock, LogOut, ShieldX, Mail } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
@@ -84,11 +84,7 @@ export default function Auth() {
   const [postalCode, setPostalCode] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<Language>("pt");
 
-  // Step 4 fields
-  const [personType, setPersonType] = useState<"individual" | "business">("individual");
-  const [itinSsn, setItinSsn] = useState("");
-  const [passport, setPassport] = useState("");
-  const [ein, setEin] = useState("");
+
 
   const { toast } = useToast();
   const a = translations[preferredLanguage].auth;
@@ -152,25 +148,6 @@ export default function Auth() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate document fields
-    if (personType === "individual") {
-      const ssnDigits = itinSsn.replace(/\D/g, "");
-      if (ssnDigits.length !== 9) {
-        toast({ title: a.error, description: (a as any).itinSsnInvalid, variant: "destructive" });
-        return;
-      }
-      if (passport && (passport.length < 5 || passport.length > 20)) {
-        toast({ title: a.error, description: (a as any).passportInvalid, variant: "destructive" });
-        return;
-      }
-    } else {
-      const einDigits = ein.replace(/\D/g, "");
-      if (einDigits.length !== 9) {
-        toast({ title: a.error, description: (a as any).einInvalid, variant: "destructive" });
-        return;
-      }
-    }
-
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -201,10 +178,6 @@ export default function Auth() {
           address_state: addressState.trim() || null,
           postal_code: postalCode.trim() || null,
           preferred_language: preferredLanguage,
-          person_type: personType,
-          itin_ssn: personType === "individual" ? (itinSsn.trim() || null) : null,
-          passport: personType === "individual" ? (passport.trim() || null) : null,
-          ein: personType === "business" ? (ein.trim() || null) : null,
         } as any).eq("user_id", data.user.id);
       }
 
@@ -305,7 +278,7 @@ export default function Auth() {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
-              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : step === 3 ? a.yourInfo : (a as any).personTypeTitle}
+              {isLogin ? a.login : step === 1 ? a.createAccount : step === 2 ? a.chooseLanguage : a.yourInfo}
             </CardTitle>
             <CardDescription>
               {isLogin
@@ -314,13 +287,11 @@ export default function Auth() {
                   ? a.signupDescription
                   : step === 2
                     ? a.chooseLanguageDescription
-                    : step === 3
-                      ? a.completeProfile
-                      : (a as any).personTypeDescription}
+                    : a.completeProfile}
             </CardDescription>
             {!isLogin && (
               <div className="flex justify-center gap-2 pt-2">
-                {[1, 2, 3, 4].map((s) => (
+                {[1, 2, 3].map((s) => (
                   <div key={s} className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`} />
                 ))}
               </div>
@@ -482,95 +453,6 @@ export default function Auth() {
                   <Button type="button" variant="outline" onClick={() => setStep(2)} className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> {a.back}
                   </Button>
-                  <Button type="button" variant="cta" className="flex-1" onClick={() => setStep(4)}>
-                    {a.next}
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {/* Step 4: person type & documents */}
-            {!isLogin && step === 4 && (
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="grid gap-3">
-                  {([{ value: "individual" as const, icon: User, label: (a as any).individual }, { value: "business" as const, icon: Building2, label: (a as any).business }]).map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setPersonType(opt.value)}
-                      className={`flex items-center gap-3 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
-                        personType === opt.value
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
-                      }`}
-                    >
-                      <opt.icon className="h-5 w-5" />
-                      <span className="flex-1">{opt.label}</span>
-                      {personType === opt.value && <Check className="h-4 w-4 text-primary" />}
-                    </button>
-                  ))}
-                </div>
-
-                {personType === "individual" ? (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="itin-ssn">{(a as any).itinSsn}</Label>
-                      <Input
-                        id="itin-ssn"
-                        value={itinSsn}
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
-                          let formatted = raw;
-                          if (raw.length > 5) formatted = `${raw.slice(0, 3)}-${raw.slice(3, 5)}-${raw.slice(5)}`;
-                          else if (raw.length > 3) formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
-                          setItinSsn(formatted);
-                        }}
-                        placeholder={(a as any).itinSsnPlaceholder}
-                        maxLength={11}
-                      />
-                      {itinSsn && itinSsn.replace(/\D/g, "").length !== 9 && (
-                        <p className="text-xs text-destructive">{(a as any).itinSsnInvalid}</p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="passport">{(a as any).passport}</Label>
-                      <Input
-                        id="passport"
-                        value={passport}
-                        onChange={(e) => setPassport(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}
-                        placeholder={(a as any).passportPlaceholder}
-                        maxLength={20}
-                      />
-                      {passport && (passport.length < 5 || passport.length > 20) && (
-                        <p className="text-xs text-destructive">{(a as any).passportInvalid}</p>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="ein">{(a as any).ein}</Label>
-                    <Input
-                      id="ein"
-                      value={ein}
-                      onChange={(e) => {
-                        const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
-                        let formatted = raw;
-                        if (raw.length > 2) formatted = `${raw.slice(0, 2)}-${raw.slice(2)}`;
-                        setEin(formatted);
-                      }}
-                      placeholder={(a as any).einPlaceholder}
-                      maxLength={10}
-                    />
-                    {ein && ein.replace(/\D/g, "").length !== 9 && (
-                      <p className="text-xs text-destructive">{(a as any).einInvalid}</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => setStep(3)} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> {a.back}
-                  </Button>
                   <Button type="submit" variant="cta" className="flex-1" disabled={loading}>
                     {loading && <Loader2 className="animate-spin" />}
                     {a.createAccountBtn}
@@ -578,6 +460,8 @@ export default function Auth() {
                 </div>
               </form>
             )}
+
+
 
             <div className="mt-6 text-center">
               <button
