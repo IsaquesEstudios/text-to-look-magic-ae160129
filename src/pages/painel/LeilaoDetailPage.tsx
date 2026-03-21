@@ -321,12 +321,32 @@ export default function LeilaoDetailPage() {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </button>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
             {auction.status === "finished" ? (
               <Badge variant="secondary">Encerrado</Badge>
             ) : (
               <Badge className="bg-discovery-green text-primary-foreground">Publicado</Badge>
+            )}
+            {auction.visibility === "private" && (
+              <Badge variant="outline" className="gap-1">
+                <Lock className="h-3 w-3" /> Privado
+              </Badge>
+            )}
+            {isAdmin && auction.status !== "finished" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 h-8"
+                onClick={() => toggleVisibilityMutation.mutate()}
+                disabled={toggleVisibilityMutation.isPending}
+              >
+                {auction.visibility === "public" ? (
+                  <><Lock className="h-3.5 w-3.5" /> Tornar Privado</>
+                ) : (
+                  <><Globe className="h-3.5 w-3.5" /> Publicar</>
+                )}
+              </Button>
             )}
             {isAdmin && (
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={startEditing}>
