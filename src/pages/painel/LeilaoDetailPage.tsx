@@ -262,6 +262,12 @@ export default function LeilaoDetailPage() {
 
   const addPropertyMutation = useMutation({
     mutationFn: async () => {
+      for (let i = 0; i < newPropertyForms.length; i++) {
+        const pForm = newPropertyForms[i];
+        const validationError = validateItemForm(pForm);
+        if (validationError) throw new Error(`Imóvel ${i + 1}: ${validationError}`);
+      }
+
       for (const pForm of newPropertyForms) {
         const { error: itemError } = await supabase.from("auction_items").insert({
           auction_id: id!,
