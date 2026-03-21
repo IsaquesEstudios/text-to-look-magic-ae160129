@@ -306,7 +306,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       title: form.title,
       location: form.location,
       state_code: form.state_code,
-      total_shares: form.total_shares,
+      total_shares: form.total_shares || 1,
       share_price: form.share_price || 0,
       status: form.status,
       estimated_auction_value: form.estimated_auction_value || 0,
