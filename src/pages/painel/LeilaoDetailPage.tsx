@@ -115,6 +115,22 @@ export default function LeilaoDetailPage() {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async () => {
+      if (!auction) return;
+      const newVis = auction.visibility === "public" ? "private" : "public";
+      const { error } = await supabase.from("auctions").update({ visibility: newVis, updated_at: new Date().toISOString() }).eq("id", id!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
+      toast({ title: "Visibilidade atualizada" });
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
   const startEditing = () => {
     if (!auction) return;
     setEditForm({
