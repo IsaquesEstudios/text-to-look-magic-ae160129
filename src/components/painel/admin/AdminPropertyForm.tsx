@@ -32,13 +32,13 @@ const propertyFormSchema = z.object({
   title: z.string().trim().min(1).max(200),
   location: z.string().trim().min(1).max(200),
   state_code: z.string().trim().min(1).max(10),
-  total_shares: z.coerce.number().int().min(1).max(1_000_000),
-  share_price: currencySchema,
+  total_shares: z.coerce.number().int().min(1).max(1_000_000).default(1),
+  share_price: currencySchema.default(0),
   status: z.string().trim().min(1).max(50),
-  estimated_auction_value: currencySchema,
-  estimated_renovation_cost: currencySchema,
-  estimated_sale_value: currencySchema,
-  estimated_timeline: z.string().trim().max(100),
+  estimated_auction_value: currencySchema.default(0),
+  estimated_renovation_cost: currencySchema.default(0),
+  estimated_sale_value: currencySchema.default(0),
+  estimated_timeline: z.string().trim().max(100).default(""),
 });
 
 function formatUSD(value: number) {
