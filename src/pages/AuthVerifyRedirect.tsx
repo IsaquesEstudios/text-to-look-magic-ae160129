@@ -2,27 +2,10 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import discoveryLogo from "@/assets/discovery-logo.png";
 
+const CANONICAL_ORIGIN = "https://app.discoveryinvestimentos.com";
+
 const getSafeResetUrl = () => {
-  try {
-    const currentUrl = new URL(window.location.href);
-    const redirectTo = currentUrl.searchParams.get("redirect_to");
-    const fallbackUrl = new URL("/reset-password", window.location.origin);
-
-    if (!redirectTo) {
-      return fallbackUrl.toString();
-    }
-
-    const targetUrl = new URL(redirectTo);
-    targetUrl.protocol = fallbackUrl.protocol;
-    targetUrl.host = fallbackUrl.host;
-    targetUrl.pathname = fallbackUrl.pathname;
-    targetUrl.search = "";
-    targetUrl.hash = "";
-
-    return targetUrl.toString();
-  } catch {
-    return new URL("/reset-password", window.location.origin).toString();
-  }
+  return `${CANONICAL_ORIGIN}/reset-password`;
 };
 
 export default function AuthVerifyRedirect() {
