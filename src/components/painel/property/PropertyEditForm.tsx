@@ -103,8 +103,31 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     setUploading(false);
   };
 
+  const validateForm = (): string | null => {
+    if (!form.title.trim()) return "O campo 'Título' é obrigatório.";
+    if (!form.location.trim()) return "O campo 'Cidade' é obrigatório.";
+    if (!form.state_code) return "O campo 'Estado' é obrigatório.";
+    const auctionVal = parseFloat(form.estimated_auction_value);
+    if (form.estimated_auction_value && isNaN(auctionVal)) return "O campo 'Valor Est. de Arremate' contém um valor inválido.";
+    if (auctionVal < 0) return "O campo 'Valor Est. de Arremate' não pode ser negativo.";
+    const renovVal = parseFloat(form.estimated_renovation_cost);
+    if (form.estimated_renovation_cost && isNaN(renovVal)) return "O campo 'Valor Est. de Reforma' contém um valor inválido.";
+    if (renovVal < 0) return "O campo 'Valor Est. de Reforma' não pode ser negativo.";
+    const saleVal = parseFloat(form.estimated_sale_value);
+    if (form.estimated_sale_value && isNaN(saleVal)) return "O campo 'Valor Est. de Venda' contém um valor inválido.";
+    if (saleVal < 0) return "O campo 'Valor Est. de Venda' não pode ser negativo.";
+    const total = (auctionVal || 0) + (renovVal || 0);
+    if (total > 9999999999.99) return "O 'Total Est. do Projeto' excede o limite máximo permitido ($9,999,999,999.99).";
+    const roi = total > 0 ? (((saleVal || 0) - total) / total) * 100 : 0;
+    if (Math.abs(roi) > 99999.99) return "O 'Retorno Estimado' excede o limite máximo permitido (99,999.99%).";
+    return null;
+  };
+
   const saveMutation = useMutation({
     mutationFn: async () => {
+      const validationError = validateForm();
+      if (validationError) throw new Error(validationError);
+
       const auctionVal = parseFloat(form.estimated_auction_value) || 0;
       const renovVal = parseFloat(form.estimated_renovation_cost) || 0;
 
@@ -121,9 +144,9 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           estimated_sale_value: parseFloat(form.estimated_sale_value) || 0,
           estimated_return_pct:
             auctionVal + renovVal > 0
-              ? ((parseFloat(form.estimated_sale_value) || 0) - (auctionVal + renovVal)) /
+              ? Math.min(((parseFloat(form.estimated_sale_value) || 0) - (auctionVal + renovVal)) /
                 (auctionVal + renovVal) *
-                100
+                100, 99999.99)
               : 0,
           estimated_timeline: form.estimated_timeline.trim(),
           status: form.status,
