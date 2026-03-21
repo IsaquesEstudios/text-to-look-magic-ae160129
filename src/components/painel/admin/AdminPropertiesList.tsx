@@ -139,8 +139,7 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
           const status = statusLabels[property.status] || statusLabels.available;
           const auction = Number(property.estimated_auction_value || 0);
           const renovation = Number(property.estimated_renovation_cost || 0);
-          const serviceFee = property.type === "house" ? 5000 : 500;
-          const totalProject = auction + serviceFee + renovation + renovation * 0.12;
+          const totalProject = auction + renovation;
           const sale = Number(property.estimated_sale_value || 0);
           const roi = totalProject > 0 ? ((sale - totalProject) / totalProject) * 100 : 0;
           return (
