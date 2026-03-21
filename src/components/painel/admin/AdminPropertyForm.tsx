@@ -117,8 +117,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
   const totalProjeto = auctionValue + renovationCost;
   const serviceFee = getServiceFee(form.type);
-  const renovationServiceFee = renovationCost * 0.12;
-  const totalProjetoComTaxas = totalProjeto + serviceFee + renovationServiceFee;
+  const hasInvestors = investorsToLink.length > 0;
+  const totalProjetoComTaxas = totalProjeto + (hasInvestors ? serviceFee : 0);
 
   // Calculate already-added amounts per investor
   const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
@@ -322,9 +322,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
     const validated = parsedForm.data;
     const validatedServiceFee = getServiceFee(validated.type);
-    const validatedRenovationFee = validated.estimated_renovation_cost * 0.12;
     const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
-    const validatedTotalProjetoComTaxas = validatedTotalProjeto + validatedServiceFee + validatedRenovationFee;
+    const validatedHasInvestors = investorsToLink.length > 0;
+    const validatedTotalProjetoComTaxas = validatedTotalProjeto + (validatedHasInvestors ? validatedServiceFee : 0);
     const calculatedReturn = validatedTotalProjetoComTaxas > 0
       ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas) / validatedTotalProjetoComTaxas) * 100
       : 0;
