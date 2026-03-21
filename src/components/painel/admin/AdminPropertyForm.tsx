@@ -249,6 +249,54 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
   };
 
+  const getValidationErrorMessage = (error: z.ZodError<typeof propertyFormSchema._type>) => {
+    const issue = error.issues[0];
+    if (!issue) return p.invalidValue;
+
+    const fieldLabels: Record<string, string> = {
+      title: "Título",
+      location: "Cidade",
+      state_code: "Estado",
+      total_shares: "Total de cotas",
+      share_price: "Valor da cota",
+      status: "Status",
+      estimated_auction_value: "Valor Est. de Arremate",
+      estimated_renovation_cost: "Valor Est. de Reforma",
+      estimated_sale_value: "Valor Est. de Venda",
+      estimated_timeline: "Prazo Estimado",
+    };
+
+    const field = String(issue.path[0] ?? "");
+    const label = fieldLabels[field] ?? "campo";
+
+    if (issue.code === "too_small") {
+      return `O campo '${label}' é obrigatório.`;
+    }
+
+    if (issue.code === "too_big") {
+      if (field === "estimated_auction_value" || field === "estimated_renovation_cost" || field === "estimated_sale_value") {
+        return `O campo '${label}' excede o limite máximo permitido ($${formatUSD(MAX_PROPERTY_AMOUNT)}).`;
+      }
+      if (field === "estimated_timeline") {
+        return `O campo '${label}' pode ter no máximo 100 caracteres.`;
+      }
+      if (field === "title" || field === "location") {
+        return `O campo '${label}' pode ter no máximo 200 caracteres.`;
+      }
+      return `O campo '${label}' excede o limite permitido.`;
+    }
+
+    if (issue.code === "invalid_type") {
+      return `O campo '${label}' contém um valor inválido.`;
+    }
+
+    if (issue.code === "custom") {
+      return issue.message || `O campo '${label}' contém um valor inválido.`;
+    }
+
+    return `Verifique o campo '${label}'.`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -268,7 +316,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     });
 
     if (!parsedForm.success) {
-      toast({ title: p.error, description: p.invalidValue, variant: "destructive" });
+      toast({ title: p.error, description: getValidationErrorMessage(parsedForm.error), variant: "destructive" });
       return;
     }
 
@@ -281,12 +329,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas) / validatedTotalProjetoComTaxas) * 100
       : 0;
 
-    if (
-      validatedTotalProjetoComTaxas > MAX_PROPERTY_AMOUNT ||
-      !Number.isFinite(calculatedReturn) ||
-      Math.abs(calculatedReturn) > MAX_PROPERTY_ROI
-    ) {
-      toast({ title: p.error, description: p.maxValueExceeded, variant: "destructive" });
+    if (validatedTotalProjetoComTaxas > MAX_PROPERTY_AMOUNT) {
+      toast({
+        title: p.error,
+        description: `O 'Total Est. do Projeto' excede o limite máximo permitido ($${formatUSD(MAX_PROPERTY_AMOUNT)}).`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!Number.isFinite(calculatedReturn) || Math.abs(calculatedReturn) > MAX_PROPERTY_ROI) {
+      toast({
+        title: p.error,
+        description: `O 'Retorno Estimado' excede o limite máximo permitido (${formatUSD(MAX_PROPERTY_ROI)}%).`,
+        variant: "destructive",
+      });
       return;
     }
 
