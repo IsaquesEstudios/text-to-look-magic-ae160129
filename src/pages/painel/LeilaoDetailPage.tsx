@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Clock, DollarSign, MapPin, Home, TreePine, Pencil, Save, X, Plus, Trash2, ArrowLeft, Lock, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -111,6 +111,22 @@ export default function LeilaoDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
       toast({ title: "Leilão atualizado!" });
       setEditing(false);
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async () => {
+      if (!auction) return;
+      const newVis = auction.visibility === "public" ? "private" : "public";
+      const { error } = await supabase.from("auctions").update({ visibility: newVis, updated_at: new Date().toISOString() }).eq("id", id!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-auctions"] });
+      toast({ title: "Visibilidade atualizada" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -305,12 +321,32 @@ export default function LeilaoDetailPage() {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </button>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
             {auction.status === "finished" ? (
               <Badge variant="secondary">Encerrado</Badge>
             ) : (
               <Badge className="bg-discovery-green text-primary-foreground">Publicado</Badge>
+            )}
+            {auction.visibility === "private" && (
+              <Badge variant="outline" className="gap-1">
+                <Lock className="h-3 w-3" /> Privado
+              </Badge>
+            )}
+            {isAdmin && auction.status !== "finished" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 h-8"
+                onClick={() => toggleVisibilityMutation.mutate()}
+                disabled={toggleVisibilityMutation.isPending}
+              >
+                {auction.visibility === "public" ? (
+                  <><Lock className="h-3.5 w-3.5" /> Tornar Privado</>
+                ) : (
+                  <><Globe className="h-3.5 w-3.5" /> Publicar</>
+                )}
+              </Button>
             )}
             {isAdmin && (
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={startEditing}>
