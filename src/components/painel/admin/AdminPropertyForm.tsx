@@ -117,8 +117,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
   const totalProjeto = auctionValue + renovationCost;
   const serviceFee = getServiceFee(form.type);
-  const renovationServiceFee = renovationCost * 0.12;
-  const totalProjetoComTaxas = totalProjeto + serviceFee + renovationServiceFee;
+  const hasInvestors = investorsToLink.length > 0;
+  const totalProjetoComTaxas = totalProjeto + (hasInvestors ? serviceFee : 0);
 
   // Calculate already-added amounts per investor
   const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
