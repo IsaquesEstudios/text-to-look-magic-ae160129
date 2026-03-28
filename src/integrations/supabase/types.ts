@@ -744,6 +744,7 @@ export type Database = {
         Row: {
           amount_paid: number
           id: string
+          investment_plan: string
           property_id: string
           purchased_at: string
           quantity: number
@@ -752,6 +753,7 @@ export type Database = {
         Insert: {
           amount_paid: number
           id?: string
+          investment_plan?: string
           property_id: string
           purchased_at?: string
           quantity?: number
@@ -760,6 +762,7 @@ export type Database = {
         Update: {
           amount_paid?: number
           id?: string
+          investment_plan?: string
           property_id?: string
           purchased_at?: string
           quantity?: number
@@ -886,16 +889,28 @@ export type Database = {
         Args: { p_property_id: string }
         Returns: undefined
       }
-      admin_link_investor_to_property: {
-        Args: {
-          p_amount: number
-          p_property_id: string
-          p_property_title: string
-          p_property_type: string
-          p_user_id: string
-        }
-        Returns: undefined
-      }
+      admin_link_investor_to_property:
+        | {
+            Args: {
+              p_amount: number
+              p_property_id: string
+              p_property_title: string
+              p_property_type: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_investment_plan?: string
+              p_property_id: string
+              p_property_title: string
+              p_property_type: string
+              p_user_id: string
+            }
+            Returns: undefined
+          }
       admin_unlink_investor: {
         Args: { p_property_id: string; p_user_id: string }
         Returns: undefined
