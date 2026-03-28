@@ -6,10 +6,12 @@ import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
+import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface Props {
   propertyId: string | null;
