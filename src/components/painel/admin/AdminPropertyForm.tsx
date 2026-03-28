@@ -401,6 +401,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             p_amount: amount,
             p_property_type: validated.type,
             p_property_title: validated.title.trim(),
+            p_investment_plan: investor.plan,
           });
           if (error) {
             toast({
