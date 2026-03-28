@@ -72,7 +72,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     state_code: "",
     total_shares: "",
     share_price: "",
-    status: "available",
+    status: "auctioned",
     estimated_auction_value: "",
     estimated_renovation_cost: "",
     estimated_return_pct: "",

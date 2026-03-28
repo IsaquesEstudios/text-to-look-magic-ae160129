@@ -16,7 +16,8 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       const { data: properties } = await supabase
         .from("properties")
         .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
-        .eq("type", filterType);
+        .eq("type", filterType)
+        .neq("status", "available");
 
       const props = properties ?? [];
       const arremate = props.reduce((s, p) => s + Number(p.estimated_auction_value || 0), 0);
@@ -99,7 +100,8 @@ export default function AdminImoveisPage() {
     queryFn: async () => {
       const { data: props } = await supabase
         .from("properties")
-        .select("type");
+        .select("type")
+        .neq("status", "available");
 
       const list = props ?? [];
       return {
