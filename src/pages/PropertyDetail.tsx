@@ -154,6 +154,7 @@ export default function PropertyDetail() {
             propertyId={property.id}
             totalProject={purchasePrice}
             renovationCost={renovationCost}
+            estimatedSaleValue={saleValue}
             propertyType={property.type}
             propertyTitle={property.title}
           />

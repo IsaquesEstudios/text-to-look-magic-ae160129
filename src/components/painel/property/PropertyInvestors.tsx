@@ -14,6 +14,7 @@ interface Props {
   propertyId: string;
   totalProject: number;
   renovationCost: number;
+  estimatedSaleValue?: number;
   propertyType?: string;
   propertyTitle?: string;
 }
@@ -22,7 +23,7 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export function PropertyInvestors({ propertyId, totalProject, renovationCost, propertyType, propertyTitle }: Props) {
+export function PropertyInvestors({ propertyId, totalProject, renovationCost, estimatedSaleValue, propertyType, propertyTitle }: Props) {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -220,6 +221,7 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, pr
         propertyType={propertyType ?? "house"}
         totalProject={totalProject}
         renovationCost={renovationCost}
+        estimatedSaleValue={estimatedSaleValue}
         remaining={remaining}
         onLink={(userId, amount, plan) => linkMutation.mutate({ userId, amount, plan })}
         isPending={linkMutation.isPending}

@@ -359,6 +359,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
           propertyType={linkingItem.type === "terreno" ? "land" : "house"}
           totalProject={linkingTotalProject}
           renovationCost={linkingRenovationVal}
+          estimatedSaleValue={linkingItem ? Number(linkingItem.estimated_sale_value) || 0 : 0}
           remaining={linkingRemaining}
           onLink={(userId, amount, plan) => linkMutation.mutate({ item: linkingItem, userId, amount, plan })}
           isPending={linkMutation.isPending}
