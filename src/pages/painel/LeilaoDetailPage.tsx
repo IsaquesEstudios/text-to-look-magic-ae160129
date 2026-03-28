@@ -259,7 +259,27 @@ export default function LeilaoDetailPage() {
 
         // Link auction item to the new property
         await supabase.from("auction_items").update({ property_id: propertyId }).eq("id", editingItemId);
-      } else if (propertyId) {
+      } else if (!shouldBeProperty && propertyId) {
+        // Status reverted to "available" — check if property has investors
+        const { count } = await supabase
+          .from("shares")
+          .select("id", { count: "exact", head: true })
+          .eq("property_id", propertyId);
+
+        if ((count ?? 0) > 0) {
+          throw new Error("Não é possível reverter para 'Disponível' pois há investidores vinculados. Desvincule-os primeiro.");
+        }
+
+        // Remove property and unlink from auction item
+        await supabase.from("property_images").delete().eq("property_id", propertyId);
+        await supabase.from("property_messages").delete().eq("property_id", propertyId);
+        await supabase.from("property_expenses").delete().eq("property_id", propertyId);
+        await supabase.from("property_message_reads").delete().eq("property_id", propertyId);
+        await supabase.from("property_expense_reads").delete().eq("property_id", propertyId);
+        await supabase.from("auction_items").update({ property_id: null }).eq("id", editingItemId);
+        await supabase.from("properties").delete().eq("id", propertyId);
+        propertyId = null;
+      } else if (shouldBeProperty && propertyId) {
         // Update existing property
         const { error: propError } = await supabase.from("properties").update({
           title: resolvedTitle,
