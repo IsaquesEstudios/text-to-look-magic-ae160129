@@ -55,6 +55,7 @@ export function LinkInvestorDialog({
   totalProject,
   renovationCost,
   remaining,
+  estimatedSaleValue = 0,
   onLink,
   isPending,
   reservedCreditsMap,
