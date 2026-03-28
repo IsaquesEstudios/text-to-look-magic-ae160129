@@ -174,9 +174,12 @@ export default function LeilaoDetailPage() {
     return null;
   };
 
+  // Statuses that mean the item should become a property
+  const PROPERTY_STATUSES = ["auctioned", "waiting_permit", "renovation_in_progress", "for_sale", "under_contract", "sold"];
+
   const updateItemMutation = useMutation({
-    mutationFn: async () => {
-      if (!editingItemId) return;
+    mutationFn: async (): Promise<string | null> => {
+      if (!editingItemId) return null;
 
       const validationError = validateItemForm(editItemForm);
       if (validationError) throw new Error(validationError);
@@ -186,14 +189,20 @@ export default function LeilaoDetailPage() {
         editItemForm.title.trim() ||
         (editItemForm.type === "house" ? "Imóvel do leilão" : "Terreno do leilão");
       const resolvedLocation = `${editItemForm.location.trim()}${editItemForm.state_code ? `, ${editItemForm.state_code}` : ""}`;
+      const auctionVal = parseFloat(editItemForm.estimated_auction_value) || 0;
+      const renovationVal = parseFloat(editItemForm.estimated_renovation_cost) || 0;
+      const saleVal = parseFloat(editItemForm.estimated_sale_value) || 0;
+      const totalProjeto = auctionVal + renovationVal;
+      const roi = totalProjeto > 0 ? ((saleVal - totalProjeto) / totalProjeto) * 100 : 0;
+
       const updatedData = {
         title: resolvedTitle,
         type: editItemForm.type === "house" ? "casa" : "terreno",
         location: resolvedLocation,
         state_code: editItemForm.state_code || null,
-        estimated_auction_value: parseFloat(editItemForm.estimated_auction_value) || 0,
-        estimated_renovation_cost: parseFloat(editItemForm.estimated_renovation_cost) || 0,
-        estimated_sale_value: parseFloat(editItemForm.estimated_sale_value) || 0,
+        estimated_auction_value: auctionVal,
+        estimated_renovation_cost: renovationVal,
+        estimated_sale_value: saleVal,
         estimated_timeline: editItemForm.estimated_timeline.trim(),
         status: editItemForm.status,
         cover_image_url: editItemForm.coverImage,
@@ -204,13 +213,54 @@ export default function LeilaoDetailPage() {
       const { error } = await supabase.from("auction_items").update(updatedData).eq("id", editingItemId);
       if (error) throw error;
 
-      if (item?.property_id) {
-        const auctionVal = parseFloat(editItemForm.estimated_auction_value) || 0;
-        const renovationVal = parseFloat(editItemForm.estimated_renovation_cost) || 0;
-        const saleVal = parseFloat(editItemForm.estimated_sale_value) || 0;
-        const totalProjeto = auctionVal + renovationVal;
-        const roi = totalProjeto > 0 ? ((saleVal - totalProjeto) / totalProjeto) * 100 : 0;
+      const shouldBeProperty = PROPERTY_STATUSES.includes(editItemForm.status);
+      let propertyId = item?.property_id ?? null;
 
+      if (shouldBeProperty && !propertyId) {
+        // Auto-create property from auction item
+        const propType = editItemForm.type === "house" ? "house" : "land";
+        const { data: prop, error: propError } = await supabase
+          .from("properties")
+          .insert({
+            type: propType,
+            title: resolvedTitle,
+            location: resolvedLocation,
+            state_code: editItemForm.state_code || null,
+            purchase_price: totalProjeto,
+            estimated_auction_value: auctionVal,
+            estimated_renovation_cost: renovationVal,
+            estimated_return_pct: Math.min(roi, 99999.99),
+            estimated_sale_value: saleVal,
+            total_shares: 1,
+            share_price: 0,
+            available_shares: 1,
+            status: editItemForm.status,
+            cover_image_url: editItemForm.coverImage,
+            estimated_timeline: editItemForm.estimated_timeline.trim(),
+            created_by: user!.id,
+          })
+          .select("id")
+          .single();
+        if (propError) throw propError;
+
+        propertyId = prop.id;
+
+        // Copy gallery images
+        const gallery = editItemForm.galleryImages ?? [];
+        if (gallery.length > 0) {
+          await supabase.from("property_images").insert(
+            gallery.map((url, i) => ({
+              property_id: propertyId!,
+              image_url: url,
+              sort_order: i,
+            }))
+          );
+        }
+
+        // Link auction item to the new property
+        await supabase.from("auction_items").update({ property_id: propertyId }).eq("id", editingItemId);
+      } else if (propertyId) {
+        // Update existing property
         const { error: propError } = await supabase.from("properties").update({
           title: resolvedTitle,
           type: editItemForm.type === "house" ? "house" : "land",
@@ -223,16 +273,24 @@ export default function LeilaoDetailPage() {
           estimated_timeline: editItemForm.estimated_timeline.trim(),
           status: editItemForm.status,
           cover_image_url: editItemForm.coverImage,
-        }).eq("id", item.property_id);
+        }).eq("id", propertyId);
         if (propError) throw propError;
       }
+
+      return shouldBeProperty && propertyId ? propertyId : null;
     },
-    onSuccess: () => {
+    onSuccess: (propertyId) => {
       queryClient.invalidateQueries({ queryKey: ["auction-items", id] });
       queryClient.invalidateQueries({ queryKey: ["admin-properties"] });
       queryClient.invalidateQueries({ queryKey: ["user-properties"] });
-      toast({ title: "Imóvel atualizado!" });
       setEditingItemId(null);
+
+      if (propertyId) {
+        toast({ title: "Imóvel criado e movido para Propriedades!" });
+        navigate(`/painel/imovel/${propertyId}`);
+      } else {
+        toast({ title: "Imóvel atualizado!" });
+      }
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
