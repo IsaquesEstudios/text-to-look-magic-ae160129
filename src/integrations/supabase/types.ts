@@ -936,6 +936,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      property_has_investors: { Args: { prop_id: string }; Returns: boolean }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
