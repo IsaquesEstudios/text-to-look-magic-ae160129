@@ -428,7 +428,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
   };
 
-  const availableInvestors = (investorsWithCredits ?? []).filter((inv) => getAvailableCredits(inv.user_id) > 0);
+  // No longer needed - dialog handles its own investor list
 
   return (
     <div className="space-y-6">
