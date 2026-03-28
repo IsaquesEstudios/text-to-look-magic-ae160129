@@ -22,6 +22,7 @@ interface InvestorToLink {
   userId: string;
   rawAmount: number;
   displayAmount: string;
+  plan: InvestmentPlan;
 }
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
@@ -47,8 +48,13 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function getServiceFee(type: string): number {
+function getServiceFee(type: string, plan: InvestmentPlan = "standard"): number {
+  if (plan !== "standard") return 0;
   return type === "land" || type === "terreno" ? 500 : 5000;
+}
+
+function getRenovationFeeRate(plan: InvestmentPlan = "standard"): number {
+  return plan === "standard" ? 0.10 : 0;
 }
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
