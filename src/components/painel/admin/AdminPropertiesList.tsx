@@ -49,7 +49,7 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
   const { data: properties, isLoading } = useQuery({
     queryKey: ["admin-properties", filterType ?? "all"],
     queryFn: async () => {
-      let query = supabase.from("properties").select("*").neq("status", "available");
+      let query = supabase.from("properties").select("*");
       if (filterType) {
         query = query.eq("type", filterType);
       }
