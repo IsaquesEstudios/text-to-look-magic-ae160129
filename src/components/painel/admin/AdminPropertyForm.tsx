@@ -606,15 +606,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   )}
                 </div>
 
-                {/* Service fee info */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 text-xs">
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-                  <span className="text-muted-foreground">
-                    Taxa de serviço: <span className="font-semibold text-foreground">${formatUSD(serviceFee)}</span>
-                    {" "}({form.type === "land" ? "terreno" : "casa"}) — proporcional ao valor vinculado
-                  </span>
-                </div>
-
                 {/* Progress bar */}
                 {totalProjeto > 0 && totalLinked > 0 && (
                   <div>
@@ -637,19 +628,34 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {investorsToLink.map((inv, idx) => {
                       const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
                       const amount = inv.rawAmount / 100;
-                      const fee = totalProjeto > 0 ? Math.min(Math.round((amount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
+                      const invServiceFee = getServiceFee(form.type, inv.plan);
+                      const invRenoRate = getRenovationFeeRate(inv.plan);
+                      const arremFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100 : 0;
+                      const renoFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100 : 0;
+                      const totalFee = arremFee + renoFee;
                       const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
+                      const planKey = inv.plan as InvestmentPlan;
 
                       return (
                         <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
-                          <div>
-                            <span className="font-medium">{profile?.full_name || "Usuário"}</span>
-                            <span className="text-muted-foreground ml-2">({pct}%)</span>
+                          <div className="flex flex-col gap-0.5">
+                            <div>
+                              <span className="font-medium">{profile?.full_name || "Usuário"}</span>
+                              <span className="text-muted-foreground ml-2">({pct}%)</span>
+                            </div>
+                            <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[planKey]}`}>
+                              {PLAN_LABELS[planKey]}
+                            </Badge>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
                               <p className="font-semibold">${formatUSD(amount)}</p>
-                              <p className="text-[10px] text-amber-500">Taxa: ${formatUSD(fee)}</p>
+                              {totalFee > 0 && (
+                                <p className="text-[10px] text-amber-500">Taxa: ${formatUSD(totalFee)}</p>
+                              )}
+                              {totalFee === 0 && (
+                                <p className="text-[10px] text-emerald-500">Sem taxas</p>
+                              )}
                             </div>
                             <Button
                               type="button"
@@ -667,111 +673,28 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   </div>
                 )}
 
-                {/* Add investor form */}
-                {showAddInvestor ? (
-                  <div className="space-y-3 pt-2 border-t border-border/50">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Investidor</label>
-                      <select
-                        value={selectedUserId}
-                        onChange={(e) => { setSelectedUserId(e.target.value); setLinkRawAmount(0); setLinkDisplayAmount(""); }}
-                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                      >
-                        <option value="">Selecione um investidor</option>
-                        {availableInvestors.map((inv) => (
-                          <option key={inv.user_id} value={inv.user_id}>
-                            {inv.full_name || "Usuário"} — Saldo: ${formatUSD(getAvailableCredits(inv.user_id))}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 w-full"
+                  onClick={() => setShowLinkDialog(true)}
+                  disabled={remaining <= 0 && totalProjeto > 0}
+                >
+                  <UserPlus className="h-4 w-4" /> Vincular Investidor
+                </Button>
 
-                    {selectedUserId && (
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                          Valor a vincular
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="0.00"
-                            value={linkDisplayAmount}
-                            onChange={(e) => {
-                              const input = e.target.value.replace(/[^0-9]/g, "");
-                              const cents = parseInt(input || "0", 10);
-                              setLinkRawAmount(cents);
-                              if (cents === 0) {
-                                setLinkDisplayAmount("");
-                              } else {
-                                setLinkDisplayAmount((cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                              }
-                            }}
-                            className="pl-7"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Fee breakdown preview */}
-                    {currentAmount > 0 && selectedUserId && (
-                      <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
-                        <p className="font-medium text-foreground">Resumo da operação:</p>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Investimento</span>
-                          <span className="font-semibold">${formatUSD(currentAmount)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            Taxa proporcional ({totalProjeto > 0 ? Math.min((currentAmount / totalProjeto) * 100, 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
-                          </span>
-                          <span className="font-semibold text-amber-500">${formatUSD(currentFeeShare)}</span>
-                        </div>
-                        <div className="border-t border-border/50 pt-1.5 flex justify-between">
-                          <span className="font-medium text-foreground">Total debitado</span>
-                          <span className="font-bold text-foreground">${formatUSD(currentTotalDeduction)}</span>
-                        </div>
-                        {currentTotalDeduction > selectedAvailableCredits && (
-                          <p className="text-destructive font-medium mt-1">
-                            ⚠ Saldo insuficiente (disponível: ${formatUSD(selectedAvailableCredits)})
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="gap-2"
-                        disabled={
-                          !selectedUserId ||
-                          currentAmount <= 0 ||
-                          currentTotalDeduction > selectedAvailableCredits ||
-                          totalProjeto <= 0
-                        }
-                        onClick={addInvestorToList}
-                      >
-                        <UserPlus className="h-4 w-4" />
-                        Adicionar
-                      </Button>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => { setShowAddInvestor(false); setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
-                        Cancelar
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 w-full"
-                    onClick={() => setShowAddInvestor(true)}
-                  >
-                    <UserPlus className="h-4 w-4" /> Vincular Investidor
-                  </Button>
-                )}
+                <LinkInvestorDialog
+                  open={showLinkDialog}
+                  onOpenChange={setShowLinkDialog}
+                  propertyType={form.type}
+                  totalProject={totalProjeto}
+                  renovationCost={renovationCost}
+                  remaining={remaining}
+                  onLink={addInvestorFromDialog}
+                  isPending={false}
+                  reservedCreditsMap={reservedCredits}
+                />
               </div>
             )}
 
