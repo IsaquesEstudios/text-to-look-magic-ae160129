@@ -159,6 +159,22 @@ export function LinkInvestorDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Property summary */}
+          <div className="rounded-lg border border-border bg-secondary/20 p-3 grid grid-cols-3 gap-2 text-xs">
+            <div>
+              <p className="text-muted-foreground">Total Projeto</p>
+              <p className="font-semibold text-foreground">${formatUSD(totalProject)}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Reforma (Est.)</p>
+              <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Disponível</p>
+              <p className="font-semibold text-emerald-500">${formatUSD(Math.max(remaining, 0))}</p>
+            </div>
+          </div>
+
           {/* Step 1: Search investor */}
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">1. Investidor</label>
