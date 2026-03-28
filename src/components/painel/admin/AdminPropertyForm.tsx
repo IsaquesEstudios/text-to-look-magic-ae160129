@@ -85,10 +85,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   // Investor linking state (only for new properties)
   const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
-  const [showAddInvestor, setShowAddInvestor] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [linkRawAmount, setLinkRawAmount] = useState(0);
-  const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -108,8 +105,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       const { data, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, credits")
-        .gt("credits", 0)
-        .order("credits", { ascending: false });
+        .eq("status", "approved")
+        .order("full_name");
       if (error) throw error;
       const { data: adminRoles } = await supabase
         .from("user_roles")
@@ -124,9 +121,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const auctionValue = parseFloat(form.estimated_auction_value) || 0;
   const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
   const totalProjeto = auctionValue + renovationCost;
-  const serviceFee = getServiceFee(form.type);
   const hasInvestors = investorsToLink.length > 0;
-  const totalProjetoComTaxas = totalProjeto + (hasInvestors ? serviceFee : 0);
+  // For standard plans, include the arremate service fee in total project cost
+  const hasStandardInvestor = investorsToLink.some((i) => i.plan === "standard");
+  const serviceFee = getServiceFee(form.type, "standard");
+  const totalProjetoComTaxas = totalProjeto + (hasInvestors && hasStandardInvestor ? serviceFee : 0);
 
   // Calculate already-added amounts per investor
   const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
@@ -136,35 +135,20 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const reservedCredits = new Map<string, number>();
   for (const investor of investorsToLink) {
     const amount = investor.rawAmount / 100;
-    const fee = totalProjeto > 0 ? Math.min(Math.round((amount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
+    const invServiceFee = getServiceFee(form.type, investor.plan);
+    const invRenoRate = getRenovationFeeRate(investor.plan);
+    const fee = totalProjeto > 0
+      ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100
+        + Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100
+      : 0;
     reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
   }
 
-  const getAvailableCredits = (userId: string) => {
-    const investor = investorsWithCredits?.find((item) => item.user_id === userId);
-    if (!investor) return 0;
-    return Number(investor.credits) - (reservedCredits.get(userId) ?? 0);
-  };
-
-
-  // Current link preview
-  const currentAmount = linkRawAmount / 100;
-  const currentFeeShare = totalProjeto > 0 ? Math.min(Math.round((currentAmount / totalProjeto) * serviceFee * 100) / 100, serviceFee) : 0;
-  const currentTotalDeduction = currentAmount + currentFeeShare;
-  const selectedAvailableCredits = getAvailableCredits(selectedUserId);
-
-  const maxLinkableByCredits = totalProjeto > 0
-    ? Math.floor((selectedAvailableCredits / (1 + serviceFee / totalProjeto)) * 100) / 100
-    : selectedAvailableCredits;
-  const maxLinkable = maxLinkableByCredits;
-
-  const addInvestorToList = () => {
-    if (!selectedUserId || currentAmount <= 0) return;
-    setInvestorsToLink((prev) => [...prev, { userId: selectedUserId, rawAmount: linkRawAmount, displayAmount: linkDisplayAmount }]);
-    setSelectedUserId("");
-    setLinkRawAmount(0);
-    setLinkDisplayAmount("");
-    setShowAddInvestor(false);
+  const addInvestorFromDialog = (userId: string, amount: number, plan: InvestmentPlan) => {
+    const rawAmount = Math.round(amount * 100);
+    const displayAmount = amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, plan }]);
+    setShowLinkDialog(false);
   };
 
   const removeInvestorFromList = (index: number) => {
