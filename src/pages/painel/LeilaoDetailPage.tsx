@@ -270,14 +270,11 @@ export default function LeilaoDetailPage() {
           throw new Error("Não é possível reverter para 'Disponível' pois há investidores vinculados. Desvincule-os primeiro.");
         }
 
-        // Remove property and unlink from auction item
-        await supabase.from("property_images").delete().eq("property_id", propertyId);
-        await supabase.from("property_messages").delete().eq("property_id", propertyId);
-        await supabase.from("property_expenses").delete().eq("property_id", propertyId);
-        await supabase.from("property_message_reads").delete().eq("property_id", propertyId);
-        await supabase.from("property_expense_reads").delete().eq("property_id", propertyId);
-        await supabase.from("auction_items").update({ property_id: null }).eq("id", editingItemId);
-        await supabase.from("properties").delete().eq("id", propertyId);
+        // Use RPC to properly delete property (handles all cleanup with SECURITY DEFINER)
+        const { error: delError } = await supabase.rpc("admin_delete_property", {
+          p_property_id: propertyId,
+        });
+        if (delError) throw delError;
         propertyId = null;
       } else if (shouldBeProperty && propertyId) {
         // Update existing property
