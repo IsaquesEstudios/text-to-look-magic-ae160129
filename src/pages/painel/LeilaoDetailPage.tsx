@@ -214,7 +214,14 @@ export default function LeilaoDetailPage() {
       if (error) throw error;
 
       const shouldBeProperty = PROPERTY_STATUSES.includes(editItemForm.status);
-      let propertyId = item?.property_id ?? null;
+
+      // Always fetch the current property_id from DB to avoid stale cache creating duplicates
+      const { data: freshItem } = await supabase
+        .from("auction_items")
+        .select("property_id")
+        .eq("id", editingItemId)
+        .single();
+      let propertyId = freshItem?.property_id ?? null;
 
       if (shouldBeProperty && !propertyId) {
         // Auto-create property from auction item
