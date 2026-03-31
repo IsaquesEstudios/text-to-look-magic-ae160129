@@ -234,7 +234,7 @@ export function UserDashboard() {
               <Link
                 key={prop.id}
                 to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
-                className="group relative flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-4 sm:gap-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300 overflow-hidden"
+                className="group relative flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-4 sm:gap-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
               >
                 <div className="h-11 w-11 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
                   {prop.cover_image_url ? (
