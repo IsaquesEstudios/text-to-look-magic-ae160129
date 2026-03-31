@@ -119,9 +119,9 @@ export default function PropertyDetail() {
           isEditing={isEditing}
         />
 
-        {isEditing ? (
+        {!isDemo && isEditing ? (
           <PropertyEditForm
-            property={property}
+            property={effectiveProperty}
             images={images ?? []}
             onDone={() => setIsEditing(false)}
           />
