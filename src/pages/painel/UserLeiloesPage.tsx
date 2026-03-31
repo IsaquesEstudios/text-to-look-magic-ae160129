@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_AUCTION, DEMO_AUCTION_ITEMS, DEMO_SHARES } from "@/data/demoData";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
@@ -124,7 +125,7 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
 }
 
 export default function UserLeiloesPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const { p, lang } = usePanelTranslation();
   const dateLocale = dateFnsLocales[lang] || ptBR;
   const queryClient = useQueryClient();
@@ -199,13 +200,30 @@ export default function UserLeiloesPage() {
     itemsByAuction.set(item.auction_id, list);
   });
 
-  const active = auctions?.filter((a) => a.status !== "finished") ?? [];
+  // Inject demo data
+  const effectiveAuctions = isDemoUser
+    ? [...(auctions ?? []), DEMO_AUCTION as any]
+    : auctions;
+
+  const effectiveItemsByAuction = new Map<string, any[]>(itemsByAuction as any);
+  if (isDemoUser) {
+    effectiveItemsByAuction.set(DEMO_AUCTION.id, DEMO_AUCTION_ITEMS as any[]);
+    // Add demo shares to maps
+    DEMO_SHARES.forEach((s) => {
+      if (!userSharesMap.has(s.property_id)) {
+        userSharesMap.set(s.property_id, { property_id: s.property_id, amount_paid: s.amount_paid });
+      }
+      linkedPropertyIds.add(s.property_id);
+    });
+  }
+
+  const active = effectiveAuctions?.filter((a) => a.status !== "finished") ?? [];
 
   if (isLoading) return <div className="animate-pulse text-muted-foreground">{p.loading}</div>;
 
-  const renderAuction = (auction: (typeof auctions)[number]) => {
+  const renderAuction = (auction: any) => {
     const start = new Date(auction.scheduled_start);
-    const items = itemsByAuction.get(auction.id) ?? [];
+    const items = effectiveItemsByAuction.get(auction.id) ?? [];
 
     return (
       <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
@@ -268,7 +286,7 @@ export default function UserLeiloesPage() {
           <Gavel className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noAuctionsAvailable}</p>
         </div>
       )}
-      {auctions?.length === 0 && (
+      {effectiveAuctions?.length === 0 && (
         <div className="text-center py-16 text-muted-foreground"><Gavel className="h-10 w-10 mx-auto mb-3 opacity-30" /><p>{p.noAuctionsAvailable}</p></div>
       )}
     </div>

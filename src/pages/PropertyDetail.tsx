@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 import { PropertyEditForm } from "@/components/painel/property/PropertyEditForm";
+import { isDemoPropertyId, getDemoProperty } from "@/data/demoData";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -31,10 +32,12 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  const isDemo = isDemoUser && id && isDemoPropertyId(id);
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
@@ -47,7 +50,7 @@ export default function PropertyDetail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!id && !!user,
+    enabled: !!id && !!user && !isDemo,
   });
 
   const { data: images } = useQuery({
@@ -61,7 +64,7 @@ export default function PropertyDetail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!id && !!user,
+    enabled: !!id && !!user && !isDemo,
   });
 
   const { data: userShares, isLoading: isSharesLoading } = useQuery({
@@ -75,46 +78,50 @@ export default function PropertyDetail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!id && !!user,
+    enabled: !!id && !!user && !isDemo,
   });
 
   const authLoading = !user;
 
-  if (isLoading || isSharesLoading || authLoading) {
+  // Demo property override
+  const effectiveProperty = isDemo ? getDemoProperty(id!) as any : property;
+  const effectiveShares = isDemo ? [{ id: "demo", quantity: 10 }] : userShares;
+
+  if (!isDemo && (isLoading || isSharesLoading || authLoading)) {
     return <PropertyPageSkeleton />;
   }
 
-  if (!property) {
+  if (!effectiveProperty) {
     return <p className="text-center text-muted-foreground py-16">Imóvel não encontrado.</p>;
   }
 
-  const status = statusLabels[property.status] || statusLabels.available;
-  const auctionValue = Number(property.estimated_auction_value) || 0;
-  const renovationCost = Number(property.estimated_renovation_cost) || 0;
+  const status = statusLabels[effectiveProperty.status] || statusLabels.available;
+  const auctionValue = Number(effectiveProperty.estimated_auction_value) || 0;
+  const renovationCost = Number(effectiveProperty.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
-  const saleValue = Number(property.estimated_sale_value) || 0;
+  const saleValue = Number(effectiveProperty.estimated_sale_value) || 0;
   const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
 
   const allImages = [
-    ...(property.cover_image_url ? [{ id: "cover", image_url: property.cover_image_url }] : []),
-    ...(images ?? []),
+    ...(effectiveProperty.cover_image_url ? [{ id: "cover", image_url: effectiveProperty.cover_image_url }] : []),
+    ...(!isDemo ? (images ?? []) : []),
   ];
 
   return (
     <>
       <div className="space-y-6">
         <PropertySubNav
-          propertyId={property.id}
-          propertyTitle={property.title}
+          propertyId={effectiveProperty.id}
+          propertyTitle={effectiveProperty.title}
           active="overview"
-          hasShares={!!(userShares && userShares.length > 0)}
-          onEdit={() => setIsEditing(!isEditing)}
+          hasShares={!!(effectiveShares && effectiveShares.length > 0)}
+          onEdit={isDemo ? undefined : () => setIsEditing(!isEditing)}
           isEditing={isEditing}
         />
 
-        {isEditing ? (
+        {!isDemo && isEditing ? (
           <PropertyEditForm
-            property={property}
+            property={effectiveProperty}
             images={images ?? []}
             onDone={() => setIsEditing(false)}
           />
@@ -126,7 +133,7 @@ export default function PropertyDetail() {
           </div>
           <p className="text-sm text-muted-foreground/80 flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5" />
-            {property.location}
+            {effectiveProperty.location}
           </p>
         </div>
 
@@ -149,14 +156,14 @@ export default function PropertyDetail() {
         </div>
         </div>
 
-        {isAdmin && (
+        {isAdmin && !isDemo && (
           <PropertyInvestors
-            propertyId={property.id}
+            propertyId={effectiveProperty.id}
             totalProject={purchasePrice}
             renovationCost={renovationCost}
             estimatedSaleValue={saleValue}
-            propertyType={property.type}
-            propertyTitle={property.title}
+            propertyType={effectiveProperty.type}
+            propertyTitle={effectiveProperty.title}
           />
         )}
 
@@ -165,10 +172,10 @@ export default function PropertyDetail() {
           style={{ aspectRatio: "2/1" }}
           onClick={() => setLightboxIndex(0)}
         >
-          {property.cover_image_url ? (
+          {effectiveProperty.cover_image_url ? (
             <img
-              src={property.cover_image_url}
-              alt={property.title}
+              src={effectiveProperty.cover_image_url}
+              alt={effectiveProperty.title}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
             />
           ) : (

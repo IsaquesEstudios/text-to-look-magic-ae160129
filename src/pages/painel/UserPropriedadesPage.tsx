@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_SHARES } from "@/data/demoData";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -166,13 +167,14 @@ function PropertyGrid({ aggregated, emptyIcon: EmptyIcon, emptyText, p }: { aggr
 }
 
 export default function UserPropriedadesPage() {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const { p } = usePanelTranslation();
   const { data: shares, isLoading } = useUserShares(user?.id);
   const [activeTab, setActiveTab] = useState("house");
 
-  const houses = aggregateByType(shares ?? [], "house");
-  const lands = aggregateByType(shares ?? [], "land");
+  const effectiveShares = isDemoUser ? [...(shares ?? []), ...DEMO_SHARES as any[]] : (shares ?? []);
+  const houses = aggregateByType(effectiveShares, "house");
+  const lands = aggregateByType(effectiveShares, "land");
 
   if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
 

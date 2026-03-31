@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_SHARES } from "@/data/demoData";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +10,7 @@ import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
 export default function UserCotas() {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const { p } = usePanelTranslation();
 
   const { data: shares, isLoading } = useQuery({
@@ -22,8 +23,12 @@ export default function UserCotas() {
     enabled: !!user,
   });
 
+  const effectiveShares = isDemoUser
+    ? [...(shares ?? []), ...DEMO_SHARES.filter((s) => (s.properties as any)?.type === "house") as any[]]
+    : shares;
+
   const propertyMap = new Map<string, { prop: any; totalQuantity: number; totalPaid: number }>();
-  shares?.forEach((share) => {
+  effectiveShares?.forEach((share) => {
     const prop = share.properties as any;
     if (!prop) return;
     const existing = propertyMap.get(prop.id);

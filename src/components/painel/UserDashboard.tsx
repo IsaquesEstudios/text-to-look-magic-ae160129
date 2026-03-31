@@ -6,11 +6,12 @@ import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard
 import { formatDistanceToNow } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
 import { Link } from "react-router-dom";
+import { DEMO_SHARES, DEMO_CREDIT_TRANSACTIONS, getDemoPropertyNews } from "@/data/demoData";
 
 const dateFnsLocales = { pt: ptBR, en: enUS, es };
 
 export function UserDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, isDemoUser } = useAuth();
   const { p, lang } = usePanelTranslation();
   const dateLocale = dateFnsLocales[lang] || ptBR;
 
@@ -121,13 +122,23 @@ export function UserDashboard() {
     staleTime: 0,
   });
 
-  const credits = profile?.credits ?? 0;
-  const totalProperties = new Set(shares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
+  // Use demo data when demo user
+  const effectiveShares = isDemoUser ? DEMO_SHARES as any[] : shares;
+  const effectiveActivity = isDemoUser
+    ? DEMO_CREDIT_TRANSACTIONS.map((c) => {
+        const typeMap: Record<string, string> = { deposit: p.deposit, withdrawal: p.withdrawal, refund: p.refund, auction_deposit: p.auctionDeposit, profit: p.profitReturn };
+        return { id: c.id, date: c.created_at, title: typeMap[c.type] || c.type, detail: c.description || `$${Number(c.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, amount: Number(c.amount), type: c.type };
+      })
+    : recentActivity;
+  const effectiveNews = isDemoUser ? getDemoPropertyNews() : propertyNews;
+
+  const credits = isDemoUser ? 2500 : (profile?.credits ?? 0);
+  const totalProperties = new Set(effectiveShares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
-    if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
+    if (!effectiveShares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
     const propMap = new Map<string, { totalPaid: number; prop: any }>();
-    shares.forEach((s) => {
+    effectiveShares.forEach((s) => {
       const prop = s.properties as any;
       if (!prop) return;
       const existing = propMap.get(prop.id);
@@ -148,7 +159,7 @@ export function UserDashboard() {
     return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
   })();
 
-  if (isLoading || isNewsLoading || isActivityLoading) {
+  if (!isDemoUser && (isLoading || isNewsLoading || isActivityLoading)) {
     return <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
   }
 
@@ -207,11 +218,11 @@ export function UserDashboard() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
             {p.propertyUpdates}
           </h2>
-          {propertyNews && propertyNews.length > 4 && (
+          {effectiveNews && effectiveNews.length > 4 && (
             <Link to="/painel/meus-projetos" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
           )}
         </div>
-        {!propertyNews?.length ? (
+        {!effectiveNews?.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Building2 className="h-8 w-8 mb-2 opacity-20" />
             <p className="text-sm">{p.noLinkedProperties}</p>
@@ -219,7 +230,7 @@ export function UserDashboard() {
           </div>
         ) : (
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {propertyNews.slice(0, 4).map((prop) => (
+            {effectiveNews.slice(0, 4).map((prop) => (
               <Link
                 key={prop.id}
                 to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
@@ -261,11 +272,11 @@ export function UserDashboard() {
           <Link to="/painel/extrato" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
         </div>
         <div>
-          {!recentActivity?.length ? (
+          {!effectiveActivity?.length ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{p.noActivityYet}</div>
           ) : (
             <div className="divide-y divide-border/10">
-              {recentActivity.map((item) => (
+              {effectiveActivity.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
                   <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                     item.type === "deposit" || item.type === "profit" ? "bg-primary/10" : item.type === "refund" ? "bg-amber-500/10" : "bg-accent/10"
