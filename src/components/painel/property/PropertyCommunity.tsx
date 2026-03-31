@@ -16,6 +16,7 @@ interface Props {
 
 export function PropertyCommunity({ propertyId }: Props) {
   const { user, isAdmin } = useAuth();
+  const isDemoBlocked = useDemoGuard();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
