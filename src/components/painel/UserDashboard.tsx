@@ -222,7 +222,7 @@ export function UserDashboard() {
             <Link to="/painel/meus-projetos" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
           )}
         </div>
-        {!propertyNews?.length ? (
+        {!effectiveNews?.length ? (
           <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Building2 className="h-8 w-8 mb-2 opacity-20" />
             <p className="text-sm">{p.noLinkedProperties}</p>
