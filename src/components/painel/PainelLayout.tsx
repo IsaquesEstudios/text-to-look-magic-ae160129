@@ -21,7 +21,7 @@ import { MoreHorizontal, X } from "lucide-react";
 import { PanelSearchBar } from "./PanelSearchBar";
 
 export function PainelLayout() {
-  const { user, isAdmin, isLoading, profile, signOut } = useAuth();
+  const { user, isAdmin, isDemoUser, isLoading, profile, signOut } = useAuth();
   const { p } = usePanelTranslation();
   const location = useLocation();
   const navigate = useNavigate();
