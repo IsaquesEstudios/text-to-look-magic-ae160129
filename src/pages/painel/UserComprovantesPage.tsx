@@ -16,6 +16,7 @@ const dateFnsLocales: Record<string, typeof ptBR> = { pt: ptBR, en: enUS, es };
 
 export default function UserComprovantesPage() {
   const { user } = useAuth();
+  const isDemoBlocked = useDemoGuard();
   const { p, lang } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
