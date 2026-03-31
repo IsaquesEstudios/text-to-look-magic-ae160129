@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ interface Props {
 
 export function PropertyCommunity({ propertyId }: Props) {
   const { user, isAdmin } = useAuth();
+  const isDemoBlocked = useDemoGuard();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -66,6 +68,7 @@ export function PropertyCommunity({ propertyId }: Props) {
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return;
+    if (isDemoBlocked()) return;
     setSending(true);
     const { error } = await supabase.from("property_messages").insert({
       property_id: propertyId,
@@ -79,6 +82,7 @@ export function PropertyCommunity({ propertyId }: Props) {
   const uploadMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    if (isDemoBlocked()) return;
     setUploading(true);
 
     const isVideo = file.type.startsWith("video/");
