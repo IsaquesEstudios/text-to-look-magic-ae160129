@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,11 @@ export function UserContractUploadForm({ userId, onClose }: UserContractUploadFo
   const [uploading, setUploading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const isDemoBlocked = useDemoGuard();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDemoBlocked()) return;
     if (!title.trim() || !file) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
       return;

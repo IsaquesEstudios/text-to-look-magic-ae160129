@@ -6,11 +6,14 @@ const isBrowser = typeof window !== "undefined";
 
 export type AppRole = "admin" | "user";
 
+export const DEMO_EMAIL = "demo@discoveryinvestimentos.com";
+
 export interface AuthState {
   user: User | null;
   session: Session | null;
   roles: AppRole[];
   isAdmin: boolean;
+  isDemoUser: boolean;
   isLoading: boolean;
   profile: { full_name: string | null; credits: number; preferred_language: string; status: string } | null;
   signOut: () => Promise<void>;
@@ -22,6 +25,7 @@ const defaultState: AuthState = {
   session: null,
   roles: [],
   isAdmin: false,
+  isDemoUser: false,
   isLoading: true,
   profile: null,
   signOut: async () => {},
@@ -132,9 +136,11 @@ export function useAuthInternal(): AuthState {
     }
   }, [user]);
 
+  const isDemoUser = user?.email === DEMO_EMAIL;
+
   return useMemo(
-    () => ({ user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile }),
-    [user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile]
+    () => ({ user, session, roles, isAdmin, isDemoUser, isLoading, profile, signOut, refreshProfile }),
+    [user, session, roles, isAdmin, isDemoUser, isLoading, profile, signOut, refreshProfile]
   );
 }
 

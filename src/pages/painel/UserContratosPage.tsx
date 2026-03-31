@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ export default function UserContratosPage() {
   const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const isDemoBlocked = useDemoGuard();
   const [signing, setSigning] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
@@ -64,6 +66,7 @@ export default function UserContratosPage() {
 
   const handleConfirmSign = async () => {
     if (!signDialog) return;
+    if (isDemoBlocked()) return;
     setSigning(signDialog.id);
     const updateField = signDialog.type === "user" ? "user_signed_at" : "admin_signed_at";
     const { error } = await supabase
@@ -82,6 +85,7 @@ export default function UserContratosPage() {
   };
 
   const handleDelete = async (contractId: string) => {
+    if (isDemoBlocked()) return;
     const { error } = await supabase.from("contracts").delete().eq("id", contractId);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });

@@ -1,4 +1,5 @@
 import { useState, useRef, forwardRef } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +16,7 @@ const dateFnsLocales: Record<string, typeof ptBR> = { pt: ptBR, en: enUS, es };
 
 export default function UserComprovantesPage() {
   const { user } = useAuth();
+  const isDemoBlocked = useDemoGuard();
   const { p, lang } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -106,12 +108,14 @@ export default function UserComprovantesPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (isDemoBlocked()) { e.target.value = ""; return; }
     if (file) uploadMutation.mutate(file);
     e.target.value = "";
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    if (isDemoBlocked()) return;
     const file = e.dataTransfer.files?.[0];
     if (file) uploadMutation.mutate(file);
   };
@@ -228,6 +232,7 @@ export default function UserComprovantesPage() {
                       className="h-6 w-6 text-white/70 hover:text-destructive hover:bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (isDemoBlocked()) return;
                         deleteMutation.mutate(item.id);
                       }}
                       disabled={deleteMutation.isPending}

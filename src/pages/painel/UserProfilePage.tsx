@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { useAuth } from "@/hooks/useAuth";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ export default function UserProfilePage() {
   const { user, refreshProfile } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
+  const isDemoBlocked = useDemoGuard();
   const queryClient = useQueryClient();
 
   const { data: profile, isLoading } = useQuery({
@@ -259,7 +261,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="gap-2">
+      <Button onClick={() => { if (isDemoBlocked()) return; mutation.mutate(); }} disabled={mutation.isPending} className="gap-2">
         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         {p.saveChanges}
       </Button>
