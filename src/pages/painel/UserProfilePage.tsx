@@ -20,6 +20,7 @@ export default function UserProfilePage() {
   const { user, refreshProfile } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
+  const isDemoBlocked = useDemoGuard();
   const queryClient = useQueryClient();
 
   const { data: profile, isLoading } = useQuery({
