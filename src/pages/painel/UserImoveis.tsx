@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_SHARES } from "@/data/demoData";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
