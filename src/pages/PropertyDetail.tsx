@@ -103,8 +103,8 @@ export default function PropertyDetail() {
   const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
 
   const allImages = [
-    ...(property.cover_image_url ? [{ id: "cover", image_url: property.cover_image_url }] : []),
-    ...(images ?? []),
+    ...(effectiveProperty.cover_image_url ? [{ id: "cover", image_url: effectiveProperty.cover_image_url }] : []),
+    ...(!isDemo ? (images ?? []) : []),
   ];
 
   return (
