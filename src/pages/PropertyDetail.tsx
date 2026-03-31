@@ -37,6 +37,8 @@ export default function PropertyDetail() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  const isDemo = isDemoUser && id && isDemoPropertyId(id);
+
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
     queryFn: async () => {
