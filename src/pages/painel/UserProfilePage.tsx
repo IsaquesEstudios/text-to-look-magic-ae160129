@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { useAuth } from "@/hooks/useAuth";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
