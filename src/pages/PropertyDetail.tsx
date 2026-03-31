@@ -32,7 +32,7 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
