@@ -16,7 +16,7 @@ import { AdminContractForm } from "@/components/painel/admin/AdminContractForm";
 import { UserContractUploadForm } from "@/components/painel/UserContractUploadForm";
 
 export default function UserContratosPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isDemoBlocked = useDemoGuard();
