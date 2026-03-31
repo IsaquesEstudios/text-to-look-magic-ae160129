@@ -133,7 +133,7 @@ export default function PropertyDetail() {
           </div>
           <p className="text-sm text-muted-foreground/80 flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5" />
-            {property.location}
+            {effectiveProperty.location}
           </p>
         </div>
 
