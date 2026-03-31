@@ -8,7 +8,7 @@ import { useCallback } from "react";
  *
  * Usage:
  *   const isDemoBlocked = useDemoGuard();
- *   const handleSave = () => { if (isDemoBlocked()) return; /* proceed */ };
+ *   const handleSave = () => { if (isDemoBlocked()) return; };
  */
 export function useDemoGuard() {
   const { isDemoUser } = useAuth();
