@@ -186,6 +186,7 @@ export default function UserComprovantesPage() {
               onChange={handleFileChange}
             />
           </div>
+          )}
 
           {sent.length === 0 ? (
             <EmptyState text={p.noSentReceipts} />
