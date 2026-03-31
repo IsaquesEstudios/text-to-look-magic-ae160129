@@ -68,6 +68,7 @@ export function PropertyCommunity({ propertyId }: Props) {
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return;
+    if (isDemoBlocked()) return;
     setSending(true);
     const { error } = await supabase.from("property_messages").insert({
       property_id: propertyId,
