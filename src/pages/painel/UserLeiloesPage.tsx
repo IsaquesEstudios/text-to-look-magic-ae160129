@@ -214,9 +214,9 @@ export default function UserLeiloesPage() {
 
   if (isLoading) return <div className="animate-pulse text-muted-foreground">{p.loading}</div>;
 
-  const renderAuction = (auction: (typeof auctions)[number]) => {
+  const renderAuction = (auction: any) => {
     const start = new Date(auction.scheduled_start);
-    const items = itemsByAuction.get(auction.id) ?? [];
+    const items = effectiveItemsByAuction.get(auction.id) ?? [];
 
     return (
       <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
