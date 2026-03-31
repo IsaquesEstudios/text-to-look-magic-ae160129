@@ -122,8 +122,18 @@ export function UserDashboard() {
     staleTime: 0,
   });
 
-  const credits = profile?.credits ?? 0;
-  const totalProperties = new Set(shares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
+  // Use demo data when demo user
+  const effectiveShares = isDemoUser ? DEMO_SHARES as any[] : shares;
+  const effectiveActivity = isDemoUser
+    ? DEMO_CREDIT_TRANSACTIONS.map((c) => {
+        const typeMap: Record<string, string> = { deposit: p.deposit, withdrawal: p.withdrawal, refund: p.refund, auction_deposit: p.auctionDeposit, profit: p.profitReturn };
+        return { id: c.id, date: c.created_at, title: typeMap[c.type] || c.type, detail: c.description || `$${Number(c.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, amount: Number(c.amount), type: c.type };
+      })
+    : recentActivity;
+  const effectiveNews = isDemoUser ? getDemoPropertyNews() : propertyNews;
+
+  const credits = isDemoUser ? 2500 : (profile?.credits ?? 0);
+  const totalProperties = new Set(effectiveShares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
     if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
