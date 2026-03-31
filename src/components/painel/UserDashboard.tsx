@@ -11,7 +11,7 @@ import { DEMO_SHARES, DEMO_CREDIT_TRANSACTIONS, getDemoPropertyNews } from "@/da
 const dateFnsLocales = { pt: ptBR, en: enUS, es };
 
 export function UserDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, isDemoUser } = useAuth();
   const { p, lang } = usePanelTranslation();
   const dateLocale = dateFnsLocales[lang] || ptBR;
 
