@@ -193,12 +193,19 @@ export default function UserLeiloesPage() {
     }
   }, [user, auctions, queryClient]);
 
+  const itemsByAuction = new Map<string, typeof allItems>();
+  allItems?.forEach((item) => {
+    const list = itemsByAuction.get(item.auction_id) ?? [];
+    list.push(item);
+    itemsByAuction.set(item.auction_id, list);
+  });
+
   // Inject demo data
   const effectiveAuctions = isDemoUser
     ? [...(auctions ?? []), DEMO_AUCTION as any]
     : auctions;
 
-  const effectiveItemsByAuction = new Map(itemsByAuction);
+  const effectiveItemsByAuction = new Map<string, any[]>(itemsByAuction as any);
   if (isDemoUser) {
     effectiveItemsByAuction.set(DEMO_AUCTION.id, DEMO_AUCTION_ITEMS as any[]);
     // Add demo shares to maps
