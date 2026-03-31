@@ -85,6 +85,7 @@ export default function UserContratosPage() {
   };
 
   const handleDelete = async (contractId: string) => {
+    if (isDemoBlocked()) return;
     const { error } = await supabase.from("contracts").delete().eq("id", contractId);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
