@@ -193,14 +193,24 @@ export default function UserLeiloesPage() {
     }
   }, [user, auctions, queryClient]);
 
-  const itemsByAuction = new Map<string, typeof allItems>();
-  allItems?.forEach((item) => {
-    const list = itemsByAuction.get(item.auction_id) ?? [];
-    list.push(item);
-    itemsByAuction.set(item.auction_id, list);
-  });
+  // Inject demo data
+  const effectiveAuctions = isDemoUser
+    ? [...(auctions ?? []), DEMO_AUCTION as any]
+    : auctions;
 
-  const active = auctions?.filter((a) => a.status !== "finished") ?? [];
+  const effectiveItemsByAuction = new Map(itemsByAuction);
+  if (isDemoUser) {
+    effectiveItemsByAuction.set(DEMO_AUCTION.id, DEMO_AUCTION_ITEMS as any[]);
+    // Add demo shares to maps
+    DEMO_SHARES.forEach((s) => {
+      if (!userSharesMap.has(s.property_id)) {
+        userSharesMap.set(s.property_id, { property_id: s.property_id, amount_paid: s.amount_paid });
+      }
+      linkedPropertyIds.add(s.property_id);
+    });
+  }
+
+  const active = effectiveAuctions?.filter((a) => a.status !== "finished") ?? [];
 
   if (isLoading) return <div className="animate-pulse text-muted-foreground">{p.loading}</div>;
 
