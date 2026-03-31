@@ -218,7 +218,7 @@ export function UserDashboard() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
             {p.propertyUpdates}
           </h2>
-          {propertyNews && propertyNews.length > 4 && (
+          {effectiveNews && effectiveNews.length > 4 && (
             <Link to="/painel/meus-projetos" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
           )}
         </div>
