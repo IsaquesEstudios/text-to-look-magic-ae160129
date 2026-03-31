@@ -195,7 +195,7 @@ export default function UserContratosPage() {
                         Ver PDF
                       </Button>
 
-                      {!isAdmin && !contract.user_signed_at && (
+                      {!isDemoUser && !isAdmin && !contract.user_signed_at && (
                         <Button
                           variant="cta"
                           size="sm"
