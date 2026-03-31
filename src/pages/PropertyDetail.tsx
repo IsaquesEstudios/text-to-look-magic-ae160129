@@ -111,11 +111,11 @@ export default function PropertyDetail() {
     <>
       <div className="space-y-6">
         <PropertySubNav
-          propertyId={property.id}
-          propertyTitle={property.title}
+          propertyId={effectiveProperty.id}
+          propertyTitle={effectiveProperty.title}
           active="overview"
-          hasShares={!!(userShares && userShares.length > 0)}
-          onEdit={() => setIsEditing(!isEditing)}
+          hasShares={!!(effectiveShares && effectiveShares.length > 0)}
+          onEdit={isDemo ? undefined : () => setIsEditing(!isEditing)}
           isEditing={isEditing}
         />
 
