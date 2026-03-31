@@ -276,7 +276,7 @@ export function UserDashboard() {
             <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{p.noActivityYet}</div>
           ) : (
             <div className="divide-y divide-border/10">
-              {recentActivity.map((item) => (
+              {effectiveActivity.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
                   <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                     item.type === "deposit" || item.type === "profit" ? "bg-primary/10" : item.type === "refund" ? "bg-amber-500/10" : "bg-accent/10"
