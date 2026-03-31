@@ -66,6 +66,7 @@ export default function UserContratosPage() {
 
   const handleConfirmSign = async () => {
     if (!signDialog) return;
+    if (isDemoBlocked()) return;
     setSigning(signDialog.id);
     const updateField = signDialog.type === "user" ? "user_signed_at" : "admin_signed_at";
     const { error } = await supabase
