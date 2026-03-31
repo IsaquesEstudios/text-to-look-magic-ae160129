@@ -272,7 +272,7 @@ export function UserDashboard() {
           <Link to="/painel/extrato" className="text-xs text-primary hover:underline">{p.viewAll}</Link>
         </div>
         <div>
-          {!recentActivity?.length ? (
+          {!effectiveActivity?.length ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{p.noActivityYet}</div>
           ) : (
             <div className="divide-y divide-border/10">
