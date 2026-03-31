@@ -6,11 +6,14 @@ const isBrowser = typeof window !== "undefined";
 
 export type AppRole = "admin" | "user";
 
+export const DEMO_EMAIL = "demo@discoveryinvestimentos.com";
+
 export interface AuthState {
   user: User | null;
   session: Session | null;
   roles: AppRole[];
   isAdmin: boolean;
+  isDemoUser: boolean;
   isLoading: boolean;
   profile: { full_name: string | null; credits: number; preferred_language: string; status: string } | null;
   signOut: () => Promise<void>;
