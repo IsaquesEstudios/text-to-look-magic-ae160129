@@ -6,6 +6,7 @@ import { Wallet, TrendingUp, Building2, Loader2, ArrowUpRight, Clock, CreditCard
 import { formatDistanceToNow } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
 import { Link } from "react-router-dom";
+import { DEMO_SHARES, DEMO_CREDIT_TRANSACTIONS, getDemoPropertyNews } from "@/data/demoData";
 
 const dateFnsLocales = { pt: ptBR, en: enUS, es };
 
