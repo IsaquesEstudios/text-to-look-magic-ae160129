@@ -83,17 +83,21 @@ export default function PropertyDetail() {
 
   const authLoading = !user;
 
-  if (isLoading || isSharesLoading || authLoading) {
+  // Demo property override
+  const effectiveProperty = isDemo ? getDemoProperty(id!) as any : property;
+  const effectiveShares = isDemo ? [{ id: "demo", quantity: 10 }] : userShares;
+
+  if (!isDemo && (isLoading || isSharesLoading || authLoading)) {
     return <PropertyPageSkeleton />;
   }
 
-  if (!property) {
+  if (!effectiveProperty) {
     return <p className="text-center text-muted-foreground py-16">Imóvel não encontrado.</p>;
   }
 
-  const status = statusLabels[property.status] || statusLabels.available;
-  const auctionValue = Number(property.estimated_auction_value) || 0;
-  const renovationCost = Number(property.estimated_renovation_cost) || 0;
+  const status = statusLabels[effectiveProperty.status] || statusLabels.available;
+  const auctionValue = Number(effectiveProperty.estimated_auction_value) || 0;
+  const renovationCost = Number(effectiveProperty.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
   const saleValue = Number(property.estimated_sale_value) || 0;
   const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
