@@ -228,19 +228,20 @@ export default function UserComprovantesPage() {
                         locale: dateLocale,
                       })}
                     </span>
+                    {!isDemoUser && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-white/70 hover:text-destructive hover:bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isDemoBlocked()) return;
                         deleteMutation.mutate(item.id);
                       }}
                       disabled={deleteMutation.isPending}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
+                    )}
                   </div>
                 </div>
               ))}
