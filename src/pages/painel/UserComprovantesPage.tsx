@@ -161,7 +161,8 @@ export default function UserComprovantesPage() {
 
         {/* SENT - user can upload */}
         <TabsContent value="sent" className="mt-6 space-y-4">
-          {/* Upload zone */}
+          {/* Upload zone — hidden for demo */}
+          {!isDemoUser && (
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
