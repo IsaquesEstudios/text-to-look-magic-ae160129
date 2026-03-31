@@ -267,6 +267,6 @@ export default function UserProfilePage() {
         {p.saveChanges}
       </Button>
       )}
-    </div>
+    </fieldset>
   );
 }
