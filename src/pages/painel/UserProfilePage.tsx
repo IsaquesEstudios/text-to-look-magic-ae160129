@@ -110,7 +110,7 @@ export default function UserProfilePage() {
   if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
 
   return (
-    <div className="space-y-4">
+    <fieldset disabled={isDemoUser} className="space-y-4">
       <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.myInfo}</h1>
 
       <Card className="bg-card/50 border-border/50">
