@@ -19,6 +19,7 @@ export default function UserContratosPage() {
   const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const isDemoBlocked = useDemoGuard();
   const [signing, setSigning] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [signDialog, setSignDialog] = useState<{ id: string; title: string; type: "user" | "admin" } | null>(null);
