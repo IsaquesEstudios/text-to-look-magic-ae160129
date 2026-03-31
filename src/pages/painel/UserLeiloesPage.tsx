@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_AUCTION, DEMO_AUCTION_ITEMS, DEMO_SHARES } from "@/data/demoData";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { markAuctionsRead } from "@/hooks/useUnreadAuctions";
 import { Badge } from "@/components/ui/badge";
