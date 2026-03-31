@@ -18,6 +18,19 @@ export const languages: { code: Language; name: string; flag: string }[] = [
 
 export const defaultLanguage: Language = "pt";
 
+export function detectBrowserLanguage(): Language {
+  try {
+    const langs = navigator.languages ?? [navigator.language];
+    for (const raw of langs) {
+      const prefix = raw.split("-")[0].toLowerCase() as Language;
+      if (translations[prefix]) return prefix;
+    }
+  } catch {
+    // SSR or unsupported
+  }
+  return defaultLanguage;
+}
+
 export function getLanguageFromPath(pathname: string): Language {
   const segments = pathname.split("/").filter(Boolean);
   const langCode = segments[0] as Language;
@@ -26,7 +39,7 @@ export function getLanguageFromPath(pathname: string): Language {
     return langCode;
   }
   
-  return defaultLanguage;
+  return detectBrowserLanguage();
 }
 
 export function getPathWithLanguage(pathname: string, newLang: Language): string {
