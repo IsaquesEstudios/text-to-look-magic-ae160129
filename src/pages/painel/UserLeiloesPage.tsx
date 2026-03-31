@@ -125,7 +125,7 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
 }
 
 export default function UserLeiloesPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const { p, lang } = usePanelTranslation();
   const dateLocale = dateFnsLocales[lang] || ptBR;
   const queryClient = useQueryClient();
