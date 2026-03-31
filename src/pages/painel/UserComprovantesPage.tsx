@@ -108,6 +108,7 @@ export default function UserComprovantesPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (isDemoBlocked()) { e.target.value = ""; return; }
     if (file) uploadMutation.mutate(file);
     e.target.value = "";
   };
