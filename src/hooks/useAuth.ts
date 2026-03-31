@@ -25,6 +25,7 @@ const defaultState: AuthState = {
   session: null,
   roles: [],
   isAdmin: false,
+  isDemoUser: false,
   isLoading: true,
   profile: null,
   signOut: async () => {},
