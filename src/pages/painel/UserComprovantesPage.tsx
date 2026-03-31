@@ -115,6 +115,7 @@ export default function UserComprovantesPage() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    if (isDemoBlocked()) return;
     const file = e.dataTransfer.files?.[0];
     if (file) uploadMutation.mutate(file);
   };
