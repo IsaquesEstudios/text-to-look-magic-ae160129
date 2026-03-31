@@ -99,7 +99,7 @@ export default function PropertyDetail() {
   const auctionValue = Number(effectiveProperty.estimated_auction_value) || 0;
   const renovationCost = Number(effectiveProperty.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
-  const saleValue = Number(property.estimated_sale_value) || 0;
+  const saleValue = Number(effectiveProperty.estimated_sale_value) || 0;
   const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
 
   const allImages = [
