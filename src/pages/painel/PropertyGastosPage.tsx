@@ -120,18 +120,6 @@ export default function PropertyGastosPage() {
     }
   }, [user, id, queryClient, isDemo]);
 
-  // Demo property
-  if (isDemo) {
-    const demoProp = getDemoProperty(id!);
-    if (!demoProp) return <p className="text-center text-muted-foreground py-16">Acesso não permitido.</p>;
-    return (
-      <div className="space-y-4">
-        <PropertySubNav propertyId={demoProp.id} propertyTitle={demoProp.title} active="gastos" hasShares={true} />
-        <DemoExpensesView propertyId={demoProp.id} />
-      </div>
-    );
-  }
-
   const { data: property, isLoading } = useQuery({
     queryKey: ["property-detail", id],
     queryFn: async () => {
@@ -160,6 +148,18 @@ export default function PropertyGastosPage() {
     },
     enabled: !!id && !!user && !isDemo,
   });
+
+  // Demo property
+  if (isDemo) {
+    const demoProp = getDemoProperty(id!);
+    if (!demoProp) return <p className="text-center text-muted-foreground py-16">Acesso não permitido.</p>;
+    return (
+      <div className="space-y-4">
+        <PropertySubNav propertyId={demoProp.id} propertyTitle={demoProp.title} active="gastos" hasShares={true} />
+        <DemoExpensesView propertyId={demoProp.id} />
+      </div>
+    );
+  }
 
   if (isLoading || isSharesLoading) {
     return <PropertyPageSkeleton />;
