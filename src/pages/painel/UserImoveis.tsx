@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { useMultiPropertyUnreadCounts } from "@/hooks/usePropertyUnreadCounts";
 
 export default function UserCotas() {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const { p } = usePanelTranslation();
 
   const { data: shares, isLoading } = useQuery({
