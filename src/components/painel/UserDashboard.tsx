@@ -136,9 +136,9 @@ export function UserDashboard() {
   const totalProperties = new Set(effectiveShares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
-    if (!shares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
+    if (!effectiveShares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
     const propMap = new Map<string, { totalPaid: number; prop: any }>();
-    shares.forEach((s) => {
+    effectiveShares.forEach((s) => {
       const prop = s.properties as any;
       if (!prop) return;
       const existing = propMap.get(prop.id);
