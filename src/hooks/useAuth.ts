@@ -136,9 +136,11 @@ export function useAuthInternal(): AuthState {
     }
   }, [user]);
 
+  const isDemoUser = user?.email === DEMO_EMAIL;
+
   return useMemo(
-    () => ({ user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile }),
-    [user, session, roles, isAdmin, isLoading, profile, signOut, refreshProfile]
+    () => ({ user, session, roles, isAdmin, isDemoUser, isLoading, profile, signOut, refreshProfile }),
+    [user, session, roles, isAdmin, isDemoUser, isLoading, profile, signOut, refreshProfile]
   );
 }
 
