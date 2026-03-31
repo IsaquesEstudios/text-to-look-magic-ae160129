@@ -261,7 +261,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="gap-2">
+      <Button onClick={() => { if (isDemoBlocked()) return; mutation.mutate(); }} disabled={mutation.isPending} className="gap-2">
         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         {p.saveChanges}
       </Button>
