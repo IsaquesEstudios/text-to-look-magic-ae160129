@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDemoGuard } from "@/hooks/useDemoGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
