@@ -172,10 +172,10 @@ export default function PropertyDetail() {
           style={{ aspectRatio: "2/1" }}
           onClick={() => setLightboxIndex(0)}
         >
-          {property.cover_image_url ? (
+          {effectiveProperty.cover_image_url ? (
             <img
-              src={property.cover_image_url}
-              alt={property.title}
+              src={effectiveProperty.cover_image_url}
+              alt={effectiveProperty.title}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
             />
           ) : (
