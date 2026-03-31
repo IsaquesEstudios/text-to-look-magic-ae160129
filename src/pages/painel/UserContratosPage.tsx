@@ -16,7 +16,7 @@ import { AdminContractForm } from "@/components/painel/admin/AdminContractForm";
 import { UserContractUploadForm } from "@/components/painel/UserContractUploadForm";
 
 export default function UserContratosPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemoUser } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isDemoBlocked = useDemoGuard();
@@ -114,10 +114,12 @@ export default function UserContratosPage() {
             {isAdmin ? "Gerencie contratos dos investidores" : "Contratos de investimento para assinatura"}
           </p>
         </div>
+        {!isDemoUser && (
         <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl">
           <PlusCircle className="h-4 w-4" />
           Novo Contrato
         </Button>
+        )}
       </div>
 
       {showForm && (
@@ -193,7 +195,7 @@ export default function UserContratosPage() {
                         Ver PDF
                       </Button>
 
-                      {!isAdmin && !contract.user_signed_at && (
+                      {!isDemoUser && !isAdmin && !contract.user_signed_at && (
                         <Button
                           variant="cta"
                           size="sm"
@@ -217,7 +219,7 @@ export default function UserContratosPage() {
                         </Button>
                       )}
 
-                      {(isAdmin || contract.user_id === user?.id) && (
+                      {!isDemoUser && (isAdmin || contract.user_id === user?.id) && (
                         <Button
                           variant="ghost"
                           size="sm"

@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 const dateFnsLocales: Record<string, typeof ptBR> = { pt: ptBR, en: enUS, es };
 
 export default function UserComprovantesPage() {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const isDemoBlocked = useDemoGuard();
   const { p, lang } = usePanelTranslation();
   const { toast } = useToast();
@@ -161,7 +161,8 @@ export default function UserComprovantesPage() {
 
         {/* SENT - user can upload */}
         <TabsContent value="sent" className="mt-6 space-y-4">
-          {/* Upload zone */}
+          {/* Upload zone — hidden for demo */}
+          {!isDemoUser && (
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
@@ -185,6 +186,7 @@ export default function UserComprovantesPage() {
               onChange={handleFileChange}
             />
           </div>
+          )}
 
           {sent.length === 0 ? (
             <EmptyState text={p.noSentReceipts} />
@@ -226,19 +228,20 @@ export default function UserComprovantesPage() {
                         locale: dateLocale,
                       })}
                     </span>
+                    {!isDemoUser && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-white/70 hover:text-destructive hover:bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isDemoBlocked()) return;
                         deleteMutation.mutate(item.id);
                       }}
                       disabled={deleteMutation.isPending}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
+                    )}
                   </div>
                 </div>
               ))}

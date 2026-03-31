@@ -17,7 +17,7 @@ import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSel
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 
 export default function UserProfilePage() {
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, isDemoUser } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const isDemoBlocked = useDemoGuard();
@@ -110,7 +110,7 @@ export default function UserProfilePage() {
   if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
 
   return (
-    <div className="space-y-4">
+    <fieldset disabled={isDemoUser} className="space-y-4">
       <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.myInfo}</h1>
 
       <Card className="bg-card/50 border-border/50">
@@ -261,10 +261,12 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Button onClick={() => { if (isDemoBlocked()) return; mutation.mutate(); }} disabled={mutation.isPending} className="gap-2">
+      {!isDemoUser && (
+      <Button onClick={() => { mutation.mutate(); }} disabled={mutation.isPending} className="gap-2">
         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         {p.saveChanges}
       </Button>
-    </div>
+      )}
+    </fieldset>
   );
 }
