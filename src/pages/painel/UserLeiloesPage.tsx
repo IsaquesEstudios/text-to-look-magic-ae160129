@@ -279,7 +279,7 @@ export default function UserLeiloesPage() {
           <Gavel className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noAuctionsAvailable}</p>
         </div>
       )}
-      {auctions?.length === 0 && (
+      {effectiveAuctions?.length === 0 && (
         <div className="text-center py-16 text-muted-foreground"><Gavel className="h-10 w-10 mx-auto mb-3 opacity-30" /><p>{p.noAuctionsAvailable}</p></div>
       )}
     </div>
