@@ -64,7 +64,7 @@ export default function PropertyDetail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!id && !!user,
+    enabled: !!id && !!user && !isDemo,
   });
 
   const { data: userShares, isLoading: isSharesLoading } = useQuery({
