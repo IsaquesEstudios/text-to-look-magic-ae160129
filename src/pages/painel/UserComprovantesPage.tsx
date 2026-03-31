@@ -232,6 +232,7 @@ export default function UserComprovantesPage() {
                       className="h-6 w-6 text-white/70 hover:text-destructive hover:bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (isDemoBlocked()) return;
                         deleteMutation.mutate(item.id);
                       }}
                       disabled={deleteMutation.isPending}
