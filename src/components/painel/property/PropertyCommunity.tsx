@@ -82,6 +82,7 @@ export function PropertyCommunity({ propertyId }: Props) {
   const uploadMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    if (isDemoBlocked()) return;
     setUploading(true);
 
     const isVideo = file.type.startsWith("video/");
