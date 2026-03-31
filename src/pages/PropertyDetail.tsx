@@ -156,14 +156,14 @@ export default function PropertyDetail() {
         </div>
         </div>
 
-        {isAdmin && (
+        {isAdmin && !isDemo && (
           <PropertyInvestors
-            propertyId={property.id}
+            propertyId={effectiveProperty.id}
             totalProject={purchasePrice}
             renovationCost={renovationCost}
             estimatedSaleValue={saleValue}
-            propertyType={property.type}
-            propertyTitle={property.title}
+            propertyType={effectiveProperty.type}
+            propertyTitle={effectiveProperty.title}
           />
         )}
 
