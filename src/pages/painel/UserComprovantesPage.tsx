@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 const dateFnsLocales: Record<string, typeof ptBR> = { pt: ptBR, en: enUS, es };
 
 export default function UserComprovantesPage() {
-  const { user } = useAuth();
+  const { user, isDemoUser } = useAuth();
   const isDemoBlocked = useDemoGuard();
   const { p, lang } = usePanelTranslation();
   const { toast } = useToast();
