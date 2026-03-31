@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PropertyCommunity } from "@/components/painel/property/PropertyCommunity";
 import { PropertySubNav } from "@/components/painel/property/PropertySubNav";
 import { PropertyPageSkeleton } from "@/components/painel/property/PropertyPageSkeleton";
+import { isDemoPropertyId, getDemoProperty, getDemoMessages } from "@/data/demoData";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function PropertyNovidadesPage() {
   const { id } = useParams<{ id: string }>();
