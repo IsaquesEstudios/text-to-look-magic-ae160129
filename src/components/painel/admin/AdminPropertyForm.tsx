@@ -65,7 +65,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const queryClient = useQueryClient();
   const { rate: docCommissionRate } = useDocCommissionRate();
   const [loading, setLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
