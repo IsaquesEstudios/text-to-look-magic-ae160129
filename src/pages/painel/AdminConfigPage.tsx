@@ -142,64 +142,7 @@ export default function AdminConfigPage() {
         </CardContent>
       </Card>
 
-      {/* Doc Commission Card */}
-      <Card className="bg-card/50 border-border/50">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-              <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-foreground text-base sm:text-lg">Taxa de Documentação e Comissão</h3>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Percentual sobre o valor estimado de venda para documentação e comissão da imobiliária.
-                </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Taxa atual: <span className="font-medium text-foreground">{loadingCommission ? "..." : `${docCommission}%`}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0 self-start">
-              {editingCommission !== null ? (
-                <>
-                  <div className="flex items-center gap-1.5">
-                    <Input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="100"
-                      value={editingCommission}
-                      onChange={(e) => setEditingCommission(e.target.value)}
-                      className="w-20 text-right h-8 text-sm"
-                    />
-                    <span className="text-xs text-muted-foreground">%</span>
-                  </div>
-                  <Button
-                    size="sm"
-                    className="gap-2"
-                    disabled={savingCommission}
-                    onClick={handleSaveCommission}
-                  >
-                    {savingCommission ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                    Salvar
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setEditingCommission(null)}>
-                    Cancelar
-                  </Button>
-                </>
-              ) : (
-                <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditingCommission(String(docCommission ?? 10))}>
-                  <Pencil className="h-4 w-4" />
-                  Alterar
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
           <DialogHeader>

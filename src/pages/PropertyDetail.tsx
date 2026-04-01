@@ -167,6 +167,7 @@ export default function PropertyDetail() {
             estimatedSaleValue={saleValue}
             propertyType={effectiveProperty.type}
             propertyTitle={effectiveProperty.title}
+            docCommissionRate={docCommRate}
           />
         )}
 
