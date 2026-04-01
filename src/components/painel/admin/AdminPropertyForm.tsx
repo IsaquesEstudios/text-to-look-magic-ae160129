@@ -320,7 +320,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
     const validatedHasInvestors = investorsToLink.length > 0;
     const validatedTotalProjetoComTaxas = validatedTotalProjeto + (validatedHasInvestors ? validatedServiceFee : 0);
-    const docComm = validated.estimated_sale_value * (docCommissionRate / 100);
+    const docRate = parseFloat(form.doc_commission_rate) || 10;
+    const docComm = validated.estimated_sale_value * (docRate / 100);
     const calculatedReturn = validatedTotalProjetoComTaxas > 0
       ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas - docComm) / validatedTotalProjetoComTaxas) * 100
       : 0;
