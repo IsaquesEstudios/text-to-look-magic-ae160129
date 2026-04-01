@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Save, Search, Receipt, Pencil, FileText } from "lucide-react";
+import { Loader2, Save, Search, Receipt, Pencil } from "lucide-react";
 
 export default function AdminConfigPage() {
   const { toast } = useToast();
