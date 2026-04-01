@@ -581,7 +581,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
                 {(() => {
                   const saleVal = parseFloat(form.estimated_sale_value) || 0;
-                  const docComm = saleVal * (docCommissionRate / 100);
+                  const dcRate = parseFloat(form.doc_commission_rate) || 10;
+                  const docComm = saleVal * (dcRate / 100);
                   const profit = saleVal - totalProjeto - docComm;
                   if (totalProjeto > 0 && saleVal > 0) {
                     return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
@@ -589,7 +590,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   return "—";
                 })()}
               </div>
-              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
+              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {form.doc_commission_rate}%) / Projeto</p>
             </div>
 
             {/* Timeline */}
