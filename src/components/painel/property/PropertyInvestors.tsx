@@ -24,7 +24,7 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export function PropertyInvestors({ propertyId, totalProject, renovationCost, estimatedSaleValue, propertyType, propertyTitle }: Props) {
+export function PropertyInvestors({ propertyId, totalProject, renovationCost, estimatedSaleValue, docCommissionRate, propertyType, propertyTitle }: Props) {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
