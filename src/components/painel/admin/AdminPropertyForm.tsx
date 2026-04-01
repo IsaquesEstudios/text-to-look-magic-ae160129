@@ -180,6 +180,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           estimated_return_pct: String(property.estimated_return_pct ?? 0),
           estimated_sale_value: String(property.estimated_sale_value ?? 0),
           estimated_timeline: property.estimated_timeline ?? "",
+          doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
         setCoverImage(property.cover_image_url);
       }
