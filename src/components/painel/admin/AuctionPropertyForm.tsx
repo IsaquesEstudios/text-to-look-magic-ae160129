@@ -37,6 +37,7 @@ export const emptyPropertyData: AuctionPropertyData = {
   estimated_return_pct: "",
   estimated_sale_value: "",
   estimated_timeline: "",
+  doc_commission_rate: "10",
   total_shares: "1",
   share_price: "",
   status: "available",
