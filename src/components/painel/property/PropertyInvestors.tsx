@@ -15,6 +15,7 @@ interface Props {
   totalProject: number;
   renovationCost: number;
   estimatedSaleValue?: number;
+  docCommissionRate?: number;
   propertyType?: string;
   propertyTitle?: string;
 }
