@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X, Loader2, Home, TreePine, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
 
 export interface AuctionPropertyData {
   type: "house" | "land";
@@ -52,6 +53,7 @@ interface Props {
 export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
+  const { rate: docCommissionRate } = useDocCommissionRate();
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -202,15 +204,21 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
           </div>
         </div>
 
-        {/* Calculated Return */}
+        {/* Calculated Return (with doc commission) */}
         <div className="space-y-2">
           <Label>Retorno Estimado (%)</Label>
           <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
-            {totalProjeto > 0 && parseFloat(data.estimated_sale_value) > 0
-              ? `${(((parseFloat(data.estimated_sale_value) - totalProjeto) / totalProjeto) * 100).toFixed(1)}%`
-              : "—"}
+            {(() => {
+              const saleVal = parseFloat(data.estimated_sale_value) || 0;
+              const docComm = saleVal * (docCommissionRate / 100);
+              const profit = saleVal - totalProjeto - docComm;
+              if (totalProjeto > 0 && saleVal > 0) {
+                return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
+              }
+              return "—";
+            })()}
           </div>
-          <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
+          <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
         </div>
 
 

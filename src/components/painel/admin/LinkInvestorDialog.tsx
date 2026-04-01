@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Search, AlertTriangle, CheckCircle } from "lucide-react";
+import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
 
 export type InvestmentPlan = "standard" | "equal_split" | "fixed_12" | "fixed_15";
 
@@ -60,6 +61,7 @@ export function LinkInvestorDialog({
   isPending,
   reservedCreditsMap,
 }: Props) {
+  const { rate: docCommissionRate } = useDocCommissionRate();
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [plan, setPlan] = useState<InvestmentPlan>("standard");
@@ -330,7 +332,8 @@ export function LinkInvestorDialog({
               {/* Estimated return */}
               {estimatedSaleValue > 0 && totalProject > 0 && (() => {
                 const participation = currentAmount / totalProject;
-                const totalProfit = estimatedSaleValue - totalProject;
+                const docComm = estimatedSaleValue * (docCommissionRate / 100);
+                const totalProfit = estimatedSaleValue - totalProject - docComm;
                 let estimatedReturn = 0;
                 if (plan === "standard") {
                   estimatedReturn = totalProfit > 0 ? totalProfit * participation * 0.70 : 0;

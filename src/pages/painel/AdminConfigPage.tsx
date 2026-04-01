@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Save, Search, Receipt, Pencil } from "lucide-react";
+import { Loader2, Save, Search, Receipt, Pencil, FileText } from "lucide-react";
 
 export default function AdminConfigPage() {
   const { toast } = useToast();
@@ -15,6 +15,43 @@ export default function AdminConfigPage() {
   const [search, setSearch] = useState("");
   const [editingRates, setEditingRates] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
+
+  // Doc commission rate state
+  const { data: docCommission, isLoading: loadingCommission } = useQuery({
+    queryKey: ["doc-commission-rate"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("system_settings" as any)
+        .select("value")
+        .eq("key", "doc_commission_rate")
+        .maybeSingle();
+      if (error) throw error;
+      return data ? parseFloat((data as any).value) : 10;
+    },
+  });
+  const [editingCommission, setEditingCommission] = useState<string | null>(null);
+  const [savingCommission, setSavingCommission] = useState(false);
+
+  const handleSaveCommission = async () => {
+    if (editingCommission === null) return;
+    const val = parseFloat(editingCommission);
+    if (isNaN(val) || val < 0 || val > 100) {
+      toast({ title: "Valor inválido (0-100%)", variant: "destructive" });
+      return;
+    }
+    setSavingCommission(true);
+    const { error } = await supabase
+      .from("system_settings" as any)
+      .upsert({ key: "doc_commission_rate", value: String(val), updated_at: new Date().toISOString() } as any);
+    if (error) {
+      toast({ title: "Erro ao salvar", variant: "destructive" });
+    } else {
+      toast({ title: "Taxa atualizada com sucesso" });
+      setEditingCommission(null);
+      queryClient.invalidateQueries({ queryKey: ["doc-commission-rate"] });
+    }
+    setSavingCommission(false);
+  };
 
   const { data: taxes, isLoading } = useQuery({
     queryKey: ["us-state-taxes"],
@@ -105,7 +142,64 @@ export default function AdminConfigPage() {
         </CardContent>
       </Card>
 
-      {/* Dialog for editing tariffs */}
+      {/* Doc Commission Card */}
+      <Card className="bg-card/50 border-border/50">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-foreground text-base sm:text-lg">Taxa de Documentação e Comissão</h3>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Percentual sobre o valor estimado de venda para documentação e comissão da imobiliária.
+                </p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm">
+                  <span className="text-muted-foreground">
+                    Taxa atual: <span className="font-medium text-foreground">{loadingCommission ? "..." : `${docCommission}%`}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0 self-start">
+              {editingCommission !== null ? (
+                <>
+                  <div className="flex items-center gap-1.5">
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      value={editingCommission}
+                      onChange={(e) => setEditingCommission(e.target.value)}
+                      className="w-20 text-right h-8 text-sm"
+                    />
+                    <span className="text-xs text-muted-foreground">%</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    disabled={savingCommission}
+                    onClick={handleSaveCommission}
+                  >
+                    {savingCommission ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    Salvar
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setEditingCommission(null)}>
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditingCommission(String(docCommission ?? 10))}>
+                  <Pencil className="h-4 w-4" />
+                  Alterar
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
           <DialogHeader>

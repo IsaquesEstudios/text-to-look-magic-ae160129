@@ -802,6 +802,24 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       us_state_taxes: {
         Row: {
           id: string

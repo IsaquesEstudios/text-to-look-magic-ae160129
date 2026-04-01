@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
+import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +63,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { rate: docCommissionRate } = useDocCommissionRate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -317,8 +319,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
     const validatedHasInvestors = investorsToLink.length > 0;
     const validatedTotalProjetoComTaxas = validatedTotalProjeto + (validatedHasInvestors ? validatedServiceFee : 0);
+    const docComm = validated.estimated_sale_value * (docCommissionRate / 100);
     const calculatedReturn = validatedTotalProjetoComTaxas > 0
-      ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas) / validatedTotalProjetoComTaxas) * 100
+      ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas - docComm) / validatedTotalProjetoComTaxas) * 100
       : 0;
 
     if (validatedTotalProjetoComTaxas > MAX_PROPERTY_AMOUNT) {
@@ -569,15 +572,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Calculated Return */}
+            {/* Calculated Return (with doc commission) */}
             <div className="space-y-2">
               <Label>Retorno Estimado (%)</Label>
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
-                {totalProjeto > 0 && parseFloat(form.estimated_sale_value) > 0
-                  ? `${(((parseFloat(form.estimated_sale_value) - totalProjeto) / totalProjeto) * 100).toFixed(1)}%`
-                  : "—"}
+                {(() => {
+                  const saleVal = parseFloat(form.estimated_sale_value) || 0;
+                  const docComm = saleVal * (docCommissionRate / 100);
+                  const profit = saleVal - totalProjeto - docComm;
+                  if (totalProjeto > 0 && saleVal > 0) {
+                    return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
+                  }
+                  return "—";
+                })()}
               </div>
-              <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
+              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
             </div>
 
             {/* Timeline */}
