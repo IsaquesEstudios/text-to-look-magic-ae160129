@@ -20,6 +20,7 @@ interface PropertyEditFormProps {
     estimated_renovation_cost: number | null;
     estimated_sale_value: number | null;
     estimated_timeline: string | null;
+    doc_commission_rate?: number | null;
     status: string;
     cover_image_url: string | null;
   };
