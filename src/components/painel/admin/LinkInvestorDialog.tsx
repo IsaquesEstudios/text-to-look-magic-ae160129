@@ -61,6 +61,7 @@ export function LinkInvestorDialog({
   isPending,
   reservedCreditsMap,
 }: Props) {
+  const { rate: docCommissionRate } = useDocCommissionRate();
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [plan, setPlan] = useState<InvestmentPlan>("standard");
