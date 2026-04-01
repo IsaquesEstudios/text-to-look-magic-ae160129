@@ -53,6 +53,7 @@ interface Props {
 export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
+  const { rate: docCommissionRate } = useDocCommissionRate();
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
