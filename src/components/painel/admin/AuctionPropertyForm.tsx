@@ -19,6 +19,7 @@ export interface AuctionPropertyData {
   estimated_return_pct: string;
   estimated_sale_value: string;
   estimated_timeline: string;
+  doc_commission_rate: string;
   total_shares: string;
   share_price: string;
   status: string;
