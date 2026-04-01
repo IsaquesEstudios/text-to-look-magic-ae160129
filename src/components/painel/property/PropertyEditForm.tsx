@@ -67,7 +67,8 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     (parseFloat(form.estimated_renovation_cost) || 0);
 
   const saleVal = parseFloat(form.estimated_sale_value) || 0;
-  const docComm = saleVal * (docCommissionRate / 100);
+  const dcRate = parseFloat(form.doc_commission_rate) || 10;
+  const docComm = saleVal * (dcRate / 100);
   const returnPct =
     totalProjeto > 0 && saleVal > 0
       ? (((saleVal - totalProjeto - docComm) / totalProjeto) * 100).toFixed(1)
