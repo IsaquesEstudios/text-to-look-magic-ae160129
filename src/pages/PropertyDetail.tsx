@@ -100,7 +100,9 @@ export default function PropertyDetail() {
   const renovationCost = Number(effectiveProperty.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
   const saleValue = Number(effectiveProperty.estimated_sale_value) || 0;
-  const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
+  const docCommRate = Number((effectiveProperty as any).doc_commission_rate) || 10;
+  const docComm = saleValue * (docCommRate / 100);
+  const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice - docComm) / purchasePrice) * 100 : 0;
 
   const allImages = [
     ...(effectiveProperty.cover_image_url ? [{ id: "cover", image_url: effectiveProperty.cover_image_url }] : []),
