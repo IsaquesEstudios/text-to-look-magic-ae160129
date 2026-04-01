@@ -290,7 +290,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
             {returnPct !== "—" ? `${returnPct}%` : "—"}
           </div>
-          <p className="text-xs text-muted-foreground">Com Doc.&Comissão de {docCommissionRate}%</p>
+          <p className="text-xs text-muted-foreground">Com Doc.&Comissão de {form.doc_commission_rate}%</p>
         </div>
 
         {/* Timeline */}
