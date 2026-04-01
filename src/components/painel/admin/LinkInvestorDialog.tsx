@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Search, AlertTriangle, CheckCircle } from "lucide-react";
+import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
 
 export type InvestmentPlan = "standard" | "equal_split" | "fixed_12" | "fixed_15";
 
