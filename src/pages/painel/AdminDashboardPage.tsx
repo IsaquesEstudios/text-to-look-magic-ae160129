@@ -56,7 +56,8 @@ export default function AdminDashboardPage() {
       // Doc commission revenue from all properties with estimated_sale_value
       const docCommissionRevenue = properties.reduce((acc, p) => {
         const saleVal = Number(p.estimated_sale_value ?? 0);
-        return acc + saleVal * (docCommissionRate / 100);
+        const rate = Number((p as any).doc_commission_rate ?? 10);
+        return acc + saleVal * (rate / 100);
       }, 0);
       const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));

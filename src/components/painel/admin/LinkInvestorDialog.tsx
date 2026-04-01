@@ -58,11 +58,11 @@ export function LinkInvestorDialog({
   renovationCost,
   remaining,
   estimatedSaleValue = 0,
+  docCommissionRate = 10,
   onLink,
   isPending,
   reservedCreditsMap,
 }: Props) {
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [plan, setPlan] = useState<InvestmentPlan>("standard");

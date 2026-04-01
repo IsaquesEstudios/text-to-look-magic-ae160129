@@ -25,7 +25,11 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       const reforma = props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0);
       const investido = arremate + reforma;
       const venda = props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0);
-      const docComm = venda * (docCommissionRate / 100);
+      const docComm = props.reduce((s, p) => {
+        const sv = Number(p.estimated_sale_value || 0);
+        const rate = Number((p as any).doc_commission_rate ?? 10);
+        return s + sv * (rate / 100);
+      }, 0);
       const roi = investido > 0 ? ((venda - investido - docComm) / investido) * 100 : 0;
 
       return { arremate, reforma, investido, venda, roi };

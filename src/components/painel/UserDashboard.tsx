@@ -155,6 +155,7 @@ export function UserDashboard() {
       const renovationVal = Number(prop.estimated_renovation_cost) || 0;
       const totalProject = auctionVal + renovationVal;
       const saleVal = Number(prop.estimated_sale_value) || 0;
+      const docCommissionRate = Number((prop as any).doc_commission_rate) || 10;
       const docComm = saleVal * (docCommissionRate / 100);
       const participation = totalProject > 0 ? totalPaid / totalProject : 0;
       estimated += totalPaid + (participation * (saleVal - totalProject - docComm));

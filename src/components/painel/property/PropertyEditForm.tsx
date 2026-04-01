@@ -293,6 +293,13 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           <p className="text-xs text-muted-foreground">Com Doc.&Comissão de {form.doc_commission_rate}%</p>
         </div>
 
+        {/* Doc Commission Rate */}
+        <div className="space-y-2">
+          <Label>Taxa Doc. & Comissão (%)</Label>
+          <Input type="number" step="0.1" min="0" max="100" value={form.doc_commission_rate} onChange={(e) => set("doc_commission_rate", e.target.value)} placeholder="10" />
+          <p className="text-xs text-muted-foreground">Percentual sobre o valor de venda para documentação e comissão</p>
+        </div>
+
         {/* Timeline */}
         <div className="space-y-2">
           <Label>Prazo Estimado</Label>
