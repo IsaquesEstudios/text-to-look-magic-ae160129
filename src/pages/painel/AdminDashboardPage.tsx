@@ -7,10 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function AdminDashboardPage() {
   const { user, isAdmin } = useAuth();
-  const { rate: docCommissionRate } = useDocCommissionRate();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-stats", docCommissionRate],
+    queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
       const [depositsRes, sharesRes, propertiesRes, profilesRes] = await Promise.all([
