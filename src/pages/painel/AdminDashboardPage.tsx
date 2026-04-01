@@ -54,7 +54,11 @@ export default function AdminDashboardPage() {
       }
 
       const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
-      const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
+      // Doc commission revenue from all properties with estimated_sale_value
+      const docCommissionRevenue = properties.reduce((acc, p) => {
+        const saleVal = Number(p.estimated_sale_value ?? 0);
+        return acc + saleVal * (docCommissionRate / 100);
+      }, 0);
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
       const totalPropertiesInvested = properties.reduce(
         (acc, p) => acc + Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0),
