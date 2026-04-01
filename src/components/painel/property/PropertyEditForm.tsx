@@ -31,6 +31,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
+  const { rate: docCommissionRate } = useDocCommissionRate();
 
   const [form, setForm] = useState({
     type: property.type as "house" | "land",
