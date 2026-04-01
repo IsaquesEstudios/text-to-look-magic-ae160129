@@ -593,6 +593,22 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {form.doc_commission_rate}%) / Projeto</p>
             </div>
 
+            {/* Doc Commission Rate */}
+            <div className="space-y-2">
+              <Label htmlFor="docCommission">Taxa Doc. & Comissão (%)</Label>
+              <Input
+                id="docCommission"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                value={form.doc_commission_rate}
+                onChange={(e) => setForm({ ...form, doc_commission_rate: e.target.value })}
+                placeholder="10"
+              />
+              <p className="text-xs text-muted-foreground">Percentual sobre o valor de venda para documentação e comissão</p>
+            </div>
+
             {/* Timeline */}
             <div className="space-y-2">
               <Label htmlFor="timeline">Prazo Estimado</Label>
