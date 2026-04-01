@@ -43,6 +43,7 @@ interface Props {
   renovationCost: number;
   remaining: number;
   estimatedSaleValue?: number;
+  docCommissionRate?: number;
   onLink: (userId: string, amount: number, plan: InvestmentPlan) => void;
   isPending: boolean;
   /** For AdminPropertyForm: pass pre-reserved credits map */
