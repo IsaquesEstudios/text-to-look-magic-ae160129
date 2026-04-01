@@ -146,12 +146,12 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           estimated_renovation_cost: renovVal,
           purchase_price: auctionVal + renovVal,
           estimated_sale_value: parseFloat(form.estimated_sale_value) || 0,
-          estimated_return_pct:
-            auctionVal + renovVal > 0
-              ? Math.min(((parseFloat(form.estimated_sale_value) || 0) - (auctionVal + renovVal)) /
-                (auctionVal + renovVal) *
-                100, 99999.99)
-              : 0,
+          estimated_return_pct: (() => {
+            const av = auctionVal + renovVal;
+            const sv = parseFloat(form.estimated_sale_value) || 0;
+            const dc = sv * (docCommissionRate / 100);
+            return av > 0 ? Math.min(((sv - av - dc) / av) * 100, 99999.99) : 0;
+          })(),
           estimated_timeline: form.estimated_timeline.trim(),
           status: form.status,
           cover_image_url: form.coverImage,
