@@ -43,6 +43,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     estimated_renovation_cost: String(property.estimated_renovation_cost ?? ""),
     estimated_sale_value: String(property.estimated_sale_value ?? ""),
     estimated_timeline: property.estimated_timeline || "",
+    doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
     status: property.status,
     coverImage: property.cover_image_url,
     galleryImages: images.map((img) => ({ id: img.id, url: img.image_url })),
