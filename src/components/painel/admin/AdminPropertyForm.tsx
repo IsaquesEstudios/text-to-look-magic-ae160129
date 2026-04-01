@@ -572,15 +572,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Calculated Return */}
+            {/* Calculated Return (with doc commission) */}
             <div className="space-y-2">
               <Label>Retorno Estimado (%)</Label>
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
-                {totalProjeto > 0 && parseFloat(form.estimated_sale_value) > 0
-                  ? `${(((parseFloat(form.estimated_sale_value) - totalProjeto) / totalProjeto) * 100).toFixed(1)}%`
-                  : "—"}
+                {(() => {
+                  const saleVal = parseFloat(form.estimated_sale_value) || 0;
+                  const docComm = saleVal * (docCommissionRate / 100);
+                  const profit = saleVal - totalProjeto - docComm;
+                  if (totalProjeto > 0 && saleVal > 0) {
+                    return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
+                  }
+                  return "—";
+                })()}
               </div>
-              <p className="text-xs text-muted-foreground">Calculado: (Valor de Venda − Total do Projeto) / Total do Projeto</p>
+              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
             </div>
 
             {/* Timeline */}
