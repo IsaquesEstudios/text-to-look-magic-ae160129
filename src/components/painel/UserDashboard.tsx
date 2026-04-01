@@ -136,7 +136,7 @@ export function UserDashboard() {
   const credits = isDemoUser ? 2500 : (profile?.credits ?? 0);
   const totalProperties = new Set(effectiveShares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
-  const { rate: docCommissionRate } = useDocCommissionRate();
+  
 
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
     if (!effectiveShares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
