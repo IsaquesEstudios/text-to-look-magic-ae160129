@@ -152,9 +152,10 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           estimated_return_pct: (() => {
             const av = auctionVal + renovVal;
             const sv = parseFloat(form.estimated_sale_value) || 0;
-            const dc = sv * (docCommissionRate / 100);
+            const dc = sv * ((parseFloat(form.doc_commission_rate) || 10) / 100);
             return av > 0 ? Math.min(((sv - av - dc) / av) * 100, 99999.99) : 0;
           })(),
+          doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
           estimated_timeline: form.estimated_timeline.trim(),
           status: form.status,
           cover_image_url: form.coverImage,
