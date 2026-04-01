@@ -11,9 +11,8 @@ import { formatCurrencySmart } from "@/lib/utils";
 
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const { data: kpis, isLoading } = useQuery({
-    queryKey: ["admin-properties-kpis", filterType, docCommissionRate],
+    queryKey: ["admin-properties-kpis", filterType],
     queryFn: async () => {
       const { data: properties } = await supabase
         .from("properties")
