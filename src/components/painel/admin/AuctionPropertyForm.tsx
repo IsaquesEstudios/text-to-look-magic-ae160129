@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X, Loader2, Home, TreePine, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 
 export interface AuctionPropertyData {
   type: "house" | "land";

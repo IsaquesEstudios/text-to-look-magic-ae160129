@@ -4,7 +4,7 @@ import { formatCurrencySmart } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 export default function AdminDashboardPage() {
   const { user, isAdmin } = useAuth();
   const { rate: docCommissionRate } = useDocCommissionRate();
