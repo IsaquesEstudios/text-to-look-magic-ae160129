@@ -364,6 +364,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         estimated_renovation_cost: validated.estimated_renovation_cost,
         estimated_sale_value: validated.estimated_sale_value,
         estimated_timeline: validated.estimated_timeline.trim(),
+        doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
       };
 
       let propId = propertyId;
