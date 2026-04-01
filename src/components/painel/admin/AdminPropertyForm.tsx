@@ -63,7 +63,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
