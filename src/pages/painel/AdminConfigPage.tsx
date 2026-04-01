@@ -16,42 +16,6 @@ export default function AdminConfigPage() {
   const [editingRates, setEditingRates] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
-  // Doc commission rate state
-  const { data: docCommission, isLoading: loadingCommission } = useQuery({
-    queryKey: ["doc-commission-rate"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_settings" as any)
-        .select("value")
-        .eq("key", "doc_commission_rate")
-        .maybeSingle();
-      if (error) throw error;
-      return data ? parseFloat((data as any).value) : 10;
-    },
-  });
-  const [editingCommission, setEditingCommission] = useState<string | null>(null);
-  const [savingCommission, setSavingCommission] = useState(false);
-
-  const handleSaveCommission = async () => {
-    if (editingCommission === null) return;
-    const val = parseFloat(editingCommission);
-    if (isNaN(val) || val < 0 || val > 100) {
-      toast({ title: "Valor inválido (0-100%)", variant: "destructive" });
-      return;
-    }
-    setSavingCommission(true);
-    const { error } = await supabase
-      .from("system_settings" as any)
-      .upsert({ key: "doc_commission_rate", value: String(val), updated_at: new Date().toISOString() } as any);
-    if (error) {
-      toast({ title: "Erro ao salvar", variant: "destructive" });
-    } else {
-      toast({ title: "Taxa atualizada com sucesso" });
-      setEditingCommission(null);
-      queryClient.invalidateQueries({ queryKey: ["doc-commission-rate"] });
-    }
-    setSavingCommission(false);
-  };
 
   const { data: taxes, isLoading } = useQuery({
     queryKey: ["us-state-taxes"],
