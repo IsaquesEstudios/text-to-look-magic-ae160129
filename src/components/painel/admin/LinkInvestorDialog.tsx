@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Search, AlertTriangle, CheckCircle } from "lucide-react";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 
 export type InvestmentPlan = "standard" | "equal_split" | "fixed_12" | "fixed_15";
 
@@ -43,6 +43,7 @@ interface Props {
   renovationCost: number;
   remaining: number;
   estimatedSaleValue?: number;
+  docCommissionRate?: number;
   onLink: (userId: string, amount: number, plan: InvestmentPlan) => void;
   isPending: boolean;
   /** For AdminPropertyForm: pass pre-reserved credits map */
@@ -57,11 +58,11 @@ export function LinkInvestorDialog({
   renovationCost,
   remaining,
   estimatedSaleValue = 0,
+  docCommissionRate = 10,
   onLink,
   isPending,
   reservedCreditsMap,
 }: Props) {
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [plan, setPlan] = useState<InvestmentPlan>("standard");

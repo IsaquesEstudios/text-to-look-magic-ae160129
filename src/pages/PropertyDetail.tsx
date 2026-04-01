@@ -100,7 +100,9 @@ export default function PropertyDetail() {
   const renovationCost = Number(effectiveProperty.estimated_renovation_cost) || 0;
   const purchasePrice = auctionValue + renovationCost;
   const saleValue = Number(effectiveProperty.estimated_sale_value) || 0;
-  const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice) / purchasePrice) * 100 : 0;
+  const docCommRate = Number((effectiveProperty as any).doc_commission_rate) || 10;
+  const docComm = saleValue * (docCommRate / 100);
+  const calculatedReturn = purchasePrice > 0 ? ((saleValue - purchasePrice - docComm) / purchasePrice) * 100 : 0;
 
   const allImages = [
     ...(effectiveProperty.cover_image_url ? [{ id: "cover", image_url: effectiveProperty.cover_image_url }] : []),
@@ -139,12 +141,13 @@ export default function PropertyDetail() {
 
         <div>
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-2">Estimativas do Projeto</p>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
             {[
               { icon: DollarSign, label: "Arremate até (Est.)", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: DollarSign, label: "Reforma (Est.)", value: `$${renovationCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: DollarSign, label: "Total do Projeto (Est.)", value: `$${purchasePrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: DollarSign, label: "Valor de Venda (Est.)", value: `$${saleValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
+              { icon: DollarSign, label: `Doc. & Comissão (${docCommRate}%)`, value: `$${docComm.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: TrendingUp, label: "Retorno (Est.)", value: `${calculatedReturn.toFixed(1)}%`, iconClass: "text-primary", valueClass: "text-primary" },
             ].map((stat, i) => (
               <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
@@ -164,6 +167,7 @@ export default function PropertyDetail() {
             estimatedSaleValue={saleValue}
             propertyType={effectiveProperty.type}
             propertyTitle={effectiveProperty.title}
+            docCommissionRate={docCommRate}
           />
         )}
 

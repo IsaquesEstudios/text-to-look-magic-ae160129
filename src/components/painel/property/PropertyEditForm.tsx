@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, X, Loader2, Home, TreePine, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 
 interface PropertyEditFormProps {
   property: {
@@ -20,6 +20,7 @@ interface PropertyEditFormProps {
     estimated_renovation_cost: number | null;
     estimated_sale_value: number | null;
     estimated_timeline: string | null;
+    doc_commission_rate?: number | null;
     status: string;
     cover_image_url: string | null;
   };
@@ -31,7 +32,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
-  const { rate: docCommissionRate } = useDocCommissionRate();
+  const docCommissionRate = (property as any).doc_commission_rate ?? 10;
 
   const [form, setForm] = useState({
     type: property.type as "house" | "land",
@@ -42,6 +43,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     estimated_renovation_cost: String(property.estimated_renovation_cost ?? ""),
     estimated_sale_value: String(property.estimated_sale_value ?? ""),
     estimated_timeline: property.estimated_timeline || "",
+    doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
     status: property.status,
     coverImage: property.cover_image_url,
     galleryImages: images.map((img) => ({ id: img.id, url: img.image_url })),
@@ -65,7 +67,8 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
     (parseFloat(form.estimated_renovation_cost) || 0);
 
   const saleVal = parseFloat(form.estimated_sale_value) || 0;
-  const docComm = saleVal * (docCommissionRate / 100);
+  const dcRate = parseFloat(form.doc_commission_rate) || 10;
+  const docComm = saleVal * (dcRate / 100);
   const returnPct =
     totalProjeto > 0 && saleVal > 0
       ? (((saleVal - totalProjeto - docComm) / totalProjeto) * 100).toFixed(1)
@@ -149,9 +152,10 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           estimated_return_pct: (() => {
             const av = auctionVal + renovVal;
             const sv = parseFloat(form.estimated_sale_value) || 0;
-            const dc = sv * (docCommissionRate / 100);
+            const dc = sv * ((parseFloat(form.doc_commission_rate) || 10) / 100);
             return av > 0 ? Math.min(((sv - av - dc) / av) * 100, 99999.99) : 0;
           })(),
+          doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
           estimated_timeline: form.estimated_timeline.trim(),
           status: form.status,
           cover_image_url: form.coverImage,
@@ -286,7 +290,14 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
             {returnPct !== "—" ? `${returnPct}%` : "—"}
           </div>
-          <p className="text-xs text-muted-foreground">Com Doc.&Comissão de {docCommissionRate}%</p>
+          <p className="text-xs text-muted-foreground">Com Doc.&Comissão de {form.doc_commission_rate}%</p>
+        </div>
+
+        {/* Doc Commission Rate */}
+        <div className="space-y-2">
+          <Label>Taxa Doc. & Comissão (%)</Label>
+          <Input type="number" step="0.1" min="0" max="100" value={form.doc_commission_rate} onChange={(e) => set("doc_commission_rate", e.target.value)} placeholder="10" />
+          <p className="text-xs text-muted-foreground">Percentual sobre o valor de venda para documentação e comissão</p>
         </div>
 
         {/* Timeline */}

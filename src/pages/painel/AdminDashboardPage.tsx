@@ -4,13 +4,12 @@ import { formatCurrencySmart } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 export default function AdminDashboardPage() {
   const { user, isAdmin } = useAuth();
-  const { rate: docCommissionRate } = useDocCommissionRate();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["admin-stats", docCommissionRate],
+    queryKey: ["admin-stats"],
     enabled: !!user && isAdmin,
     queryFn: async () => {
       const [depositsRes, sharesRes, propertiesRes, profilesRes] = await Promise.all([
@@ -18,7 +17,7 @@ export default function AdminDashboardPage() {
         supabase.from("shares").select("property_id, amount_paid, investment_plan"),
         supabase
           .from("properties")
-          .select("id, type, status, estimated_auction_value, estimated_renovation_cost, estimated_sale_value"),
+          .select("id, type, status, estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate"),
         supabase.from("profiles").select("id"),
       ]);
 
@@ -57,7 +56,8 @@ export default function AdminDashboardPage() {
       // Doc commission revenue from all properties with estimated_sale_value
       const docCommissionRevenue = properties.reduce((acc, p) => {
         const saleVal = Number(p.estimated_sale_value ?? 0);
-        return acc + saleVal * (docCommissionRate / 100);
+        const rate = Number((p as any).doc_commission_rate ?? 10);
+        return acc + saleVal * (rate / 100);
       }, 0);
       const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));

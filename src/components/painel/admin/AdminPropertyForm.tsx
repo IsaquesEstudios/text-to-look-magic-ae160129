@@ -3,7 +3,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePanelTranslation } from "@/hooks/usePanelTranslation";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,7 +63,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -80,6 +79,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     estimated_return_pct: "",
     estimated_sale_value: "",
     estimated_timeline: "",
+    doc_commission_rate: "10",
   });
 
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -180,6 +180,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           estimated_return_pct: String(property.estimated_return_pct ?? 0),
           estimated_sale_value: String(property.estimated_sale_value ?? 0),
           estimated_timeline: property.estimated_timeline ?? "",
+          doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
         setCoverImage(property.cover_image_url);
       }
@@ -319,7 +320,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
     const validatedHasInvestors = investorsToLink.length > 0;
     const validatedTotalProjetoComTaxas = validatedTotalProjeto + (validatedHasInvestors ? validatedServiceFee : 0);
-    const docComm = validated.estimated_sale_value * (docCommissionRate / 100);
+    const docRate = parseFloat(form.doc_commission_rate) || 10;
+    const docComm = validated.estimated_sale_value * (docRate / 100);
     const calculatedReturn = validatedTotalProjetoComTaxas > 0
       ? ((validated.estimated_sale_value - validatedTotalProjetoComTaxas - docComm) / validatedTotalProjetoComTaxas) * 100
       : 0;
@@ -362,6 +364,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         estimated_renovation_cost: validated.estimated_renovation_cost,
         estimated_sale_value: validated.estimated_sale_value,
         estimated_timeline: validated.estimated_timeline.trim(),
+        doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
       };
 
       let propId = propertyId;
@@ -578,7 +581,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
                 {(() => {
                   const saleVal = parseFloat(form.estimated_sale_value) || 0;
-                  const docComm = saleVal * (docCommissionRate / 100);
+                  const dcRate = parseFloat(form.doc_commission_rate) || 10;
+                  const docComm = saleVal * (dcRate / 100);
                   const profit = saleVal - totalProjeto - docComm;
                   if (totalProjeto > 0 && saleVal > 0) {
                     return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
@@ -586,7 +590,23 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   return "—";
                 })()}
               </div>
-              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
+              <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {form.doc_commission_rate}%) / Projeto</p>
+            </div>
+
+            {/* Doc Commission Rate */}
+            <div className="space-y-2">
+              <Label htmlFor="docCommission">Taxa Doc. & Comissão (%)</Label>
+              <Input
+                id="docCommission"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                value={form.doc_commission_rate}
+                onChange={(e) => setForm({ ...form, doc_commission_rate: e.target.value })}
+                placeholder="10"
+              />
+              <p className="text-xs text-muted-foreground">Percentual sobre o valor de venda para documentação e comissão</p>
             </div>
 
             {/* Timeline */}

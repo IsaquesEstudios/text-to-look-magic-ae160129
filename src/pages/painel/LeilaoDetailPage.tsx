@@ -333,6 +333,7 @@ export default function LeilaoDetailPage() {
       estimated_return_pct: "",
       estimated_sale_value: String(item.estimated_sale_value || ""),
       estimated_timeline: item.estimated_timeline || "",
+      doc_commission_rate: "10",
       total_shares: "1",
       share_price: "",
       status: item.status || "available",

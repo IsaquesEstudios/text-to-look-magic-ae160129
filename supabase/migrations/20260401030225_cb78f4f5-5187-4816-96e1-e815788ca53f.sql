@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN doc_commission_rate numeric NOT NULL DEFAULT 10;

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X, Loader2, Home, TreePine, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 
 export interface AuctionPropertyData {
   type: "house" | "land";
@@ -19,6 +19,7 @@ export interface AuctionPropertyData {
   estimated_return_pct: string;
   estimated_sale_value: string;
   estimated_timeline: string;
+  doc_commission_rate: string;
   total_shares: string;
   share_price: string;
   status: string;
@@ -36,6 +37,7 @@ export const emptyPropertyData: AuctionPropertyData = {
   estimated_return_pct: "",
   estimated_sale_value: "",
   estimated_timeline: "",
+  doc_commission_rate: "10",
   total_shares: "1",
   share_price: "",
   status: "available",
@@ -53,7 +55,7 @@ interface Props {
 export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
-  const { rate: docCommissionRate } = useDocCommissionRate();
+  
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -210,7 +212,8 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
           <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
             {(() => {
               const saleVal = parseFloat(data.estimated_sale_value) || 0;
-              const docComm = saleVal * (docCommissionRate / 100);
+              const dcRate = parseFloat(data.doc_commission_rate) || 10;
+              const docComm = saleVal * (dcRate / 100);
               const profit = saleVal - totalProjeto - docComm;
               if (totalProjeto > 0 && saleVal > 0) {
                 return `${((profit / totalProjeto) * 100).toFixed(1)}%`;
@@ -218,9 +221,16 @@ export function AuctionPropertyForm({ index, data, onChange, onRemove }: Props) 
               return "—";
             })()}
           </div>
-          <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {docCommissionRate}%) / Projeto</p>
+          <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {data.doc_commission_rate}%) / Projeto</p>
         </div>
 
+
+        {/* Doc Commission Rate */}
+        <div className="space-y-2">
+          <Label>Taxa Doc. & Comissão (%)</Label>
+          <Input type="number" step="0.1" min="0" max="100" value={data.doc_commission_rate} onChange={(e) => set("doc_commission_rate", e.target.value)} placeholder="10" />
+          <p className="text-xs text-muted-foreground">Percentual sobre o valor de venda para documentação e comissão</p>
+        </div>
 
         {/* Timeline */}
         <div className="space-y-2">

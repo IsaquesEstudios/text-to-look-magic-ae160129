@@ -8,16 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Gavel, Wrench, TrendingUp, Loader2, Receipt, Building2, MapPin, PlusCircle, Percent } from "lucide-react";
 import { formatCurrencySmart } from "@/lib/utils";
-import { useDocCommissionRate } from "@/hooks/useDocCommissionRate";
+
 
 function KPICards({ filterType }: { filterType: "house" | "land" }) {
-  const { rate: docCommissionRate } = useDocCommissionRate();
   const { data: kpis, isLoading } = useQuery({
-    queryKey: ["admin-properties-kpis", filterType, docCommissionRate],
+    queryKey: ["admin-properties-kpis", filterType],
     queryFn: async () => {
       const { data: properties } = await supabase
         .from("properties")
-        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
+        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate")
         .eq("type", filterType)
         .neq("status", "available");
 
@@ -26,7 +25,11 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       const reforma = props.reduce((s, p) => s + Number(p.estimated_renovation_cost || 0), 0);
       const investido = arremate + reforma;
       const venda = props.reduce((s, p) => s + Number(p.estimated_sale_value || 0), 0);
-      const docComm = venda * (docCommissionRate / 100);
+      const docComm = props.reduce((s, p) => {
+        const sv = Number(p.estimated_sale_value || 0);
+        const rate = Number((p as any).doc_commission_rate ?? 10);
+        return s + sv * (rate / 100);
+      }, 0);
       const roi = investido > 0 ? ((venda - investido - docComm) / investido) * 100 : 0;
 
       return { arremate, reforma, investido, venda, roi };
