@@ -16,7 +16,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
     queryFn: async () => {
       const { data: properties } = await supabase
         .from("properties")
-        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value")
+        .select("estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate")
         .eq("type", filterType)
         .neq("status", "available");
 
