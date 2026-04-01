@@ -332,7 +332,8 @@ export function LinkInvestorDialog({
               {/* Estimated return */}
               {estimatedSaleValue > 0 && totalProject > 0 && (() => {
                 const participation = currentAmount / totalProject;
-                const totalProfit = estimatedSaleValue - totalProject;
+                const docComm = estimatedSaleValue * (docCommissionRate / 100);
+                const totalProfit = estimatedSaleValue - totalProject - docComm;
                 let estimatedReturn = 0;
                 if (plan === "standard") {
                   estimatedReturn = totalProfit > 0 ? totalProfit * participation * 0.70 : 0;
