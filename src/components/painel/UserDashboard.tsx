@@ -136,6 +136,8 @@ export function UserDashboard() {
   const credits = isDemoUser ? 2500 : (profile?.credits ?? 0);
   const totalProperties = new Set(effectiveShares?.map(s => (s.properties as any)?.id).filter(Boolean)).size;
 
+  const { rate: docCommissionRate } = useDocCommissionRate();
+
   const { totalInvested, totalEstimatedReturn, portfolioRoi } = (() => {
     if (!effectiveShares?.length) return { totalInvested: 0, totalEstimatedReturn: 0, portfolioRoi: 0 };
     const propMap = new Map<string, { totalPaid: number; prop: any }>();
@@ -153,8 +155,9 @@ export function UserDashboard() {
       const renovationVal = Number(prop.estimated_renovation_cost) || 0;
       const totalProject = auctionVal + renovationVal;
       const saleVal = Number(prop.estimated_sale_value) || 0;
+      const docComm = saleVal * (docCommissionRate / 100);
       const participation = totalProject > 0 ? totalPaid / totalProject : 0;
-      estimated += totalPaid + (participation * (saleVal - totalProject));
+      estimated += totalPaid + (participation * (saleVal - totalProject - docComm));
     });
     const portfolioRoi = invested > 0 ? ((estimated - invested) / invested) * 100 : 0;
     return { totalInvested: invested, totalEstimatedReturn: estimated, portfolioRoi };
