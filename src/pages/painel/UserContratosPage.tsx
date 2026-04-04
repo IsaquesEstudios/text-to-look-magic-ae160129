@@ -289,13 +289,25 @@ export default function UserContratosPage() {
 
       <Dialog open={!!pdfViewer} onOpenChange={(open) => { if (!open) setPdfViewer(null); }}>
         <DialogContent className="sm:max-w-4xl h-[85vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
+          <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle>{pdfViewer?.title}</DialogTitle>
+            <p className="text-xs text-muted-foreground pt-1 sm:hidden">
+              Caso não consiga rolar, {" "}
+              <a
+                href={pdfViewer?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                toque aqui para abrir em nova aba
+              </a>
+            </p>
           </DialogHeader>
-          <div className="flex-1 min-h-0 px-6 pb-6">
+          <div className="flex-1 min-h-0 px-6 pb-6 overflow-auto" style={{ WebkitOverflowScrolling: "touch" }}>
             <iframe
               src={pdfViewer?.url}
               className="w-full h-full rounded-lg border border-border/50"
+              style={{ minHeight: "70vh" }}
               title="Visualizador de contrato"
             />
           </div>
