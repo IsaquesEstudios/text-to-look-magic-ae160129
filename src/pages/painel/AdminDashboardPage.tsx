@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
         adminFees: discoveryFromShares + discoveryFromDeposits + docCommissionRevenue,
         totalInvested: totalPropertiesInvested + auctionInvested,
         casas: linkedProperties.filter(p => p.type === "house").length,
-        terrenos: linkedProperties.filter(p => p.type === "land").length,
+        terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
         totalUsers: profiles.length,
       };
     },
