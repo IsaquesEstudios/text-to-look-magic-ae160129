@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow, format, subMonths, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 type ActivityItem = {
   id: string;
@@ -98,13 +98,19 @@ function DashboardCharts() {
         <CardContent>
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="gradInvestido" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="investido" name="Investido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="investido" name="Investido" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradInvestido)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
@@ -117,13 +123,19 @@ function DashboardCharts() {
         <CardContent>
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="gradDiscovery" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="discovery" name="Receita Discovery" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(142, 71%, 45%)" strokeWidth={2} fill="url(#gradDiscovery)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
