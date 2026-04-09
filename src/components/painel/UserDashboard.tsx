@@ -270,10 +270,10 @@ export function UserDashboard() {
       </div>
 
       {/* Charts Section */}
-      {effectiveShares && effectiveShares.length > 0 && (() => {
+      {(() => {
         // Build per-property data
         const propMap = new Map<string, { title: string; totalPaid: number; estimatedReturn: number; timelineMonths: number }>();
-        effectiveShares.forEach((s: any) => {
+        (effectiveShares || []).forEach((s: any) => {
           const prop = s.properties as any;
           if (!prop) return;
           const existing = propMap.get(prop.id);
@@ -295,7 +295,7 @@ export function UserDashboard() {
         });
 
         // Monthly return chart data
-        const maxMonths = Math.max(...Array.from(propMap.values()).map(p => p.timelineMonths), 1);
+        const maxMonths = propMap.size > 0 ? Math.max(...Array.from(propMap.values()).map(p => p.timelineMonths), 1) : 6;
         const monthlyData = Array.from({ length: maxMonths }, (_, i) => {
           let monthReturn = 0;
           propMap.forEach(({ totalPaid, estimatedReturn, timelineMonths }) => {
@@ -346,21 +346,25 @@ export function UserDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={monthlyData}>
-                      <defs>
-                        <linearGradient id="gradRendimento" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Area type="monotone" dataKey="rendimento" name="Rendimento/mês" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradRendimento)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  {propMap.size === 0 ? (
+                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Sem dados de rendimento</div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={monthlyData}>
+                        <defs>
+                          <linearGradient id="gradRendimento" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Area type="monotone" dataKey="rendimento" name="Rendimento/mês" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradRendimento)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -371,17 +375,21 @@ export function UserDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                        {pieData.map((_, idx) => (
-                          <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<PieTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: 11 }} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {pieData.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Sem imóveis vinculados</div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2}>
+                          {pieData.map((_, idx) => (
+                            <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<PieTooltip />} />
+                        <Legend wrapperStyle={{ fontSize: 11 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
             </Card>
