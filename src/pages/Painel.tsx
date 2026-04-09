@@ -81,6 +81,7 @@ function AdminDashboardContent() {
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
       return {
         adminFees: discoveryFromShares + discoveryFromDeposits,
+        projectedRevenue,
         totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
