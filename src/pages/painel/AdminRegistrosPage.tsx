@@ -219,6 +219,8 @@ export default function AdminRegistrosPage() {
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-registrations"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast({
         title: status === "approved" ? "Usuário aprovado" : "Usuário rejeitado",
         description: status === "approved"
