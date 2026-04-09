@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         {cards.map((card) => (
           <Card key={card.label} className="bg-card/50 border-border/50">
             <CardContent className="p-5">
