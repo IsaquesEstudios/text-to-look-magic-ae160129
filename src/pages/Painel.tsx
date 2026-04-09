@@ -290,14 +290,14 @@ function AdminDashboardContent() {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-8">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
       {/* Mobile: 2-col layout | Desktop: 6 cols */}
-      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-6">
         {kpis.map((card) => (
           <div
             key={card.label}
