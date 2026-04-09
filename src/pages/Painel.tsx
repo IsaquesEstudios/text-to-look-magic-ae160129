@@ -27,7 +27,7 @@ function AdminDashboardContent() {
         supabase.from("shares").select("property_id, amount_paid, investment_plan"),
         supabase
           .from("properties")
-          .select("id, type, status, estimated_auction_value, estimated_renovation_cost"),
+          .select("id, type, status, estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate"),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
       ]);
       const deposits = depositsRes.data ?? [];
