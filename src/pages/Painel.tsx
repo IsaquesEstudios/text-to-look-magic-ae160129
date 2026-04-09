@@ -41,14 +41,11 @@ function AdminDashboardContent() {
         return acc + maxFee;
       }, 0);
       const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
-      const totalPropertiesInvested = properties.reduce(
-        (acc, p) => acc + Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0),
-        0
-      );
+      const totalSharesInvested = shares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
       return {
         adminFees: discoveryFromProperties + discoveryFromDeposits,
-        totalInvested: totalPropertiesInvested + auctionInvested,
+        totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
         totalUsers: profilesCountRes.count ?? 0,
