@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
 
   const cards = [
     { label: "Valor Discovery Atual", value: fmtVal(stats?.adminFees ?? 0), icon: DollarSign },
-    { label: "Receita Projetada", value: fmtVal(stats?.projectedRevenue ?? 0), icon: TrendingUp },
+    { label: "Valor Discovery Projetado", value: fmtVal(stats?.projectedRevenue ?? 0), icon: TrendingUp },
     { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
     { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
     { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
