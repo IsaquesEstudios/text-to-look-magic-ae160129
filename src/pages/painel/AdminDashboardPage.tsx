@@ -17,7 +17,7 @@ export default function AdminDashboardPage() {
         supabase.from("shares").select("property_id, amount_paid, investment_plan"),
         supabase
           .from("properties")
-          .select("id, type, status, estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate"),
+          .select("id, type, status, estimated_auction_value, estimated_renovation_cost"),
         supabase.from("profiles").select("id"),
       ]);
 
@@ -53,19 +53,11 @@ export default function AdminDashboardPage() {
       }
 
       const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
-      // Doc commission revenue from all properties with estimated_sale_value
-      const docCommissionRevenue = properties.reduce((acc, p) => {
-        const saleVal = Number(p.estimated_sale_value ?? 0);
-        const rate = Number((p as any).doc_commission_rate ?? 10);
-        return acc + saleVal * (rate / 100);
-      }, 0);
-      const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
-      const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
       const totalSharesInvested = shares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
       return {
-        adminFees: discoveryFromShares + discoveryFromDeposits + docCommissionRevenue,
+        adminFees: discoveryFromShares + discoveryFromDeposits,
         totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
