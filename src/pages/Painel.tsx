@@ -58,18 +58,18 @@ function AdminDashboardContent() {
           }
 
           // Projected profit-based revenue
+          const grossProceeds = proportion * saleValue * (1 - docRate);
           const netProfit = saleValue - totalProject - (saleValue * docRate);
           if (netProfit > 0) {
-            const investorProfit = proportion * netProfit;
             let discoveryShare = 0;
             if (plan === "standard") {
-              discoveryShare = investorProfit * (30 / 70); // Discovery gets 30% of the 70/30 split
+              discoveryShare = proportion * netProfit * (30 / 70);
             } else if (plan === "equal_split") {
               discoveryShare = proportion * netProfit * 0.50;
             } else if (plan === "fixed_12") {
-              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.12;
+              discoveryShare = grossProceeds - Number(share.amount_paid) * 1.12;
             } else if (plan === "fixed_15") {
-              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.15;
+              discoveryShare = grossProceeds - Number(share.amount_paid) * 1.15;
             }
             if (discoveryShare > 0) projectedRevenue += Math.round(discoveryShare * 100) / 100;
           }
