@@ -24,7 +24,7 @@ function AdminDashboardContent() {
     queryFn: async () => {
       const [depositsRes, sharesRes, propertiesRes, profilesCountRes] = await Promise.all([
         supabase.from("auction_deposits").select("amount, service_fee"),
-        supabase.from("shares").select("property_id, amount_paid"),
+        supabase.from("shares").select("property_id, amount_paid, investment_plan"),
         supabase
           .from("properties")
           .select("id, type, status, estimated_auction_value, estimated_renovation_cost"),
@@ -33,18 +33,30 @@ function AdminDashboardContent() {
       const deposits = depositsRes.data ?? [];
       const shares = sharesRes.data ?? [];
       const properties = propertiesRes.data ?? [];
-      const linkedPropertyIds = new Set(shares.map(s => s.property_id));
-      const linkedProperties = properties.filter(p => linkedPropertyIds.has(p.id));
-      const discoveryFromProperties = linkedProperties.reduce((acc, p) => {
-        const normalizedType = (p.type ?? "").toLowerCase();
-        const maxFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
-        return acc + maxFee;
-      }, 0);
+      const propertyMap = new Map(properties.map(p => [p.id, p]));
+
+      let discoveryFromShares = 0;
+      for (const share of shares) {
+        const plan = (share as any).investment_plan ?? "standard";
+        if (plan !== "standard") continue;
+        const prop = propertyMap.get(share.property_id);
+        if (!prop) continue;
+        const normalizedType = (prop.type ?? "").toLowerCase();
+        const serviceFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
+        const totalProject = Number(prop.estimated_auction_value ?? 0) + Number(prop.estimated_renovation_cost ?? 0);
+        const renovationCost = Number(prop.estimated_renovation_cost ?? 0);
+        if (totalProject > 0) {
+          const proportion = Number(share.amount_paid) / totalProject;
+          discoveryFromShares += Math.round(proportion * serviceFee * 100) / 100;
+          discoveryFromShares += Math.round(proportion * (renovationCost * 0.10) * 100) / 100;
+        }
+      }
+
       const discoveryFromDeposits = deposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
       const totalSharesInvested = shares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
       return {
-        adminFees: discoveryFromProperties + discoveryFromDeposits,
+        adminFees: discoveryFromShares + discoveryFromDeposits,
         totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
