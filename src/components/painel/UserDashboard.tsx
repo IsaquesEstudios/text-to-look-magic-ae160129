@@ -269,6 +269,126 @@ export function UserDashboard() {
         )}
       </div>
 
+      {/* Charts Section */}
+      {effectiveShares && effectiveShares.length > 0 && (() => {
+        // Build per-property data
+        const propMap = new Map<string, { title: string; totalPaid: number; estimatedReturn: number; timelineMonths: number }>();
+        effectiveShares.forEach((s: any) => {
+          const prop = s.properties as any;
+          if (!prop) return;
+          const existing = propMap.get(prop.id);
+          const paid = Number(s.amount_paid);
+          if (existing) {
+            existing.totalPaid += paid;
+          } else {
+            const auctionVal = Number(prop.estimated_auction_value) || 0;
+            const renovationVal = Number(prop.estimated_renovation_cost) || 0;
+            const totalProject = auctionVal + renovationVal;
+            const saleVal = Number(prop.estimated_sale_value) || 0;
+            const docRate = Number(prop.doc_commission_rate ?? 10) / 100;
+            const participation = totalProject > 0 ? paid / totalProject : 0;
+            const estReturn = paid + (participation * (saleVal - totalProject - saleVal * docRate));
+            const timelineStr = prop.estimated_timeline || "";
+            const timelineMonths = Math.max(parseInt(timelineStr.replace(/\D/g, "")) || 6, 1);
+            propMap.set(prop.id, { title: prop.title, totalPaid: paid, estimatedReturn: Math.max(estReturn, 0), timelineMonths });
+          }
+        });
+
+        // Monthly return chart data
+        const maxMonths = Math.max(...Array.from(propMap.values()).map(p => p.timelineMonths), 1);
+        const monthlyData = Array.from({ length: maxMonths }, (_, i) => {
+          let monthReturn = 0;
+          propMap.forEach(({ totalPaid, estimatedReturn, timelineMonths }) => {
+            if (i < timelineMonths) {
+              const profit = estimatedReturn - totalPaid;
+              monthReturn += profit > 0 ? profit / timelineMonths : 0;
+            }
+          });
+          return { name: `${p.month || "Mês"} ${i + 1}`, rendimento: Math.round(monthReturn * 100) / 100 };
+        });
+
+        // Pie chart data
+        const PIE_COLORS = ["hsl(var(--primary))", "hsl(142, 71%, 45%)", "hsl(38, 92%, 50%)", "hsl(280, 67%, 55%)", "hsl(200, 80%, 50%)", "hsl(350, 70%, 55%)"];
+        const pieData = Array.from(propMap.entries()).map(([, v]) => ({
+          name: v.title.length > 20 ? v.title.slice(0, 18) + "…" : v.title,
+          value: Math.round(v.totalPaid * 100) / 100,
+        }));
+
+        const CustomTooltip = ({ active, payload, label }: any) => {
+          if (!active || !payload?.length) return null;
+          return (
+            <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+              <p className="text-xs font-medium text-foreground mb-1">{label}</p>
+              {payload.map((entry: any) => (
+                <p key={entry.name} className="text-xs" style={{ color: entry.color }}>
+                  {entry.name}: $ {Number(entry.value).toLocaleString("en-US")}
+                </p>
+              ))}
+            </div>
+          );
+        };
+
+        const PieTooltip = ({ active, payload }: any) => {
+          if (!active || !payload?.length) return null;
+          return (
+            <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+              <p className="text-xs font-medium text-foreground">{payload[0].name}</p>
+              <p className="text-xs text-primary">$ {Number(payload[0].value).toLocaleString("en-US")}</p>
+            </div>
+          );
+        };
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">{p.estimatedReturn || "Rendimento Estimado"}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={monthlyData}>
+                      <defs>
+                        <linearGradient id="gradRendimento" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Area type="monotone" dataKey="rendimento" name="Rendimento/mês" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradRendimento)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">Distribuição por Imóvel</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2}>
+                        {pieData.map((_, idx) => (
+                          <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<PieTooltip />} />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
+
       <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
           <div className="flex items-center gap-2">
