@@ -27,7 +27,7 @@ function AdminDashboardContent() {
         supabase.from("shares").select("property_id, amount_paid, investment_plan"),
         supabase
           .from("properties")
-          .select("id, type, status, estimated_auction_value, estimated_renovation_cost"),
+          .select("id, type, status, estimated_auction_value, estimated_renovation_cost, estimated_sale_value, doc_commission_rate"),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
       ]);
       const deposits = depositsRes.data ?? [];
@@ -36,19 +36,43 @@ function AdminDashboardContent() {
       const propertyMap = new Map(properties.map(p => [p.id, p]));
 
       let discoveryFromShares = 0;
+      let projectedRevenue = 0;
       for (const share of shares) {
         const plan = (share as any).investment_plan ?? "standard";
-        if (plan !== "standard") continue;
         const prop = propertyMap.get(share.property_id);
         if (!prop) continue;
         const normalizedType = (prop.type ?? "").toLowerCase();
         const serviceFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
         const totalProject = Number(prop.estimated_auction_value ?? 0) + Number(prop.estimated_renovation_cost ?? 0);
         const renovationCost = Number(prop.estimated_renovation_cost ?? 0);
+        const saleValue = Number(prop.estimated_sale_value ?? 0);
+        const docRate = Number(prop.doc_commission_rate ?? 10) / 100;
+
         if (totalProject > 0) {
           const proportion = Number(share.amount_paid) / totalProject;
-          discoveryFromShares += Math.round(proportion * serviceFee * 100) / 100;
-          discoveryFromShares += Math.round(proportion * (renovationCost * 0.10) * 100) / 100;
+
+          // Upfront fees (only Standard plan)
+          if (plan === "standard") {
+            discoveryFromShares += Math.round(proportion * serviceFee * 100) / 100;
+            discoveryFromShares += Math.round(proportion * (renovationCost * 0.10) * 100) / 100;
+          }
+
+          // Projected profit-based revenue
+          const netProfit = saleValue - totalProject - (saleValue * docRate);
+          if (netProfit > 0) {
+            const investorProfit = proportion * netProfit;
+            let discoveryShare = 0;
+            if (plan === "standard") {
+              discoveryShare = investorProfit * (30 / 70); // Discovery gets 30% of the 70/30 split
+            } else if (plan === "equal_split") {
+              discoveryShare = proportion * netProfit * 0.50;
+            } else if (plan === "fixed_12") {
+              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.12;
+            } else if (plan === "fixed_15") {
+              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.15;
+            }
+            if (discoveryShare > 0) projectedRevenue += Math.round(discoveryShare * 100) / 100;
+          }
         }
       }
 
@@ -57,6 +81,7 @@ function AdminDashboardContent() {
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
       return {
         adminFees: discoveryFromShares + discoveryFromDeposits,
+        projectedRevenue,
         totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
@@ -140,7 +165,8 @@ function AdminDashboardContent() {
   }
 
   const kpis = [
-    { label: "Valor Discovery", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Valor Discovery Atual", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
+    { label: "Receita Projetada", value: `$ ${(stats?.projectedRevenue ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
     { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
     { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
     { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
@@ -154,12 +180,12 @@ function AdminDashboardContent() {
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
-      {/* Mobile: 2-2-1 layout | Desktop: 5 cols */}
-      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-5">
-        {kpis.map((card, i) => (
+      {/* Mobile: 2-col layout | Desktop: 6 cols */}
+      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-6">
+        {kpis.map((card) => (
           <div
             key={card.label}
-            className={`flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden ${i === 4 ? "col-span-2 lg:col-span-1" : ""}`}
+            className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden"
           >
             <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
               <card.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
