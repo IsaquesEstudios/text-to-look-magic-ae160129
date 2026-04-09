@@ -304,7 +304,7 @@ export function UserDashboard() {
               monthReturn += profit > 0 ? profit / timelineMonths : 0;
             }
           });
-          return { name: `${p.month || "Mês"} ${i + 1}`, rendimento: Math.round(monthReturn * 100) / 100 };
+          return { name: `Mês ${i + 1}`, rendimento: Math.round(monthReturn * 100) / 100 };
         });
 
         // Pie chart data
