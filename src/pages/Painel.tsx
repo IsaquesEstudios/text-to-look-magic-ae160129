@@ -5,8 +5,9 @@ import { Loader2, DollarSign, Building2, MapPin, TrendingUp, Users, UserPlus, Sh
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format, subMonths, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 type ActivityItem = {
   id: string;
@@ -15,6 +16,121 @@ type ActivityItem = {
   timestamp: string;
   icon: typeof ShoppingCart;
 };
+
+function DashboardCharts() {
+  const { data: chartData, isLoading } = useQuery({
+    queryKey: ["admin-dashboard-charts"],
+    refetchOnMount: "always",
+    staleTime: 0,
+    queryFn: async () => {
+      const months: { key: string; label: string; start: string; end: string }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = subMonths(new Date(), i);
+        const s = startOfMonth(d);
+        const e = i === 0 ? new Date() : startOfMonth(subMonths(new Date(), i - 1));
+        months.push({
+          key: format(d, "yyyy-MM"),
+          label: format(d, "MMM yy", { locale: ptBR }),
+          start: s.toISOString(),
+          end: e.toISOString(),
+        });
+      }
+
+      const [sharesRes, depositsRes, propertiesRes] = await Promise.all([
+        supabase.from("shares").select("amount_paid, purchased_at, property_id, investment_plan"),
+        supabase.from("auction_deposits").select("service_fee, created_at"),
+        supabase.from("properties").select("id, type, estimated_auction_value, estimated_renovation_cost"),
+      ]);
+
+      const shares = sharesRes.data ?? [];
+      const deposits = depositsRes.data ?? [];
+      const properties = propertiesRes.data ?? [];
+      const propMap = new Map(properties.map(p => [p.id, p]));
+
+      return months.map(m => {
+        const mShares = shares.filter(s => s.purchased_at >= m.start && s.purchased_at < m.end);
+        const mDeposits = deposits.filter(d => d.created_at >= m.start && d.created_at < m.end);
+
+        const investido = mShares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
+
+        let discoveryFees = mDeposits.reduce((acc, d) => acc + Number(d.service_fee), 0);
+        for (const share of mShares) {
+          const plan = (share as any).investment_plan ?? "standard";
+          if (plan !== "standard") continue;
+          const prop = propMap.get(share.property_id);
+          if (!prop) continue;
+          const totalProject = Number(prop.estimated_auction_value ?? 0) + Number(prop.estimated_renovation_cost ?? 0);
+          if (totalProject <= 0) continue;
+          const proportion = Number(share.amount_paid) / totalProject;
+          const normalizedType = (prop.type ?? "").toLowerCase();
+          const serviceFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
+          discoveryFees += Math.round(proportion * serviceFee * 100) / 100;
+          discoveryFees += Math.round(proportion * (Number(prop.estimated_renovation_cost ?? 0) * 0.10) * 100) / 100;
+        }
+
+        return { name: m.label, investido: Math.round(investido), discovery: Math.round(discoveryFees) };
+      });
+    },
+  });
+
+  if (isLoading || !chartData) return null;
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+        <p className="text-xs font-medium text-foreground mb-1">{label}</p>
+        {payload.map((entry: any) => (
+          <p key={entry.name} className="text-xs" style={{ color: entry.color }}>
+            {entry.name}: $ {Number(entry.value).toLocaleString("en-US")}
+          </p>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-semibold">Investimentos por Mês</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="investido" name="Investido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-semibold">Receita Discovery por Mês</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="discovery" name="Receita Discovery" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 function AdminDashboardContent() {
   const { data: stats, isLoading } = useQuery({
@@ -197,6 +313,8 @@ function AdminDashboardContent() {
           </div>
         ))}
       </div>
+
+      <DashboardCharts />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card/50 border-border/50">
