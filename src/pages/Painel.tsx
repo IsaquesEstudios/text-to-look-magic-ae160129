@@ -5,8 +5,9 @@ import { Loader2, DollarSign, Building2, MapPin, TrendingUp, Users, UserPlus, Sh
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format, subMonths, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 type ActivityItem = {
   id: string;
@@ -197,6 +198,8 @@ function AdminDashboardContent() {
           </div>
         ))}
       </div>
+
+      <DashboardCharts />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card/50 border-border/50">
