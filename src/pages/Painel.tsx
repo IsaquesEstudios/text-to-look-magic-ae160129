@@ -36,19 +36,43 @@ function AdminDashboardContent() {
       const propertyMap = new Map(properties.map(p => [p.id, p]));
 
       let discoveryFromShares = 0;
+      let projectedRevenue = 0;
       for (const share of shares) {
         const plan = (share as any).investment_plan ?? "standard";
-        if (plan !== "standard") continue;
         const prop = propertyMap.get(share.property_id);
         if (!prop) continue;
         const normalizedType = (prop.type ?? "").toLowerCase();
         const serviceFee = normalizedType === "land" || normalizedType === "terreno" ? 500 : 5000;
         const totalProject = Number(prop.estimated_auction_value ?? 0) + Number(prop.estimated_renovation_cost ?? 0);
         const renovationCost = Number(prop.estimated_renovation_cost ?? 0);
+        const saleValue = Number(prop.estimated_sale_value ?? 0);
+        const docRate = Number(prop.doc_commission_rate ?? 10) / 100;
+
         if (totalProject > 0) {
           const proportion = Number(share.amount_paid) / totalProject;
-          discoveryFromShares += Math.round(proportion * serviceFee * 100) / 100;
-          discoveryFromShares += Math.round(proportion * (renovationCost * 0.10) * 100) / 100;
+
+          // Upfront fees (only Standard plan)
+          if (plan === "standard") {
+            discoveryFromShares += Math.round(proportion * serviceFee * 100) / 100;
+            discoveryFromShares += Math.round(proportion * (renovationCost * 0.10) * 100) / 100;
+          }
+
+          // Projected profit-based revenue
+          const netProfit = saleValue - totalProject - (saleValue * docRate);
+          if (netProfit > 0) {
+            const investorProfit = proportion * netProfit;
+            let discoveryShare = 0;
+            if (plan === "standard") {
+              discoveryShare = investorProfit * (30 / 70); // Discovery gets 30% of the 70/30 split
+            } else if (plan === "equal_split") {
+              discoveryShare = proportion * netProfit * 0.50;
+            } else if (plan === "fixed_12") {
+              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.12;
+            } else if (plan === "fixed_15") {
+              discoveryShare = proportion * netProfit - Number(share.amount_paid) * 0.15;
+            }
+            if (discoveryShare > 0) projectedRevenue += Math.round(discoveryShare * 100) / 100;
+          }
         }
       }
 
