@@ -93,7 +93,7 @@ function DashboardCharts() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <Card className="bg-card/50 border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">Investimentos por Mês</CardTitle>
+          <CardTitle className="text-base font-semibold">Total Investido</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[220px]">
