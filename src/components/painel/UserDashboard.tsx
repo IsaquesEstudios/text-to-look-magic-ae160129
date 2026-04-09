@@ -7,7 +7,8 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { DEMO_SHARES, DEMO_CREDIT_TRANSACTIONS, getDemoPropertyNews } from "@/data/demoData";
-
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const dateFnsLocales = { pt: ptBR, en: enUS, es };
 
