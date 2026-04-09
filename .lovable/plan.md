@@ -1,21 +1,37 @@
 
 
-## Diagnóstico
+## Correção do KPI "Total Investido"
 
-O Nelson Ocampo-Rodriguez aparece tanto na página de Registros (pendente) quanto na lista de Usuários porque o componente `AdminUsersList.tsx` carrega todos os perfis sem filtrar por status. Ele deveria aparecer apenas na lista de Usuários **após ser aprovado**.
+### Problema
+O cálculo atual soma os custos estimados de todos os projetos (`estimated_auction_value + estimated_renovation_cost`), independente de ter investidor ou não. Isso inflaciona o valor.
 
-## Plano
+### Solução
+Alterar o cálculo para refletir o capital real aportado:
+- `SUM(shares.amount_paid)` — investimentos vinculados a propriedades
+- `SUM(auction_deposits.amount)` — depósitos em leilões
 
-### Arquivo: `src/components/painel/admin/AdminUsersList.tsx`
+### Arquivos a alterar
 
-Adicionar filtro na query para mostrar apenas usuários aprovados, excluindo pendentes e rejeitados:
+1. **`src/pages/Painel.tsx`** — `AdminDashboardContent`, atualizar o cálculo de `totalInvested` na queryFn
+2. **`src/pages/painel/AdminDashboardPage.tsx`** — mesmo ajuste no cálculo de `totalInvested`
 
-- Na query (linha 15-19), adicionar `.eq("status", "approved")` ao select
-- Isso garante que usuários pendentes/rejeitados apareçam apenas na página de Registros
+### Código (ambos os arquivos)
+```typescript
+// DE:
+const totalPropertiesInvested = properties.reduce(
+  (acc, p) => acc + Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0),
+  0
+);
+const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
-### Resultado esperado
+// PARA:
+const totalSharesInvested = shares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
+const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
-- Usuários com status `pending` ou `rejected` aparecem **somente** em `/painel/registros`
-- Após aprovação, o usuário migra automaticamente para a lista de Usuários em `/painel/usuarios`
-- Nelson só aparecerá na lista de usuários depois de ser aprovado na página de registros
+// E no return:
+totalInvested: totalSharesInvested + auctionInvested,
+```
+
+### Resultado
+O KPI mostrará apenas o dinheiro efetivamente investido por investidores reais, não estimativas de custo de projeto.
 
