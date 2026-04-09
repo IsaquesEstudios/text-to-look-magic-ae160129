@@ -61,15 +61,12 @@ export default function AdminDashboardPage() {
       }, 0);
       const linkedPropertyIds = new Set(shares.map((s) => s.property_id));
       const linkedProperties = properties.filter((p) => linkedPropertyIds.has(p.id));
-      const totalPropertiesInvested = properties.reduce(
-        (acc, p) => acc + Number(p.estimated_auction_value ?? 0) + Number(p.estimated_renovation_cost ?? 0),
-        0
-      );
+      const totalSharesInvested = shares.reduce((acc, s) => acc + Number(s.amount_paid), 0);
       const auctionInvested = deposits.reduce((acc, d) => acc + Number(d.amount), 0);
 
       return {
         adminFees: discoveryFromShares + discoveryFromDeposits + docCommissionRevenue,
-        totalInvested: totalPropertiesInvested + auctionInvested,
+        totalInvested: totalSharesInvested + auctionInvested,
         casas: properties.filter(p => p.type === "house" && p.status !== "available").length,
         terrenos: properties.filter(p => p.type === "land" && p.status !== "available").length,
         totalUsers: profiles.length,
