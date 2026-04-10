@@ -40,6 +40,14 @@ import {
 import { format } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 const MAX_CREDITS = 99_999_999.99;
 
 const dateLocaleMap: Record<string, any> = { pt: ptBR, en: enUS, es };
@@ -56,6 +64,10 @@ export default function AdminUserProfilePage() {
   const [savingCredits, setSavingCredits] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showCreditDialog, setShowCreditDialog] = useState(false);
+  const [creditEditType, setCreditEditType] = useState<"add" | "set">("add");
+  const [creditSetRawAmount, setCreditSetRawAmount] = useState(0);
+  const [creditSetDisplayAmount, setCreditSetDisplayAmount] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -359,6 +371,49 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const handleSetCredits = async () => {
+    if (!userId || !user) return;
+    const newCredits = creditEditType === "set"
+      ? creditSetRawAmount / 100
+      : (Number(profile?.credits) || 0) + creditSetRawAmount / 100;
+    if (newCredits < 0 || newCredits > MAX_CREDITS) {
+      toast({ title: p.maxValueExceeded, variant: "destructive" });
+      return;
+    }
+    setSavingCredits(true);
+    try {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ credits: newCredits })
+        .eq("user_id", userId);
+      if (profileError) throw profileError;
+
+      const oldCredits = Number(profile?.credits) || 0;
+      const diff = newCredits - oldCredits;
+      if (diff !== 0) {
+        await supabase.from("credit_transactions").insert({
+          user_id: userId,
+          amount: Math.abs(diff),
+          type: diff > 0 ? "deposit" : "withdrawal",
+          description: diff > 0 ? p.creditAddedByAdmin : "Crédito ajustado pelo admin",
+          created_by: user.id,
+        });
+      }
+
+      toast({ title: `Créditos atualizados para $${newCredits.toLocaleString("en-US", { minimumFractionDigits: 2 })}` });
+      setCreditSetRawAmount(0);
+      setCreditSetDisplayAmount("");
+      setShowCreditDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
+    } catch {
+      toast({ title: p.error, description: p.unexpectedError, variant: "destructive" });
+    } finally {
+      setSavingCredits(false);
+    }
+  };
+
   const credits = Number(profile?.credits) || 0;
 
   // Consolidate multiple shares in the same property
@@ -398,15 +453,24 @@ export default function AdminUserProfilePage() {
         {p.backToUsers}
       </button>
 
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             {profile.full_name || p.noName}
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{userId}</p>
+          <p className="text-sm text-muted-foreground mt-0.5 break-all">{userId}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="border-primary/30 text-primary text-base px-4 py-1.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            variant="outline"
+            className="border-primary/30 text-primary text-base px-4 py-1.5 cursor-pointer hover:bg-primary/10 transition-colors"
+            onClick={() => {
+              setCreditEditType("add");
+              setCreditSetRawAmount(0);
+              setCreditSetDisplayAmount("");
+              setShowCreditDialog(true);
+            }}
+          >
             <DollarSign className="h-4 w-4 mr-1" />
             {credits.toLocaleString("en-US")}
           </Badge>
@@ -416,15 +480,81 @@ export default function AdminUserProfilePage() {
           </Button>
           <Button
             variant="outline"
-            size="sm"
-            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
+            size="icon"
+            className="h-8 w-8 text-destructive border-destructive/30 hover:bg-destructive/10"
             onClick={() => setShowDeleteDialog(true)}
           >
             <UserX className="h-4 w-4" />
-            {p.deleteUser}
           </Button>
         </div>
       </div>
+
+      {/* Credit Edit Dialog */}
+      <Dialog open={showCreditDialog} onOpenChange={setShowCreditDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Alterar Créditos</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Button
+                variant={creditEditType === "add" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCreditEditType("add")}
+                className="flex-1"
+              >
+                Adicionar
+              </Button>
+              <Button
+                variant={creditEditType === "set" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCreditEditType("set")}
+                className="flex-1"
+              >
+                Definir valor
+              </Button>
+            </div>
+            <div>
+              <Label className="text-sm text-muted-foreground">
+                {creditEditType === "add" ? "Valor a adicionar" : "Novo saldo"}
+              </Label>
+              <div className="relative mt-1">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-9"
+                  placeholder="0.00"
+                  value={creditSetDisplayAmount}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, "");
+                    const num = parseInt(raw || "0", 10);
+                    setCreditSetRawAmount(num);
+                    setCreditSetDisplayAmount((num / 100).toLocaleString("en-US", { minimumFractionDigits: 2 }));
+                  }}
+                />
+              </div>
+              {creditEditType === "add" && creditSetRawAmount > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Saldo atual: ${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })} → Novo: ${(credits + creditSetRawAmount / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </p>
+              )}
+              {creditEditType === "set" && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Saldo atual: ${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setShowCreditDialog(false)}>
+              Cancelar
+            </Button>
+            <Button size="sm" onClick={handleSetCredits} disabled={savingCredits || creditSetRawAmount === 0}>
+              {savingCredits && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
