@@ -108,28 +108,32 @@ export function LinkInvestorDialog({
   const selectedInvestor = investorsWithCredits?.find((i) => i.user_id === selectedUserId);
   const userMaxCredits = getAvailableCredits(selectedUserId);
 
-  // Fee calculations
+  // Fee calculations — valor digitado = total bruto (taxas inclusas)
   const serviceFee = propertyType === "land" || propertyType === "terreno" ? 500 : 5000;
-  const currentAmount = linkRawAmount / 100;
+  const currentAmount = linkRawAmount / 100; // total bruto digitado
 
-  const arremmateFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((currentAmount / totalProject) * serviceFee * 100) / 100
-    : 0;
-  const renoFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((currentAmount / totalProject) * (renovationCost * 0.10) * 100) / 100
-    : 0;
-  const totalFees = arremmateFeeShare + renoFeeShare;
-  const currentTotalDeduction = currentAmount + totalFees;
-
-  // Max linkable
   const totalFeeRate = plan === "standard" && totalProject > 0
     ? (serviceFee + renovationCost * 0.10) / totalProject
     : 0;
-  const maxLinkableByCredits = totalFeeRate > 0
-    ? Math.floor((userMaxCredits / (1 + totalFeeRate)) * 100) / 100
-    : userMaxCredits;
+
+  // Investimento líquido (o que vai para o projeto)
+  const netInvestment = plan === "standard" && totalFeeRate > 0
+    ? Math.round((currentAmount / (1 + totalFeeRate)) * 100) / 100
+    : currentAmount;
+
+  const arremmateFeeShare = plan === "standard" && totalProject > 0
+    ? Math.round((netInvestment / totalProject) * serviceFee * 100) / 100
+    : 0;
+  const renoFeeShare = plan === "standard" && totalProject > 0
+    ? Math.round((netInvestment / totalProject) * (renovationCost * 0.10) * 100) / 100
+    : 0;
+  const totalFees = arremmateFeeShare + renoFeeShare;
+  const currentTotalDeduction = netInvestment + totalFees; // ≈ currentAmount
+
+  // Max linkable — créditos = valor bruto direto; remaining = líquido
+  const maxLinkableByCredits = userMaxCredits;
   const maxLinkableByRemaining = Math.max(remaining, 0);
-  const maxLinkable = Math.min(maxLinkableByCredits, maxLinkableByRemaining);
+  // Para remaining, precisamos comparar netInvestment, não currentAmount
 
   const resetForm = () => {
     setSearch("");
