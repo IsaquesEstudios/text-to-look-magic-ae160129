@@ -92,10 +92,10 @@ function DashboardCharts() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <Card className="bg-card/50 border-border/50">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">Total Investido</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
