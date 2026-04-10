@@ -64,7 +64,10 @@ export default function AdminUserProfilePage() {
   const [savingCredits, setSavingCredits] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [showCreditDialog, setShowCreditDialog] = useState(false);
+  const [creditEditType, setCreditEditType] = useState<"add" | "set">("add");
+  const [creditSetRawAmount, setCreditSetRawAmount] = useState(0);
+  const [creditSetDisplayAmount, setCreditSetDisplayAmount] = useState("");
   const [editingProfile, setEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
