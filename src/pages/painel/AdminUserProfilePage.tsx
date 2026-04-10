@@ -40,6 +40,14 @@ import {
 import { format } from "date-fns";
 import { ptBR, enUS, es } from "date-fns/locale";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 const MAX_CREDITS = 99_999_999.99;
 
 const dateLocaleMap: Record<string, any> = { pt: ptBR, en: enUS, es };
