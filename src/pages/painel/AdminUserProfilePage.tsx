@@ -371,6 +371,49 @@ export default function AdminUserProfilePage() {
     }
   };
 
+  const handleSetCredits = async () => {
+    if (!userId || !user) return;
+    const newCredits = creditEditType === "set"
+      ? creditSetRawAmount / 100
+      : (Number(profile?.credits) || 0) + creditSetRawAmount / 100;
+    if (newCredits < 0 || newCredits > MAX_CREDITS) {
+      toast({ title: p.maxValueExceeded, variant: "destructive" });
+      return;
+    }
+    setSavingCredits(true);
+    try {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ credits: newCredits })
+        .eq("user_id", userId);
+      if (profileError) throw profileError;
+
+      const oldCredits = Number(profile?.credits) || 0;
+      const diff = newCredits - oldCredits;
+      if (diff !== 0) {
+        await supabase.from("credit_transactions").insert({
+          user_id: userId,
+          amount: Math.abs(diff),
+          type: diff > 0 ? "deposit" : "withdrawal",
+          description: diff > 0 ? p.creditAddedByAdmin : "Crédito ajustado pelo admin",
+          created_by: user.id,
+        });
+      }
+
+      toast({ title: `Créditos atualizados para $${newCredits.toLocaleString("en-US", { minimumFractionDigits: 2 })}` });
+      setCreditSetRawAmount(0);
+      setCreditSetDisplayAmount("");
+      setShowCreditDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-user-profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["investors-with-credits-linking"] });
+      queryClient.invalidateQueries({ queryKey: ["investment-kpis"] });
+    } catch {
+      toast({ title: p.error, description: p.unexpectedError, variant: "destructive" });
+    } finally {
+      setSavingCredits(false);
+    }
+  };
+
   const credits = Number(profile?.credits) || 0;
 
   // Consolidate multiple shares in the same property
