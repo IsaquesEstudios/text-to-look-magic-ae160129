@@ -294,7 +294,7 @@ function AdminDashboardContent() {
 
   const kpis = [
     { label: "Valor Discovery Atual", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
-    { label: "Valor Discovery Projetado", value: `$ ${(stats?.projectedRevenue ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
+    { label: "Est. Discovery", value: `$ ${(stats?.projectedRevenue ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
     { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
     { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
     { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
