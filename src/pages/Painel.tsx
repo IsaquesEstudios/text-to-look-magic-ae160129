@@ -98,7 +98,7 @@ function DashboardCharts() {
         <CardContent className="px-2 sm:px-6">
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
+              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gradInvestido" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
@@ -106,8 +106,8 @@ function DashboardCharts() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={40} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area type="monotone" dataKey="investido" name="Investido" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradInvestido)" />
               </AreaChart>
@@ -117,13 +117,13 @@ function DashboardCharts() {
       </Card>
 
       <Card className="bg-card/50 border-border/50">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">Receita Discovery por Mês</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
+              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gradDiscovery" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.4} />
@@ -131,8 +131,8 @@ function DashboardCharts() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={40} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(142, 71%, 45%)" strokeWidth={2} fill="url(#gradDiscovery)" />
               </AreaChart>
