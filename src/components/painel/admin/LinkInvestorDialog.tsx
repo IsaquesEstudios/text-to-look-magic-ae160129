@@ -108,28 +108,32 @@ export function LinkInvestorDialog({
   const selectedInvestor = investorsWithCredits?.find((i) => i.user_id === selectedUserId);
   const userMaxCredits = getAvailableCredits(selectedUserId);
 
-  // Fee calculations
+  // Fee calculations — valor digitado = total bruto (taxas inclusas)
   const serviceFee = propertyType === "land" || propertyType === "terreno" ? 500 : 5000;
-  const currentAmount = linkRawAmount / 100;
+  const currentAmount = linkRawAmount / 100; // total bruto digitado
 
-  const arremmateFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((currentAmount / totalProject) * serviceFee * 100) / 100
-    : 0;
-  const renoFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((currentAmount / totalProject) * (renovationCost * 0.10) * 100) / 100
-    : 0;
-  const totalFees = arremmateFeeShare + renoFeeShare;
-  const currentTotalDeduction = currentAmount + totalFees;
-
-  // Max linkable
   const totalFeeRate = plan === "standard" && totalProject > 0
     ? (serviceFee + renovationCost * 0.10) / totalProject
     : 0;
-  const maxLinkableByCredits = totalFeeRate > 0
-    ? Math.floor((userMaxCredits / (1 + totalFeeRate)) * 100) / 100
-    : userMaxCredits;
+
+  // Investimento líquido (o que vai para o projeto)
+  const netInvestment = plan === "standard" && totalFeeRate > 0
+    ? Math.round((currentAmount / (1 + totalFeeRate)) * 100) / 100
+    : currentAmount;
+
+  const arremmateFeeShare = plan === "standard" && totalProject > 0
+    ? Math.round((netInvestment / totalProject) * serviceFee * 100) / 100
+    : 0;
+  const renoFeeShare = plan === "standard" && totalProject > 0
+    ? Math.round((netInvestment / totalProject) * (renovationCost * 0.10) * 100) / 100
+    : 0;
+  const totalFees = arremmateFeeShare + renoFeeShare;
+  const currentTotalDeduction = netInvestment + totalFees; // ≈ currentAmount
+
+  // Max linkable — créditos = valor bruto direto; remaining = líquido
+  const maxLinkableByCredits = userMaxCredits;
   const maxLinkableByRemaining = Math.max(remaining, 0);
-  const maxLinkable = Math.min(maxLinkableByCredits, maxLinkableByRemaining);
+  // Para remaining, precisamos comparar netInvestment, não currentAmount
 
   const resetForm = () => {
     setSearch("");
@@ -146,7 +150,7 @@ export function LinkInvestorDialog({
 
   const handleLink = () => {
     if (currentAmount <= 0 || !selectedUserId) return;
-    onLink(selectedUserId, currentAmount, plan);
+    onLink(selectedUserId, netInvestment, plan);
     resetForm();
   };
 
@@ -261,7 +265,7 @@ export function LinkInvestorDialog({
           {selectedUserId && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                3. Valor a vincular
+                3. Valor do aporte {plan === "standard" ? "(taxas inclusas)" : ""}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -291,21 +295,25 @@ export function LinkInvestorDialog({
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Investimento</span>
+                <span className="text-muted-foreground">Total do aporte</span>
                 <span className="font-semibold">${formatUSD(currentAmount)}</span>
               </div>
               {plan === "standard" && (
                 <>
                   <div className="flex justify-between">
+                    <span className="text-muted-foreground">Investimento líquido</span>
+                    <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Taxa arremate ({totalProject > 0 ? ((currentAmount / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
+                      Taxa arremate ({totalProject > 0 ? ((netInvestment / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
                     </span>
                     <span className="font-semibold text-amber-500">${formatUSD(arremmateFeeShare)}</span>
                   </div>
                   {renovationCost > 0 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        Taxa reforma 10% ({totalProject > 0 ? ((currentAmount / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(renovationCost * 0.10)})
+                        Taxa reforma 10% ({totalProject > 0 ? ((netInvestment / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(renovationCost * 0.10)})
                       </span>
                       <span className="font-semibold text-amber-500">${formatUSD(renoFeeShare)}</span>
                     </div>
@@ -332,7 +340,7 @@ export function LinkInvestorDialog({
               </div>
               {/* Estimated return */}
               {estimatedSaleValue > 0 && totalProject > 0 && (() => {
-                const participation = currentAmount / totalProject;
+                const participation = netInvestment / totalProject;
                 const docComm = estimatedSaleValue * (docCommissionRate / 100);
                 const totalProfit = estimatedSaleValue - totalProject - docComm;
                 let estimatedReturn = 0;
@@ -341,11 +349,11 @@ export function LinkInvestorDialog({
                 } else if (plan === "equal_split") {
                   estimatedReturn = totalProfit > 0 ? totalProfit * participation * 0.50 : 0;
                 } else if (plan === "fixed_12") {
-                  estimatedReturn = currentAmount * 0.12;
+                  estimatedReturn = netInvestment * 0.12;
                 } else if (plan === "fixed_15") {
-                  estimatedReturn = currentAmount * 0.15;
+                  estimatedReturn = netInvestment * 0.15;
                 }
-                const returnPct = currentAmount > 0 ? (estimatedReturn / currentAmount) * 100 : 0;
+                const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
                 return (
                   <div className="border-t border-border/50 pt-1.5 flex justify-between">
                     <span className="font-medium text-foreground">Retorno Est. Investidor</span>
@@ -355,12 +363,12 @@ export function LinkInvestorDialog({
                   </div>
                 );
               })()}
-              {currentAmount > maxLinkableByRemaining && maxLinkableByRemaining >= 0 && (
+              {netInvestment > maxLinkableByRemaining && maxLinkableByRemaining >= 0 && (
                 <p className="text-destructive font-medium mt-1">
-                  ⚠ Valor excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
+                  ⚠ Valor líquido excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
                 </p>
               )}
-              {currentAmount <= maxLinkableByRemaining && currentTotalDeduction > userMaxCredits && (
+              {netInvestment <= maxLinkableByRemaining && currentAmount > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
                 </p>
@@ -375,8 +383,8 @@ export function LinkInvestorDialog({
               disabled={
                 !selectedUserId ||
                 currentAmount <= 0 ||
-                currentAmount > maxLinkableByRemaining ||
-                currentTotalDeduction > userMaxCredits ||
+                netInvestment > maxLinkableByRemaining ||
+                currentAmount > userMaxCredits ||
                 isPending
               }
               onClick={handleLink}
