@@ -480,11 +480,12 @@ export default function AdminUserProfilePage() {
           </Button>
           <Button
             variant="outline"
-            size="icon"
-            className="h-8 w-8 text-destructive border-destructive/30 hover:bg-destructive/10"
+            size="sm"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
             onClick={() => setShowDeleteDialog(true)}
           >
             <UserX className="h-4 w-4" />
+            Excluir
           </Button>
         </div>
       </div>
