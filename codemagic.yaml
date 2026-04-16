@@ -8,6 +8,9 @@ workflows:
     environment:
       node: 22
       xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: "com.discovery.investments"
       vars:
         BUNDLE_ID: "com.discovery.investments"
     scripts:
@@ -21,20 +24,19 @@ workflows:
         script: npx cap sync ios
       - name: Set up code signing
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-          keychain initialize
-          keychain add-certificates
           xcode-project use-profiles \
             --project "App.xcodeproj" \
             --profile "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"/*.mobileprovision \
             --profile "$HOME/Library/MobileDevice/Provisioning Profiles"/*.mobileprovision \
-            --archive-method app-store
+            --archive-method app-store \
+            --code-signing-setup-verbose-logging
         working_directory: ios/App
       - name: Build iOS
         script: |
           xcode-project build-ipa \
             --project "App.xcodeproj" \
-            --scheme "App"
+            --scheme "App" \
+            --export-options-plist "$HOME/export_options.plist"
         working_directory: ios/App
     artifacts:
       - ios/App/build/ios/ipa/*.ipa
