@@ -6,7 +6,7 @@ workflows:
     integrations:
       app_store_connect: Discovery Investments API Key
     environment:
-      node: 18
+      node: 22
       xcode: latest
       vars:
         BUNDLE_ID: "com.discovery.investments"
