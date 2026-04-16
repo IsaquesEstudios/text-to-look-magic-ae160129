@@ -24,7 +24,11 @@ workflows:
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
           keychain initialize
           keychain add-certificates
-          xcode-project use-profiles --project "App.xcodeproj"
+          xcode-project use-profiles \
+            --project "App.xcodeproj" \
+            --profile "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"/*.mobileprovision \
+            --profile "$HOME/Library/MobileDevice/Provisioning Profiles"/*.mobileprovision \
+            --archive-method app-store
         working_directory: ios/App
       - name: Build iOS
         script: |
