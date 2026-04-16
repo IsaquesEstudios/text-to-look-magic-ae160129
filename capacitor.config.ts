@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.discoveryinvestments',
+  appId: 'com.discovery.investments',
   appName: 'Discovery Investments',
   webDir: 'dist',
   android: {

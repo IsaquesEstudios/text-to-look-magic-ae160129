@@ -3,13 +3,13 @@ workflows:
     name: iOS Capacitor Build
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Discovery Investments API Key
     environment:
       node: 18
       xcode: latest
-      groups:
-        - ios_credentials # Configure no Codemagic: certificate, provisioning profile
       vars:
-        BUNDLE_ID: "app.lovable.49ba0e0710164b45a06f70056be9b8cc"
+        BUNDLE_ID: "com.discovery.investments"
     scripts:
       - name: Install dependencies
         script: npm install
@@ -21,8 +21,8 @@ workflows:
         script: npx cap sync ios
       - name: Set up code signing
         script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
           keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
           keychain add-certificates
           xcode-project use-profiles
         working_directory: ios/App
