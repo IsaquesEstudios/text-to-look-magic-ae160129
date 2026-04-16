@@ -1,4 +1,35 @@
 workflows:
+  ios-simulator:
+    name: iOS Simulator Build (App Preview)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 22
+      xcode: latest
+      vars:
+        BUNDLE_ID: "com.discovery.investments"
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build web assets
+        script: npm run build
+      - name: Add iOS platform
+        script: npx cap add ios || true
+      - name: Sync Capacitor
+        script: npx cap sync ios
+      - name: Build for simulator
+        script: |
+          xcode-project build-ipa \
+            --project "App.xcodeproj" \
+            --scheme "App" \
+            --config "Debug" \
+            --sdk "iphonesimulator" \
+            --disable-code-signing
+        working_directory: ios/App
+    artifacts:
+      - ios/App/build/ios/**/*.app
+      - ios/App/build/**/*.app
+
   ios-capacitor:
     name: iOS Capacitor Build
     max_build_duration: 60
