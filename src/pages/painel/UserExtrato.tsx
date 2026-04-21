@@ -13,7 +13,9 @@ export default function UserExtrato() {
   const { user, profile } = useAuth();
   const { p, lang } = usePanelTranslation();
   const [rechargeOpen, setRechargeOpen] = useState(false);
-  const [rechargeAmount, setRechargeAmount] = useState("");
+  const [rechargeRawCents, setRechargeRawCents] = useState(0);
+  const [rechargeDisplay, setRechargeDisplay] = useState("");
+  const MAX_RECHARGE = 99_999_999.99;
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["credit-transactions", user?.id],
