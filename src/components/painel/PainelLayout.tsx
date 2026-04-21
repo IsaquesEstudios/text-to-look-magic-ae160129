@@ -118,6 +118,7 @@ export function PainelLayout() {
   const profilePath = isAdmin ? "/painel/usuarios" : "/painel/informacoes";
   const isProfileActive = location.pathname === "/painel/informacoes";
   const mobileBottomInset = "max(env(safe-area-inset-bottom, 0px), 14px)";
+  const mobileTopInset = "max(env(safe-area-inset-top, 0px), 12px)";
   const mobileNavHeight = `calc(4rem + ${mobileBottomInset})`;
 
   return (
@@ -411,7 +412,13 @@ export function PainelLayout() {
           );
         })()}
 
-        <main className="flex-1 min-w-0 w-full md:pb-8 pt-10 md:pt-8 px-[4%] md:px-6 overflow-x-hidden" style={{ paddingBottom: `calc(5rem + ${mobileBottomInset})` }}>
+        <main
+          className="flex-1 min-w-0 w-full md:pb-8 md:pt-8 px-[4%] md:px-6 overflow-x-hidden md:!pl-6"
+          style={{
+            paddingTop: `calc(0.5rem + ${mobileTopInset})`,
+            paddingBottom: `calc(5rem + ${mobileBottomInset})`,
+          }}
+        >
           {isDemoUser && (
             <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-200 flex items-center gap-2">
               <Shield className="h-4 w-4 flex-shrink-0" />
