@@ -10,7 +10,8 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: false,
   },
   ios: {
-    contentInset: 'always',
+    backgroundColor: '#141414',
+    contentInset: 'never',
   },
 };
 
