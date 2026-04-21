@@ -131,8 +131,9 @@ export default function UserLeiloesPage() {
   const queryClient = useQueryClient();
 
   const { data: auctions, isLoading } = useQuery({
-    queryKey: ["user-auctions", isAdmin],
+    queryKey: ["user-auctions", isAdmin, isDemoUser],
     queryFn: async () => {
+      if (isDemoUser) return [];
       let query = supabase.from("auctions").select("*").order("scheduled_start", { ascending: false });
       if (!isAdmin) query = query.eq("visibility", "public");
       const { data, error } = await query;
