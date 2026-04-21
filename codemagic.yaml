@@ -37,10 +37,7 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: false
-        submit_to_app_store: true
+      app_store_connect: Discovery Investments API Key
     environment:
       node: 22
       xcode: latest
@@ -74,7 +71,6 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" App/Info.plist
           /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" App/Info.plist
         working_directory: ios/App
-        working_directory: ios/App
       - name: Build iOS
         script: |
           xcode-project build-ipa \
@@ -93,7 +89,5 @@ workflows:
           failure: true
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
-        beta_groups:
-          - Internal Testers
-        submit_to_app_store: false
+        submit_to_testflight: false
+        submit_to_app_store: true
