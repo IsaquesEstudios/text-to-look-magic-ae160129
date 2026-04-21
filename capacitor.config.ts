@@ -1,3 +1,4 @@
+/// <reference types="@capacitor/status-bar" />
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -12,6 +13,13 @@ const config: CapacitorConfig = {
   ios: {
     backgroundColor: '#141414',
     contentInset: 'never',
+  },
+  plugins: {
+    StatusBar: {
+      overlaysWebView: false,
+      backgroundColor: '#141414',
+      style: 'LIGHT',
+    },
   },
 };
 
