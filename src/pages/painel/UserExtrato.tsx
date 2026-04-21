@@ -99,7 +99,7 @@ export default function UserExtrato() {
         </CollapsibleContent>
       </Collapsible>
 
-      <Dialog open={rechargeOpen} onOpenChange={(open) => { setRechargeOpen(open); if (!open) setRechargeAmount(""); }}>
+      <Dialog open={rechargeOpen} onOpenChange={(open) => { setRechargeOpen(open); if (!open) { setRechargeRawCents(0); setRechargeDisplay(""); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-primary" />{p.creditRecharge}</DialogTitle>
@@ -110,7 +110,19 @@ export default function UserExtrato() {
               <label className="text-sm font-medium text-foreground">{p.rechargeAmount}</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input type="number" min="1" step="0.01" placeholder="Ex: 500.00" value={rechargeAmount} onChange={(e) => setRechargeAmount(e.target.value)} className="pl-9" />
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0.00"
+                  value={rechargeDisplay}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/[^0-9]/g, "");
+                    const cents = Math.min(parseInt(digits || "0", 10), Math.round(MAX_RECHARGE * 100));
+                    setRechargeRawCents(cents);
+                    setRechargeDisplay(cents === 0 ? "" : (cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                  }}
+                  className="pl-9"
+                />
               </div>
             </div>
             <div className="rounded-xl border border-border/40 bg-muted/30 p-4 space-y-3">
