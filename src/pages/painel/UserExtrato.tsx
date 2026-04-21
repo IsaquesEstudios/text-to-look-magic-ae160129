@@ -144,7 +144,7 @@ export default function UserExtrato() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setRechargeOpen(false); setRechargeAmount(""); }}>{p.cancel}</Button>
+            <Button variant="outline" onClick={() => { setRechargeOpen(false); setRechargeRawCents(0); setRechargeDisplay(""); }}>{p.cancel}</Button>
             <Button onClick={handleWhatsAppRedirect} disabled={!isValidAmount} className="gap-2"><MessageCircle className="h-4 w-4" />{p.goToWhatsApp}</Button>
           </DialogFooter>
         </DialogContent>
