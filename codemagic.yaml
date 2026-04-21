@@ -66,8 +66,10 @@ workflows:
         working_directory: ios/App
       - name: Increment build number
         script: |
-          LATEST=$(app-store-connect get-latest-build-number "com.discovery.investments")
-          agvtool new-version -all $(($LATEST + 1))
+          BUILD_NUMBER=$(date +%s)
+          echo "Setting build number to: $BUILD_NUMBER"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" ios/App/App/Info.plist
         working_directory: ios/App
         working_directory: ios/App
       - name: Build iOS
