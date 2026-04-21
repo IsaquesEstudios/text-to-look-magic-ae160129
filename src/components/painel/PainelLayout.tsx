@@ -413,9 +413,9 @@ export function PainelLayout() {
         })()}
 
         <main
-          className="flex-1 min-w-0 w-full md:pb-8 md:pt-8 px-[4%] md:px-6 overflow-x-hidden"
+          className="flex-1 min-w-0 w-full md:pb-8 md:pt-8 px-[4%] md:px-6 overflow-x-hidden md:!pl-6"
           style={{
-            paddingTop: `calc(1rem + ${mobileTopInset})`,
+            paddingTop: `calc(0.5rem + ${mobileTopInset})`,
             paddingBottom: `calc(5rem + ${mobileBottomInset})`,
           }}
         >
