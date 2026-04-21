@@ -355,7 +355,7 @@ export function PainelLayout() {
                 </div>
               </div>
 
-              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background/95 backdrop-blur-xl">
+              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background">
                 <nav
                   className="flex items-center justify-evenly px-1 w-full"
                   style={{
