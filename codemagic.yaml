@@ -65,11 +65,11 @@ workflows:
             --code-signing-setup-verbose-logging
         working_directory: ios/App
       - name: Increment build number
-      script: |
-        cd ios/App
-        LATEST=$(app-store-connect get-latest-build-number "com.discovery.investments")
-        agvtool new-version -all $(($LATEST + 1))
-      working_directory: ios/App
+        script: |
+          cd ios/App
+          LATEST=$(app-store-connect get-latest-build-number "com.discovery.investments")
+          agvtool new-version -all $(($LATEST + 1))
+        working_directory: ios/App
       - name: Build iOS
         script: |
           xcode-project build-ipa \
