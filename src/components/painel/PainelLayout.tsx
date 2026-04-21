@@ -118,6 +118,7 @@ export function PainelLayout() {
   const profilePath = isAdmin ? "/painel/usuarios" : "/painel/informacoes";
   const isProfileActive = location.pathname === "/painel/informacoes";
   const mobileBottomInset = "max(env(safe-area-inset-bottom, 0px), 14px)";
+  const mobileTopInset = "max(env(safe-area-inset-top, 0px), 12px)";
   const mobileNavHeight = `calc(4rem + ${mobileBottomInset})`;
 
   return (
