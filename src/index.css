@@ -92,12 +92,19 @@
   body {
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-family: 'Poppins', sans-serif;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+    background-color: hsl(var(--background));
   }
 
   html {
     @apply overflow-x-hidden;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+    background-color: hsl(var(--background));
+  }
+
+  #root {
+    background-color: hsl(var(--background));
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
