@@ -66,10 +66,11 @@ workflows:
         working_directory: ios/App
       - name: Increment build number
         script: |
+          echo "=== Procurando Info.plist ==="
+          find . -name "Info.plist" -not -path "*/DerivedData/*" -not -path "*/node_modules/*"
+          
           BUILD_NUMBER=$(date +%s)
-          echo "Setting build number to: $BUILD_NUMBER"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
-          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" ios/App/App/Info.plist
+          echo "Build number: $BUILD_NUMBER"
         working_directory: ios/App
         working_directory: ios/App
       - name: Build iOS
