@@ -40,8 +40,8 @@ export default function UserExtrato() {
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const credits = profile?.credits ?? 0;
-  const parsedAmount = Number(rechargeAmount);
-  const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
+  const parsedAmount = rechargeRawCents / 100;
+  const isValidAmount = parsedAmount > 0;
 
   const handleWhatsAppRedirect = () => {
     if (!isValidAmount) return;
@@ -50,7 +50,8 @@ export default function UserExtrato() {
     );
     window.open(`https://wa.me/14752985931?text=${msg}`, "_blank");
     setRechargeOpen(false);
-    setRechargeAmount("");
+    setRechargeRawCents(0);
+    setRechargeDisplay("");
   };
 
   const dateLocale = lang === "en" ? "en-US" : lang === "es" ? "es-ES" : "pt-BR";
