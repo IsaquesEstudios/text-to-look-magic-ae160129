@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, Mail, Phone, MapPin, Save, Globe } from "lucide-react";
+import { Loader2, User, Mail, Phone, MapPin, Save, Globe, Trash2, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { languages } from "@/i18n";
 import { PhonePrefixSelect, MaskedPhoneInput } from "@/components/PhonePrefixSelect";
 import { CountryAutocomplete } from "@/components/CountryAutocomplete";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function UserProfilePage() {
   const { user, refreshProfile, isDemoUser } = useAuth();
