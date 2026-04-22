@@ -92,13 +92,11 @@
   body {
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-family: 'Poppins', sans-serif;
-    overscroll-behavior: none;
     background-color: hsl(var(--background));
   }
 
   html {
     @apply overflow-x-hidden;
-    overscroll-behavior: none;
     background-color: hsl(var(--background));
   }
 
