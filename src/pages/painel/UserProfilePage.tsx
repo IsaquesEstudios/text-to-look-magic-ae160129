@@ -18,11 +18,36 @@ import { CountryAutocomplete } from "@/components/CountryAutocomplete";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function UserProfilePage() {
-  const { user, refreshProfile, isDemoUser } = useAuth();
+  const { user, refreshProfile, isDemoUser, signOut } = useAuth();
   const { p } = usePanelTranslation();
   const { toast } = useToast();
   const isDemoBlocked = useDemoGuard();
   const queryClient = useQueryClient();
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      toast({ title: "Digite sua senha para confirmar", variant: "destructive" });
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-own-account", {
+        body: { password: deletePassword },
+      });
+      if (error || (data as any)?.error) {
+        throw new Error((data as any)?.error || error?.message || "Erro ao excluir conta");
+      }
+      toast({ title: "Conta excluída com sucesso" });
+      await signOut();
+      window.location.href = "/";
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+      setDeleting(false);
+    }
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["user-profile-full", user?.id],
