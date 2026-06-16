@@ -49,13 +49,8 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function getServiceFee(type: string, plan: InvestmentPlan = "standard"): number {
-  if (plan !== "standard") return 0;
-  return type === "land" || type === "terreno" ? 500 : 5000;
-}
-
-function getRenovationFeeRate(plan: InvestmentPlan = "standard"): number {
-  return plan === "standard" ? 0.10 : 0;
+function investorEntryFees(fees: ManualFees): number {
+  return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
 }
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
