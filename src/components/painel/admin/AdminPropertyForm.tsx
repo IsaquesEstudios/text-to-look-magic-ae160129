@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
-import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
+import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface Props {
   propertyId: string | null;
