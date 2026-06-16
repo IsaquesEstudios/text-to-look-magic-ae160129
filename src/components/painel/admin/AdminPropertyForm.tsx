@@ -23,7 +23,7 @@ interface InvestorToLink {
   userId: string;
   rawAmount: number;
   displayAmount: string;
-  plan: InvestmentPlan;
+  fees: ManualFees;
 }
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
