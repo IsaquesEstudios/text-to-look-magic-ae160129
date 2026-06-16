@@ -85,11 +85,11 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   };
 
   const linkMutation = useMutation({
-    mutationFn: async ({ item, userId, amount, plan }: {
+    mutationFn: async ({ item, userId, amount, fees }: {
       item: AuctionItem;
       userId: string;
       amount: number;
-      plan: InvestmentPlan;
+      fees: ManualFees;
     }) => {
       let propertyId = item.property_id;
 
@@ -141,14 +141,15 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
         await supabase.from("auction_items").update({ property_id: propertyId }).eq("id", item.id);
       }
 
-      const propType = item.type === "terreno" ? "land" : "house";
       const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
         p_property_id: propertyId,
         p_user_id: userId,
         p_amount: amount,
-        p_property_type: propType,
         p_property_title: item.title,
-        p_investment_plan: plan,
+        p_fee_service: fees.feeService,
+        p_fee_renovation: fees.feeRenovation,
+        p_fee_sales: fees.feeSales,
+        p_fee_profit_rate: fees.feeProfitRate,
       });
       if (error) throw error;
     },
