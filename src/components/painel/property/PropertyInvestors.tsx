@@ -4,11 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Users, ExternalLink, UserPlus, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
+import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface Props {
   propertyId: string;
