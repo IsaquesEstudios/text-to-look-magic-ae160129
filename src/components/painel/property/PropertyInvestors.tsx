@@ -34,7 +34,7 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
     queryFn: async () => {
       const { data, error } = await supabase
         .from("shares")
-        .select("id, user_id, amount_paid, investment_plan")
+        .select("id, user_id, amount_paid, fee_service, fee_renovation, fee_sales")
         .eq("property_id", propertyId);
       if (error) throw error;
       return data;
@@ -42,14 +42,16 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
     enabled: !!propertyId && isAdmin,
   });
 
-  const userTotals = new Map<string, { total: number; shareIds: string[]; plan: string }>();
+  const userTotals = new Map<string, { total: number; shareIds: string[]; fees: number }>();
   for (const s of shares ?? []) {
+    const shareFees = Number((s as any).fee_service ?? 0) + Number((s as any).fee_renovation ?? 0) + Number((s as any).fee_sales ?? 0);
     const existing = userTotals.get(s.user_id);
     if (existing) {
       existing.total += Number(s.amount_paid);
       existing.shareIds.push(s.id);
+      existing.fees += shareFees;
     } else {
-      userTotals.set(s.user_id, { total: Number(s.amount_paid), shareIds: [s.id], plan: (s as any).investment_plan ?? "standard" });
+      userTotals.set(s.user_id, { total: Number(s.amount_paid), shareIds: [s.id], fees: shareFees });
     }
   }
 
