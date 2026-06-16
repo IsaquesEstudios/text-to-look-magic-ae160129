@@ -228,7 +228,7 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
         estimatedSaleValue={estimatedSaleValue}
         docCommissionRate={docCommissionRate}
         remaining={remaining}
-        onLink={(userId, amount, plan) => linkMutation.mutate({ userId, amount, plan })}
+        onLink={(userId, amount, fees) => linkMutation.mutate({ userId, amount, fees })}
         isPending={linkMutation.isPending}
       />
     </div>
