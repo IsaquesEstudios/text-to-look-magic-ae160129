@@ -644,13 +644,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {investorsToLink.map((inv, idx) => {
                       const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
                       const amount = inv.rawAmount / 100;
-                      const invServiceFee = getServiceFee(form.type, inv.plan);
-                      const invRenoRate = getRenovationFeeRate(inv.plan);
-                      const arremFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100 : 0;
-                      const renoFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100 : 0;
-                      const totalFee = arremFee + renoFee;
+                      const totalFee = investorEntryFees(inv.fees);
                       const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
-                      const planKey = inv.plan as InvestmentPlan;
 
                       return (
                         <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
@@ -659,15 +654,12 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                               <span className="font-medium">{profile?.full_name || "Usuário"}</span>
                               <span className="text-muted-foreground ml-2">({pct}%)</span>
                             </div>
-                            <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[planKey]}`}>
-                              {PLAN_LABELS[planKey]}
-                            </Badge>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
                               <p className="font-semibold">${formatUSD(amount)}</p>
                               {totalFee > 0 && (
-                                <p className="text-[10px] text-amber-500">Taxa: ${formatUSD(totalFee)}</p>
+                                <p className="text-[10px] text-amber-500">Taxas: ${formatUSD(totalFee)}</p>
                               )}
                               {totalFee === 0 && (
                                 <p className="text-[10px] text-emerald-500">Sem taxas</p>
