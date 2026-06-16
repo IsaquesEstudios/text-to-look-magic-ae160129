@@ -119,32 +119,24 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
   const totalProjeto = auctionValue + renovationCost;
   const hasInvestors = investorsToLink.length > 0;
-  // For standard plans, include the arremate service fee in total project cost
-  const hasStandardInvestor = investorsToLink.some((i) => i.plan === "standard");
-  const serviceFee = getServiceFee(form.type, "standard");
-  const totalProjetoComTaxas = totalProjeto + (hasInvestors && hasStandardInvestor ? serviceFee : 0);
+  const totalProjetoComTaxas = totalProjeto;
 
   // Calculate already-added amounts per investor
   const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
   const remaining = totalProjeto - totalLinked;
 
-  // Build a map of credits already "reserved" by pending links
+  // Build a map of credits already "reserved" by pending links (aporte + entry fees)
   const reservedCredits = new Map<string, number>();
   for (const investor of investorsToLink) {
     const amount = investor.rawAmount / 100;
-    const invServiceFee = getServiceFee(form.type, investor.plan);
-    const invRenoRate = getRenovationFeeRate(investor.plan);
-    const fee = totalProjeto > 0
-      ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100
-        + Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100
-      : 0;
+    const fee = investorEntryFees(investor.fees);
     reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
   }
 
-  const addInvestorFromDialog = (userId: string, amount: number, plan: InvestmentPlan) => {
+  const addInvestorFromDialog = (userId: string, amount: number, fees: ManualFees) => {
     const rawAmount = Math.round(amount * 100);
     const displayAmount = amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, plan }]);
+    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, fees }]);
     setShowLinkDialog(false);
   };
 
