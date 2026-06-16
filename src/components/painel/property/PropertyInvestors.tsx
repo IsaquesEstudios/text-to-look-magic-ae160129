@@ -72,14 +72,16 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
   });
 
   const linkMutation = useMutation({
-    mutationFn: async ({ userId, amount, plan }: { userId: string; amount: number; plan: InvestmentPlan }) => {
+    mutationFn: async ({ userId, amount, fees }: { userId: string; amount: number; fees: ManualFees }) => {
       const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
         p_property_id: propertyId,
         p_user_id: userId,
         p_amount: amount,
-        p_property_type: propertyType ?? "house",
         p_property_title: propertyTitle ?? "",
-        p_investment_plan: plan,
+        p_fee_service: fees.feeService,
+        p_fee_renovation: fees.feeRenovation,
+        p_fee_sales: fees.feeSales,
+        p_fee_profit_rate: fees.feeProfitRate,
       });
       if (error) throw error;
     },
