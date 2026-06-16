@@ -178,9 +178,9 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
                   <span className="truncate">{inv.name}</span>
                   <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
                 </Link>
-                <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[inv.plan]}`}>
-                  {PLAN_LABELS[inv.plan]}
-                </Badge>
+                {inv.fees > 0 && (
+                  <span className="text-[10px] text-amber-500 w-fit">Taxas: ${formatUSD(inv.fees)}</span>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right flex-shrink-0">
