@@ -285,16 +285,18 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
 
                 {/* Linked investors */}
                 {linkedShares.length > 0 && (() => {
-                  const grouped = new Map<string, { userId: string; totalPaid: number; plan: string }>();
+                  const grouped = new Map<string, { userId: string; totalPaid: number; fees: number }>();
                   for (const share of linkedShares) {
+                    const shareFees = Number((share as any).fee_service ?? 0) + Number((share as any).fee_renovation ?? 0) + Number((share as any).fee_sales ?? 0);
                     const existing = grouped.get(share.user_id);
                     if (existing) {
                       existing.totalPaid += Number(share.amount_paid);
+                      existing.fees += shareFees;
                     } else {
                       grouped.set(share.user_id, {
                         userId: share.user_id,
                         totalPaid: Number(share.amount_paid),
-                        plan: (share as any).investment_plan ?? "standard",
+                        fees: shareFees,
                       });
                     }
                   }
@@ -304,15 +306,14 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                       <p className="text-xs font-medium text-muted-foreground">Investidores vinculados:</p>
                       {[...grouped.values()].map((g) => {
                         const pct = totalProject > 0 ? ((g.totalPaid / totalProject) * 100).toFixed(1) : "0";
-                        const planKey = g.plan as InvestmentPlan;
 
                         return (
                           <div key={g.userId} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
                             <div className="flex flex-col gap-0.5">
                               <span className="font-medium">{profileMap.get(g.userId) || "Usuário"}</span>
-                              <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[planKey]}`}>
-                                {PLAN_LABELS[planKey]}
-                              </Badge>
+                              {g.fees > 0 && (
+                                <span className="text-[10px] text-amber-500">Taxas: ${formatUSD(g.fees)}</span>
+                              )}
                             </div>
                             <div className="flex items-center gap-3">
                               <div className="text-right">
