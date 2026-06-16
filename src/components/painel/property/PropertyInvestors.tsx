@@ -4,11 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Users, ExternalLink, UserPlus, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
+import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface Props {
   propertyId: string;
@@ -35,7 +34,7 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
     queryFn: async () => {
       const { data, error } = await supabase
         .from("shares")
-        .select("id, user_id, amount_paid, investment_plan")
+        .select("id, user_id, amount_paid, fee_service, fee_renovation, fee_sales")
         .eq("property_id", propertyId);
       if (error) throw error;
       return data;
@@ -43,14 +42,16 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
     enabled: !!propertyId && isAdmin,
   });
 
-  const userTotals = new Map<string, { total: number; shareIds: string[]; plan: string }>();
+  const userTotals = new Map<string, { total: number; shareIds: string[]; fees: number }>();
   for (const s of shares ?? []) {
+    const shareFees = Number((s as any).fee_service ?? 0) + Number((s as any).fee_renovation ?? 0) + Number((s as any).fee_sales ?? 0);
     const existing = userTotals.get(s.user_id);
     if (existing) {
       existing.total += Number(s.amount_paid);
       existing.shareIds.push(s.id);
+      existing.fees += shareFees;
     } else {
-      userTotals.set(s.user_id, { total: Number(s.amount_paid), shareIds: [s.id], plan: (s as any).investment_plan ?? "standard" });
+      userTotals.set(s.user_id, { total: Number(s.amount_paid), shareIds: [s.id], fees: shareFees });
     }
   }
 
@@ -71,14 +72,16 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
   });
 
   const linkMutation = useMutation({
-    mutationFn: async ({ userId, amount, plan }: { userId: string; amount: number; plan: InvestmentPlan }) => {
+    mutationFn: async ({ userId, amount, fees }: { userId: string; amount: number; fees: ManualFees }) => {
       const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
         p_property_id: propertyId,
         p_user_id: userId,
         p_amount: amount,
-        p_property_type: propertyType ?? "house",
         p_property_title: propertyTitle ?? "",
-        p_investment_plan: plan,
+        p_fee_service: fees.feeService,
+        p_fee_renovation: fees.feeRenovation,
+        p_fee_sales: fees.feeSales,
+        p_fee_profit_rate: fees.feeProfitRate,
       });
       if (error) throw error;
     },
@@ -121,12 +124,12 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
   const isFullyCovered = remaining <= 0;
 
   const investors = [...userTotals.entries()]
-    .map(([userId, { total, shareIds, plan }]) => ({
+    .map(([userId, { total, shareIds, fees }]) => ({
       userId,
       name: profileMap.get(userId) || "Usuário",
       amount: total,
       shareIds,
-      plan: plan as InvestmentPlan,
+      fees,
       pct: totalProject > 0 ? (total / totalProject) * 100 : 0,
     }))
     .sort((a, b) => b.amount - a.amount);
@@ -175,9 +178,9 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
                   <span className="truncate">{inv.name}</span>
                   <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
                 </Link>
-                <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[inv.plan]}`}>
-                  {PLAN_LABELS[inv.plan]}
-                </Badge>
+                {inv.fees > 0 && (
+                  <span className="text-[10px] text-amber-500 w-fit">Taxas: ${formatUSD(inv.fees)}</span>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right flex-shrink-0">
@@ -225,7 +228,7 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
         estimatedSaleValue={estimatedSaleValue}
         docCommissionRate={docCommissionRate}
         remaining={remaining}
-        onLink={(userId, amount, plan) => linkMutation.mutate({ userId, amount, plan })}
+        onLink={(userId, amount, fees) => linkMutation.mutate({ userId, amount, fees })}
         isPending={linkMutation.isPending}
       />
     </div>

@@ -7,12 +7,12 @@ import { usePanelTranslation } from "@/hooks/usePanelTranslation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
-import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
+import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface Props {
   propertyId: string | null;
@@ -23,7 +23,7 @@ interface InvestorToLink {
   userId: string;
   rawAmount: number;
   displayAmount: string;
-  plan: InvestmentPlan;
+  fees: ManualFees;
 }
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
@@ -49,13 +49,8 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function getServiceFee(type: string, plan: InvestmentPlan = "standard"): number {
-  if (plan !== "standard") return 0;
-  return type === "land" || type === "terreno" ? 500 : 5000;
-}
-
-function getRenovationFeeRate(plan: InvestmentPlan = "standard"): number {
-  return plan === "standard" ? 0.10 : 0;
+function investorEntryFees(fees: ManualFees): number {
+  return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
 }
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
@@ -124,32 +119,24 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
   const totalProjeto = auctionValue + renovationCost;
   const hasInvestors = investorsToLink.length > 0;
-  // For standard plans, include the arremate service fee in total project cost
-  const hasStandardInvestor = investorsToLink.some((i) => i.plan === "standard");
-  const serviceFee = getServiceFee(form.type, "standard");
-  const totalProjetoComTaxas = totalProjeto + (hasInvestors && hasStandardInvestor ? serviceFee : 0);
+  const totalProjetoComTaxas = totalProjeto;
 
   // Calculate already-added amounts per investor
   const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
   const remaining = totalProjeto - totalLinked;
 
-  // Build a map of credits already "reserved" by pending links
+  // Build a map of credits already "reserved" by pending links (aporte + entry fees)
   const reservedCredits = new Map<string, number>();
   for (const investor of investorsToLink) {
     const amount = investor.rawAmount / 100;
-    const invServiceFee = getServiceFee(form.type, investor.plan);
-    const invRenoRate = getRenovationFeeRate(investor.plan);
-    const fee = totalProjeto > 0
-      ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100
-        + Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100
-      : 0;
+    const fee = investorEntryFees(investor.fees);
     reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
   }
 
-  const addInvestorFromDialog = (userId: string, amount: number, plan: InvestmentPlan) => {
+  const addInvestorFromDialog = (userId: string, amount: number, fees: ManualFees) => {
     const rawAmount = Math.round(amount * 100);
     const displayAmount = amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, plan }]);
+    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, fees }]);
     setShowLinkDialog(false);
   };
 
@@ -316,10 +303,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
 
     const validated = parsedForm.data;
-    const validatedServiceFee = getServiceFee(validated.type);
     const validatedTotalProjeto = validated.estimated_auction_value + validated.estimated_renovation_cost;
-    const validatedHasInvestors = investorsToLink.length > 0;
-    const validatedTotalProjetoComTaxas = validatedTotalProjeto + (validatedHasInvestors ? validatedServiceFee : 0);
+    const validatedTotalProjetoComTaxas = validatedTotalProjeto;
     const docRate = parseFloat(form.doc_commission_rate) || 10;
     const docComm = validated.estimated_sale_value * (docRate / 100);
     const calculatedReturn = validatedTotalProjetoComTaxas > 0
@@ -405,9 +390,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             p_property_id: propId,
             p_user_id: investor.userId,
             p_amount: amount,
-            p_property_type: validated.type,
             p_property_title: validated.title.trim(),
-            p_investment_plan: investor.plan,
+            p_fee_service: investor.fees.feeService,
+            p_fee_renovation: investor.fees.feeRenovation,
+            p_fee_sales: investor.fees.feeSales,
+            p_fee_profit_rate: investor.fees.feeProfitRate,
           });
           if (error) {
             toast({
@@ -657,13 +644,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     {investorsToLink.map((inv, idx) => {
                       const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
                       const amount = inv.rawAmount / 100;
-                      const invServiceFee = getServiceFee(form.type, inv.plan);
-                      const invRenoRate = getRenovationFeeRate(inv.plan);
-                      const arremFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * invServiceFee * 100) / 100 : 0;
-                      const renoFee = totalProjeto > 0 ? Math.round((amount / totalProjeto) * (renovationCost * invRenoRate) * 100) / 100 : 0;
-                      const totalFee = arremFee + renoFee;
+                      const totalFee = investorEntryFees(inv.fees);
                       const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
-                      const planKey = inv.plan as InvestmentPlan;
 
                       return (
                         <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
@@ -672,15 +654,12 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                               <span className="font-medium">{profile?.full_name || "Usuário"}</span>
                               <span className="text-muted-foreground ml-2">({pct}%)</span>
                             </div>
-                            <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[planKey]}`}>
-                              {PLAN_LABELS[planKey]}
-                            </Badge>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
                               <p className="font-semibold">${formatUSD(amount)}</p>
                               {totalFee > 0 && (
-                                <p className="text-[10px] text-amber-500">Taxa: ${formatUSD(totalFee)}</p>
+                                <p className="text-[10px] text-amber-500">Taxas: ${formatUSD(totalFee)}</p>
                               )}
                               {totalFee === 0 && (
                                 <p className="text-[10px] text-emerald-500">Sem taxas</p>

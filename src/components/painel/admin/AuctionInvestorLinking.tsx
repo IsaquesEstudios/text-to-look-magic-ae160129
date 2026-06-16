@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Trash2, Home, TreePine, MapPin, CheckCircle } from "lucide-react";
-import { LinkInvestorDialog, PLAN_LABELS, PLAN_BADGE_COLORS, type InvestmentPlan } from "@/components/painel/admin/LinkInvestorDialog";
+import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
 
 interface AuctionItem {
   id: string;
@@ -85,11 +85,11 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
   };
 
   const linkMutation = useMutation({
-    mutationFn: async ({ item, userId, amount, plan }: {
+    mutationFn: async ({ item, userId, amount, fees }: {
       item: AuctionItem;
       userId: string;
       amount: number;
-      plan: InvestmentPlan;
+      fees: ManualFees;
     }) => {
       let propertyId = item.property_id;
 
@@ -141,14 +141,15 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
         await supabase.from("auction_items").update({ property_id: propertyId }).eq("id", item.id);
       }
 
-      const propType = item.type === "terreno" ? "land" : "house";
       const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
         p_property_id: propertyId,
         p_user_id: userId,
         p_amount: amount,
-        p_property_type: propType,
         p_property_title: item.title,
-        p_investment_plan: plan,
+        p_fee_service: fees.feeService,
+        p_fee_renovation: fees.feeRenovation,
+        p_fee_sales: fees.feeSales,
+        p_fee_profit_rate: fees.feeProfitRate,
       });
       if (error) throw error;
     },
@@ -284,16 +285,18 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
 
                 {/* Linked investors */}
                 {linkedShares.length > 0 && (() => {
-                  const grouped = new Map<string, { userId: string; totalPaid: number; plan: string }>();
+                  const grouped = new Map<string, { userId: string; totalPaid: number; fees: number }>();
                   for (const share of linkedShares) {
+                    const shareFees = Number((share as any).fee_service ?? 0) + Number((share as any).fee_renovation ?? 0) + Number((share as any).fee_sales ?? 0);
                     const existing = grouped.get(share.user_id);
                     if (existing) {
                       existing.totalPaid += Number(share.amount_paid);
+                      existing.fees += shareFees;
                     } else {
                       grouped.set(share.user_id, {
                         userId: share.user_id,
                         totalPaid: Number(share.amount_paid),
-                        plan: (share as any).investment_plan ?? "standard",
+                        fees: shareFees,
                       });
                     }
                   }
@@ -303,15 +306,14 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                       <p className="text-xs font-medium text-muted-foreground">Investidores vinculados:</p>
                       {[...grouped.values()].map((g) => {
                         const pct = totalProject > 0 ? ((g.totalPaid / totalProject) * 100).toFixed(1) : "0";
-                        const planKey = g.plan as InvestmentPlan;
 
                         return (
                           <div key={g.userId} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
                             <div className="flex flex-col gap-0.5">
                               <span className="font-medium">{profileMap.get(g.userId) || "Usuário"}</span>
-                              <Badge variant="outline" className={`text-[10px] w-fit ${PLAN_BADGE_COLORS[planKey]}`}>
-                                {PLAN_LABELS[planKey]}
-                              </Badge>
+                              {g.fees > 0 && (
+                                <span className="text-[10px] text-amber-500">Taxas: ${formatUSD(g.fees)}</span>
+                              )}
                             </div>
                             <div className="flex items-center gap-3">
                               <div className="text-right">
@@ -361,7 +363,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
           renovationCost={linkingRenovationVal}
           estimatedSaleValue={linkingItem ? Number(linkingItem.estimated_sale_value) || 0 : 0}
           remaining={linkingRemaining}
-          onLink={(userId, amount, plan) => linkMutation.mutate({ item: linkingItem, userId, amount, plan })}
+          onLink={(userId, amount, fees) => linkMutation.mutate({ item: linkingItem, userId, amount, fees })}
           isPending={linkMutation.isPending}
         />
       )}
