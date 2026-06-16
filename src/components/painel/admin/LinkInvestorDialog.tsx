@@ -4,32 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { UserPlus, Search, AlertTriangle, CheckCircle } from "lucide-react";
+import { UserPlus, Search } from "lucide-react";
 
+export interface ManualFees {
+  feeService: number;
+  feeRenovation: number;
+  feeSales: number;
+  feeProfitRate: number;
+}
 
-export type InvestmentPlan = "standard" | "equal_split" | "fixed_12" | "fixed_15";
-
-export const PLAN_LABELS: Record<InvestmentPlan, string> = {
-  standard: "Padrão",
-  equal_split: "50/50",
-  fixed_12: "12% Fixo",
-  fixed_15: "15% Fixo",
-};
-
-export const PLAN_BADGE_COLORS: Record<InvestmentPlan, string> = {
-  standard: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-  equal_split: "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  fixed_12: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-  fixed_15: "bg-purple-500/10 text-purple-600 border-purple-500/30",
-};
-
-const PLAN_DESCRIPTIONS: Record<InvestmentPlan, string> = {
-  standard: "Taxa arremate + 10% reforma · Lucros 70/30",
-  equal_split: "Zero taxas · Lucros 50/50",
-  fixed_12: "Zero taxas · 12% fixo ao investidor",
-  fixed_15: "Zero taxas · 15% fixo ao investidor",
-};
+type FeeMode = "pct" | "usd";
 
 function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -44,16 +28,80 @@ interface Props {
   remaining: number;
   estimatedSaleValue?: number;
   docCommissionRate?: number;
-  onLink: (userId: string, amount: number, plan: InvestmentPlan) => void;
+  onLink: (userId: string, amount: number, fees: ManualFees) => void;
   isPending: boolean;
   /** For AdminPropertyForm: pass pre-reserved credits map */
   reservedCreditsMap?: Map<string, number>;
 }
 
+interface FeeFieldProps {
+  label: string;
+  hint: string;
+  mode: FeeMode;
+  value: string;
+  onModeChange: (m: FeeMode) => void;
+  onValueChange: (v: string) => void;
+  computed: number;
+}
+
+function FeeField({ label, hint, mode, value, onModeChange, onValueChange, computed }: FeeFieldProps) {
+  return (
+    <div className="rounded-lg border border-border p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-[10px] text-muted-foreground">{hint}</p>
+        </div>
+        <div className="flex rounded-md border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => onModeChange("pct")}
+            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+              mode === "pct" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+            }`}
+          >
+            %
+          </button>
+          <button
+            type="button"
+            onClick={() => onModeChange("usd")}
+            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+              mode === "usd" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+            }`}
+          >
+            $
+          </button>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          {mode === "usd" && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+          )}
+          <Input
+            type="number"
+            min="0"
+            step={mode === "pct" ? "0.01" : "0.01"}
+            placeholder="0"
+            value={value}
+            onChange={(e) => onValueChange(e.target.value)}
+            className={mode === "usd" ? "pl-7 h-9" : "pr-7 h-9"}
+          />
+          {mode === "pct" && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground whitespace-nowrap w-24 text-right">
+          = ${formatUSD(computed)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function LinkInvestorDialog({
   open,
   onOpenChange,
-  propertyType,
   totalProject,
   renovationCost,
   remaining,
@@ -65,9 +113,18 @@ export function LinkInvestorDialog({
 }: Props) {
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [plan, setPlan] = useState<InvestmentPlan>("standard");
   const [linkRawAmount, setLinkRawAmount] = useState(0);
   const [linkDisplayAmount, setLinkDisplayAmount] = useState("");
+
+  // Fee state: each fee has a mode (% or $) and a raw string value
+  const [serviceMode, setServiceMode] = useState<FeeMode>("usd");
+  const [serviceValue, setServiceValue] = useState("");
+  const [renoMode, setRenoMode] = useState<FeeMode>("pct");
+  const [renoValue, setRenoValue] = useState("");
+  const [salesMode, setSalesMode] = useState<FeeMode>("pct");
+  const [salesValue, setSalesValue] = useState("");
+  const [profitMode, setProfitMode] = useState<FeeMode>("pct");
+  const [profitValue, setProfitValue] = useState("");
 
   const { data: investorsWithCredits } = useQuery({
     queryKey: ["investors-with-credits-dialog"],
@@ -108,39 +165,46 @@ export function LinkInvestorDialog({
   const selectedInvestor = investorsWithCredits?.find((i) => i.user_id === selectedUserId);
   const userMaxCredits = getAvailableCredits(selectedUserId);
 
-  // Fee calculations — valor digitado = total bruto (taxas inclusas)
-  const serviceFee = propertyType === "land" || propertyType === "terreno" ? 500 : 5000;
-  const currentAmount = linkRawAmount / 100; // total bruto digitado
+  // Net investment = the aporte typed (fees added on top)
+  const netInvestment = linkRawAmount / 100;
+  const participation = totalProject > 0 ? netInvestment / totalProject : 0;
 
-  const totalFeeRate = plan === "standard" && totalProject > 0
-    ? (serviceFee + renovationCost * 0.10) / totalProject
-    : 0;
+  // Investor gross estimated profit
+  const docComm = estimatedSaleValue * (docCommissionRate / 100);
+  const totalProfit = estimatedSaleValue - totalProject - docComm;
+  const grossProfit = totalProfit > 0 ? totalProfit * participation : 0;
 
-  // Investimento líquido (o que vai para o projeto)
-  const netInvestment = plan === "standard" && totalFeeRate > 0
-    ? Math.round((currentAmount / (1 + totalFeeRate)) * 100) / 100
-    : currentAmount;
+  const num = (s: string) => {
+    const n = parseFloat(s);
+    return isNaN(n) || n < 0 ? 0 : n;
+  };
 
-  const arremmateFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((netInvestment / totalProject) * serviceFee * 100) / 100
-    : 0;
-  const renoFeeShare = plan === "standard" && totalProject > 0
-    ? Math.round((netInvestment / totalProject) * (renovationCost * 0.10) * 100) / 100
-    : 0;
-  const totalFees = arremmateFeeShare + renoFeeShare;
-  const currentTotalDeduction = netInvestment + totalFees; // ≈ currentAmount
+  // Compute each fee in USD
+  const feeService = serviceMode === "pct" ? (netInvestment * num(serviceValue)) / 100 : num(serviceValue);
+  const feeRenovation =
+    renoMode === "pct" ? (participation * renovationCost * num(renoValue)) / 100 : num(renoValue);
+  const feeSales =
+    salesMode === "pct" ? (participation * estimatedSaleValue * num(salesValue)) / 100 : num(salesValue);
+  const feeProfitUsd = profitMode === "pct" ? (grossProfit * num(profitValue)) / 100 : num(profitValue);
+  const feeProfitRate = profitMode === "pct" ? num(profitValue) : grossProfit > 0 ? (feeProfitUsd / grossProfit) * 100 : 0;
 
-  // Max linkable — créditos = valor bruto direto; remaining = líquido
-  const maxLinkableByCredits = userMaxCredits;
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const entryFees = round2(feeService + feeRenovation + feeSales);
+  const totalDeduction = round2(netInvestment + entryFees);
+  const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
+  const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
+
   const maxLinkableByRemaining = Math.max(remaining, 0);
-  // Para remaining, precisamos comparar netInvestment, não currentAmount
 
   const resetForm = () => {
     setSearch("");
     setSelectedUserId("");
-    setPlan("standard");
     setLinkRawAmount(0);
     setLinkDisplayAmount("");
+    setServiceMode("usd"); setServiceValue("");
+    setRenoMode("pct"); setRenoValue("");
+    setSalesMode("pct"); setSalesValue("");
+    setProfitMode("pct"); setProfitValue("");
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -149,8 +213,13 @@ export function LinkInvestorDialog({
   };
 
   const handleLink = () => {
-    if (currentAmount <= 0 || !selectedUserId) return;
-    onLink(selectedUserId, netInvestment, plan);
+    if (netInvestment <= 0 || !selectedUserId) return;
+    onLink(selectedUserId, netInvestment, {
+      feeService: round2(feeService),
+      feeRenovation: round2(feeRenovation),
+      feeSales: round2(feeSales),
+      feeProfitRate: round2(feeProfitRate),
+    });
     resetForm();
   };
 
@@ -163,7 +232,7 @@ export function LinkInvestorDialog({
             Vincular Investidor
           </DialogTitle>
           <DialogDescription>
-            Selecione o investidor, plano de taxação e valor a vincular.
+            Selecione o investidor, defina o aporte e as taxas de serviço.
           </DialogDescription>
         </DialogHeader>
 
@@ -237,35 +306,11 @@ export function LinkInvestorDialog({
             )}
           </div>
 
-          {/* Step 2: Plan selection */}
-          {selectedUserId && (
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">2. Plano de Taxação</label>
-              <div className="grid grid-cols-2 gap-2">
-                {(["standard", "equal_split", "fixed_12", "fixed_15"] as InvestmentPlan[]).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setPlan(p)}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      plan === p
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold">{PLAN_LABELS[p]}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{PLAN_DESCRIPTIONS[p]}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Amount */}
+          {/* Step 2: Amount */}
           {selectedUserId && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                3. Valor do aporte {plan === "standard" ? "(taxas inclusas)" : ""}
+                2. Valor do aporte (investimento líquido)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -290,85 +335,101 @@ export function LinkInvestorDialog({
             </div>
           )}
 
+          {/* Step 3: Manual fees */}
+          {selectedUserId && netInvestment > 0 && (
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">3. Taxas de serviço (Discovery)</label>
+              <div className="space-y-2">
+                <FeeField
+                  label="Serviço"
+                  hint="% sobre o aporte ou valor fixo"
+                  mode={serviceMode}
+                  value={serviceValue}
+                  onModeChange={setServiceMode}
+                  onValueChange={setServiceValue}
+                  computed={round2(feeService)}
+                />
+                <FeeField
+                  label="Reforma"
+                  hint="% da reforma (proporcional) ou valor fixo"
+                  mode={renoMode}
+                  value={renoValue}
+                  onModeChange={setRenoMode}
+                  onValueChange={setRenoValue}
+                  computed={round2(feeRenovation)}
+                />
+                <FeeField
+                  label="Vendas"
+                  hint="% da venda (proporcional) ou valor fixo"
+                  mode={salesMode}
+                  value={salesValue}
+                  onModeChange={setSalesMode}
+                  onValueChange={setSalesValue}
+                  computed={round2(feeSales)}
+                />
+                <FeeField
+                  label="Lucro"
+                  hint="% do lucro do investidor (seu corte, descontado no retorno)"
+                  mode={profitMode}
+                  value={profitValue}
+                  onModeChange={setProfitMode}
+                  onValueChange={setProfitValue}
+                  computed={round2(feeProfitUsd)}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Summary */}
-          {currentAmount > 0 && selectedUserId && (
+          {netInvestment > 0 && selectedUserId && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total do aporte</span>
-                <span className="font-semibold">${formatUSD(currentAmount)}</span>
+                <span className="text-muted-foreground">Investimento líquido</span>
+                <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
               </div>
-              {plan === "standard" && (
-                <>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Investimento líquido</span>
-                    <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Taxa arremate ({totalProject > 0 ? ((netInvestment / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(serviceFee)})
-                    </span>
-                    <span className="font-semibold text-amber-500">${formatUSD(arremmateFeeShare)}</span>
-                  </div>
-                  {renovationCost > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Taxa reforma 10% ({totalProject > 0 ? ((netInvestment / totalProject) * 100).toFixed(1) : 0}% de ${formatUSD(renovationCost * 0.10)})
-                      </span>
-                      <span className="font-semibold text-amber-500">${formatUSD(renoFeeShare)}</span>
-                    </div>
-                  )}
-                </>
-              )}
-              {plan !== "standard" && (
+              {feeService > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Taxas</span>
-                  <span className="font-semibold text-emerald-500 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" /> $0.00
-                  </span>
+                  <span className="text-muted-foreground">Taxa de serviço</span>
+                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeService))}</span>
+                </div>
+              )}
+              {feeRenovation > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Taxa de reforma</span>
+                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeRenovation))}</span>
+                </div>
+              )}
+              {feeSales > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Taxa de vendas</span>
+                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeSales))}</span>
                 </div>
               )}
               <div className="border-t border-border/50 pt-1.5 flex justify-between">
                 <span className="font-medium text-foreground">Total debitado</span>
-                <span className="font-bold text-foreground">${formatUSD(currentTotalDeduction)}</span>
+                <span className="font-bold text-foreground">${formatUSD(totalDeduction)}</span>
               </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Plano</span>
-                <Badge variant="outline" className={`text-[10px] ${PLAN_BADGE_COLORS[plan]}`}>
-                  {PLAN_LABELS[plan]}
-                </Badge>
-              </div>
-              {/* Estimated return */}
-              {estimatedSaleValue > 0 && totalProject > 0 && (() => {
-                const participation = netInvestment / totalProject;
-                const docComm = estimatedSaleValue * (docCommissionRate / 100);
-                const totalProfit = estimatedSaleValue - totalProject - docComm;
-                let estimatedReturn = 0;
-                if (plan === "standard") {
-                  estimatedReturn = totalProfit > 0 ? totalProfit * participation * 0.70 : 0;
-                } else if (plan === "equal_split") {
-                  estimatedReturn = totalProfit > 0 ? totalProfit * participation * 0.50 : 0;
-                } else if (plan === "fixed_12") {
-                  estimatedReturn = netInvestment * 0.12;
-                } else if (plan === "fixed_15") {
-                  estimatedReturn = netInvestment * 0.15;
-                }
-                const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
-                return (
-                  <div className="border-t border-border/50 pt-1.5 flex justify-between">
-                    <span className="font-medium text-foreground">Retorno Est. Investidor</span>
-                    <span className="font-bold text-emerald-500">
-                      ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)
-                    </span>
-                  </div>
-                );
-              })()}
-              {netInvestment > maxLinkableByRemaining && maxLinkableByRemaining >= 0 && (
+              {feeProfitUsd > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Taxa de lucro ({feeProfitRate.toFixed(1)}% do lucro)</span>
+                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeProfitUsd))}</span>
+                </div>
+              )}
+              {estimatedSaleValue > 0 && totalProject > 0 && (
+                <div className="border-t border-border/50 pt-1.5 flex justify-between">
+                  <span className="font-medium text-foreground">Retorno Est. Investidor</span>
+                  <span className="font-bold text-emerald-500">
+                    ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)
+                  </span>
+                </div>
+              )}
+              {netInvestment > maxLinkableByRemaining && (
                 <p className="text-destructive font-medium mt-1">
-                  ⚠ Valor líquido excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
+                  ⚠ Aporte excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
                 </p>
               )}
-              {netInvestment <= maxLinkableByRemaining && currentAmount > userMaxCredits && (
+              {netInvestment <= maxLinkableByRemaining && totalDeduction > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
                 </p>
@@ -382,9 +443,9 @@ export function LinkInvestorDialog({
               className="flex-1 gap-2"
               disabled={
                 !selectedUserId ||
-                currentAmount <= 0 ||
+                netInvestment <= 0 ||
                 netInvestment > maxLinkableByRemaining ||
-                currentAmount > userMaxCredits ||
+                totalDeduction > userMaxCredits ||
                 isPending
               }
               onClick={handleLink}
