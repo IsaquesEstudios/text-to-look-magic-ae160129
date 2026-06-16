@@ -124,12 +124,12 @@ export function PropertyInvestors({ propertyId, totalProject, renovationCost, es
   const isFullyCovered = remaining <= 0;
 
   const investors = [...userTotals.entries()]
-    .map(([userId, { total, shareIds, plan }]) => ({
+    .map(([userId, { total, shareIds, fees }]) => ({
       userId,
       name: profileMap.get(userId) || "Usuário",
       amount: total,
       shareIds,
-      plan: plan as InvestmentPlan,
+      fees,
       pct: totalProject > 0 ? (total / totalProject) * 100 : 0,
     }))
     .sort((a, b) => b.amount - a.amount);
