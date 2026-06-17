@@ -295,9 +295,38 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     return `Verifique o campo '${label}'.`;
   };
 
+  const validateStep1 = (): boolean => {
+    const parsedForm = propertyFormSchema.safeParse({
+      type: form.type,
+      title: form.title,
+      location: form.location,
+      state_code: form.state_code,
+      total_shares: form.total_shares || 1,
+      share_price: form.share_price || 0,
+      status: form.status,
+      estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
+      estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
+      estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
+      estimated_timeline: form.estimated_timeline,
+    });
+    if (!parsedForm.success) {
+      toast({ title: p.error, description: getValidationErrorMessage(parsedForm.error), variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (step === 1 && !validateStep1()) return;
+    setStep((s) => Math.min(s + 1, totalSteps));
+  };
+
+  const handleBack = () => setStep((s) => Math.max(s - 1, 1));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
 
     const parsedForm = propertyFormSchema.safeParse({
       type: form.type,
