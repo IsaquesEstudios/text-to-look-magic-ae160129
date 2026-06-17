@@ -92,6 +92,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
+  // Timeline split state
+  const [timelineValue, setTimelineValue] = useState("");
+  const [timelineUnit, setTimelineUnit] = useState<"months" | "years">("months");
+
   // Investor linking state (only for new properties)
   const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
