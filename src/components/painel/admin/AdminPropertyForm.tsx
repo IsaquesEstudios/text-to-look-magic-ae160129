@@ -550,7 +550,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm({ ...form, type: "land" })}
+                  onClick={() => setForm({ ...form, type: "land", estimated_renovation_cost: "" })}
                   className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
                     form.type === "land"
                       ? "border-primary bg-primary/10 text-primary"
