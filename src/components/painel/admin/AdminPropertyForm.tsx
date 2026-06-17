@@ -530,22 +530,22 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
                 <Input
                   id="auctionValue"
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.estimated_auction_value}
-                  onChange={(e) => setForm({ ...form, estimated_auction_value: e.target.value })}
+                  onChange={(e) => setForm({ ...form, estimated_auction_value: maskUSDInput(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
                 <Input
                   id="renovationCost"
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.estimated_renovation_cost}
-                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: e.target.value })}
+                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: maskUSDInput(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
             </div>
