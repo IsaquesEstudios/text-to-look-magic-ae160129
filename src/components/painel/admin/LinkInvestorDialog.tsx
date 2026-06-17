@@ -188,16 +188,17 @@ export function LinkInvestorDialog({
     (renoMode === "usd" ? num(renoValue) : 0) +
     (salesMode === "usd" ? num(salesValue) : 0);
 
-  // Percentage-mode entry fees scale with participation = netInvestment / totalProject.
-  // grossAporte = netInvestment + fixedEntryFees + netInvestment * kPct
-  // => netInvestment = (grossAporte - fixedEntryFees) / (1 + kPct)
-  const kPct =
-    totalProject > 0
-      ? (renoMode === "pct" ? (renovationCost * num(renoValue)) / 100 : 0) / totalProject +
-        (salesMode === "pct" ? (estimatedSaleValue * num(salesValue)) / 100 : 0) / totalProject
-      : 0;
+  // Percentage-mode entry fees incide directly on the aporte typed.
+  // Ex.: reforma 10% sobre aporte de $10.000 = $1.000.
+  // netInvestment = grossAporte - (fixedEntryFees + percentEntryFees)
+  const feeRenovation =
+    renoMode === "pct" ? (grossAporte * num(renoValue)) / 100 : num(renoValue);
+  const feeSales =
+    salesMode === "pct" ? (grossAporte * num(salesValue)) / 100 : num(salesValue);
 
-  const netInvestment = Math.max((grossAporte - fixedEntryFees) / (1 + kPct), 0);
+  const totalEntryFees = fixedEntryFees + (renoMode === "pct" ? feeRenovation : 0) + (salesMode === "pct" ? feeSales : 0);
+
+  const netInvestment = Math.max(grossAporte - totalEntryFees, 0);
   const participation = totalProject > 0 ? netInvestment / totalProject : 0;
 
   // Investor gross estimated profit
@@ -205,11 +206,6 @@ export function LinkInvestorDialog({
   const totalProfit = estimatedSaleValue - totalProject - docComm;
   const grossProfit = totalProfit > 0 ? totalProfit * participation : 0;
 
-  // Compute each entry fee in USD using the resolved net investment.
-  const feeRenovation =
-    renoMode === "pct" ? (participation * renovationCost * num(renoValue)) / 100 : num(renoValue);
-  const feeSales =
-    salesMode === "pct" ? (participation * estimatedSaleValue * num(salesValue)) / 100 : num(salesValue);
   const feeProfitUsd = profitMode === "pct" ? (grossProfit * num(profitValue)) / 100 : num(profitValue);
   const feeProfitRate = profitMode === "pct" ? num(profitValue) : grossProfit > 0 ? (feeProfitUsd / grossProfit) * 100 : 0;
 
@@ -396,7 +392,7 @@ export function LinkInvestorDialog({
                 />
                 <FeeField
                   label="Reforma"
-                  hint="% da reforma (proporcional) ou valor fixo"
+                  hint="% sobre o aporte ou valor fixo"
                   mode={renoMode}
                   value={renoValue}
                   onModeChange={setRenoMode}
@@ -405,7 +401,7 @@ export function LinkInvestorDialog({
                 />
                 <FeeField
                   label="Vendas"
-                  hint="% da venda (proporcional) ou valor fixo"
+                  hint="% sobre o aporte ou valor fixo"
                   mode={salesMode}
                   value={salesValue}
                   onModeChange={setSalesMode}

@@ -1,43 +1,47 @@
-## Objetivo
+## Problema
 
-Remover as 4 modalidades fixas (Padrão / 50-50 / 12% / 15%) do momento de vincular um investidor a um imóvel. No lugar, o admin preenche manualmente **4 taxas de serviço da Discovery**, cada uma podendo ser digitada como **porcentagem (%)** ou **valor fixo ($)**:
+No modal "Vincular Investidor", o campo **Reforma (modo %)** está calculando a taxa de forma proporcional à participação no projeto:
 
-- **Serviço** — sua taxa de serviço sobre o aporte
-- **Reforma** — sua taxa sobre o custo de reforma (ex.: 5% da reforma = você recebe 5% do valor da reforma)
-- **Vendas** — sua taxa sobre o valor de venda estimado
-- **Lucro** — sua taxa sobre o lucro estimado do investidor (ex.: 20% do lucro = você fica com 20% do que o investidor lucraria)
+```text
+taxa = participação × custo_de_reforma × 10%
+     = (9.130 / 100.000) × 9.530 × 10%  ≈  $869,57
+```
 
-O **retorno estimado do investidor** continua sendo calculado automaticamente pela participação no projeto; a única diferença é que a "taxa de lucro" passa a ser o seu corte sobre esse lucro (substitui o antigo 70/30).
+Isso não corresponde à regra real: os **10% são a taxa de serviço cobrada sobre o aporte do investidor**. Com aporte de $10.000, a taxa deveria ser **$1.000** (10% direto sobre o valor investido).
 
-## Como cada taxa é calculada
+## Mudança
 
-Para cada campo, ao escolher `%`, a base é:
+Alterar o cálculo das taxas em **modo %** para incidirem **diretamente sobre o aporte digitado**, e não sobre custos do projeto ponderados por participação:
 
-| Campo    | Base da porcentagem                          |
-|----------|----------------------------------------------|
-| Serviço  | valor do aporte (investimento líquido)       |
-| Reforma  | proporcional: participação × custo de reforma|
-| Vendas   | proporcional: participação × valor de venda  |
-| Lucro    | lucro bruto estimado do investidor           |
+```text
+taxa_reforma (%)  = aporte × (% reforma) / 100   →  10% de 10.000 = $1.000
+taxa_vendas (%)   = aporte × (% vendas)  / 100
+```
 
-Ao escolher `$`, o valor digitado é cobrado diretamente.
+O modo **$ (valor fixo)** continua igual (valor digitado é a taxa).
 
-**Total debitado do investidor** = aporte líquido + serviço + reforma + vendas (taxas de entrada). A taxa de **lucro** não é cobrada na entrada — ela apenas reduz o retorno estimado mostrado (é o seu corte no lucro, liquidado na venda).
+### Como o aporte/líquido fica
 
-**Retorno estimado do investidor** = (lucro bruto pela participação) − taxa de lucro.
+Mantendo a regra atual de que o **aporte digitado = total debitado** (taxas inclusas):
 
-## Mudanças
+```text
+Aporte (debitado)     = $10.000,00
+Taxa de reforma (10%) = $1.000,00
+Investimento líquido  = $9.000,00
+```
 
-### Banco de dados (migração)
-- Adicionar à tabela `shares` as colunas para guardar o que foi cobrado/configurado em cada vínculo: `fee_service`, `fee_renovation`, `fee_sales`, `fee_profit_rate` (numéricas). Manter `investment_plan` por compatibilidade dos registros antigos, mas deixar de usá-lo nos novos.
-- Reescrever a função `admin_link_investor_to_property` para receber os 4 valores de taxa já calculados (em $) do front-end, debitar `aporte + serviço + reforma + vendas` dos créditos, criar o share e registrar cada taxa em `credit_transactions` com descrição própria. Guardar também a taxa de lucro (%) no share.
-- Ajustar `admin_unlink_investor` e `admin_delete_property` para estornar com base nas taxas realmente gravadas no share (em vez de recalcular pelos valores fixos antigos).
+Ou seja, `investimento_líquido = aporte − soma_das_taxas`, com as taxas % calculadas sobre o aporte.
 
-### Front-end
-- `LinkInvestorDialog.tsx`: remover os botões dos 4 planos e o seletor; adicionar 4 campos de taxa, cada um com alternância **% / $** e cálculo ao vivo. Atualizar o resumo da operação (taxas detalhadas, total debitado, retorno estimado já descontando a taxa de lucro).
-- `AuctionInvestorLinking.tsx`: passar os novos valores para a RPC; substituir o badge de plano por exibição das taxas aplicadas no investidor vinculado.
-- Manter os textos/labels existentes em português e a formatação USD en-US.
+## Arquivo afetado
 
-## Observações
-- Registros antigos (com plano) continuam válidos e exibidos; o estorno deles usará os valores gravados.
-- Mudanças ficam restritas ao fluxo de vínculo (dialog + componente de leilão) e às 3 funções de banco citadas.
+- `src/components/painel/admin/LinkInvestorDialog.tsx`
+  - Substituir a fórmula de `kPct` / `netInvestment` baseada em participação por: somar todas as taxas (fixas + %), onde as % incidem sobre `grossAporte`, e definir `netInvestment = grossAporte − somaTaxas`.
+  - Ajustar `feeRenovation` e `feeSales` no modo % para `grossAporte * pct / 100` (em vez de `participation * custo * pct / 100`).
+  - Recalcular `participation` a partir do novo `netInvestment` para os cálculos de lucro/retorno.
+  - Atualizar os textos de dica (hint) para refletir "% sobre o aporte" em vez de "proporcional".
+
+## Detalhes técnicos
+
+- A taxa de **lucro** continua sobre o lucro estimado (não muda).
+- A validação `feesExceedAporte` passa a checar se a soma das taxas % + fixas ≥ aporte.
+- O resumo da operação continua mostrando Aporte → Taxas → Investimento líquido, agora com os valores novos (ex.: reforma $1.000).
