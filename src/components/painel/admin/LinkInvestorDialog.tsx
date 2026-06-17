@@ -422,7 +422,7 @@ export function LinkInvestorDialog({
           )}
 
           {/* Summary */}
-          {netInvestment > 0 && selectedUserId && (
+          {grossAporte > 0 && selectedUserId && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
