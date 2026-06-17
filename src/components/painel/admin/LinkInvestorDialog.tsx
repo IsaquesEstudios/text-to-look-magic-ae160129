@@ -42,9 +42,10 @@ interface FeeFieldProps {
   onModeChange: (m: FeeMode) => void;
   onValueChange: (v: string) => void;
   computed: number;
+  usdOnly?: boolean;
 }
 
-function FeeField({ label, hint, mode, value, onModeChange, onValueChange, computed }: FeeFieldProps) {
+function FeeField({ label, hint, mode, value, onModeChange, onValueChange, computed, usdOnly }: FeeFieldProps) {
   return (
     <div className="rounded-lg border border-border p-3 space-y-2">
       <div className="flex items-center justify-between">
@@ -52,26 +53,30 @@ function FeeField({ label, hint, mode, value, onModeChange, onValueChange, compu
           <p className="text-sm font-medium text-foreground">{label}</p>
           <p className="text-[10px] text-muted-foreground">{hint}</p>
         </div>
-        <div className="flex rounded-md border border-border overflow-hidden">
-          <button
-            type="button"
-            onClick={() => onModeChange("pct")}
-            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
-              mode === "pct" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
-            }`}
-          >
-            %
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange("usd")}
-            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
-              mode === "usd" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
-            }`}
-          >
-            $
-          </button>
-        </div>
+        {usdOnly ? (
+          <span className="px-2.5 py-1 text-xs font-medium rounded-md border border-border bg-primary text-primary-foreground">$</span>
+        ) : (
+          <div className="flex rounded-md border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => onModeChange("pct")}
+              className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                mode === "pct" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+              }`}
+            >
+              %
+            </button>
+            <button
+              type="button"
+              onClick={() => onModeChange("usd")}
+              className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                mode === "usd" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+              }`}
+            >
+              $
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
