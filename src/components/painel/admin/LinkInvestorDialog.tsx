@@ -227,7 +227,7 @@ export function LinkInvestorDialog({
   };
 
   const handleLink = () => {
-    if (netInvestment <= 0 || !selectedUserId) return;
+    if (netInvestment <= 0 || !selectedUserId || missingPropertyValues || feesExceedAporte) return;
     onLink(selectedUserId, netInvestment, {
       feeService: round2(feeService),
       feeRenovation: round2(feeRenovation),
@@ -236,6 +236,7 @@ export function LinkInvestorDialog({
     });
     resetForm();
   };
+
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
