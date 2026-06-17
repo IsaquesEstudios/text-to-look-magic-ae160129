@@ -49,6 +49,17 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function parseMaskedUSD(display: string): number {
+  const clean = display.replace(/[^0-9]/g, "");
+  return clean ? parseInt(clean, 10) / 100 : 0;
+}
+
+function maskUSDInput(raw: string): string {
+  const clean = raw.replace(/[^0-9]/g, "");
+  const num = clean ? parseInt(clean, 10) : 0;
+  return (num / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function investorEntryFees(fees: ManualFees): number {
   return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
 }
@@ -115,8 +126,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     enabled: !propertyId,
   });
 
-  const auctionValue = parseFloat(form.estimated_auction_value) || 0;
-  const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
+  const auctionValue = parseMaskedUSD(form.estimated_auction_value);
+  const renovationCost = parseMaskedUSD(form.estimated_renovation_cost);
   const totalProjeto = auctionValue + renovationCost;
   const hasInvestors = investorsToLink.length > 0;
   const totalProjetoComTaxas = totalProjeto;
@@ -162,10 +173,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           total_shares: String(property.total_shares),
           share_price: String(property.share_price),
           status: property.status,
-          estimated_auction_value: String(property.estimated_auction_value ?? 0),
-          estimated_renovation_cost: String(property.estimated_renovation_cost ?? 0),
+          estimated_auction_value: formatUSD(property.estimated_auction_value ?? 0),
+          estimated_renovation_cost: formatUSD(property.estimated_renovation_cost ?? 0),
           estimated_return_pct: String(property.estimated_return_pct ?? 0),
-          estimated_sale_value: String(property.estimated_sale_value ?? 0),
+          estimated_sale_value: formatUSD(property.estimated_sale_value ?? 0),
           estimated_timeline: property.estimated_timeline ?? "",
           doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
@@ -291,9 +302,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       total_shares: form.total_shares || 1,
       share_price: form.share_price || 0,
       status: form.status,
-      estimated_auction_value: form.estimated_auction_value || 0,
-      estimated_renovation_cost: form.estimated_renovation_cost || 0,
-      estimated_sale_value: form.estimated_sale_value || 0,
+      estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
+      estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
+      estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
       estimated_timeline: form.estimated_timeline,
     });
 
@@ -519,22 +530,22 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
                 <Input
                   id="auctionValue"
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.estimated_auction_value}
-                  onChange={(e) => setForm({ ...form, estimated_auction_value: e.target.value })}
+                  onChange={(e) => setForm({ ...form, estimated_auction_value: maskUSDInput(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
                 <Input
                   id="renovationCost"
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.estimated_renovation_cost}
-                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: e.target.value })}
+                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: maskUSDInput(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
             </div>
@@ -552,12 +563,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <Label htmlFor="saleValue">Valor Est. de Venda ($)</Label>
                 <Input
                   id="saleValue"
-                  type="number"
-                  step="0.01"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   value={form.estimated_sale_value}
-                  onChange={(e) => setForm({ ...form, estimated_sale_value: e.target.value })}
-                  placeholder="Ex: 350000"
+                  onChange={(e) => setForm({ ...form, estimated_sale_value: maskUSDInput(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
             </div>
@@ -567,7 +577,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <Label>Retorno Estimado (%)</Label>
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
                 {(() => {
-                  const saleVal = parseFloat(form.estimated_sale_value) || 0;
+                  const saleVal = parseMaskedUSD(form.estimated_sale_value);
                   const dcRate = parseFloat(form.doc_commission_rate) || 10;
                   const docComm = saleVal * (dcRate / 100);
                   const profit = saleVal - totalProjeto - docComm;
@@ -698,7 +708,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   propertyType={form.type}
                   totalProject={totalProjeto}
                   renovationCost={renovationCost}
-                  estimatedSaleValue={parseFloat(form.estimated_sale_value) || 0}
+                  estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
                   remaining={remaining}
                   onLink={addInvestorFromDialog}
                   isPending={false}
