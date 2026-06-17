@@ -208,7 +208,9 @@ export function LinkInvestorDialog({
   const entryFees = round2(feeService + feeRenovation + feeSales);
   // Total debited = aporte (compra) + taxas cobradas à parte.
   const totalDeduction = round2(grossAporte + entryFees);
-  const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
+  // O retorno do investidor é a sua parte do lucro menos TODAS as taxas
+  // cobradas pela Discovery (serviço, reforma, vendas e o corte do lucro).
+  const estimatedReturn = Math.max(grossProfit - feeProfitUsd - entryFees, 0);
   const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
 
   // No longer applicable: fees never consume the aporte.
