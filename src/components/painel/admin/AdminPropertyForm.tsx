@@ -126,8 +126,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     enabled: !propertyId,
   });
 
-  const auctionValue = parseFloat(form.estimated_auction_value) || 0;
-  const renovationCost = parseFloat(form.estimated_renovation_cost) || 0;
+  const auctionValue = parseMaskedUSD(form.estimated_auction_value);
+  const renovationCost = parseMaskedUSD(form.estimated_renovation_cost);
   const totalProjeto = auctionValue + renovationCost;
   const hasInvestors = investorsToLink.length > 0;
   const totalProjetoComTaxas = totalProjeto;
