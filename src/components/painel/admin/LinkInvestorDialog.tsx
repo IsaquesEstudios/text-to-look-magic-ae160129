@@ -397,15 +397,17 @@ export function LinkInvestorDialog({
                   computed={round2(feeService)}
                   usdOnly
                 />
-                <FeeField
-                  label="Reforma"
-                  hint="% sobre o aporte ou valor fixo"
-                  mode={renoMode}
-                  value={renoValue}
-                  onModeChange={setRenoMode}
-                  onValueChange={setRenoValue}
-                  computed={round2(feeRenovation)}
-                />
+                {!isLand && (
+                  <FeeField
+                    label="Reforma"
+                    hint="% sobre o aporte ou valor fixo"
+                    mode={renoMode}
+                    value={renoValue}
+                    onModeChange={setRenoMode}
+                    onValueChange={setRenoValue}
+                    computed={round2(feeRenovation)}
+                  />
+                )}
                 <FeeField
                   label="Vendas"
                   hint="% sobre o aporte ou valor fixo"
