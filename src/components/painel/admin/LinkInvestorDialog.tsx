@@ -434,12 +434,8 @@ export function LinkInvestorDialog({
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Aporte (debitado)</span>
+                <span className="text-muted-foreground">Aporte (investimento na compra)</span>
                 <span className="font-semibold text-foreground">${formatUSD(grossAporte)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Investimento líquido</span>
-                <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
               </div>
               {feeService > 0 && (
                 <div className="flex justify-between">
