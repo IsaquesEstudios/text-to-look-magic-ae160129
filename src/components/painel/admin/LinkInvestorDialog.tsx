@@ -193,7 +193,7 @@ export function LinkInvestorDialog({
   const feeRenovation =
     renoMode === "pct" ? (grossAporte * num(renoValue)) / 100 : num(renoValue);
   const feeSales =
-    salesMode === "pct" ? (grossAporte * num(salesValue)) / 100 : num(salesValue);
+    salesMode === "pct" ? (estimatedSaleValue * num(salesValue)) / 100 : num(salesValue);
 
   // Investor gross estimated profit.
   // Documentação é sempre calculada sobre o valor de VENDA.
@@ -411,7 +411,7 @@ export function LinkInvestorDialog({
                 )}
                 <FeeField
                   label="Vendas"
-                  hint="% sobre o aporte ou valor fixo"
+                  hint="% sobre o valor vendido ou valor fixo"
                   mode={salesMode}
                   value={salesValue}
                   onModeChange={setSalesMode}
