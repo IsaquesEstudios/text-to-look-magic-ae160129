@@ -288,6 +288,11 @@ export function LinkInvestorDialog({
             <div>
               <p className="text-muted-foreground">Venda (Est.)</p>
               <p className="font-semibold text-foreground">${formatUSD(estimatedSaleValue)}</p>
+              {docCommissionRate > 0 && estimatedSaleValue > 0 && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  Líquido ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))} (-{docCommissionRate}% doc)
+                </p>
+              )}
             </div>
             <div>
               <p className="text-muted-foreground">Disponível</p>
