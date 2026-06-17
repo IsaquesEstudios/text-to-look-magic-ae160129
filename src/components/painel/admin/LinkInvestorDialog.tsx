@@ -376,7 +376,7 @@ export function LinkInvestorDialog({
           )}
 
           {/* Step 3: Manual fees */}
-          {selectedUserId && netInvestment > 0 && (
+          {selectedUserId && grossAporte > 0 && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">3. Taxas de serviço (Discovery)</label>
               <div className="space-y-2">
