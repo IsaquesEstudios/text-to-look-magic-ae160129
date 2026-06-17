@@ -107,6 +107,7 @@ function FeeField({ label, hint, mode, value, onModeChange, onValueChange, compu
 export function LinkInvestorDialog({
   open,
   onOpenChange,
+  propertyType,
   totalProject,
   renovationCost,
   remaining,
@@ -220,8 +221,12 @@ export function LinkInvestorDialog({
   const feesExceedAporte = grossAporte > 0 && netInvestment <= 0;
 
   // Required property values to link an investor.
+  // Terrenos (land) não têm Reforma — exigem apenas Arremate e Venda.
+  const isLand = propertyType === "land";
   const auctionValue = round2(totalProject - renovationCost);
-  const missingPropertyValues = auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
+  const missingPropertyValues = isLand
+    ? auctionValue <= 0 || estimatedSaleValue <= 0
+    : auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
 
   const maxLinkableByRemaining = Math.max(remaining, 0);
 
@@ -274,10 +279,12 @@ export function LinkInvestorDialog({
               <p className="text-muted-foreground">Total Projeto</p>
               <p className="font-semibold text-foreground">${formatUSD(totalProject)}</p>
             </div>
-            <div>
-              <p className="text-muted-foreground">Reforma (Est.)</p>
-              <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
-            </div>
+            {!isLand && (
+              <div>
+                <p className="text-muted-foreground">Reforma (Est.)</p>
+                <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground">Venda (Est.)</p>
               <p className="font-semibold text-foreground">${formatUSD(estimatedSaleValue)}</p>
@@ -290,7 +297,7 @@ export function LinkInvestorDialog({
 
           {missingPropertyValues && (
             <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive font-medium">
-              ⚠ Para vincular um investidor, preencha os valores de Arremate, Reforma e Venda do imóvel.
+              ⚠ Para vincular um investidor, preencha os valores de {isLand ? "Arremate e Venda do terreno" : "Arremate, Reforma e Venda do imóvel"}.
             </div>
           )}
 
@@ -390,15 +397,17 @@ export function LinkInvestorDialog({
                   computed={round2(feeService)}
                   usdOnly
                 />
-                <FeeField
-                  label="Reforma"
-                  hint="% sobre o aporte ou valor fixo"
-                  mode={renoMode}
-                  value={renoValue}
-                  onModeChange={setRenoMode}
-                  onValueChange={setRenoValue}
-                  computed={round2(feeRenovation)}
-                />
+                {!isLand && (
+                  <FeeField
+                    label="Reforma"
+                    hint="% sobre o aporte ou valor fixo"
+                    mode={renoMode}
+                    value={renoValue}
+                    onModeChange={setRenoMode}
+                    onValueChange={setRenoValue}
+                    computed={round2(feeRenovation)}
+                  />
+                )}
                 <FeeField
                   label="Vendas"
                   hint="% sobre o aporte ou valor fixo"
