@@ -176,33 +176,27 @@ export function LinkInvestorDialog({
     return isNaN(n) || n < 0 ? 0 : n;
   };
 
-  // The aporte typed = total amount debited. Entry fees are taken FROM the aporte,
-  // so: netInvestment = aporte - entryFees (no fees added on top).
+  // The aporte typed = the amount invested to BUY the property. It is the
+  // investment itself and is NOT reduced by service fees. Fees are charged
+  // ON TOP of the aporte (added to the total debited from credits).
   const grossAporte = linkRawAmount / 100;
+
+  // The full aporte counts as the investment / participation.
+  const netInvestment = grossAporte;
+  const participation = totalProject > 0 ? netInvestment / totalProject : 0;
 
   // Service is always a fixed USD value.
   const feeService = num(serviceValue);
 
-  // Fixed (USD-mode) entry fees are independent of participation.
-  const fixedEntryFees =
-    feeService +
-    (renoMode === "usd" ? num(renoValue) : 0) +
-    (salesMode === "usd" ? num(salesValue) : 0);
-
-  // Percentage-mode entry fees incide directly on the aporte typed.
-  // Ex.: reforma 10% sobre aporte de $10.000 = $1.000.
-  // netInvestment = grossAporte - (fixedEntryFees + percentEntryFees)
+  // Percentage-mode entry fees incide sobre o aporte (valor de compra).
+  // Ex.: reforma 10% sobre aporte de $10.000 = $1.000 (cobrado à parte).
   const feeRenovation =
     renoMode === "pct" ? (grossAporte * num(renoValue)) / 100 : num(renoValue);
   const feeSales =
     salesMode === "pct" ? (grossAporte * num(salesValue)) / 100 : num(salesValue);
 
-  const totalEntryFees = fixedEntryFees + (renoMode === "pct" ? feeRenovation : 0) + (salesMode === "pct" ? feeSales : 0);
-
-  const netInvestment = Math.max(grossAporte - totalEntryFees, 0);
-  const participation = totalProject > 0 ? netInvestment / totalProject : 0;
-
-  // Investor gross estimated profit
+  // Investor gross estimated profit.
+  // Documentação é sempre calculada sobre o valor de VENDA.
   const docComm = estimatedSaleValue * (docCommissionRate / 100);
   const totalProfit = estimatedSaleValue - totalProject - docComm;
   const grossProfit = totalProfit > 0 ? totalProfit * participation : 0;
@@ -212,13 +206,13 @@ export function LinkInvestorDialog({
 
   const round2 = (n: number) => Math.round(n * 100) / 100;
   const entryFees = round2(feeService + feeRenovation + feeSales);
-  // Total debited equals the aporte typed (fees are inside it).
-  const totalDeduction = round2(grossAporte);
+  // Total debited = aporte (compra) + taxas cobradas à parte.
+  const totalDeduction = round2(grossAporte + entryFees);
   const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
   const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
 
-  // The sum of entry fees cannot consume the entire aporte (net must be > 0).
-  const feesExceedAporte = grossAporte > 0 && netInvestment <= 0;
+  // No longer applicable: fees never consume the aporte.
+  const feesExceedAporte = false;
 
   // Required property values to link an investor.
   // Terrenos (land) não têm Reforma — exigem apenas Arremate e Venda.
@@ -362,7 +356,7 @@ export function LinkInvestorDialog({
           {selectedUserId && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                2. Valor do aporte (total debitado — taxas inclusas)
+                2. Valor do aporte (investimento na compra)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -440,12 +434,8 @@ export function LinkInvestorDialog({
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Aporte (debitado)</span>
+                <span className="text-muted-foreground">Aporte (investimento na compra)</span>
                 <span className="font-semibold text-foreground">${formatUSD(grossAporte)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Investimento líquido</span>
-                <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
               </div>
               {feeService > 0 && (
                 <div className="flex justify-between">
