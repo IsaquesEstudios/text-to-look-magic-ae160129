@@ -279,10 +279,12 @@ export function LinkInvestorDialog({
               <p className="text-muted-foreground">Total Projeto</p>
               <p className="font-semibold text-foreground">${formatUSD(totalProject)}</p>
             </div>
-            <div>
-              <p className="text-muted-foreground">Reforma (Est.)</p>
-              <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
-            </div>
+            {!isLand && (
+              <div>
+                <p className="text-muted-foreground">Reforma (Est.)</p>
+                <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground">Venda (Est.)</p>
               <p className="font-semibold text-foreground">${formatUSD(estimatedSaleValue)}</p>
