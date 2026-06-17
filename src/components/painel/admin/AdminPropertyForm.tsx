@@ -302,9 +302,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       total_shares: form.total_shares || 1,
       share_price: form.share_price || 0,
       status: form.status,
-      estimated_auction_value: form.estimated_auction_value || 0,
-      estimated_renovation_cost: form.estimated_renovation_cost || 0,
-      estimated_sale_value: form.estimated_sale_value || 0,
+      estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
+      estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
+      estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
       estimated_timeline: form.estimated_timeline,
     });
 
