@@ -358,7 +358,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
       estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
       estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
-      estimated_timeline: form.estimated_timeline,
+      estimated_timeline: timelineValue
+        ? `${timelineValue} ${timelineUnit === "months" ? "meses" : "anos"}`
+        : "",
     });
 
     if (!parsedForm.success) {
@@ -412,7 +414,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         estimated_auction_value: validated.estimated_auction_value,
         estimated_renovation_cost: validated.estimated_renovation_cost,
         estimated_sale_value: validated.estimated_sale_value,
-        estimated_timeline: validated.estimated_timeline.trim(),
+        estimated_timeline: timelineValue
+          ? `${timelineValue} ${timelineUnit === "months" ? "meses" : "anos"}`
+          : "",
         doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
       };
 
