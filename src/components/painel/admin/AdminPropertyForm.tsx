@@ -342,8 +342,8 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   const handleBack = () => setStep((s) => Math.max(s - 1, 1));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!user) return;
 
 
@@ -939,11 +939,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             )}
 
             {step < totalSteps ? (
-              <Button type="button" variant="cta" onClick={handleNext} className="flex-1">
+              <Button key="next-btn" type="button" variant="cta" onClick={handleNext} className="flex-1">
                 Próximo
               </Button>
             ) : (
-              <Button type="submit" variant="cta" className="flex-1" disabled={loading || uploading}>
+              <Button key="submit-btn" type="button" variant="cta" className="flex-1" disabled={loading || uploading} onClick={() => handleSubmit()}>
                 {loading && <Loader2 className="animate-spin" />}
                 {propertyId ? "Salvar Alterações" : "Criar Imóvel"}
               </Button>
