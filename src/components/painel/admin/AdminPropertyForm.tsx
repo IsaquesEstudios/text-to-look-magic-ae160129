@@ -49,6 +49,17 @@ function formatUSD(value: number) {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function parseMaskedUSD(display: string): number {
+  const clean = display.replace(/[^0-9]/g, "");
+  return clean ? parseInt(clean, 10) / 100 : 0;
+}
+
+function maskUSDInput(raw: string): string {
+  const clean = raw.replace(/[^0-9]/g, "");
+  const num = clean ? parseInt(clean, 10) : 0;
+  return (num / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function investorEntryFees(fees: ManualFees): number {
   return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
 }
