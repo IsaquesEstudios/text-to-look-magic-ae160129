@@ -221,8 +221,12 @@ export function LinkInvestorDialog({
   const feesExceedAporte = grossAporte > 0 && netInvestment <= 0;
 
   // Required property values to link an investor.
+  // Terrenos (land) não têm Reforma — exigem apenas Arremate e Venda.
+  const isLand = propertyType === "land";
   const auctionValue = round2(totalProject - renovationCost);
-  const missingPropertyValues = auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
+  const missingPropertyValues = isLand
+    ? auctionValue <= 0 || estimatedSaleValue <= 0
+    : auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
 
   const maxLinkableByRemaining = Math.max(remaining, 0);
 
