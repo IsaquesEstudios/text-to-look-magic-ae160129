@@ -479,7 +479,7 @@ export function LinkInvestorDialog({
                       Lucro do projeto: ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))} - ${formatUSD(totalProject)} (custo) = ${formatUSD(Math.max(totalProfit, 0))}
                     </span>
                     <span className="block opacity-75">
-                      O retorno do investidor é a sua parte do lucro ({(participation * 100).toFixed(1)}% de participação).
+                      Retorno = sua parte do lucro ({(participation * 100).toFixed(1)}%) menos as taxas da Discovery.
                     </span>
                   </div>
                   <div className="border-t border-border/50 pt-1.5 flex justify-between">
