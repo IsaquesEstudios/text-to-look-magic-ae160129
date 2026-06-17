@@ -274,17 +274,11 @@ export function LinkInvestorDialog({
 
         <div className="space-y-4">
           {/* Property summary */}
-          <div className="rounded-lg border border-border bg-secondary/20 p-3 grid grid-cols-2 gap-2 text-xs">
+          <div className="rounded-lg border border-border bg-secondary/20 p-3 grid grid-cols-2 gap-2 text-xs items-start">
             <div>
               <p className="text-muted-foreground">Total Projeto</p>
               <p className="font-semibold text-foreground">${formatUSD(totalProject)}</p>
             </div>
-            {!isLand && (
-              <div>
-                <p className="text-muted-foreground">Reforma (Est.)</p>
-                <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
-              </div>
-            )}
             <div>
               <p className="text-muted-foreground">Venda (Est.)</p>
               <p className="font-semibold text-foreground">${formatUSD(estimatedSaleValue)}</p>
@@ -294,6 +288,12 @@ export function LinkInvestorDialog({
                 </p>
               )}
             </div>
+            {!isLand && (
+              <div>
+                <p className="text-muted-foreground">Reforma (Est.)</p>
+                <p className="font-semibold text-foreground">${formatUSD(renovationCost)}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground">Disponível</p>
               <p className="font-semibold text-emerald-500">${formatUSD(Math.max(remaining, 0))}</p>
@@ -476,12 +476,24 @@ export function LinkInvestorDialog({
                 </div>
               )}
               {estimatedSaleValue > 0 && totalProject > 0 && (
-                <div className="border-t border-border/50 pt-1.5 flex justify-between">
-                  <span className="font-medium text-foreground">Retorno Est. Investidor</span>
-                  <span className="font-bold text-emerald-500">
-                    ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)
-                  </span>
-                </div>
+                <>
+                  {docCommissionRate > 0 && (
+                    <div className="text-[10px] text-muted-foreground px-1">
+                      <span className="block">
+                        Base do retorno: ${formatUSD(estimatedSaleValue)} - {docCommissionRate}% doc = ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))}
+                      </span>
+                      <span className="block mt-0.5 opacity-75">
+                        Os cálculos de lucro e retorno são feitos sobre esse valor líquido.
+                      </span>
+                    </div>
+                  )}
+                  <div className="border-t border-border/50 pt-1.5 flex justify-between">
+                    <span className="font-medium text-foreground">Retorno Est. Investidor</span>
+                    <span className="font-bold text-emerald-500">
+                      ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)
+                    </span>
+                  </div>
+                </>
               )}
               {netInvestment > maxLinkableByRemaining && (
                 <p className="text-destructive font-medium mt-1">
