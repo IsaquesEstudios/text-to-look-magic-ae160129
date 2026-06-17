@@ -356,7 +356,7 @@ export function LinkInvestorDialog({
           {selectedUserId && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                2. Valor do aporte (total debitado — taxas inclusas)
+                2. Valor do aporte (investimento na compra)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
