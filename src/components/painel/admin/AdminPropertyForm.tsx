@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
@@ -94,6 +95,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   // Investor linking state (only for new properties)
   const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
+
+  // Wizard step state
+  const [step, setStep] = useState(1);
+  const totalSteps = propertyId ? 2 : 3;
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -290,9 +295,38 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     return `Verifique o campo '${label}'.`;
   };
 
+  const validateStep1 = (): boolean => {
+    const parsedForm = propertyFormSchema.safeParse({
+      type: form.type,
+      title: form.title,
+      location: form.location,
+      state_code: form.state_code,
+      total_shares: form.total_shares || 1,
+      share_price: form.share_price || 0,
+      status: form.status,
+      estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
+      estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
+      estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
+      estimated_timeline: form.estimated_timeline,
+    });
+    if (!parsedForm.success) {
+      toast({ title: p.error, description: getValidationErrorMessage(parsedForm.error), variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (step === 1 && !validateStep1()) return;
+    setStep((s) => Math.min(s + 1, totalSteps));
+  };
+
+  const handleBack = () => setStep((s) => Math.max(s - 1, 1));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
 
     const parsedForm = propertyFormSchema.safeParse({
       type: form.type,
@@ -432,24 +466,50 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
   };
 
-  // No longer needed - dialog handles its own investor list
+  const stepTitles = propertyId
+    ? ["Informações", "Imagens"]
+    : ["Informações", "Imagens", "Investidores"];
 
   return (
-    <div className="space-y-6">
-      <button
-        onClick={onClose}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Voltar
-      </button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+        <DialogHeader>
+          <DialogTitle>{propertyId ? "Editar Imóvel" : "Novo Imóvel"}</DialogTitle>
+          {/* Step indicator */}
+          <div className="flex items-center gap-2 pt-3">
+            {stepTitles.map((title, i) => {
+              const n = i + 1;
+              const active = step === n;
+              const done = step > n;
+              return (
+                <div key={title} className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : done
+                          ? "bg-primary/20 text-primary"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {n}
+                    </span>
+                    <span className={`text-xs font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                      {title}
+                    </span>
+                  </div>
+                  {n < stepTitles.length && <span className="w-6 h-px bg-border" />}
+                </div>
+              );
+            })}
+          </div>
+        </DialogHeader>
 
-      <Card className="bg-card/50 border-border/50">
-        <CardHeader>
-          <CardTitle>{propertyId ? "Editar Imóvel" : "Novo Imóvel"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* ===== STEP 1: Informações ===== */}
+          {step === 1 && (
+            <>
             {/* Type */}
             <div className="space-y-2">
               <Label>Tipo</Label>
@@ -617,106 +677,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               />
             </div>
 
-            {/* ===== Investor Linking Section (only for new properties) ===== */}
-            {!propertyId && (
-              <div className="space-y-3 rounded-xl border border-border/50 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="h-4 w-4 text-primary" />
-                    <Label className="text-sm font-semibold">Vincular Investidores</Label>
-                  </div>
-                  {totalProjeto > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      Falta: <span className="font-semibold text-foreground">${formatUSD(Math.max(remaining, 0))}</span> de ${formatUSD(totalProjeto)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Progress bar */}
-                {totalProjeto > 0 && totalLinked > 0 && (
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Vinculado: ${formatUSD(totalLinked)}</span>
-                      <span>Total: ${formatUSD(totalProjeto)}</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${Math.min((totalLinked / totalProjeto) * 100, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Listed investors to link */}
-                {investorsToLink.length > 0 && (
-                  <div className="space-y-1.5">
-                    {investorsToLink.map((inv, idx) => {
-                      const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
-                      const amount = inv.rawAmount / 100;
-                      const totalFee = investorEntryFees(inv.fees);
-                      const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
-
-                      return (
-                        <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
-                          <div className="flex flex-col gap-0.5">
-                            <div>
-                              <span className="font-medium">{profile?.full_name || "Usuário"}</span>
-                              <span className="text-muted-foreground ml-2">({pct}%)</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="text-right">
-                              <p className="font-semibold">${formatUSD(amount)}</p>
-                              {totalFee > 0 && (
-                                <p className="text-[10px] text-amber-500">Taxas: ${formatUSD(totalFee)}</p>
-                              )}
-                              {totalFee === 0 && (
-                                <p className="text-[10px] text-emerald-500">Sem taxas</p>
-                              )}
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-destructive"
-                              onClick={() => removeInvestorFromList(idx)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 w-full"
-                  onClick={() => setShowLinkDialog(true)}
-                  disabled={remaining <= 0 && totalProjeto > 0}
-                >
-                  <UserPlus className="h-4 w-4" /> Vincular Investidor
-                </Button>
-
-                <LinkInvestorDialog
-                  open={showLinkDialog}
-                  onOpenChange={setShowLinkDialog}
-                  propertyType={form.type}
-                  totalProject={totalProjeto}
-                  renovationCost={renovationCost}
-                  estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
-                  remaining={remaining}
-                  onLink={addInvestorFromDialog}
-                  isPending={false}
-                  reservedCreditsMap={reservedCredits}
-                />
-              </div>
-            )}
-
             {/* Status */}
             <div className="space-y-2">
               <Label>Status</Label>
@@ -734,7 +694,12 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <option value="sold">Vendido</option>
               </select>
             </div>
+            </>
+          )}
 
+          {/* ===== STEP 2: Imagens ===== */}
+          {step === 2 && (
+            <>
             {/* Cover Image */}
             <div className="space-y-2">
               <Label>Foto de Capa</Label>
@@ -794,19 +759,135 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 Enviando imagem...
               </div>
             )}
+            </>
+          )}
 
-            <div className="flex gap-3">
+          {/* ===== STEP 3: Investidores (only for new properties) ===== */}
+          {step === 3 && !propertyId && (
+            <div className="space-y-3 rounded-xl border border-border/50 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4 text-primary" />
+                  <Label className="text-sm font-semibold">Vincular Investidores</Label>
+                </div>
+                {totalProjeto > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    Falta: <span className="font-semibold text-foreground">${formatUSD(Math.max(remaining, 0))}</span> de ${formatUSD(totalProjeto)}
+                  </span>
+                )}
+              </div>
+
+              {/* Progress bar */}
+              {totalProjeto > 0 && totalLinked > 0 && (
+                <div>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>Vinculado: ${formatUSD(totalLinked)}</span>
+                    <span>Total: ${formatUSD(totalProjeto)}</span>
+                  </div>
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all"
+                      style={{ width: `${Math.min((totalLinked / totalProjeto) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Listed investors to link */}
+              {investorsToLink.length > 0 && (
+                <div className="space-y-1.5">
+                  {investorsToLink.map((inv, idx) => {
+                    const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
+                    const amount = inv.rawAmount / 100;
+                    const totalFee = investorEntryFees(inv.fees);
+                    const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
+
+                    return (
+                      <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
+                        <div className="flex flex-col gap-0.5">
+                          <div>
+                            <span className="font-medium">{profile?.full_name || "Usuário"}</span>
+                            <span className="text-muted-foreground ml-2">({pct}%)</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <p className="font-semibold">${formatUSD(amount)}</p>
+                            {totalFee > 0 && (
+                              <p className="text-[10px] text-amber-500">Taxas: ${formatUSD(totalFee)}</p>
+                            )}
+                            {totalFee === 0 && (
+                              <p className="text-[10px] text-emerald-500">Sem taxas</p>
+                            )}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive"
+                            onClick={() => removeInvestorFromList(idx)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2 w-full"
+                onClick={() => setShowLinkDialog(true)}
+                disabled={remaining <= 0 && totalProjeto > 0}
+              >
+                <UserPlus className="h-4 w-4" /> Vincular Investidor
+              </Button>
+
+              <LinkInvestorDialog
+                open={showLinkDialog}
+                onOpenChange={setShowLinkDialog}
+                propertyType={form.type}
+                totalProject={totalProjeto}
+                renovationCost={renovationCost}
+                estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
+                remaining={remaining}
+                onLink={addInvestorFromDialog}
+                isPending={false}
+                reservedCreditsMap={reservedCredits}
+              />
+            </div>
+          )}
+
+          {/* Footer navigation */}
+          <div className="flex gap-3 pt-2">
+            {step > 1 ? (
+              <Button type="button" variant="outline" onClick={handleBack} className="flex-1">
+                <ArrowLeft className="h-4 w-4" /> Voltar
+              </Button>
+            ) : (
               <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 Cancelar
               </Button>
+            )}
+
+            {step < totalSteps ? (
+              <Button type="button" variant="cta" onClick={handleNext} className="flex-1">
+                Próximo
+              </Button>
+            ) : (
               <Button type="submit" variant="cta" className="flex-1" disabled={loading || uploading}>
                 {loading && <Loader2 className="animate-spin" />}
                 {propertyId ? "Salvar Alterações" : "Criar Imóvel"}
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            )}
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
+
