@@ -392,7 +392,7 @@ export function LinkInvestorDialog({
                 />
                 <FeeField
                   label="Reforma"
-                  hint="% da reforma (proporcional) ou valor fixo"
+                  hint="% sobre o aporte ou valor fixo"
                   mode={renoMode}
                   value={renoValue}
                   onModeChange={setRenoMode}
@@ -401,7 +401,7 @@ export function LinkInvestorDialog({
                 />
                 <FeeField
                   label="Vendas"
-                  hint="% da venda (proporcional) ou valor fixo"
+                  hint="% sobre o aporte ou valor fixo"
                   mode={salesMode}
                   value={salesValue}
                   onModeChange={setSalesMode}
