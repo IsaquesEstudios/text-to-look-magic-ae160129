@@ -92,6 +92,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
+  // Timeline split state
+  const [timelineValue, setTimelineValue] = useState("");
+  const [timelineUnit, setTimelineUnit] = useState<"months" | "years">("months");
+
   // Investor linking state (only for new properties)
   const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
@@ -185,6 +189,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           estimated_timeline: property.estimated_timeline ?? "",
           doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
+        // Parse timeline string like "6 meses" or "2 anos"
+        const tl = property.estimated_timeline ?? "";
+        const match = tl.match(/^(\d+)\s*(meses?|anos?|months?|years?)/i);
+        if (match) {
+          setTimelineValue(match[1]);
+          const unitStr = match[2].toLowerCase();
+          if (unitStr.startsWith("ano") || unitStr.startsWith("year")) {
+            setTimelineUnit("years");
+          } else {
+            setTimelineUnit("months");
+          }
+        } else {
+          setTimelineValue("");
+          setTimelineUnit("months");
+        }
         setCoverImage(property.cover_image_url);
       }
 
@@ -339,7 +358,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       estimated_auction_value: parseMaskedUSD(form.estimated_auction_value),
       estimated_renovation_cost: parseMaskedUSD(form.estimated_renovation_cost),
       estimated_sale_value: parseMaskedUSD(form.estimated_sale_value),
-      estimated_timeline: form.estimated_timeline,
+      estimated_timeline: timelineValue
+        ? `${timelineValue} ${timelineUnit === "months" ? "meses" : "anos"}`
+        : "",
     });
 
     if (!parsedForm.success) {
@@ -393,7 +414,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         estimated_auction_value: validated.estimated_auction_value,
         estimated_renovation_cost: validated.estimated_renovation_cost,
         estimated_sale_value: validated.estimated_sale_value,
-        estimated_timeline: validated.estimated_timeline.trim(),
+        estimated_timeline: timelineValue
+          ? `${timelineValue} ${timelineUnit === "months" ? "meses" : "anos"}`
+          : "",
         doc_commission_rate: parseFloat(form.doc_commission_rate) || 10,
       };
 
@@ -666,33 +689,46 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {form.doc_commission_rate}%) / Projeto</p>
             </div>
 
-            {/* Timeline */}
-            <div className="space-y-2">
-              <Label htmlFor="timeline">Prazo Estimado</Label>
-              <Input
-                id="timeline"
-                value={form.estimated_timeline}
-                onChange={(e) => setForm({ ...form, estimated_timeline: e.target.value })}
-                placeholder="Ex: 6 meses"
-              />
-            </div>
-
-            {/* Status */}
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="available">Disponível</option>
-                <option value="auctioned">Arrematado</option>
-                <option value="waiting_permit">Aguardando Alvará</option>
-                <option value="renovation_in_progress">Reforma em Andamento</option>
-                <option value="for_sale">À Venda</option>
-                <option value="under_contract">Sob Contrato</option>
-                <option value="sold">Vendido</option>
-              </select>
+            {/* Timeline & Status */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="timelineValue">Prazo Estimado</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="timelineValue"
+                    type="number"
+                    min="1"
+                    value={timelineValue}
+                    onChange={(e) => setTimelineValue(e.target.value)}
+                    placeholder="6"
+                    className="flex-1"
+                  />
+                  <select
+                    value={timelineUnit}
+                    onChange={(e) => setTimelineUnit(e.target.value as "months" | "years")}
+                    className="h-10 rounded-md border border-input bg-background px-3 text-sm w-28 shrink-0"
+                  >
+                    <option value="months">meses</option>
+                    <option value="years">anos</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="available">Disponível</option>
+                  <option value="auctioned">Arrematado</option>
+                  <option value="waiting_permit">Aguardando Alvará</option>
+                  <option value="renovation_in_progress">Reforma em Andamento</option>
+                  <option value="for_sale">À Venda</option>
+                  <option value="under_contract">Sob Contrato</option>
+                  <option value="sold">Vendido</option>
+                </select>
+              </div>
             </div>
             </>
           )}
