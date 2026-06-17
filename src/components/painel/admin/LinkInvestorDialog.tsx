@@ -480,7 +480,7 @@ export function LinkInvestorDialog({
               )}
               {feesExceedAporte && (
                 <p className="text-destructive font-medium mt-1">
-                  ⚠ A soma das taxas (${formatUSD(totalAllFees)}) não pode ultrapassar o valor do aporte (${formatUSD(netInvestment)})
+                  ⚠ As taxas consomem todo o aporte. Aumente o valor do aporte ou reduza as taxas.
                 </p>
               )}
               {netInvestment <= maxLinkableByRemaining && totalDeduction > userMaxCredits && (
