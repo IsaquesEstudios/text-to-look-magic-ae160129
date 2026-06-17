@@ -272,8 +272,17 @@ export function LinkInvestorDialog({
             </div>
           </div>
 
+          {missingPropertyValues && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive font-medium">
+              ⚠ Para vincular um investidor, preencha os valores de Arremate, Reforma e Venda do imóvel.
+            </div>
+          )}
+
+          {!missingPropertyValues && (
+          <>
           {/* Step 1: Search investor */}
           <div>
+
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">1. Investidor</label>
             {!selectedUserId ? (
               <>
