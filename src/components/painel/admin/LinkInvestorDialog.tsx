@@ -470,6 +470,7 @@ export function LinkInvestorDialog({
                 netInvestment <= 0 ||
                 netInvestment > maxLinkableByRemaining ||
                 totalDeduction > userMaxCredits ||
+                feesExceedAporte ||
                 isPending
               }
               onClick={handleLink}
@@ -481,7 +482,10 @@ export function LinkInvestorDialog({
               Cancelar
             </Button>
           </div>
+          </>
+          )}
         </div>
+
       </DialogContent>
     </Dialog>
   );
