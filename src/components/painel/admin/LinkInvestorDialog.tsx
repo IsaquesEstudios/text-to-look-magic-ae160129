@@ -477,16 +477,19 @@ export function LinkInvestorDialog({
               )}
               {estimatedSaleValue > 0 && totalProject > 0 && (
                 <>
-                  {docCommissionRate > 0 && (
-                    <div className="text-[10px] text-muted-foreground px-1">
+                  <div className="text-[10px] text-muted-foreground px-1 space-y-0.5">
+                    {docCommissionRate > 0 && (
                       <span className="block">
-                        Base do retorno: ${formatUSD(estimatedSaleValue)} - {docCommissionRate}% doc = ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))}
+                        Venda líquida: ${formatUSD(estimatedSaleValue)} - {docCommissionRate}% doc = ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))}
                       </span>
-                      <span className="block mt-0.5 opacity-75">
-                        Os cálculos de lucro e retorno são feitos sobre esse valor líquido.
-                      </span>
-                    </div>
-                  )}
+                    )}
+                    <span className="block">
+                      Lucro do projeto: ${formatUSD(Math.max(estimatedSaleValue * (1 - docCommissionRate / 100), 0))} - ${formatUSD(totalProject)} (custo) = ${formatUSD(Math.max(totalProfit, 0))}
+                    </span>
+                    <span className="block opacity-75">
+                      O retorno do investidor é a sua parte do lucro ({(participation * 100).toFixed(1)}% de participação).
+                    </span>
+                  </div>
                   <div className="border-t border-border/50 pt-1.5 flex justify-between">
                     <span className="font-medium text-foreground">Retorno Est. Investidor</span>
                     <span className="font-bold text-emerald-500">
