@@ -454,6 +454,11 @@ export function LinkInvestorDialog({
                   ⚠ Aporte excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
                 </p>
               )}
+              {feesExceedAporte && (
+                <p className="text-destructive font-medium mt-1">
+                  ⚠ A soma das taxas (${formatUSD(totalAllFees)}) não pode ultrapassar o valor do aporte (${formatUSD(netInvestment)})
+                </p>
+              )}
               {netInvestment <= maxLinkableByRemaining && totalDeduction > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
