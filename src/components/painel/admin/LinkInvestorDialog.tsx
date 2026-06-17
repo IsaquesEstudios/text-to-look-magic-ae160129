@@ -297,7 +297,7 @@ export function LinkInvestorDialog({
 
           {missingPropertyValues && (
             <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive font-medium">
-              ⚠ Para vincular um investidor, preencha os valores de Arremate, Reforma e Venda do imóvel.
+              ⚠ Para vincular um investidor, preencha os valores de {isLand ? "Arremate e Venda do terreno" : "Arremate, Reforma e Venda do imóvel"}.
             </div>
           )}
 
