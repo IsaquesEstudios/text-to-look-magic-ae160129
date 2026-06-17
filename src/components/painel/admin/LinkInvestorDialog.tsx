@@ -42,9 +42,10 @@ interface FeeFieldProps {
   onModeChange: (m: FeeMode) => void;
   onValueChange: (v: string) => void;
   computed: number;
+  usdOnly?: boolean;
 }
 
-function FeeField({ label, hint, mode, value, onModeChange, onValueChange, computed }: FeeFieldProps) {
+function FeeField({ label, hint, mode, value, onModeChange, onValueChange, computed, usdOnly }: FeeFieldProps) {
   return (
     <div className="rounded-lg border border-border p-3 space-y-2">
       <div className="flex items-center justify-between">
@@ -52,26 +53,30 @@ function FeeField({ label, hint, mode, value, onModeChange, onValueChange, compu
           <p className="text-sm font-medium text-foreground">{label}</p>
           <p className="text-[10px] text-muted-foreground">{hint}</p>
         </div>
-        <div className="flex rounded-md border border-border overflow-hidden">
-          <button
-            type="button"
-            onClick={() => onModeChange("pct")}
-            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
-              mode === "pct" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
-            }`}
-          >
-            %
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange("usd")}
-            className={`px-2.5 py-1 text-xs font-medium transition-colors ${
-              mode === "usd" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
-            }`}
-          >
-            $
-          </button>
-        </div>
+        {usdOnly ? (
+          <span className="px-2.5 py-1 text-xs font-medium rounded-md border border-border bg-primary text-primary-foreground">$</span>
+        ) : (
+          <div className="flex rounded-md border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => onModeChange("pct")}
+              className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                mode === "pct" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+              }`}
+            >
+              %
+            </button>
+            <button
+              type="button"
+              onClick={() => onModeChange("usd")}
+              className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                mode === "usd" ? "bg-primary text-primary-foreground" : "bg-secondary/30 text-muted-foreground"
+              }`}
+            >
+              $
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -179,8 +184,8 @@ export function LinkInvestorDialog({
     return isNaN(n) || n < 0 ? 0 : n;
   };
 
-  // Compute each fee in USD
-  const feeService = serviceMode === "pct" ? (netInvestment * num(serviceValue)) / 100 : num(serviceValue);
+  // Compute each fee in USD. Service is always a real (USD) value.
+  const feeService = num(serviceValue);
   const feeRenovation =
     renoMode === "pct" ? (participation * renovationCost * num(renoValue)) / 100 : num(renoValue);
   const feeSales =
@@ -194,7 +199,16 @@ export function LinkInvestorDialog({
   const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
   const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
 
+  // The sum of all fees (Discovery's charges) cannot exceed the aporte.
+  const totalAllFees = round2(feeService + feeRenovation + feeSales + feeProfitUsd);
+  const feesExceedAporte = netInvestment > 0 && totalAllFees > round2(netInvestment);
+
+  // Required property values to link an investor.
+  const auctionValue = round2(totalProject - renovationCost);
+  const missingPropertyValues = auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
+
   const maxLinkableByRemaining = Math.max(remaining, 0);
+
 
   const resetForm = () => {
     setSearch("");
@@ -213,7 +227,7 @@ export function LinkInvestorDialog({
   };
 
   const handleLink = () => {
-    if (netInvestment <= 0 || !selectedUserId) return;
+    if (netInvestment <= 0 || !selectedUserId || missingPropertyValues || feesExceedAporte) return;
     onLink(selectedUserId, netInvestment, {
       feeService: round2(feeService),
       feeRenovation: round2(feeRenovation),
@@ -222,6 +236,7 @@ export function LinkInvestorDialog({
     });
     resetForm();
   };
+
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -257,8 +272,17 @@ export function LinkInvestorDialog({
             </div>
           </div>
 
+          {missingPropertyValues && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive font-medium">
+              ⚠ Para vincular um investidor, preencha os valores de Arremate, Reforma e Venda do imóvel.
+            </div>
+          )}
+
+          {!missingPropertyValues && (
+          <>
           {/* Step 1: Search investor */}
           <div>
+
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">1. Investidor</label>
             {!selectedUserId ? (
               <>
@@ -342,12 +366,13 @@ export function LinkInvestorDialog({
               <div className="space-y-2">
                 <FeeField
                   label="Serviço"
-                  hint="% sobre o aporte ou valor fixo"
+                  hint="Valor fixo cobrado pela Discovery"
                   mode={serviceMode}
                   value={serviceValue}
                   onModeChange={setServiceMode}
                   onValueChange={setServiceValue}
                   computed={round2(feeService)}
+                  usdOnly
                 />
                 <FeeField
                   label="Reforma"
@@ -429,6 +454,11 @@ export function LinkInvestorDialog({
                   ⚠ Aporte excede o restante do projeto (disponível: ${formatUSD(maxLinkableByRemaining)})
                 </p>
               )}
+              {feesExceedAporte && (
+                <p className="text-destructive font-medium mt-1">
+                  ⚠ A soma das taxas (${formatUSD(totalAllFees)}) não pode ultrapassar o valor do aporte (${formatUSD(netInvestment)})
+                </p>
+              )}
               {netInvestment <= maxLinkableByRemaining && totalDeduction > userMaxCredits && (
                 <p className="text-destructive font-medium mt-1">
                   ⚠ Saldo insuficiente (disponível: ${formatUSD(userMaxCredits)})
@@ -446,6 +476,7 @@ export function LinkInvestorDialog({
                 netInvestment <= 0 ||
                 netInvestment > maxLinkableByRemaining ||
                 totalDeduction > userMaxCredits ||
+                feesExceedAporte ||
                 isPending
               }
               onClick={handleLink}
@@ -457,7 +488,10 @@ export function LinkInvestorDialog({
               Cancelar
             </Button>
           </div>
+          </>
+          )}
         </div>
+
       </DialogContent>
     </Dialog>
   );
