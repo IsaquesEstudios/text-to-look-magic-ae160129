@@ -173,10 +173,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           total_shares: String(property.total_shares),
           share_price: String(property.share_price),
           status: property.status,
-          estimated_auction_value: String(property.estimated_auction_value ?? 0),
-          estimated_renovation_cost: String(property.estimated_renovation_cost ?? 0),
+          estimated_auction_value: formatUSD(property.estimated_auction_value ?? 0),
+          estimated_renovation_cost: formatUSD(property.estimated_renovation_cost ?? 0),
           estimated_return_pct: String(property.estimated_return_pct ?? 0),
-          estimated_sale_value: String(property.estimated_sale_value ?? 0),
+          estimated_sale_value: formatUSD(property.estimated_sale_value ?? 0),
           estimated_timeline: property.estimated_timeline ?? "",
           doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
