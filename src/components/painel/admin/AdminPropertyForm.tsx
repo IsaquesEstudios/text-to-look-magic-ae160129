@@ -189,6 +189,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
           estimated_timeline: property.estimated_timeline ?? "",
           doc_commission_rate: String((property as any).doc_commission_rate ?? 10),
         });
+        // Parse timeline string like "6 meses" or "2 anos"
+        const tl = property.estimated_timeline ?? "";
+        const match = tl.match(/^(\d+)\s*(meses?|anos?|months?|years?)/i);
+        if (match) {
+          setTimelineValue(match[1]);
+          const unitStr = match[2].toLowerCase();
+          if (unitStr.startsWith("ano") || unitStr.startsWith("year")) {
+            setTimelineUnit("years");
+          } else {
+            setTimelineUnit("months");
+          }
+        } else {
+          setTimelineValue("");
+          setTimelineUnit("months");
+        }
         setCoverImage(property.cover_image_url);
       }
 
