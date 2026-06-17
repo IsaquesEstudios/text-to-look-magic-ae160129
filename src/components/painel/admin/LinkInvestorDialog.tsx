@@ -107,6 +107,7 @@ function FeeField({ label, hint, mode, value, onModeChange, onValueChange, compu
 export function LinkInvestorDialog({
   open,
   onOpenChange,
+  propertyType,
   totalProject,
   renovationCost,
   remaining,
