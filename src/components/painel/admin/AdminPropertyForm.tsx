@@ -708,7 +708,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   propertyType={form.type}
                   totalProject={totalProjeto}
                   renovationCost={renovationCost}
-                  estimatedSaleValue={parseFloat(form.estimated_sale_value) || 0}
+                  estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
                   remaining={remaining}
                   onLink={addInvestorFromDialog}
                   isPending={false}
