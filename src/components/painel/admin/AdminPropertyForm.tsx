@@ -577,7 +577,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <Label>Retorno Estimado (%)</Label>
               <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
                 {(() => {
-                  const saleVal = parseFloat(form.estimated_sale_value) || 0;
+                  const saleVal = parseMaskedUSD(form.estimated_sale_value);
                   const dcRate = parseFloat(form.doc_commission_rate) || 10;
                   const docComm = saleVal * (dcRate / 100);
                   const profit = saleVal - totalProjeto - docComm;
