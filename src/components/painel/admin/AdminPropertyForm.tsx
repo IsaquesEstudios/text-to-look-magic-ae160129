@@ -608,52 +608,80 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             </div>
 
             {/* Auction & Renovation Values */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
-                <Input
-                  id="auctionValue"
-                  type="text"
-                  inputMode="decimal"
-                  value={form.estimated_auction_value}
-                  onChange={(e) => setForm({ ...form, estimated_auction_value: maskUSDInput(e.target.value) })}
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
-                <Input
-                  id="renovationCost"
-                  type="text"
-                  inputMode="decimal"
-                  value={form.estimated_renovation_cost}
-                  onChange={(e) => setForm({ ...form, estimated_renovation_cost: maskUSDInput(e.target.value) })}
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-
-            {/* Total + Sale Value */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Total Est. do Projeto ($)</Label>
-                <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
-                  {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {form.type === "land" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
+                  <Input
+                    id="auctionValue"
+                    type="text"
+                    inputMode="decimal"
+                    value={form.estimated_auction_value}
+                    onChange={(e) => setForm({ ...form, estimated_auction_value: maskUSDInput(e.target.value) })}
+                    placeholder="0.00"
+                  />
                 </div>
-                <p className="text-xs text-muted-foreground">Arremate + Reforma</p>
+                <div className="space-y-2">
+                  <Label htmlFor="saleValue">Valor Est. de Venda ($)</Label>
+                  <Input
+                    id="saleValue"
+                    type="text"
+                    inputMode="decimal"
+                    value={form.estimated_sale_value}
+                    onChange={(e) => setForm({ ...form, estimated_sale_value: maskUSDInput(e.target.value) })}
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="saleValue">Valor Est. de Venda ($)</Label>
-                <Input
-                  id="saleValue"
-                  type="text"
-                  inputMode="decimal"
-                  value={form.estimated_sale_value}
-                  onChange={(e) => setForm({ ...form, estimated_sale_value: maskUSDInput(e.target.value) })}
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="auctionValue">Valor Est. de Arremate ($)</Label>
+                    <Input
+                      id="auctionValue"
+                      type="text"
+                      inputMode="decimal"
+                      value={form.estimated_auction_value}
+                      onChange={(e) => setForm({ ...form, estimated_auction_value: maskUSDInput(e.target.value) })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="renovationCost">Valor Est. de Reforma ($)</Label>
+                    <Input
+                      id="renovationCost"
+                      type="text"
+                      inputMode="decimal"
+                      value={form.estimated_renovation_cost}
+                      onChange={(e) => setForm({ ...form, estimated_renovation_cost: maskUSDInput(e.target.value) })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Total Est. do Projeto ($)</Label>
+                    <div className="flex items-center h-10 rounded-md border border-input bg-muted/50 px-3 text-sm font-medium">
+                      {totalProjeto.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Arremate + Reforma</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="saleValue">Valor Est. de Venda ($)</Label>
+                    <Input
+                      id="saleValue"
+                      type="text"
+                      inputMode="decimal"
+                      value={form.estimated_sale_value}
+                      onChange={(e) => setForm({ ...form, estimated_sale_value: maskUSDInput(e.target.value) })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Doc Commission Rate */}
             <div className="space-y-2">
