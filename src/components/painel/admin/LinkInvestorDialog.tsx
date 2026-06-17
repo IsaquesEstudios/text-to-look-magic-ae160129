@@ -170,8 +170,34 @@ export function LinkInvestorDialog({
   const selectedInvestor = investorsWithCredits?.find((i) => i.user_id === selectedUserId);
   const userMaxCredits = getAvailableCredits(selectedUserId);
 
-  // Net investment = the aporte typed (fees added on top)
-  const netInvestment = linkRawAmount / 100;
+  const num = (s: string) => {
+    const n = parseFloat(s);
+    return isNaN(n) || n < 0 ? 0 : n;
+  };
+
+  // The aporte typed = total amount debited. Entry fees are taken FROM the aporte,
+  // so: netInvestment = aporte - entryFees (no fees added on top).
+  const grossAporte = linkRawAmount / 100;
+
+  // Service is always a fixed USD value.
+  const feeService = num(serviceValue);
+
+  // Fixed (USD-mode) entry fees are independent of participation.
+  const fixedEntryFees =
+    feeService +
+    (renoMode === "usd" ? num(renoValue) : 0) +
+    (salesMode === "usd" ? num(salesValue) : 0);
+
+  // Percentage-mode entry fees scale with participation = netInvestment / totalProject.
+  // grossAporte = netInvestment + fixedEntryFees + netInvestment * kPct
+  // => netInvestment = (grossAporte - fixedEntryFees) / (1 + kPct)
+  const kPct =
+    totalProject > 0
+      ? (renoMode === "pct" ? (renovationCost * num(renoValue)) / 100 : 0) / totalProject +
+        (salesMode === "pct" ? (estimatedSaleValue * num(salesValue)) / 100 : 0) / totalProject
+      : 0;
+
+  const netInvestment = Math.max((grossAporte - fixedEntryFees) / (1 + kPct), 0);
   const participation = totalProject > 0 ? netInvestment / totalProject : 0;
 
   // Investor gross estimated profit
@@ -179,13 +205,7 @@ export function LinkInvestorDialog({
   const totalProfit = estimatedSaleValue - totalProject - docComm;
   const grossProfit = totalProfit > 0 ? totalProfit * participation : 0;
 
-  const num = (s: string) => {
-    const n = parseFloat(s);
-    return isNaN(n) || n < 0 ? 0 : n;
-  };
-
-  // Compute each fee in USD. Service is always a real (USD) value.
-  const feeService = num(serviceValue);
+  // Compute each entry fee in USD using the resolved net investment.
   const feeRenovation =
     renoMode === "pct" ? (participation * renovationCost * num(renoValue)) / 100 : num(renoValue);
   const feeSales =
@@ -195,13 +215,13 @@ export function LinkInvestorDialog({
 
   const round2 = (n: number) => Math.round(n * 100) / 100;
   const entryFees = round2(feeService + feeRenovation + feeSales);
-  const totalDeduction = round2(netInvestment + entryFees);
+  // Total debited equals the aporte typed (fees are inside it).
+  const totalDeduction = round2(grossAporte);
   const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
   const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
 
-  // The sum of all fees (Discovery's charges) cannot exceed the aporte.
-  const totalAllFees = round2(feeService + feeRenovation + feeSales + feeProfitUsd);
-  const feesExceedAporte = netInvestment > 0 && totalAllFees > round2(netInvestment);
+  // The sum of entry fees cannot consume the entire aporte (net must be > 0).
+  const feesExceedAporte = grossAporte > 0 && netInvestment <= 0;
 
   // Required property values to link an investor.
   const auctionValue = round2(totalProject - renovationCost);
@@ -334,7 +354,7 @@ export function LinkInvestorDialog({
           {selectedUserId && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                2. Valor do aporte (investimento líquido)
+                2. Valor do aporte (total debitado — taxas inclusas)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -410,6 +430,10 @@ export function LinkInvestorDialog({
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
+                <span className="text-muted-foreground">Aporte (debitado)</span>
+                <span className="font-semibold text-foreground">${formatUSD(grossAporte)}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-muted-foreground">Investimento líquido</span>
                 <span className="font-semibold text-foreground">${formatUSD(netInvestment)}</span>
               </div>
@@ -456,7 +480,7 @@ export function LinkInvestorDialog({
               )}
               {feesExceedAporte && (
                 <p className="text-destructive font-medium mt-1">
-                  ⚠ A soma das taxas (${formatUSD(totalAllFees)}) não pode ultrapassar o valor do aporte (${formatUSD(netInvestment)})
+                  ⚠ As taxas consomem todo o aporte. Aumente o valor do aporte ou reduza as taxas.
                 </p>
               )}
               {netInvestment <= maxLinkableByRemaining && totalDeduction > userMaxCredits && (
