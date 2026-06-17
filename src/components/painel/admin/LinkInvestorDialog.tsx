@@ -184,8 +184,8 @@ export function LinkInvestorDialog({
     return isNaN(n) || n < 0 ? 0 : n;
   };
 
-  // Compute each fee in USD
-  const feeService = serviceMode === "pct" ? (netInvestment * num(serviceValue)) / 100 : num(serviceValue);
+  // Compute each fee in USD. Service is always a real (USD) value.
+  const feeService = num(serviceValue);
   const feeRenovation =
     renoMode === "pct" ? (participation * renovationCost * num(renoValue)) / 100 : num(renoValue);
   const feeSales =
@@ -199,7 +199,16 @@ export function LinkInvestorDialog({
   const estimatedReturn = Math.max(grossProfit - feeProfitUsd, 0);
   const returnPct = netInvestment > 0 ? (estimatedReturn / netInvestment) * 100 : 0;
 
+  // The sum of all fees (Discovery's charges) cannot exceed the aporte.
+  const totalAllFees = round2(feeService + feeRenovation + feeSales + feeProfitUsd);
+  const feesExceedAporte = netInvestment > 0 && totalAllFees > round2(netInvestment);
+
+  // Required property values to link an investor.
+  const auctionValue = round2(totalProject - renovationCost);
+  const missingPropertyValues = auctionValue <= 0 || renovationCost <= 0 || estimatedSaleValue <= 0;
+
   const maxLinkableByRemaining = Math.max(remaining, 0);
+
 
   const resetForm = () => {
     setSearch("");
