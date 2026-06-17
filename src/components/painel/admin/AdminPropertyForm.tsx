@@ -939,11 +939,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             )}
 
             {step < totalSteps ? (
-              <Button type="button" variant="cta" onClick={handleNext} className="flex-1">
+              <Button key="next-btn" type="button" variant="cta" onClick={handleNext} className="flex-1">
                 Próximo
               </Button>
             ) : (
-              <Button type="submit" variant="cta" className="flex-1" disabled={loading || uploading}>
+              <Button key="submit-btn" type="button" variant="cta" className="flex-1" disabled={loading || uploading} onClick={() => handleSubmit()}>
                 {loading && <Loader2 className="animate-spin" />}
                 {propertyId ? "Salvar Alterações" : "Criar Imóvel"}
               </Button>
