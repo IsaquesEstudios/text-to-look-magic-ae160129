@@ -366,12 +366,13 @@ export function LinkInvestorDialog({
               <div className="space-y-2">
                 <FeeField
                   label="Serviço"
-                  hint="% sobre o aporte ou valor fixo"
+                  hint="Valor fixo cobrado pela Discovery"
                   mode={serviceMode}
                   value={serviceValue}
                   onModeChange={setServiceMode}
                   onValueChange={setServiceValue}
                   computed={round2(feeService)}
+                  usdOnly
                 />
                 <FeeField
                   label="Reforma"
