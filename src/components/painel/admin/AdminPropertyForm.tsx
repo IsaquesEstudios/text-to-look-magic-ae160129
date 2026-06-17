@@ -95,6 +95,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
 
+  // Wizard step state
+  const [step, setStep] = useState(1);
+  const totalSteps = propertyId ? 2 : 3;
+
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
     queryFn: async () => {
