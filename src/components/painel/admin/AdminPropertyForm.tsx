@@ -332,6 +332,30 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
       toast({ title: p.error, description: getValidationErrorMessage(parsedForm.error), variant: "destructive" });
       return false;
     }
+
+    // Financial values must be greater than zero
+    const auctionVal = parseMaskedUSD(form.estimated_auction_value);
+    const saleVal = parseMaskedUSD(form.estimated_sale_value);
+    if (auctionVal <= 0) {
+      toast({ title: p.error, description: "O campo 'Valor Est. de Arremate' deve ser maior que zero.", variant: "destructive" });
+      return false;
+    }
+    if (saleVal <= 0) {
+      toast({ title: p.error, description: "O campo 'Valor Est. de Venda' deve ser maior que zero.", variant: "destructive" });
+      return false;
+    }
+    if (form.type === "house") {
+      const renoVal = parseMaskedUSD(form.estimated_renovation_cost);
+      if (renoVal <= 0) {
+        toast({ title: p.error, description: "O campo 'Valor Est. de Reforma' deve ser maior que zero.", variant: "destructive" });
+        return false;
+      }
+    }
+    if (!timelineValue) {
+      toast({ title: p.error, description: "O campo 'Prazo Estimado' é obrigatório.", variant: "destructive" });
+      return false;
+    }
+
     return true;
   };
 
