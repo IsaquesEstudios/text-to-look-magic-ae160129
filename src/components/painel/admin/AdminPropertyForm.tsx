@@ -689,33 +689,46 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               <p className="text-xs text-muted-foreground">Calculado: (Venda − Projeto − Doc.&Comissão {form.doc_commission_rate}%) / Projeto</p>
             </div>
 
-            {/* Timeline */}
-            <div className="space-y-2">
-              <Label htmlFor="timeline">Prazo Estimado</Label>
-              <Input
-                id="timeline"
-                value={form.estimated_timeline}
-                onChange={(e) => setForm({ ...form, estimated_timeline: e.target.value })}
-                placeholder="Ex: 6 meses"
-              />
-            </div>
-
-            {/* Status */}
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="available">Disponível</option>
-                <option value="auctioned">Arrematado</option>
-                <option value="waiting_permit">Aguardando Alvará</option>
-                <option value="renovation_in_progress">Reforma em Andamento</option>
-                <option value="for_sale">À Venda</option>
-                <option value="under_contract">Sob Contrato</option>
-                <option value="sold">Vendido</option>
-              </select>
+            {/* Timeline & Status */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="timelineValue">Prazo Estimado</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="timelineValue"
+                    type="number"
+                    min="1"
+                    value={timelineValue}
+                    onChange={(e) => setTimelineValue(e.target.value)}
+                    placeholder="6"
+                    className="flex-1"
+                  />
+                  <select
+                    value={timelineUnit}
+                    onChange={(e) => setTimelineUnit(e.target.value as "months" | "years")}
+                    className="h-10 rounded-md border border-input bg-background px-3 text-sm w-28 shrink-0"
+                  >
+                    <option value="months">meses</option>
+                    <option value="years">anos</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="available">Disponível</option>
+                  <option value="auctioned">Arrematado</option>
+                  <option value="waiting_permit">Aguardando Alvará</option>
+                  <option value="renovation_in_progress">Reforma em Andamento</option>
+                  <option value="for_sale">À Venda</option>
+                  <option value="under_contract">Sob Contrato</option>
+                  <option value="sold">Vendido</option>
+                </select>
+              </div>
             </div>
             </>
           )}
