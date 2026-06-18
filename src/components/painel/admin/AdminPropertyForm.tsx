@@ -529,7 +529,11 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               const done = step > n;
               return (
                 <div key={title} className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setStep(n)}
+                    className="flex items-center gap-1.5 cursor-pointer"
+                  >
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                         active
@@ -544,7 +548,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                     <span className={`text-xs font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>
                       {title}
                     </span>
-                  </div>
+                  </button>
                   {n < stepTitles.length && <span className="w-6 h-px bg-border" />}
                 </div>
               );
