@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
 import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
+import { PropertyInvestors } from "@/components/painel/property/PropertyInvestors";
 
 interface Props {
   propertyId: string | null;
@@ -102,7 +103,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   // Wizard step state
   const [step, setStep] = useState(1);
-  const totalSteps = propertyId ? 2 : 3;
+  const totalSteps = 3;
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -513,9 +514,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
   };
 
-  const stepTitles = propertyId
-    ? ["Informações", "Imagens"]
-    : ["Informações", "Imagens", "Investidores"];
+  const stepTitles = ["Informações", "Imagens", "Investidores"];
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -848,6 +847,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
               </div>
             )}
             </>
+          )}
+
+          {/* ===== STEP 3: Investidores (editing existing property) ===== */}
+          {step === 3 && propertyId && (
+            <div className="rounded-xl border border-border/50 p-4">
+              <PropertyInvestors
+                propertyId={propertyId}
+                totalProject={totalProjeto}
+                renovationCost={renovationCost}
+                estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
+                docCommissionRate={parseFloat(form.doc_commission_rate) || 10}
+                propertyType={form.type}
+                propertyTitle={form.title}
+              />
+            </div>
           )}
 
           {/* ===== STEP 3: Investidores (only for new properties) ===== */}
