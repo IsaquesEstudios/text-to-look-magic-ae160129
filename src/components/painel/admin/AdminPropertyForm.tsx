@@ -102,7 +102,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   // Wizard step state
   const [step, setStep] = useState(1);
-  const totalSteps = propertyId ? 2 : 3;
+  const totalSteps = 3;
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
