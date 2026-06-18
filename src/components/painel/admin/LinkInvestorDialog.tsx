@@ -471,6 +471,12 @@ export function LinkInvestorDialog({
                   <span className="font-semibold text-amber-500">${formatUSD(round2(feeProfitUsd))}</span>
                 </div>
               )}
+              {entryFees > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Total Discovery (taxas)</span>
+                  <span className="font-semibold text-primary">${formatUSD(round2(entryFees + feeProfitUsd))}</span>
+                </div>
+              )}
               {estimatedSaleValue > 0 && totalProject > 0 && (
                 <>
                   <div className="text-[10px] text-muted-foreground px-1 space-y-0.5">
