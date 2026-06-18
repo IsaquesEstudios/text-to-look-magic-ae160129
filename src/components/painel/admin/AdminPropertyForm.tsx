@@ -849,6 +849,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             </>
           )}
 
+          {/* ===== STEP 3: Investidores (editing existing property) ===== */}
+          {step === 3 && propertyId && (
+            <div className="rounded-xl border border-border/50 p-4">
+              <PropertyInvestors
+                propertyId={propertyId}
+                totalProject={totalProjeto}
+                renovationCost={renovationCost}
+                estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
+                docCommissionRate={parseFloat(form.doc_commission_rate) || 10}
+                propertyType={form.type}
+                propertyTitle={form.title}
+              />
+            </div>
+          )}
+
           {/* ===== STEP 3: Investidores (only for new properties) ===== */}
           {step === 3 && !propertyId && (
             <div className="space-y-3 rounded-xl border border-border/50 p-4">
