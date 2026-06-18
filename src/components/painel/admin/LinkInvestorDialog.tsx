@@ -351,7 +351,7 @@ export function LinkInvestorDialog({
                   <p className="font-medium text-sm">{selectedInvestor?.full_name || "Usuário"}</p>
                   <p className="text-xs text-muted-foreground">Saldo: ${formatUSD(userMaxCredits)}</p>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => { setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setSelectedUserId(""); setLinkRawAmount(0); setLinkDisplayAmount(""); }}>
                   Alterar
                 </Button>
               </div>
@@ -515,6 +515,7 @@ export function LinkInvestorDialog({
           {/* Actions */}
           <div className="flex gap-2 pt-2">
             <Button
+              type="button"
               className="flex-1 gap-2"
               disabled={
                 !selectedUserId ||
@@ -529,7 +530,7 @@ export function LinkInvestorDialog({
               <UserPlus className="h-4 w-4" />
               {isPending ? "Vinculando..." : "Vincular"}
             </Button>
-            <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
               Cancelar
             </Button>
           </div>
