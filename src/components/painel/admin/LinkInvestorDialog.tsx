@@ -201,11 +201,15 @@ export function LinkInvestorDialog({
   const totalProfit = estimatedSaleValue - totalProject - docComm;
   const grossProfit = totalProfit > 0 ? totalProfit * participation : 0;
 
-  const feeProfitUsd = profitMode === "pct" ? (grossProfit * num(profitValue)) / 100 : num(profitValue);
-  const feeProfitRate = profitMode === "pct" ? num(profitValue) : grossProfit > 0 ? (feeProfitUsd / grossProfit) * 100 : 0;
-
   const round2 = (n: number) => Math.round(n * 100) / 100;
   const entryFees = round2(feeService + feeRenovation + feeSales);
+
+  // A taxa de lucro incide sobre o lucro JÁ DESCONTADO das demais taxas
+  // (serviço, reforma e vendas). Ou seja, base = lucro do investidor - taxas.
+  const profitAfterFees = Math.max(grossProfit - entryFees, 0);
+  const feeProfitUsd = profitMode === "pct" ? (profitAfterFees * num(profitValue)) / 100 : num(profitValue);
+  const feeProfitRate = profitMode === "pct" ? num(profitValue) : profitAfterFees > 0 ? (feeProfitUsd / profitAfterFees) * 100 : 0;
+
   // Total debited = aporte (compra) + taxas cobradas à parte.
   const totalDeduction = round2(grossAporte + entryFees);
   // O retorno do investidor é a sua parte do lucro menos TODAS as taxas
