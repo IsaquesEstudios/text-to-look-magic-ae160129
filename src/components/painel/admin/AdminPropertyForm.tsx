@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
 import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
+import { PropertyInvestors } from "@/components/painel/property/PropertyInvestors";
 
 interface Props {
   propertyId: string | null;
