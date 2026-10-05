@@ -3,19 +3,24 @@ import { useState, useEffect, useCallback, useRef } from "react";
 const PING_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`;
 const PING_INTERVAL = 15_000; // 15s
 const PING_TIMEOUT = 5_000;   // 5s
+const MAX_FAILURES = 3;       // only show offline after 3 consecutive failures
 
 /**
  * Robust online detection: combines navigator.onLine with active pings
  * to the backend. Works reliably on mobile where navigator.onLine
- * can return true even without real internet.
+ * can return true even without real internet. Requires several
+ * consecutive failures before declaring offline, so a single
+ * momentary network hiccup doesn't flash the offline screen.
  */
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(true); // optimistic
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const failuresRef = useRef(0);
 
   const checkConnection = useCallback(async () => {
     // Quick fail if browser says offline
     if (typeof navigator !== "undefined" && !navigator.onLine) {
+      failuresRef.current = MAX_FAILURES;
       setIsOnline(false);
       return;
     }
@@ -32,9 +37,13 @@ export function useOnlineStatus() {
       });
 
       clearTimeout(timeout);
+      failuresRef.current = 0;
       setIsOnline(true);
     } catch {
-      setIsOnline(false);
+      failuresRef.current += 1;
+      if (failuresRef.current >= MAX_FAILURES) {
+        setIsOnline(false);
+      }
     }
   }, []);
 
