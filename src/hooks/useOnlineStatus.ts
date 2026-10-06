@@ -69,6 +69,9 @@ export function useOnlineStatus() {
     const onVisibility = () => {
       if (document.visibilityState === "visible") {
         resumedAtRef.current = Date.now();
+        // If the OS reports the network is back, let the person keep using the
+        // app right away while the silent tests confirm the connection.
+        if (navigator.onLine !== false) setIsOnline(true);
         checkConnection();
       }
     };
