@@ -13,6 +13,9 @@ export interface ManualFees {
   feeProfitRate: number;
 }
 
+// Taxas foram removidas do fluxo (Compra > Reforma > Venda)
+const SHOW_FEES = false;
+
 type FeeMode = "pct" | "usd";
 
 function formatUSD(value: number) {
@@ -388,7 +391,7 @@ export function LinkInvestorDialog({
           )}
 
           {/* Step 3: Manual fees */}
-          {selectedUserId && grossAporte > 0 && (
+          {SHOW_FEES && selectedUserId && grossAporte > 0 && (
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">3. Taxas de serviço (Discovery)</label>
               <div className="space-y-2">
@@ -436,7 +439,7 @@ export function LinkInvestorDialog({
           )}
 
           {/* Summary */}
-          {grossAporte > 0 && selectedUserId && (
+          {SHOW_FEES && grossAporte > 0 && selectedUserId && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
