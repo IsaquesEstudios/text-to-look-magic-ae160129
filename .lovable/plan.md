@@ -1,47 +1,36 @@
-## Problema
+## Objetivo
+Separar cada imóvel em 3 etapas: Compra > Reforma > Venda, sem taxas de serviço. O cadastro continua com as estimativas (Arremate, Reforma, Total, Venda, Retorno) como referência.
 
-No modal "Vincular Investidor", o campo **Reforma (modo %)** está calculando a taxa de forma proporcional à participação no projeto:
+## Como vai funcionar
 
-```text
-taxa = participação × custo_de_reforma × 10%
-     = (9.130 / 100.000) × 9.530 × 10%  ≈  $869,57
-```
+**1. Compra**
+- Meta: valor estimado de arremate.
+- O admin vincula usuários e informa quanto cada um investiu na compra (sai do saldo de créditos; volta se o vínculo for removido).
+- Botão "Concluir compra" muda o status para Reforma.
 
-Isso não corresponde à regra real: os **10% são a taxa de serviço cobrada sobre o aporte do investidor**. Com aporte de $10.000, a taxa deveria ser **$1.000** (10% direto sobre o valor investido).
+**2. Reforma**
+- Meta: reforma estimada (terrenos pulam esta etapa).
+- Qualquer usuário pode fazer aportes, mesmo quem não participou da compra. O valor sai do saldo.
+- Botão "Concluir reforma" muda o status para À Venda.
 
-## Mudança
+**3. Venda**
+- Resumo por investidor: compra + reforma = total investido, em $ e %.
+- Novos campos: Documentação de Venda ($) e Comissão do Corretor ($), além do valor de venda.
+- Cálculo automático: lucro = venda − documentação − comissão − total investido. Cada investidor recebe o lucro proporcional ao seu % do total, e o sistema mostra o retorno estimado de cada um.
 
-Alterar o cálculo das taxas em **modo %** para incidirem **diretamente sobre o aporte digitado**, e não sobre custos do projeto ponderados por participação:
+**Regras gerais**
+- Valores e investidores podem ser alterados a qualquer momento, em qualquer etapa (edição ajusta o saldo pela diferença).
+- O admin pode voltar uma etapa se precisar.
+- Todas as taxas (serviço, reforma, vendas, lucro) saem da tela de vinculação. Vínculos antigos com taxas continuam com estorno correto.
 
-```text
-taxa_reforma (%)  = aporte × (% reforma) / 100   →  10% de 10.000 = $1.000
-taxa_vendas (%)   = aporte × (% vendas)  / 100
-```
-
-O modo **$ (valor fixo)** continua igual (valor digitado é a taxa).
-
-### Como o aporte/líquido fica
-
-Mantendo a regra atual de que o **aporte digitado = total debitado** (taxas inclusas):
-
-```text
-Aporte (debitado)     = $10.000,00
-Taxa de reforma (10%) = $1.000,00
-Investimento líquido  = $9.000,00
-```
-
-Ou seja, `investimento_líquido = aporte − soma_das_taxas`, com as taxas % calculadas sobre o aporte.
-
-## Arquivo afetado
-
-- `src/components/painel/admin/LinkInvestorDialog.tsx`
-  - Substituir a fórmula de `kPct` / `netInvestment` baseada em participação por: somar todas as taxas (fixas + %), onde as % incidem sobre `grossAporte`, e definir `netInvestment = grossAporte − somaTaxas`.
-  - Ajustar `feeRenovation` e `feeSales` no modo % para `grossAporte * pct / 100` (em vez de `participation * custo * pct / 100`).
-  - Recalcular `participation` a partir do novo `netInvestment` para os cálculos de lucro/retorno.
-  - Atualizar os textos de dica (hint) para refletir "% sobre o aporte" em vez de "proporcional".
+## Documentos
+- Recibos: na lista de depósitos que entram na conta, botão para abrir o recibo dentro do sistema (visualizador em janela, sem sair do app).
+- Contratos: na página de contratos que já existe, botão para abrir o PDF dentro do sistema.
 
 ## Detalhes técnicos
-
-- A taxa de **lucro** continua sobre o lucro estimado (não muda).
-- A validação `feesExceedAporte` passa a checar se a soma das taxas % + fixas ≥ aporte.
-- O resumo da operação continua mostrando Aporte → Taxas → Investimento líquido, agora com os valores novos (ex.: reforma $1.000).
+- `shares`: nova coluna `phase` ('purchase' | 'renovation', padrão 'purchase'); vínculos atuais ficam como compra.
+- `properties`: novas colunas `sale_doc_cost`, `broker_commission` (padrão 0). Status reaproveita os existentes (auctioned/renovation_in_progress/for_sale/sold).
+- Novas RPCs SECURITY DEFINER: `admin_link_investor_phase(property, user, amount, phase)`, `admin_update_share_amount(share, new_amount)` (debita/estorna a diferença), `admin_remove_share(share)`; registram em `credit_transactions`. `admin_unlink_investor` e `admin_delete_property` mantidos para estornos legados.
+- Validação: soma da compra ≤ arremate estimado e da reforma ≤ reforma estimada apenas como aviso (não bloqueia, pois valores reais podem variar).
+- UI: novo componente de etapas no detalhe do imóvel e na etapa Investidores do `AdminPropertyForm`; `LinkInvestorDialog` simplificado (usuário + valor + etapa). Visualizador de PDF/imagem reutilizável para recibos e contratos.
+- Testes: cálculo de lucro e divisão proporcional por investidor.
