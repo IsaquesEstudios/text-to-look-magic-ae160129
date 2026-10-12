@@ -198,17 +198,16 @@ export default function UserComprovantesPage() {
                   className="group relative rounded-xl overflow-hidden border border-border/40 bg-card"
                 >
                   {isPdf(item.image_url) ? (
-                    <a
-                      href={item.image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImage(item.image_url)}
+                      className="w-full flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
                     >
                       <FileText className="h-10 w-10 text-muted-foreground/50 mb-2" />
                       <span className="text-xs text-muted-foreground truncate max-w-[90%] px-2">
                         {item.description || "PDF"}
                       </span>
-                    </a>
+                    </button>
                   ) : (
                     <button
                       onClick={() => setSelectedImage(item.image_url)}
@@ -261,17 +260,16 @@ export default function UserComprovantesPage() {
                   className="group relative rounded-xl overflow-hidden border border-border/40 bg-card"
                 >
                   {isPdf(item.image_url) ? (
-                    <a
-                      href={item.image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImage(item.image_url)}
+                      className="w-full flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
                     >
                       <FileText className="h-10 w-10 text-muted-foreground/50 mb-2" />
                       <span className="text-xs text-muted-foreground truncate max-w-[90%] px-2">
                         {item.description || "PDF"}
                       </span>
-                    </a>
+                    </button>
                   ) : (
                     <button
                       onClick={() => setSelectedImage(item.image_url)}
@@ -339,15 +337,26 @@ export default function UserComprovantesPage() {
       </Tabs>
 
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-3xl p-2">
-          {selectedImage && (
+        <DialogContent className={isPdfUrl(selectedImage) ? "sm:max-w-4xl h-[85vh] flex flex-col p-4" : "max-w-3xl p-2"}>
+          {selectedImage && (isPdfUrl(selectedImage) ? (
+            <>
+              <a href={selectedImage} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">Abrir em nova aba</a>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(selectedImage)}&embedded=true`}
+                className="w-full flex-1 min-h-[70vh] rounded-lg border border-border/50"
+                title="Recibo"
+              />
+            </>
+          ) : (
             <img src={selectedImage} alt="" className="w-full rounded-lg" />
-          )}
+          ))}
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
+const isPdfUrl = (u: string | null) => !!u && /\.pdf(\?|$)/i.test(u);
 
 const EmptyState = forwardRef<HTMLDivElement, { text: string; icon?: React.ReactNode }>(
   ({ text, icon }, ref) => (
