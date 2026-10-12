@@ -499,6 +499,7 @@ export type Database = {
       properties: {
         Row: {
           available_shares: number
+          broker_commission: number
           cover_image_url: string | null
           created_at: string
           created_by: string
@@ -512,6 +513,7 @@ export type Database = {
           id: string
           location: string
           purchase_price: number
+          sale_doc_cost: number
           share_price: number
           state_code: string | null
           status: string
@@ -522,6 +524,7 @@ export type Database = {
         }
         Insert: {
           available_shares?: number
+          broker_commission?: number
           cover_image_url?: string | null
           created_at?: string
           created_by: string
@@ -535,6 +538,7 @@ export type Database = {
           id?: string
           location: string
           purchase_price: number
+          sale_doc_cost?: number
           share_price: number
           state_code?: string | null
           status?: string
@@ -545,6 +549,7 @@ export type Database = {
         }
         Update: {
           available_shares?: number
+          broker_commission?: number
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
@@ -558,6 +563,7 @@ export type Database = {
           id?: string
           location?: string
           purchase_price?: number
+          sale_doc_cost?: number
           share_price?: number
           state_code?: string | null
           status?: string
@@ -752,6 +758,7 @@ export type Database = {
           fee_service: number
           id: string
           investment_plan: string
+          phase: string
           property_id: string
           purchased_at: string
           quantity: number
@@ -765,6 +772,7 @@ export type Database = {
           fee_service?: number
           id?: string
           investment_plan?: string
+          phase?: string
           property_id: string
           purchased_at?: string
           quantity?: number
@@ -778,6 +786,7 @@ export type Database = {
           fee_service?: number
           id?: string
           investment_plan?: string
+          phase?: string
           property_id?: string
           purchased_at?: string
           quantity?: number
@@ -922,6 +931,15 @@ export type Database = {
         Args: { p_property_id: string }
         Returns: undefined
       }
+      admin_link_investor_phase: {
+        Args: {
+          p_amount: number
+          p_phase: string
+          p_property_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       admin_link_investor_to_property: {
         Args: {
           p_amount: number
@@ -935,8 +953,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_remove_share: { Args: { p_share_id: string }; Returns: undefined }
       admin_unlink_investor: {
         Args: { p_property_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_update_share_amount: {
+        Args: { p_new_amount: number; p_share_id: string }
         Returns: undefined
       }
       auto_finish_expired_auctions: { Args: never; Returns: undefined }
