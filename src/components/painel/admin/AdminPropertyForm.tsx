@@ -434,7 +434,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
   };
 
-  const stepTitles = ["Informações", "Imagens", "Investidores"];
+  const stepTitles = propertyId
+    ? ["Informações", "Imagens", "Investidores"]
+    : ["Informações", "Imagens"];
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
