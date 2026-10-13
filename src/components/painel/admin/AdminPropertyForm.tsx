@@ -12,8 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
-import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
+import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
 import { PropertyInvestors } from "@/components/painel/property/PropertyInvestors";
 
 interface Props {
@@ -21,12 +20,6 @@ interface Props {
   onClose: () => void;
 }
 
-interface InvestorToLink {
-  userId: string;
-  rawAmount: number;
-  displayAmount: string;
-  fees: ManualFees;
-}
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
 const MAX_PROPERTY_ROI = 99_999.99;
@@ -62,9 +55,6 @@ function maskUSDInput(raw: string): string {
   return (num / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function investorEntryFees(fees: ManualFees): number {
-  return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
-}
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { user } = useAuth();
@@ -97,13 +87,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [timelineValue, setTimelineValue] = useState("");
   const [timelineUnit, setTimelineUnit] = useState<"months" | "years">("months");
 
-  // Investor linking state (only for new properties)
-  const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
-  const [showLinkDialog, setShowLinkDialog] = useState(false);
-
-  // Wizard step state
+  // Wizard step state (investors step only when editing)
   const [step, setStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = propertyId ? 3 : 2;
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
@@ -116,54 +102,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     },
   });
 
-  // Fetch investors with credits (only when not editing)
-  const { data: investorsWithCredits } = useQuery({
-    queryKey: ["investors-with-credits-form"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, credits")
-        .eq("status", "approved")
-        .order("full_name");
-      if (error) throw error;
-      const { data: adminRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin");
-      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
-      return data.filter((profile) => !adminIds.has(profile.user_id));
-    },
-    enabled: !propertyId,
-  });
-
   const auctionValue = parseMaskedUSD(form.estimated_auction_value);
   const renovationCost = parseMaskedUSD(form.estimated_renovation_cost);
   const totalProjeto = auctionValue + renovationCost;
-  const hasInvestors = investorsToLink.length > 0;
   const totalProjetoComTaxas = totalProjeto;
-
-  // Calculate already-added amounts per investor
-  const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
-  const remaining = totalProjeto - totalLinked;
-
-  // Build a map of credits already "reserved" by pending links (aporte + entry fees)
-  const reservedCredits = new Map<string, number>();
-  for (const investor of investorsToLink) {
-    const amount = investor.rawAmount / 100;
-    const fee = investorEntryFees(investor.fees);
-    reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
-  }
-
-  const addInvestorFromDialog = (userId: string, amount: number, fees: ManualFees) => {
-    const rawAmount = Math.round(amount * 100);
-    const displayAmount = amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, fees }]);
-    setShowLinkDialog(false);
-  };
-
-  const removeInvestorFromList = (index: number) => {
-    setInvestorsToLink((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
-  };
 
   useEffect(() => {
     if (!propertyId) return;
@@ -476,28 +418,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         }
       }
 
-      if (propId && !propertyId && investorsToLink.length > 0) {
-        for (const investor of investorsToLink) {
-          const amount = investor.rawAmount / 100;
-          const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
-            p_property_id: propId,
-            p_user_id: investor.userId,
-            p_amount: amount,
-            p_property_title: validated.title.trim(),
-            p_fee_service: investor.fees.feeService,
-            p_fee_renovation: investor.fees.feeRenovation,
-            p_fee_sales: investor.fees.feeSales,
-            p_fee_profit_rate: investor.fees.feeProfitRate,
-          });
-          if (error) {
-            toast({
-              title: p.error,
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        }
-      }
 
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
       invalidateAll();
@@ -514,7 +434,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     }
   };
 
-  const stepTitles = ["Informações", "Imagens", "Investidores"];
+  const stepTitles = propertyId
+    ? ["Informações", "Imagens", "Investidores"]
+    : ["Informações", "Imagens"];
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -868,105 +790,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             </div>
           )}
 
-          {/* ===== STEP 3: Investidores (only for new properties) ===== */}
-          {step === 3 && !propertyId && (
-            <div className="space-y-3 rounded-xl border border-border/50 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4 text-primary" />
-                  <Label className="text-sm font-semibold">Vincular Investidores</Label>
-                </div>
-                {totalProjeto > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    Falta: <span className="font-semibold text-foreground">${formatUSD(Math.max(remaining, 0))}</span> de ${formatUSD(totalProjeto)}
-                  </span>
-                )}
-              </div>
-
-              {/* Progress bar */}
-              {totalProjeto > 0 && totalLinked > 0 && (
-                <div>
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>Vinculado: ${formatUSD(totalLinked)}</span>
-                    <span>Total: ${formatUSD(totalProjeto)}</span>
-                  </div>
-                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${Math.min((totalLinked / totalProjeto) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Listed investors to link */}
-              {investorsToLink.length > 0 && (
-                <div className="space-y-1.5">
-                  {investorsToLink.map((inv, idx) => {
-                    const profile = investorsWithCredits?.find((p) => p.user_id === inv.userId);
-                    const amount = inv.rawAmount / 100;
-                    const totalFee = investorEntryFees(inv.fees);
-                    const pct = totalProjeto > 0 ? ((amount / totalProjeto) * 100).toFixed(1) : "0";
-
-                    return (
-                      <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-secondary/20 text-sm">
-                        <div className="flex flex-col gap-0.5">
-                          <div>
-                            <span className="font-medium">{profile?.full_name || "Usuário"}</span>
-                            <span className="text-muted-foreground ml-2">({pct}%)</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <p className="font-semibold">${formatUSD(amount)}</p>
-                            {totalFee > 0 && (
-                              <p className="text-[10px] text-amber-500">Taxas: ${formatUSD(totalFee)}</p>
-                            )}
-                            {totalFee === 0 && (
-                              <p className="text-[10px] text-emerald-500">Sem taxas</p>
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-destructive"
-                            onClick={() => removeInvestorFromList(idx)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2 w-full"
-                onClick={() => setShowLinkDialog(true)}
-                disabled={remaining <= 0 && totalProjeto > 0}
-              >
-                <UserPlus className="h-4 w-4" /> Vincular Investidor
-              </Button>
-
-              <LinkInvestorDialog
-                open={showLinkDialog}
-                onOpenChange={setShowLinkDialog}
-                propertyType={form.type}
-                totalProject={totalProjeto}
-                renovationCost={renovationCost}
-                estimatedSaleValue={parseMaskedUSD(form.estimated_sale_value)}
-                remaining={remaining}
-                onLink={addInvestorFromDialog}
-                isPending={false}
-                reservedCreditsMap={reservedCredits}
-              />
-            </div>
-          )}
 
           {/* Footer navigation */}
           <div className="flex gap-3 pt-2">
