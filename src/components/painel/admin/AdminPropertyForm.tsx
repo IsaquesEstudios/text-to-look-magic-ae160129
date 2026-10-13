@@ -102,54 +102,10 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
     },
   });
 
-  // Fetch investors with credits (only when not editing)
-  const { data: investorsWithCredits } = useQuery({
-    queryKey: ["investors-with-credits-form"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, credits")
-        .eq("status", "approved")
-        .order("full_name");
-      if (error) throw error;
-      const { data: adminRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin");
-      const adminIds = new Set(adminRoles?.map((r) => r.user_id) ?? []);
-      return data.filter((profile) => !adminIds.has(profile.user_id));
-    },
-    enabled: !propertyId,
-  });
-
   const auctionValue = parseMaskedUSD(form.estimated_auction_value);
   const renovationCost = parseMaskedUSD(form.estimated_renovation_cost);
   const totalProjeto = auctionValue + renovationCost;
-  const hasInvestors = investorsToLink.length > 0;
   const totalProjetoComTaxas = totalProjeto;
-
-  // Calculate already-added amounts per investor
-  const totalLinked = investorsToLink.reduce((sum, investor) => sum + investor.rawAmount / 100, 0);
-  const remaining = totalProjeto - totalLinked;
-
-  // Build a map of credits already "reserved" by pending links (aporte + entry fees)
-  const reservedCredits = new Map<string, number>();
-  for (const investor of investorsToLink) {
-    const amount = investor.rawAmount / 100;
-    const fee = investorEntryFees(investor.fees);
-    reservedCredits.set(investor.userId, (reservedCredits.get(investor.userId) ?? 0) + amount + fee);
-  }
-
-  const addInvestorFromDialog = (userId: string, amount: number, fees: ManualFees) => {
-    const rawAmount = Math.round(amount * 100);
-    const displayAmount = amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    setInvestorsToLink((prev) => [...prev, { userId, rawAmount, displayAmount, fees }]);
-    setShowLinkDialog(false);
-  };
-
-  const removeInvestorFromList = (index: number) => {
-    setInvestorsToLink((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
-  };
 
   useEffect(() => {
     if (!propertyId) return;
