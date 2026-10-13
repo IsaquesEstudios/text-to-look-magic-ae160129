@@ -225,7 +225,7 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
           );
         })}
 
-        <Button type="button" variant="outline" size="sm" className="w-full gap-2" onClick={() => setLinkPhase(ph)}>
+        <Button type="button" variant="outline" size="sm" className="h-10 sm:h-9 w-full shrink-0 gap-2" onClick={() => setLinkPhase(ph)}>
           <UserPlus className="h-3.5 w-3.5" /> Vincular Investidor
         </Button>
       </div>
@@ -276,12 +276,12 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
       {active === currentPhase && (
         <div className="flex flex-col sm:flex-row gap-2">
           {prev && (
-            <Button type="button" variant="outline" size="sm" className="gap-1.5" disabled={statusMut.isPending} onClick={() => goTo(prev)}>
+            <Button type="button" variant="outline" size="sm" className="h-10 sm:h-9 w-full sm:w-auto shrink-0 gap-1.5" disabled={statusMut.isPending} onClick={() => goTo(prev)}>
               <ArrowLeft className="h-3.5 w-3.5" /> Voltar para {meta[prev].label}
             </Button>
           )}
           {next && (
-            <Button type="button" variant="cta" size="sm" className="flex-1 gap-1.5" disabled={statusMut.isPending}
+            <Button type="button" variant="cta" size="sm" className="h-10 sm:h-9 w-full sm:w-auto sm:flex-1 shrink-0 gap-1.5" disabled={statusMut.isPending}
               onClick={() => { if (confirm(`Concluir ${meta[currentPhase].label} e avançar para ${meta[next].label}?`)) goTo(next); }}>
               Concluir {meta[currentPhase].label} <ArrowRight className="h-3.5 w-3.5" />
             </Button>
