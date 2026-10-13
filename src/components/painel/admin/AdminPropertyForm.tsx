@@ -418,28 +418,6 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
         }
       }
 
-      if (propId && !propertyId && investorsToLink.length > 0) {
-        for (const investor of investorsToLink) {
-          const amount = investor.rawAmount / 100;
-          const { error } = await supabase.rpc("admin_link_investor_to_property" as any, {
-            p_property_id: propId,
-            p_user_id: investor.userId,
-            p_amount: amount,
-            p_property_title: validated.title.trim(),
-            p_fee_service: investor.fees.feeService,
-            p_fee_renovation: investor.fees.feeRenovation,
-            p_fee_sales: investor.fees.feeSales,
-            p_fee_profit_rate: investor.fees.feeProfitRate,
-          });
-          if (error) {
-            toast({
-              title: p.error,
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        }
-      }
 
       toast({ title: propertyId ? "Imóvel atualizado!" : "Imóvel criado!" });
       invalidateAll();
