@@ -183,11 +183,11 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
           const isEd = editing?.id === s.id;
           const pct = total > 0 ? (Number(s.amount_paid) / total) * 100 : 0;
           return (
-            <div key={s.id} className="flex items-center justify-between gap-3 rounded-lg border border-border/50 bg-card/50 px-4 py-3">
-              <Link to={`/painel/usuarios/${s.user_id}`} className="text-sm font-medium truncate hover:text-primary flex items-center gap-1.5">
-                {nameOf(s.user_id)} <ExternalLink className="h-3 w-3 text-muted-foreground" />
+            <div key={s.id} className="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-border/50 bg-card/50 px-4 py-3">
+              <Link to={`/painel/usuarios/${s.user_id}`} className="min-w-0 text-sm font-medium hover:text-primary flex items-center gap-1.5">
+                <span className="min-w-0 break-words">{nameOf(s.user_id)}</span> <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
               </Link>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end gap-2 shrink-0">
                 {isEd ? (
                   <>
                     <div className="relative w-32">
@@ -234,23 +234,23 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
   return (
     <div className="space-y-4">
       {/* Stepper */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {phases.map((ph, i) => {
           const M = meta[ph];
           const done = phases.indexOf(currentPhase) > i;
           const isCurrent = currentPhase === ph;
           return (
-            <div key={ph} className="flex items-center gap-2 flex-1">
-              <button type="button" onClick={() => setViewPhase(ph)}
-                className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+            <div key={ph} className="flex flex-col sm:flex-row items-center gap-2 sm:flex-1 min-w-0">
+              <Button type="button" variant="ghost" onClick={() => setViewPhase(ph)}
+                className={`w-full sm:w-auto sm:flex-1 h-auto min-h-10 flex flex-wrap items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium whitespace-normal transition-colors ${
                   active === ph ? "border-primary bg-primary/10 text-primary" : "border-border/50 text-muted-foreground hover:bg-secondary/30"
                 }`}>
                 <M.icon className="h-4 w-4" />
                 {i + 1}. {M.label}
                 {isCurrent && <span className="text-[9px] uppercase tracking-wider rounded bg-primary text-primary-foreground px-1.5 py-0.5">atual</span>}
                 {done && <Check className="h-3 w-3" />}
-              </button>
-              {i < phases.length - 1 && <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />}
+              </Button>
+              {i < phases.length - 1 && <ArrowRight className="h-3.5 w-3.5 rotate-90 sm:rotate-0 text-muted-foreground/50 flex-shrink-0" />}
             </div>
           );
         })}
@@ -273,7 +273,7 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
 
       {/* Phase advance */}
       {active === currentPhase && (
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {prev && (
             <Button type="button" variant="outline" size="sm" className="gap-1.5" disabled={statusMut.isPending} onClick={() => goTo(prev)}>
               <ArrowLeft className="h-3.5 w-3.5" /> Voltar para {meta[prev].label}
