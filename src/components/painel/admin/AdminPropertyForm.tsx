@@ -55,9 +55,6 @@ function maskUSDInput(raw: string): string {
   return (num / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function investorEntryFees(fees: ManualFees): number {
-  return Math.round((fees.feeService + fees.feeRenovation + fees.feeSales) * 100) / 100;
-}
 
 export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const { user } = useAuth();
@@ -90,13 +87,9 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
   const [timelineValue, setTimelineValue] = useState("");
   const [timelineUnit, setTimelineUnit] = useState<"months" | "years">("months");
 
-  // Investor linking state (only for new properties)
-  const [investorsToLink, setInvestorsToLink] = useState<InvestorToLink[]>([]);
-  const [showLinkDialog, setShowLinkDialog] = useState(false);
-
-  // Wizard step state
+  // Wizard step state (investors step only when editing)
   const [step, setStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = propertyId ? 3 : 2;
 
   const { data: usStates } = useQuery({
     queryKey: ["us-states"],
