@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ShoppingCart, Hammer, Handshake, UserPlus, Trash2, Pencil, Check, X, Search, ArrowRight, ArrowLeft, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { computeSaleResults, phaseFromStatus, type Phase } from "@/lib/propertyPhases";
 
 interface Props {
@@ -387,6 +388,17 @@ function LinkPhaseDialog({ phase, onClose, onLink, isPending, title }: {
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState("");
   const [amount, setAmount] = useState("");
+  const isMobile = useIsMobile();
+
+  // No celular, nomes longos quebram o layout: mostra só nome + segundo nome.
+  const shortName = (full?: string | null) => {
+    const name = (full ?? "").trim();
+    if (!name) return "Usuário";
+    if (!isMobile) return name;
+    const parts = name.split(/\s+/);
+    return parts.length > 2 ? `${parts[0]} ${parts[1]}` : name;
+  };
+
 
   const { data: users } = useQuery({
     queryKey: ["investors-with-credits-dialog"],
@@ -424,18 +436,18 @@ function LinkPhaseDialog({ phase, onClose, onLink, isPending, title }: {
               <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-border p-1">
                 {filtered.map((u) => (
                   <button key={u.user_id} type="button" onClick={() => setUserId(u.user_id)}
-                    className="w-full flex justify-between rounded-md px-3 py-2 text-sm hover:bg-secondary/40">
-                    <span>{u.full_name || "Usuário"}</span>
-                    <span className="text-xs text-muted-foreground">${fmt(Number(u.credits))}</span>
+                    className="w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm hover:bg-secondary/40">
+                    <span className="min-w-0 truncate">{shortName(u.full_name)}</span>
+                    <span className="text-xs text-muted-foreground shrink-0">${fmt(Number(u.credits))}</span>
                   </button>
                 ))}
                 {filtered.length === 0 && <p className="text-xs text-muted-foreground text-center py-3">Nenhum usuário</p>}
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2 text-sm">
-              <div>
-                <p className="font-medium">{sel.full_name}</p>
+            <div className="flex items-center justify-between gap-2 rounded-lg bg-secondary/30 px-3 py-2 text-sm">
+              <div className="min-w-0">
+                <p className="font-medium truncate">{shortName(sel.full_name)}</p>
                 <p className="text-xs text-muted-foreground">Saldo: ${fmt(Number(sel.credits))}</p>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => setUserId("")}>Alterar</Button>
