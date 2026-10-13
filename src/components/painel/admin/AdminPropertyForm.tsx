@@ -12,8 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Upload, X, Loader2, UserPlus, Trash2 } from "lucide-react";
-import { LinkInvestorDialog, type ManualFees } from "@/components/painel/admin/LinkInvestorDialog";
+import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
 import { PropertyInvestors } from "@/components/painel/property/PropertyInvestors";
 
 interface Props {
@@ -21,12 +20,6 @@ interface Props {
   onClose: () => void;
 }
 
-interface InvestorToLink {
-  userId: string;
-  rawAmount: number;
-  displayAmount: string;
-  fees: ManualFees;
-}
 
 const MAX_PROPERTY_AMOUNT = 9_999_999_999.99;
 const MAX_PROPERTY_ROI = 99_999.99;
