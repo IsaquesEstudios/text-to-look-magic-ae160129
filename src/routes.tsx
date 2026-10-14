@@ -1,7 +1,7 @@
 import { Suspense, lazy } from "react";
 import type { RouteObject } from "react-router-dom";
 import { AdminGuard } from "@/components/painel/AdminGuard";
-import discoveryLogo from "@/assets/discovery-logo.png";
+import { AnimatedLogo } from "@/components/AnimatedLogo";
 import {
   DashboardSkeleton,
   AuctionsSkeleton,
@@ -48,8 +48,7 @@ const PainelLayoutModule = lazy(() =>
 
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-    <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
-    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+    <AnimatedLogo size={96} />
   </div>
 );
 
