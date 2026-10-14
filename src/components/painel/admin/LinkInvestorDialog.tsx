@@ -299,7 +299,7 @@ export function LinkInvestorDialog({
             )}
             <div>
               <p className="text-muted-foreground">Disponível</p>
-              <p className="font-semibold text-emerald-500">${formatUSD(Math.max(remaining, 0))}</p>
+              <p className="font-semibold text-primary">${formatUSD(Math.max(remaining, 0))}</p>
             </div>
           </div>
 
@@ -497,7 +497,7 @@ export function LinkInvestorDialog({
                   </div>
                   <div className="border-t border-border pt-1.5 flex justify-between">
                     <span className="font-medium text-foreground">Retorno Est. Investidor</span>
-                    <span className="font-bold text-emerald-500">
+                    <span className="font-bold text-primary">
                       ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)
                     </span>
                   </div>

@@ -235,7 +235,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                     )}
                   </div>
                   {isFullyCovered ? (
-                    <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 gap-1">
+                    <Badge className="bg-primary/10 text-primary border-primary/30 gap-1">
                       <CheckCircle className="h-3 w-3" /> Coberto
                     </Badge>
                   ) : totalProject > 0 ? (

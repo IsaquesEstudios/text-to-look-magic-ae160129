@@ -40,11 +40,11 @@ const langLabel = (code: string) => {
 const statusBadge = (status: string) => {
   switch (status) {
     case "pending":
-      return <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
+      return <Badge variant="outline" className="text-warning border-warning/30 gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
     case "approved":
       return <Badge variant="outline" className="text-primary border-primary/30 gap-1"><UserCheck className="h-3 w-3" /> Aprovado</Badge>;
     case "rejected":
-      return <Badge variant="outline" className="text-red-500 border-red-500/30 gap-1"><UserX className="h-3 w-3" /> Rejeitado</Badge>;
+      return <Badge variant="outline" className="text-destructive border-destructive/30 gap-1"><UserX className="h-3 w-3" /> Rejeitado</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
@@ -134,7 +134,7 @@ function RegistrationCard({ reg, onUpdateStatus, isPending }: {
                   onClick={() => onUpdateStatus(reg.user_id, "approved")} disabled={isPending}>
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
-                <Button size="sm" variant="outline" className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1 h-8 text-xs"
+                <Button size="sm" variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1 h-8 text-xs"
                   onClick={() => onUpdateStatus(reg.user_id, "rejected")} disabled={isPending}>
                   <X className="h-3.5 w-3.5" /> Rejeitar
                 </Button>

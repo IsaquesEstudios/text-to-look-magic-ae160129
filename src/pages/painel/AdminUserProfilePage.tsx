@@ -571,7 +571,7 @@ export default function AdminUserProfilePage() {
                   <strong>{profile.full_name || p.noName}</strong>? {p.deleteUserIrreversible}
                 </p>
                 {hasBalance && (
-                  <Alert variant="destructive" className="border-yellow-500/50 text-yellow-600 [&>svg]:text-yellow-600">
+                  <Alert variant="destructive" className="border-warning/50 text-warning [&>svg]:text-warning">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>{p.balanceWarningTitle}</AlertTitle>
                     <AlertDescription>
@@ -580,7 +580,7 @@ export default function AdminUserProfilePage() {
                   </Alert>
                 )}
                  {hasLinkedProperties && (
-                  <Alert variant="destructive" className="border-orange-500/50 text-orange-600 [&>svg]:text-orange-600">
+                  <Alert variant="destructive" className="border-warning/50 text-warning [&>svg]:text-warning">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>{p.linkedPropertiesTitle}</AlertTitle>
                     <AlertDescription>

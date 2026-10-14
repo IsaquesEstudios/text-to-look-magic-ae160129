@@ -46,12 +46,12 @@ const TYPE_LABELS: Record<ActivityType, string> = {
 const TYPE_COLORS: Record<ActivityType, string> = {
   share_purchase: "bg-info/10 text-info",
   user_registration: "bg-primary/10 text-primary",
-  credit_transaction: "bg-yellow-500/10 text-yellow-500",
-  auction_deposit: "bg-purple-500/10 text-purple-500",
-  property_expense: "bg-orange-500/10 text-orange-500",
+  credit_transaction: "bg-warning/10 text-warning",
+  auction_deposit: "bg-chart-4/10 text-chart-4",
+  property_expense: "bg-warning/10 text-warning",
   property_message: "bg-cyan-500/10 text-cyan-500",
-  auction_created: "bg-red-500/10 text-red-500",
-  property_created: "bg-emerald-500/10 text-emerald-500",
+  auction_created: "bg-destructive/10 text-destructive",
+  property_created: "bg-primary/10 text-primary",
   payment_image: "bg-pink-500/10 text-pink-500",
   property_image: "bg-indigo-500/10 text-indigo-500",
 };
