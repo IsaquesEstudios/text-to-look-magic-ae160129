@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRoutes } from "react-router-dom";
 import { Suspense } from "react";
 import { Loader2, WifiOff } from "lucide-react";
-import discoveryLogo from "@/assets/discovery-logo.png";
+import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { routes } from "./routes";
@@ -26,8 +26,7 @@ const queryClient = new QueryClient({
 
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-    <img src={discoveryLogo} alt="Discovery" className="h-12 mb-6" />
-    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    <AnimatedLogo size={96} />
   </div>
 );
 
