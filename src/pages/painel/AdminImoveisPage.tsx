@@ -73,25 +73,20 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
   };
 
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-3 sm:gap-4`}>
-      {cards.map((card) => (
-        <Card key={card.label} className={`bg-card border-border ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
-          <CardContent className="p-3 sm:p-5">
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-normal">
-                {card.label}
-              </span>
-              <card.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-            </div>
-            <p className={`font-heading text-lg sm:text-xl font-semibold break-words tabular-nums ${(card as any).colorClass || "text-foreground"}`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-2 sm:gap-3`}>
+      {cards.map((card) => {
+        const dark = card.label === "Total Investido" || (card as any).isPercentage;
+        return (
+          <div key={card.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"} ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
+            <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${dark ? "text-background/80" : "text-muted-foreground"}`}>{card.label}</p>
+            <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums ${!dark && (card as any).colorClass ? (card as any).colorClass : ""}`}>
               {(card as any).isPercentage
                 ? `${card.value.toFixed(1)}%`
-                : fmt(card.value)
-              }
+                : `$ ${card.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             </p>
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
