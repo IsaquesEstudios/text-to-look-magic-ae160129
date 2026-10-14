@@ -90,57 +90,36 @@ function DashboardCharts() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-base font-semibold">Total Investido</CardTitle>
-        </CardHeader>
-        <CardContent className="px-2 sm:px-6">
-          <div className="h-[220px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="gradInvestido" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={45} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="investido" name="Investido" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#gradInvestido)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-base font-semibold">Receita Discovery por Mês</CardTitle>
-        </CardHeader>
-        <CardContent className="px-2 sm:px-6">
-          <div className="h-[220px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="gradDiscovery" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={45} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(var(--chart-2))" strokeWidth={2} fill="url(#gradDiscovery)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="bg-card border-border">
+      <CardContent className="px-2 sm:px-6 pt-5">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 px-3 mb-4 text-sm text-foreground">
+          <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-primary" />Total Investido</span>
+          <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-warning" />Receita Discovery por Mês</span>
+        </div>
+        <div className="h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+              <defs>
+                <linearGradient id="gradInvestido" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="gradDiscovery" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--warning))" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="hsl(var(--warning))" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
+              <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={45} />
+              <Tooltip content={<CustomTooltip />} />
+              <Area type="monotone" dataKey="investido" name="Total Investido" stroke="hsl(var(--primary))" strokeWidth={2.5} fill="url(#gradInvestido)" />
+              <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(var(--warning))" strokeWidth={2} fill="url(#gradDiscovery)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -292,14 +271,13 @@ function AdminDashboardContent() {
     );
   }
 
-  const kpis = [
-    { label: "Valor Discovery Atual", value: `$ ${(stats?.adminFees ?? 0).toLocaleString("en-US")}`, icon: DollarSign },
-    { label: "Est. Discovery", value: `$ ${(stats?.projectedRevenue ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
-    { label: "Usuários", value: String(stats?.totalUsers ?? 0), icon: Users },
-    { label: "Imóveis Ativos", value: String(stats?.casas ?? 0), icon: Building2 },
-    { label: "Terrenos Ativos", value: String(stats?.terrenos ?? 0), icon: MapPin },
-    { label: "Total Investido", value: `$ ${(stats?.totalInvested ?? 0).toLocaleString("en-US")}`, icon: TrendingUp },
-  ];
+  const money = (v: number) => `$ ${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const Kpi = ({ label, value, dark }: { label: string; value: string; dark?: boolean }) => (
+    <div className={`rounded-lg border px-3 py-2.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+      <p className={`text-[11px] sm:text-sm truncate ${dark ? "text-background/80" : "text-muted-foreground"}`}>{label}</p>
+      <p className="text-base sm:text-xl font-bold truncate font-heading">{value}</p>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
@@ -308,23 +286,19 @@ function AdminDashboardContent() {
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
-      {/* Mobile: 2-col layout | Desktop: 6 cols */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-6">
-        {kpis.map((card) => (
-          <div
-            key={card.label}
-            className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden"
-          >
-            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <card.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{card.label}</p>
-              <p className="text-sm sm:text-lg font-bold text-foreground truncate">{card.value}</p>
-            </div>
-          </div>
-        ))}
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Kpi label="Valor Discovery Atual" value={money(stats?.adminFees ?? 0)} dark />
+          <Kpi label="Est. Discovery" value={money(stats?.projectedRevenue ?? 0)} />
+        </div>
+        <div className="grid grid-cols-[1fr_1fr_1fr_2fr] gap-3">
+          <Kpi label="Usuários" value={String(stats?.totalUsers ?? 0)} />
+          <Kpi label="Imóveis" value={String(stats?.casas ?? 0)} />
+          <Kpi label="Terrenos" value={String(stats?.terrenos ?? 0)} />
+          <Kpi label="Total Investido" value={money(stats?.totalInvested ?? 0)} dark />
+        </div>
       </div>
+
 
       <DashboardCharts />
 

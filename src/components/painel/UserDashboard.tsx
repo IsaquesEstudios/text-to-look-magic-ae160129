@@ -185,38 +185,20 @@ export function UserDashboard() {
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-4">
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.availableCredit}</p>
-            <p className="text-sm sm:text-lg font-bold text-foreground truncate">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: p.availableCredit, value: `$ ${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, dark: true },
+          { label: p.totalInvested, value: `$ ${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}` },
+          { label: p.estimatedReturn, value: `$ ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, tone: totalEstimatedReturn >= totalInvested ? "" : "text-destructive" },
+          { label: p.estimatedROI, value: `${portfolioRoi.toFixed(1)}%`, dark: true },
+        ].map((k) => (
+          <div key={k.label} className={`rounded-lg border px-3 py-2.5 sm:px-4 sm:py-3 min-w-0 ${k.dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+            <p className={`text-[11px] sm:text-sm truncate ${k.dark ? "text-background/80" : "text-muted-foreground"}`}>{k.label}</p>
+            <p className={`text-base sm:text-xl font-bold truncate font-heading ${(k as any).tone ?? ""}`}>{k.value}</p>
           </div>
-        </div>
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.totalInvested}</p>
-            <p className="text-sm sm:text-lg font-bold text-foreground truncate">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-          </div>
-        </div>
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /></div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.estimatedReturn}</p>
-            <p className={`text-sm sm:text-lg font-bold truncate ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
-              ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.estimatedROI}</p>
-            <p className={`text-sm sm:text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
-          </div>
-        </div>
+        ))}
       </div>
+
 
       <div>
         <div className="flex items-center justify-between mb-3">
