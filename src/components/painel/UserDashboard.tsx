@@ -185,16 +185,16 @@ export function UserDashboard() {
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
         {[
           { label: p.availableCredit, value: `$ ${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, dark: true },
           { label: p.totalInvested, value: `$ ${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}` },
           { label: p.estimatedReturn, value: `$ ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, tone: totalEstimatedReturn >= totalInvested ? "" : "text-destructive" },
           { label: p.estimatedROI, value: `${portfolioRoi.toFixed(1)}%`, dark: true },
         ].map((k) => (
-          <div key={k.label} className={`rounded-lg border px-3 py-2.5 sm:px-4 sm:py-3 min-w-0 ${k.dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
-            <p className={`text-[11px] sm:text-sm truncate ${k.dark ? "text-background/80" : "text-muted-foreground"}`}>{k.label}</p>
-            <p className={`text-base sm:text-xl font-bold truncate font-heading ${(k as any).tone ?? ""}`}>{k.value}</p>
+          <div key={k.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${k.dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+            <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${k.dark ? "text-background/80" : "text-muted-foreground"}`}>{k.label}</p>
+            <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading ${(k as any).tone ?? ""}`}>{k.value}</p>
           </div>
         ))}
       </div>

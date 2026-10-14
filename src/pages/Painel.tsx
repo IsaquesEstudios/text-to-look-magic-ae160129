@@ -91,12 +91,12 @@ function DashboardCharts() {
 
   return (
     <Card className="bg-card border-border">
-      <CardContent className="px-2 sm:px-6 pt-5">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 px-3 mb-4 text-sm text-foreground">
+      <CardContent className="px-1 sm:px-6 pt-3 pb-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 mb-2 text-xs sm:text-sm text-foreground">
           <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-primary" />Total Investido</span>
           <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-warning" />Receita Discovery por Mês</span>
         </div>
-        <div className="h-[260px]">
+        <div className="h-[200px] sm:h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
               <defs>
@@ -273,9 +273,9 @@ function AdminDashboardContent() {
 
   const money = (v: number) => `$ ${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const Kpi = ({ label, value, dark }: { label: string; value: string; dark?: boolean }) => (
-    <div className={`rounded-lg border px-3 py-2.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
-      <p className={`text-[11px] sm:text-sm truncate ${dark ? "text-background/80" : "text-muted-foreground"}`}>{label}</p>
-      <p className="text-base sm:text-xl font-bold truncate font-heading">{value}</p>
+    <div className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+      <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${dark ? "text-background/80" : "text-muted-foreground"}`}>{label}</p>
+      <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading">{value}</p>
     </div>
   );
 
@@ -286,12 +286,12 @@ function AdminDashboardContent() {
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-2 sm:space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <Kpi label="Valor Discovery Atual" value={money(stats?.adminFees ?? 0)} dark />
           <Kpi label="Est. Discovery" value={money(stats?.projectedRevenue ?? 0)} />
         </div>
-        <div className="grid grid-cols-[1fr_1fr_1fr_2fr] gap-3">
+        <div className="grid grid-cols-[1fr_1fr_1fr_2fr] gap-2 sm:gap-3">
           <Kpi label="Usuários" value={String(stats?.totalUsers ?? 0)} />
           <Kpi label="Imóveis" value={String(stats?.casas ?? 0)} />
           <Kpi label="Terrenos" value={String(stats?.terrenos ?? 0)} />
