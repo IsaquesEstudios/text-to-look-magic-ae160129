@@ -48,13 +48,13 @@ function TerrenosKPIs() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {cards.map((card) => (
-        <Card key={card.label} className="bg-card/50 border-border/50">
+        <Card key={card.label} className="bg-card border-border">
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-normal">
                 {card.label}
               </span>
-              <card.icon className="h-4 w-4 text-muted-foreground/60" />
+              <card.icon className="h-4 w-4 text-muted-foreground" />
             </div>
             <p className="text-2xl font-bold text-foreground">
               {(() => { const { compact, full } = formatCurrencySmart(card.value); return compact !== full ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></> : full; })()}
@@ -87,7 +87,7 @@ export default function AdminTerrenosPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Terrenos</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">Terrenos</h1>
         <p className="text-sm text-muted-foreground mt-1">Terrenos com investidores vinculados</p>
       </div>
       <TerrenosKPIs />

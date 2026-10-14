@@ -35,11 +35,11 @@ function DemoExpensesView({ propertyId }: { propertyId: string }) {
   const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
-    <Card className="bg-card/50 border-border/50 overflow-hidden">
+    <Card className="bg-card border-border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm table-fixed">
           <thead>
-            <tr className="border-b border-border/50">
+            <tr className="border-b border-border">
               <th className="text-left p-2 sm:p-3 text-muted-foreground font-medium">Categoria</th>
               <th className="text-right p-2 sm:p-3 text-muted-foreground font-medium w-20 sm:w-auto">Valor</th>
               <th className="text-right p-2 sm:p-3 text-muted-foreground font-medium w-16 sm:w-auto">Tarifa</th>
@@ -52,7 +52,7 @@ function DemoExpensesView({ propertyId }: { propertyId: string }) {
               const hasMultiple = group.items.length > 1;
               return (
                 <Fragment key={group.category}>
-                  <tr className={cn("border-b border-border/30 hover:bg-secondary/30", hasMultiple && "cursor-pointer")} onClick={() => hasMultiple && toggleCat(group.category)}>
+                  <tr className={cn("border-b border-border hover:bg-secondary/30", hasMultiple && "cursor-pointer")} onClick={() => hasMultiple && toggleCat(group.category)}>
                     <td className="p-2 sm:p-3 text-foreground">
                       <div className="flex items-center gap-1 sm:gap-2 min-w-0">
                         {hasMultiple && (isExpanded ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />)}
@@ -67,7 +67,7 @@ function DemoExpensesView({ propertyId }: { propertyId: string }) {
                   {isExpanded && group.items.map((expense) => {
                     const itemTax = expense.price * ((expense.tax_rate || 0) / 100);
                     return (
-                      <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
+                      <tr key={expense.id} className="border-b border-border bg-secondary/10">
                         <td className="p-2 sm:p-3 pl-6 sm:pl-8 text-muted-foreground text-xs">{expense.product}</td>
                         <td className="p-2 sm:p-3 text-right text-muted-foreground text-xs">${fmt(expense.price)}</td>
                         <td className="p-2 sm:p-3 text-right text-muted-foreground text-xs">{itemTax > 0 ? `$${fmt(itemTax)}` : "—"}</td>

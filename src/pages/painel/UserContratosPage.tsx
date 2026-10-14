@@ -109,13 +109,13 @@ export default function UserContratosPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Contratos</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-normal">Contratos</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {isAdmin ? "Gerencie contratos dos investidores" : "Contratos de investimento para assinatura"}
           </p>
         </div>
         {!isDemoUser && (
-        <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl">
+        <Button onClick={() => setShowForm(true)} className="gap-2 rounded-lg">
           <PlusCircle className="h-4 w-4" />
           Novo Contrato
         </Button>
@@ -131,7 +131,7 @@ export default function UserContratosPage() {
       )}
 
       {!contracts?.length ? (
-        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center py-20 text-muted-foreground">
           <FileText className="h-9 w-9 mb-3 opacity-25" />
           <p className="text-sm">Nenhum contrato disponível</p>
         </div>
@@ -140,11 +140,11 @@ export default function UserContratosPage() {
           {contracts.map((contract) => {
             const status = getStatus(contract);
             return (
-              <Card key={contract.id} className="bg-card/50 border-border/50">
+              <Card key={contract.id} className="bg-card border-border">
                 <CardContent className="p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
-                      <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                         <FileText className="h-5 w-5 text-primary" />
                       </div>
                       <div className="min-w-0">
@@ -164,7 +164,7 @@ export default function UserContratosPage() {
                               Investidor assinou • {format(new Date(contract.user_signed_at), "dd/MM/yyyy", { locale: ptBR })}
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500 gap-1">
+                            <Badge variant="outline" className="text-[10px] border-warning/30 text-warning gap-1">
                               <Clock className="h-3 w-3" />
                               Aguardando assinatura do investidor
                             </Badge>
@@ -259,7 +259,7 @@ export default function UserContratosPage() {
               Antes de assinar, certifique-se de que leu o documento PDF completo. Ao marcar a caixa abaixo e confirmar, sua assinatura digital será registrada com data e hora.
             </p>
 
-            <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-secondary/30 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/30 p-4">
               <Checkbox
                 id="agree"
                 checked={agreed}
@@ -312,7 +312,7 @@ export default function UserContratosPage() {
           <div className="flex-1 min-h-0 px-6 pb-6 overflow-auto" style={{ WebkitOverflowScrolling: "touch" }}>
             <iframe
               src={`https://docs.google.com/gview?url=${encodeURIComponent(pdfViewer?.url || "")}&embedded=true`}
-              className="w-full h-full rounded-lg border border-border/50"
+              className="w-full h-full rounded-lg border border-border"
               style={{ minHeight: "70vh" }}
               title="Visualizador de contrato"
             />

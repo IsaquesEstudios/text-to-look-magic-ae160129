@@ -36,7 +36,7 @@ function CountdownBlock({ targetDate, status, p }: { targetDate: string; status:
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
       <span className="text-lg sm:text-xl font-bold font-mono text-foreground bg-secondary rounded-md px-2 py-1 min-w-[2.5rem] text-center">{String(value).padStart(2, "0")}</span>
-      <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-normal">{label}</span>
     </div>
   );
 
@@ -64,15 +64,15 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
   const shareInfo = prop ? userSharesMap.get(prop.id) : undefined;
 
   const content = (
-    <div className={`group relative flex flex-col rounded-2xl border ${isLinked ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border/30'} bg-card overflow-hidden hover:shadow-lg transition-all duration-300`}>
+    <div className={`group relative flex flex-col rounded-lg border ${isLinked ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border'} bg-card overflow-hidden hover:shadow-lg transition-all duration-150`}>
       <div className="aspect-[16/10] bg-secondary/50 overflow-hidden relative">
         {image ? <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /> : (
           <div className="w-full h-full flex items-center justify-center">
-            {type === p.land ? <TreePine className="h-8 w-8 text-muted-foreground/20" /> : <Home className="h-8 w-8 text-muted-foreground/20" />}
+            {type === p.land ? <TreePine className="h-8 w-8 text-muted-foreground" /> : <Home className="h-8 w-8 text-muted-foreground" />}
           </div>
         )}
         <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px]">{type}</Badge>
-        {isLinked && <Badge className="absolute top-3 right-3 bg-green-600 text-white text-[10px] flex items-center gap-1"><UserCheck className="h-3 w-3" /> {p.linked}</Badge>}
+        {isLinked && <Badge className="absolute top-3 right-3 bg-primary text-media-foreground text-[10px] flex items-center gap-1"><UserCheck className="h-3 w-3" /> {p.linked}</Badge>}
       </div>
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="flex items-start justify-between">
@@ -80,7 +80,7 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
             <h3 className="font-semibold text-foreground leading-tight">{title}</h3>
             {location && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {location}</p>}
           </div>
-          {hasProperty && <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />}
+          {hasProperty && <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />}
         </div>
         {(() => {
           const auctionVal = Number(prop?.estimated_auction_value ?? item.estimated_auction_value) || 0;
@@ -93,19 +93,19 @@ function AuctionItemCard({ item, userSharesMap, linkedPropertyIds, p }: { item: 
           const showEstimates = auctionVal > 0 || renovationVal > 0 || saleVal > 0;
           return showEstimates ? (
             <>
-              <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-medium mb-1">{p.estimates}</p>
+              <p className="text-[9px] uppercase tracking-normal text-muted-foreground font-medium mb-1">{p.estimates}</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.auctionPrice}</p><p className="font-semibold text-foreground">${auctionVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
-                <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.renovation}</p><p className="font-semibold text-foreground">${renovationVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
-                <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.projectTotal}</p><p className="font-semibold text-foreground">${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
-                <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.saleValue}</p><p className="font-semibold text-foreground">${saleVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.auctionPrice}</p><p className="font-semibold text-foreground">${auctionVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.renovation}</p><p className="font-semibold text-foreground">${renovationVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.projectTotal}</p><p className="font-semibold text-foreground">${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.saleValue}</p><p className="font-semibold text-foreground">${saleVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
               </div>
               {isLinked && shareInfo && (
-                <div className="border-t border-border/30 pt-3 mt-1">
-                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-medium mb-2">{p.yourParticipation}</p>
+                <div className="border-t border-border pt-3 mt-1">
+                  <p className="text-[9px] uppercase tracking-normal text-muted-foreground font-medium mb-2">{p.yourParticipation}</p>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p><p className="font-semibold text-primary">${investedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
-                    <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.participation}</p><p className="font-semibold text-primary">{participationPct.toFixed(1)}%</p></div>
+                    <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.invested}</p><p className="font-semibold text-primary">${investedAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p></div>
+                    <div><p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.participation}</p><p className="font-semibold text-primary">{participationPct.toFixed(1)}%</p></div>
                   </div>
                 </div>
               )}
@@ -227,7 +227,7 @@ export default function UserLeiloesPage() {
     const items = effectiveItemsByAuction.get(auction.id) ?? [];
 
     return (
-      <AccordionItem key={auction.id} value={auction.id} className="border border-border/50 rounded-xl overflow-hidden bg-card/50">
+      <AccordionItem key={auction.id} value={auction.id} className="border border-border rounded-lg overflow-hidden bg-card">
         <AccordionTrigger className="hover:no-underline px-4 sm:px-5 py-4 text-left">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between w-full pr-3 gap-3">
             <div className="flex items-start gap-3 min-w-0">
@@ -252,7 +252,7 @@ export default function UserLeiloesPage() {
         <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
           {auction.description && <p className="text-sm text-muted-foreground">{auction.description}</p>}
           {depositsByAuction.has(auction.id) && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 border border-border/30">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 border border-border">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">{p.serviceFee}</span>
               <span className="text-xs font-semibold text-foreground">${depositsByAuction.get(auction.id)!.service_fee.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
@@ -273,7 +273,7 @@ export default function UserLeiloesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2"><Gavel className="h-6 w-6 text-primary" /> {p.auctionsTitle}</h1>
+        <h1 className="text-2xl font-bold tracking-normal flex items-center gap-2"><Gavel className="h-6 w-6 text-primary" /> {p.auctionsTitle}</h1>
         <p className="text-sm text-muted-foreground mt-1">{p.followAuctions}</p>
       </div>
       {active.length > 0 && (
@@ -283,7 +283,7 @@ export default function UserLeiloesPage() {
         </div>
       )}
       {active.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center py-20 text-muted-foreground">
           <Gavel className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noAuctionsAvailable}</p>
         </div>
       )}

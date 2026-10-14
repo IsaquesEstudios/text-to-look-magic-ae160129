@@ -215,7 +215,7 @@ export default function AdminLeiloesPage() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Novo Leilão</h1>
+          <h1 className="text-2xl font-bold tracking-normal">Novo Leilão</h1>
           <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
         </div>
 
@@ -273,7 +273,7 @@ export default function AdminLeiloesPage() {
           </div>
 
           {propertyForms.length === 0 && (
-            <div className="text-center py-10 border border-dashed border-border rounded-xl text-muted-foreground">
+            <div className="text-center py-10 border border-dashed border-border rounded-lg text-muted-foreground">
               <p className="text-sm">Nenhum imóvel adicionado</p>
               <p className="text-xs mt-1">Clique em "Adicionar Imóvel" para incluir propriedades ao leilão</p>
             </div>
@@ -308,33 +308,33 @@ export default function AdminLeiloesPage() {
     <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Leilões</h1>
+          <h1 className="text-2xl font-bold tracking-normal">Leilões</h1>
           <p className="text-sm text-muted-foreground mt-1">Gerencie os leilões publicados</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="gap-2 rounded-xl h-10 px-5 font-medium">
+        <Button onClick={() => setShowForm(true)} className="gap-2 rounded-lg h-10 px-5 font-medium">
           <PlusCircle className="h-4 w-4" /> Novo Leilão
         </Button>
       </div>
 
       {/* KPIs: Available + Invested */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
             <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-discovery-green" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Disponível para Investimento</p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-normal text-muted-foreground truncate">Disponível para Investimento</p>
             <p className="text-sm sm:text-xl font-bold text-foreground truncate">
               ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
             <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground truncate">Total Investido em Leilões</p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-normal text-muted-foreground truncate">Total Investido em Leilões</p>
             <p className="text-sm sm:text-xl font-bold text-foreground truncate">
               ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
@@ -344,7 +344,7 @@ export default function AdminLeiloesPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          {[1,2,3].map(i => <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />)}
+          {[1,2,3].map(i => <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />)}
         </div>
       ) : (
         <>
@@ -354,7 +354,7 @@ export default function AdminLeiloesPage() {
               <div className="grid gap-4">
                 {upcoming.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
-                    <Card className="bg-card/50 border-border/50 hover:shadow-md transition-shadow cursor-pointer">
+                    <Card className="bg-card border-border hover:shadow-md transition-shadow cursor-pointer">
                       <CardContent className="p-4 sm:p-5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -396,7 +396,7 @@ export default function AdminLeiloesPage() {
               <div className="grid gap-3">
                 {finished.map((auction) => (
                   <Link key={auction.id} to={`/painel/leilao/${auction.id}`} className="block">
-                    <Card className="bg-card/50 border-border/50 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                    <Card className="bg-card border-border opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
                       <CardContent className="p-4 flex items-center justify-between gap-4">
                         <div>
                           <span className="font-medium text-sm">{auction.title}</span>

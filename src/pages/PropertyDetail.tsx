@@ -133,14 +133,14 @@ export default function PropertyDetail() {
           <div className="flex flex-wrap items-center gap-3 mb-1.5">
             <Badge className={`${status.color} border-0 text-xs font-medium`}>{status.label}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground/80 flex items-center gap-1.5">
+          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5" />
             {effectiveProperty.location}
           </p>
         </div>
 
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-2">Estimativas do Projeto</p>
+          <p className="text-[10px] uppercase tracking-normal text-muted-foreground font-medium mb-2">Estimativas do Projeto</p>
           <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
             {[
               { icon: DollarSign, label: "Arremate até (Est.)", value: `$${auctionValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
@@ -150,9 +150,9 @@ export default function PropertyDetail() {
               { icon: DollarSign, label: `Doc. & Comissão (${docCommRate}%)`, value: `$${docComm.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, iconClass: "text-muted-foreground" },
               { icon: TrendingUp, label: "Retorno (Est.)", value: `${calculatedReturn.toFixed(1)}%`, iconClass: "text-primary", valueClass: "text-primary" },
             ].map((stat, i) => (
-              <div key={i} className="rounded-xl border border-border/60 bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
+              <div key={i} className="rounded-lg border border-border bg-card p-5 text-center space-y-1.5 shadow-sm hover:shadow-md transition-shadow">
                 <stat.icon className={`h-5 w-5 mx-auto ${stat.iconClass}`} />
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">{stat.label}</p>
+                <p className="text-[10px] uppercase tracking-normal text-muted-foreground font-medium">{stat.label}</p>
                 <p className={`text-lg font-bold ${stat.valueClass || "text-foreground"}`}>{stat.value}</p>
               </div>
             ))}
@@ -172,7 +172,7 @@ export default function PropertyDetail() {
         )}
 
         <div
-          className="relative w-full rounded-2xl overflow-hidden bg-secondary/30 cursor-pointer group"
+          className="relative w-full rounded-lg overflow-hidden bg-secondary/30 cursor-pointer group"
           style={{ aspectRatio: "2/1" }}
           onClick={() => setLightboxIndex(0)}
         >
@@ -183,7 +183,7 @@ export default function PropertyDetail() {
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground/20 text-sm">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
               Sem foto de capa
             </div>
           )}
@@ -196,13 +196,13 @@ export default function PropertyDetail() {
               {images.map((img, i) => (
                 <div
                   key={img.id}
-                  className="aspect-[4/3] rounded-xl overflow-hidden bg-secondary/50 cursor-pointer group"
+                  className="aspect-[4/3] rounded-lg overflow-hidden bg-secondary/50 cursor-pointer group"
                   onClick={() => setLightboxIndex(property.cover_image_url ? i + 1 : i)}
                 >
                   <img
                     src={img.image_url}
                     alt=""
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-150"
                   />
                 </div>
               ))}
@@ -215,7 +215,7 @@ export default function PropertyDetail() {
 
       {lightboxIndex !== null && allImages.length > 0 && (
         <div
-          className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center"
+          className="fixed inset-0 z-[100] bg-background/95  flex items-center justify-center"
           onClick={() => setLightboxIndex(null)}
         >
           <button

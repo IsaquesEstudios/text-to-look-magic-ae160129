@@ -60,12 +60,12 @@ export default function UserExtrato() {
     <div className="space-y-4">
       <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.statement}</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-normal">{p.statement}</h1>
           <p className="text-sm text-muted-foreground mt-1">{p.transactionHistory}</p>
         </div>
-        <div className="flex items-center justify-between rounded-xl border border-border/30 bg-card/40 px-4 py-3">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.currentBalance}</p>
+            <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.currentBalance}</p>
             <p className="text-xl font-bold text-primary">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
           <Button variant="outline" size="sm" className="gap-2" onClick={() => setRechargeOpen(true)}>
@@ -76,14 +76,14 @@ export default function UserExtrato() {
 
       <Collapsible>
         <CollapsibleTrigger className="w-full">
-          <div className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 cursor-pointer hover:bg-amber-500/10 transition-colors group">
-            <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0"><Info className="h-4 w-4 text-amber-500" /></div>
-            <p className="text-sm font-semibold text-amber-500 flex-1 text-left">{p.importantInfoTitle}</p>
-            <ChevronDown className="h-4 w-4 text-amber-500 group-data-[state=open]:rotate-180 transition-transform" />
+          <div className="flex items-center gap-3 rounded-lg border border-warning/30 bg-warning/5 px-5 py-4 cursor-pointer hover:bg-warning/10 transition-colors group">
+            <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center flex-shrink-0"><Info className="h-4 w-4 text-warning" /></div>
+            <p className="text-sm font-semibold text-warning flex-1 text-left">{p.importantInfoTitle}</p>
+            <ChevronDown className="h-4 w-4 text-warning group-data-[state=open]:rotate-180 transition-transform" />
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="rounded-2xl border border-border/30 bg-card/40 p-5 mt-2 space-y-4 text-sm text-muted-foreground">
+          <div className="rounded-lg border border-border bg-card p-5 mt-2 space-y-4 text-sm text-muted-foreground">
             <div><h3 className="font-semibold text-foreground mb-1">{p.howInvestmentWorks}</h3><p>{p.howInvestmentWorksDesc}</p></div>
             <div>
               <h3 className="font-semibold text-foreground mb-1">{p.investmentTiers}</h3>
@@ -125,8 +125,8 @@ export default function UserExtrato() {
                 />
               </div>
             </div>
-            <div className="rounded-xl border border-border/40 bg-muted/30 p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{p.howItWorks}</p>
+            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">{p.howItWorks}</p>
               <div className="space-y-3">
                 <div className="flex gap-3 items-start">
                   <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5"><MessageCircle className="h-3.5 w-3.5 text-primary" /></div>
@@ -151,13 +151,13 @@ export default function UserExtrato() {
       </Dialog>
 
       {!timeline.length ? (
-        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center py-20 text-muted-foreground">
           <Receipt className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noTransactions}</p>
         </div>
       ) : (
         <div className="space-y-2">
           {timeline.map((item) => (
-            <div key={item.id} className="flex items-center gap-4 rounded-xl border border-border/20 bg-card/30 px-4 py-3">
+            <div key={item.id} className="flex items-center gap-4 rounded-lg border border-border bg-card px-4 py-3">
               <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.isCredit ? "bg-primary/10" : "bg-secondary"}`}>
                 {item.isCredit ? <ArrowDownLeft className="h-4 w-4 text-primary" /> : <ArrowUpRight className="h-4 w-4 text-muted-foreground" />}
               </div>

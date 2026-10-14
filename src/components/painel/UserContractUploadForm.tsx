@@ -65,7 +65,7 @@ export function UserContractUploadForm({ userId, onClose }: UserContractUploadFo
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-border/40 bg-card/50 p-6">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-lg border border-border bg-card p-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-foreground">Enviar Contrato</h3>
         <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
@@ -86,7 +86,7 @@ export function UserContractUploadForm({ userId, onClose }: UserContractUploadFo
       <div className="space-y-2">
         <Label>PDF do contrato</Label>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-border/60 cursor-pointer hover:bg-secondary/30 transition-colors text-sm text-muted-foreground">
+          <label className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-border cursor-pointer hover:bg-secondary/30 transition-colors text-sm text-muted-foreground">
             <Upload className="h-4 w-4" />
             {file ? file.name : "Escolher arquivo PDF"}
             <input

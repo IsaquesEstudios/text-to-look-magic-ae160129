@@ -137,9 +137,9 @@ export default function UserProfilePage() {
 
   return (
     <fieldset disabled={isDemoUser} className="space-y-4">
-      <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.myInfo}</h1>
+      <h1 className="text-2xl font-bold text-foreground tracking-normal">{p.myInfo}</h1>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4 text-primary" />{p.personalData}</CardTitle>
         </CardHeader>
@@ -156,7 +156,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4 text-primary" />{p.preferredLanguage}</CardTitle>
         </CardHeader>
@@ -176,7 +176,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Phone className="h-4 w-4 text-primary" />{p.contact}</CardTitle>
         </CardHeader>
@@ -204,7 +204,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />{p.address}</CardTitle>
         </CardHeader>
@@ -250,7 +250,7 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4 text-primary" />Tipo de Pessoa</CardTitle>
         </CardHeader>
@@ -295,7 +295,7 @@ export default function UserProfilePage() {
       )}
 
       {!isDemoUser && (
-        <Card className="bg-card/50 border-destructive/40 mt-6">
+        <Card className="bg-card border-destructive/40 mt-6">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-4 w-4" />

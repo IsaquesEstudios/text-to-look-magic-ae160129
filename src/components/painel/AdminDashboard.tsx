@@ -35,7 +35,7 @@ export function AdminDashboard() {
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-normal">
             Painel Administrativo
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -44,7 +44,7 @@ export function AdminDashboard() {
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="gap-2 rounded-xl h-10 px-5 font-medium"
+          className="gap-2 rounded-lg h-10 px-5 font-medium"
         >
           <PlusCircle className="h-4 w-4" />
           Novo Imóvel
@@ -53,7 +53,7 @@ export function AdminDashboard() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-secondary/50 border-0 p-1 rounded-xl h-auto">
+        <TabsList className="bg-secondary/50 border-0 p-1 rounded-lg h-auto">
           <TabsTrigger
             value="properties"
             className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm px-4 py-2 text-sm"

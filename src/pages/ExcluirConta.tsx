@@ -43,7 +43,7 @@ export default function ExcluirConta() {
         {submitted ? (
           <Card>
             <CardContent className="pt-6 text-center space-y-4">
-              <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+              <CheckCircle className="mx-auto h-12 w-12 text-primary" />
               <h2 className="text-xl font-semibold text-foreground">
                 Solicitação enviada
               </h2>
@@ -69,7 +69,7 @@ export default function ExcluirConta() {
             <CardContent className="space-y-5">
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div className="flex gap-2">
-                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-amber-500" />
+                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-warning" />
                   <p>
                     Ao solicitar a exclusão da conta, <strong>todos os seus dados pessoais</strong> serão
                     permanentemente removidos, incluindo perfil, histórico de transações e documentos enviados.

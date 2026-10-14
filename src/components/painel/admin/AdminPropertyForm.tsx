@@ -440,21 +440,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden bg-card border-border p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>{propertyId ? "Editar Imóvel" : "Novo Imóvel"}</DialogTitle>
           {/* Step indicator */}
-          <div className="flex items-center gap-2 pt-3">
+          <div className="grid grid-flow-col auto-cols-fr gap-1 pt-3 sm:flex sm:items-center sm:gap-2">
             {stepTitles.map((title, i) => {
               const n = i + 1;
               const active = step === n;
               const done = step > n;
               return (
-                <div key={title} className="flex items-center gap-2">
+                <div key={title} className="min-w-0 flex items-center gap-1 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => setStep(n)}
-                    className="flex items-center gap-1.5 cursor-pointer"
+                    className="min-w-0 flex flex-col sm:flex-row items-center gap-1.5 cursor-pointer"
                   >
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
@@ -471,7 +471,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                       {title}
                     </span>
                   </button>
-                  {n < stepTitles.length && <span className="w-6 h-px bg-border" />}
+                  {n < stepTitles.length && <span className="hidden sm:block w-6 h-px bg-border shrink-0" />}
                 </div>
               );
             })}
@@ -489,7 +489,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, type: "house" })}
-                  className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+                  className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
                     form.type === "house"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -500,7 +500,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, type: "land", estimated_renovation_cost: "" })}
-                  className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+                  className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
                     form.type === "land"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -717,7 +717,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             <div className="space-y-2">
               <Label>Foto de Capa</Label>
               {coverImage ? (
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
                   <img src={coverImage} alt="Capa" className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -728,7 +728,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full aspect-video rounded-xl border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
+                <label className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
                   <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                   <span className="text-sm text-muted-foreground">Clique para enviar</span>
                   <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
@@ -777,7 +777,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
           {/* ===== STEP 3: Investidores (editing existing property) ===== */}
           {step === 3 && propertyId && (
-            <div className="rounded-xl border border-border/50 p-4">
+            <div className="min-w-0">
               <PropertyInvestors
                 propertyId={propertyId}
                 totalProject={totalProjeto}
@@ -792,7 +792,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
 
           {/* Footer navigation */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             {step > 1 ? (
               <Button type="button" variant="outline" onClick={handleBack} className="flex-1">
                 <ArrowLeft className="h-4 w-4" /> Voltar

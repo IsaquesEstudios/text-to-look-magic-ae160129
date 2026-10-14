@@ -75,15 +75,15 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 ${filterType === "house" ? "lg:grid-cols-5" : "lg:grid-cols-3"} gap-3 sm:gap-4`}>
       {cards.map((card) => (
-        <Card key={card.label} className={`bg-card/50 border-border/50 ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
+        <Card key={card.label} className={`bg-card border-border ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
           <CardContent className="p-3 sm:p-5">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-normal">
                 {card.label}
               </span>
               <card.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
             </div>
-            <p className={`text-lg sm:text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
+            <p className={`font-heading text-lg sm:text-xl font-semibold break-words tabular-nums ${(card as any).colorClass || "text-foreground"}`}>
               {(card as any).isPercentage
                 ? `${card.value.toFixed(1)}%`
                 : fmt(card.value)
@@ -138,12 +138,12 @@ export default function AdminImoveisPage() {
     <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Propriedades</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-normal">Propriedades</h1>
           <p className="text-sm text-muted-foreground mt-1">Imóveis e terrenos do portfólio</p>
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="gap-2 rounded-xl h-10 px-5 font-medium"
+          className="gap-2 rounded-lg h-10 px-5 font-medium"
         >
           <PlusCircle className="h-4 w-4" />
           Nova Propriedade
@@ -151,7 +151,7 @@ export default function AdminImoveisPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-secondary/50 border-0 p-1 rounded-xl h-auto">
+        <TabsList className="bg-secondary/50 border-0 p-1 rounded-lg h-auto">
           <TabsTrigger
             value="house"
             className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm px-4 py-2 text-sm"

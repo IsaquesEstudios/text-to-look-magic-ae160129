@@ -78,7 +78,7 @@ function DashboardCharts() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
     return (
-      <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+      <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
         <p className="text-xs font-medium text-foreground mb-1">{label}</p>
         {payload.map((entry: any) => (
           <p key={entry.name} className="text-xs" style={{ color: entry.color }}>
@@ -91,7 +91,7 @@ function DashboardCharts() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">Total Investido</CardTitle>
         </CardHeader>
@@ -116,7 +116,7 @@ function DashboardCharts() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">Receita Discovery por Mês</CardTitle>
         </CardHeader>
@@ -126,15 +126,15 @@ function DashboardCharts() {
               <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gradDiscovery" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.05} />
+                    <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} dy={8} />
                 <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} width={45} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(142, 71%, 45%)" strokeWidth={2} fill="url(#gradDiscovery)" />
+                <Area type="monotone" dataKey="discovery" name="Receita Discovery" stroke="hsl(var(--chart-2))" strokeWidth={2} fill="url(#gradDiscovery)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -304,7 +304,7 @@ function AdminDashboardContent() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
@@ -313,13 +313,13 @@ function AdminDashboardContent() {
         {kpis.map((card) => (
           <div
             key={card.label}
-            className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden"
+            className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden"
           >
-            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
               <card.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{card.label}</p>
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{card.label}</p>
               <p className="text-sm sm:text-lg font-bold text-foreground truncate">{card.value}</p>
             </div>
           </div>
@@ -329,7 +329,7 @@ function AdminDashboardContent() {
       <DashboardCharts />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="bg-card/50 border-border/50">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ function AdminDashboardContent() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50 border-border/50">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

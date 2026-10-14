@@ -145,7 +145,7 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
           return (
             <Card
               key={property.id}
-              className="group border-border/30 bg-card/40 overflow-hidden hover:bg-card/70 transition-all duration-300"
+              className="group border-border bg-card overflow-hidden hover:bg-card transition-all duration-150"
             >
               <div className="aspect-[16/10] relative bg-secondary/50">
                 {property.cover_image_url ? (
@@ -157,9 +157,9 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     {property.type === "house" ? (
-                      <Home className="h-10 w-10 text-muted-foreground/20" />
+                      <Home className="h-10 w-10 text-muted-foreground" />
                     ) : (
-                      <TreePine className="h-10 w-10 text-muted-foreground/20" />
+                      <TreePine className="h-10 w-10 text-muted-foreground" />
                     )}
                   </div>
                 )}
@@ -201,31 +201,31 @@ export function AdminPropertiesList({ onEdit, filterType }: Props) {
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm pt-1">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Est. Arremate</p>
+                    <p className="text-[11px] uppercase tracking-normal text-muted-foreground">Est. Arremate</p>
                     <p className="font-semibold text-foreground">
                       ${auction.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Est. Reforma</p>
+                    <p className="text-[11px] uppercase tracking-normal text-muted-foreground">Est. Reforma</p>
                     <p className="font-semibold text-foreground">
                       ${renovation.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Est. Total</p>
+                    <p className="text-[11px] uppercase tracking-normal text-muted-foreground">Est. Total</p>
                     <p className="font-semibold text-foreground">
                       ${totalProject.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Est. Venda</p>
+                    <p className="text-[11px] uppercase tracking-normal text-muted-foreground">Est. Venda</p>
                     <p className="font-semibold text-foreground">
                       ${sale.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Est. Retorno</p>
+                    <p className="text-[11px] uppercase tracking-normal text-muted-foreground">Est. Retorno</p>
                     <p className={`font-semibold ${roi > 0 ? "text-primary" : roi < 0 ? "text-destructive" : "text-muted-foreground"}`}>
                       {roi.toFixed(1)}%
                     </p>

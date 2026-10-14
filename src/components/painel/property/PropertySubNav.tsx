@@ -57,11 +57,11 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, o
         )}
       </div>
 
-      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-normal text-foreground">
         {propertyTitle}
       </h1>
 
-      <nav className="flex gap-0.5 sm:gap-1 p-1 rounded-xl bg-secondary/50 w-full sm:w-fit overflow-x-auto">
+      <nav className="flex gap-0.5 sm:gap-1 p-1 rounded-lg bg-secondary/50 w-full sm:w-fit overflow-x-auto">
         {visibleItems.map((item) => {
           const count = item.badgeKey && unread ? unread[item.badgeKey] : 0;
           return (
@@ -71,7 +71,7 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, o
               className={`relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 active === item.key
                   ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+                  : "text-muted-foreground hover:text-foreground hover:bg-card"
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function PropertySubNav({ propertyId, propertyTitle, active, hasShares, o
               {count > 0 && (
                 <span className={`min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
                   item.badgeKey === "gastos"
-                    ? "bg-amber-500 text-white"
+                    ? "bg-warning text-media-foreground"
                     : "bg-destructive text-destructive-foreground"
                 }`}>
                   {count > 9 ? "+9" : count}

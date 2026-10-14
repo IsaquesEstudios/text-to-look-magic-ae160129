@@ -50,11 +50,11 @@ function CountdownTimer({ targetDate, label = "Começa em", expiredLabel = "Leil
   }, [targetDate, expiredLabel]);
 
   return (
-    <div className={`text-center p-4 rounded-xl ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
+    <div className={`text-center p-4 rounded-lg ${isStarted ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary"}`}>
       <p className="text-xs text-muted-foreground mb-1">
         {isStarted ? "Status" : label}
       </p>
-      <p className="text-2xl font-bold font-mono tracking-wider">{timeLeft}</p>
+      <p className="text-2xl font-bold font-mono tracking-normal">{timeLeft}</p>
     </div>
   );
 }
@@ -385,8 +385,8 @@ export default function LeilaoDetailPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 rounded-lg bg-muted animate-pulse" />
-        <div className="h-32 rounded-xl bg-muted animate-pulse" />
-        <div className="h-48 rounded-xl bg-muted animate-pulse" />
+        <div className="h-32 rounded-lg bg-muted animate-pulse" />
+        <div className="h-48 rounded-lg bg-muted animate-pulse" />
       </div>
     );
   }
@@ -395,7 +395,7 @@ export default function LeilaoDetailPage() {
     <div className="space-y-4">
       {/* Header */}
       {editing ? (
-        <Card className="bg-card/50 border-border/50">
+        <Card className="bg-card border-border">
           <CardContent className="pt-6 space-y-4">
             <div>
               <Label>Título *</Label>
@@ -435,7 +435,7 @@ export default function LeilaoDetailPage() {
             Voltar
           </button>
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight">{auction.title}</h1>
+            <h1 className="text-2xl font-bold tracking-normal">{auction.title}</h1>
             {auction.status === "finished" ? (
               <Badge variant="secondary">Encerrado</Badge>
             ) : (
@@ -496,7 +496,7 @@ export default function LeilaoDetailPage() {
       })()}
 
       {/* Auction items */}
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Imóveis / Terrenos</CardTitle>
           {isAdmin && !showAddProperty && auction.status !== "finished" && (
@@ -537,7 +537,7 @@ export default function LeilaoDetailPage() {
               ) : (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-4 p-3 rounded-xl bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
+                  className={`flex items-center gap-4 p-3 rounded-lg bg-secondary/30 ${item.property_id ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
                   onClick={() => {
                     if (isAdmin && item.property_id) navigate(`/painel/imovel/${item.property_id}`);
                   }}
@@ -590,7 +590,7 @@ export default function LeilaoDetailPage() {
 
           {/* Add property forms */}
           {showAddProperty && (
-            <div className="space-y-4 mt-4 pt-4 border-t border-border/50">
+            <div className="space-y-4 mt-4 pt-4 border-t border-border">
               {newPropertyForms.map((pData, idx) => (
                 <AuctionPropertyForm
                   key={idx}
