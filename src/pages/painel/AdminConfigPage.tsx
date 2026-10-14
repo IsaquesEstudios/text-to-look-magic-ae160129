@@ -73,11 +73,11 @@ export default function AdminConfigPage() {
         <p className="text-muted-foreground text-sm mt-1">Gerencie as configurações do sistema</p>
       </div>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-              <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Receipt className="h-5 w-5 text-primary" />
               </div>
               <div className="min-w-0">
@@ -162,7 +162,7 @@ export default function AdminConfigPage() {
           </div>
 
           {/* Save all button */}
-          <div className="pt-4 border-t border-border/50">
+          <div className="pt-4 border-t border-border">
             <Button
               className="w-full gap-2"
               disabled={!hasChanges || saving === "all"}

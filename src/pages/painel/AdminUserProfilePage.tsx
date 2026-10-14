@@ -455,7 +455,7 @@ export default function AdminUserProfilePage() {
 
       <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-normal">
             {profile.full_name || p.noName}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5 break-all">{userId}</p>
@@ -613,7 +613,7 @@ export default function AdminUserProfilePage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">{p.profileInfo}</CardTitle>
           {editingProfile && (
@@ -662,7 +662,7 @@ export default function AdminUserProfilePage() {
                 </div>
               </div>
 
-              <div className="border-t border-border/50 pt-4 space-y-3">
+              <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground">Tipo de pessoa</Label>
                   <Select value={profileForm.person_type} onValueChange={(v: "individual" | "business") => setProfileForm(prev => ({ ...prev, person_type: v }))}>
@@ -729,7 +729,7 @@ export default function AdminUserProfilePage() {
                 const pr = profile as any;
                 const personType = pr.person_type || "individual";
                 return (
-                  <div className="border-t border-border/50 pt-4">
+                  <div className="border-t border-border pt-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-muted-foreground text-xs">Tipo de pessoa</span>
@@ -763,7 +763,7 @@ export default function AdminUserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base">{p.addCredits}</CardTitle>
         </CardHeader>
@@ -807,7 +807,7 @@ export default function AdminUserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Gavel className="h-4 w-4 text-primary" />
@@ -822,7 +822,7 @@ export default function AdminUserProfilePage() {
           ) : (
             <div className="space-y-4">
               {auctionInvestments.map((item) => (
-                <div key={item.auction?.id || Math.random()} className="border border-border/50 rounded-lg p-4 space-y-3">
+                <div key={item.auction?.id || Math.random()} className="border border-border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">{item.auction?.title || p.auctionsTitle}</p>
@@ -858,7 +858,7 @@ export default function AdminUserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <ArrowDownLeft className="h-4 w-4 text-primary" />
@@ -908,7 +908,7 @@ export default function AdminUserProfilePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <ArrowUpRight className="h-4 w-4 text-muted-foreground" />

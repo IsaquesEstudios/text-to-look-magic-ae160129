@@ -42,7 +42,7 @@ const statusBadge = (status: string) => {
     case "pending":
       return <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
     case "approved":
-      return <Badge variant="outline" className="text-green-500 border-green-500/30 gap-1"><UserCheck className="h-3 w-3" /> Aprovado</Badge>;
+      return <Badge variant="outline" className="text-primary border-primary/30 gap-1"><UserCheck className="h-3 w-3" /> Aprovado</Badge>;
     case "rejected":
       return <Badge variant="outline" className="text-red-500 border-red-500/30 gap-1"><UserX className="h-3 w-3" /> Rejeitado</Badge>;
     default:
@@ -75,12 +75,12 @@ function groupByDate(list: Registration[]) {
 function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 pointer-events-none" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
       <Input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder="Buscar por nome, cidade, país..."
-        className="pl-9 h-9 text-sm bg-secondary/30 border-border/30"
+        className="pl-9 h-9 text-sm bg-secondary/30 border-border"
       />
     </div>
   );
@@ -94,7 +94,7 @@ function RegistrationCard({ reg, onUpdateStatus, isPending }: {
   const showActions = reg.status === "pending";
 
   return (
-    <Card className="border-border/50 bg-card/80">
+    <Card className="border-border bg-card">
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-start gap-3">
           <Avatar className="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
@@ -125,12 +125,12 @@ function RegistrationCard({ reg, onUpdateStatus, isPending }: {
               )}
               <span>{langLabel(reg.preferred_language)}</span>
             </div>
-            <p className="text-xs text-muted-foreground/70">
+            <p className="text-xs text-muted-foreground">
               Cadastrado {formatDistanceToNow(new Date(reg.created_at), { addSuffix: true, locale: ptBR })}
             </p>
             {showActions && (
               <div className="flex items-center gap-2 pt-1.5">
-                <Button size="sm" variant="outline" className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/10 gap-1 h-8 text-xs"
                   onClick={() => onUpdateStatus(reg.user_id, "approved")} disabled={isPending}>
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
@@ -142,7 +142,7 @@ function RegistrationCard({ reg, onUpdateStatus, isPending }: {
             )}
             {!showActions && reg.status === "rejected" && (
               <div className="flex items-center gap-2 pt-1.5">
-                <Button size="sm" variant="outline" className="text-green-500 border-green-500/30 hover:bg-green-500/10 gap-1 h-8 text-xs"
+                <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/10 gap-1 h-8 text-xs"
                   onClick={() => onUpdateStatus(reg.user_id, "approved")} disabled={isPending}>
                   <Check className="h-3.5 w-3.5" /> Aprovar
                 </Button>
@@ -166,7 +166,7 @@ function DateGroupedList({ items, onUpdateStatus, isPending }: {
     <div className="space-y-5">
       {groups.map(([date, regs]) => (
         <div key={date} className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">{date}</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-normal px-1">{date}</p>
           <div className="space-y-2">
             {regs.map(reg => (
               <RegistrationCard key={reg.id} reg={reg} onUpdateStatus={onUpdateStatus} isPending={isPending} />
@@ -256,7 +256,7 @@ export default function AdminRegistrosPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Registros</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">Registros</h1>
         <p className="text-sm text-muted-foreground mt-1">Gerencie as solicitações de acesso à plataforma</p>
       </div>
 

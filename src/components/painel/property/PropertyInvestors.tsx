@@ -172,7 +172,7 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${target > 0 ? Math.min((total / target) * 100, 100) : 0}%` }} />
           </div>
           {target > 0 && diff !== 0 && (
-            <p className={`text-[11px] mt-1 ${diff > 0 ? "text-muted-foreground" : "text-amber-500"}`}>
+            <p className={`text-[11px] mt-1 ${diff > 0 ? "text-muted-foreground" : "text-warning"}`}>
               {diff > 0 ? `Faltam $${fmt(diff)}` : `Acima da estimativa em $${fmt(-diff)}`}
             </p>
           )}
@@ -184,7 +184,7 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
           const isEd = editing?.id === s.id;
           const pct = total > 0 ? (Number(s.amount_paid) / total) * 100 : 0;
           return (
-            <div key={s.id} className="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-border/50 bg-card/50 px-4 py-3">
+            <div key={s.id} className="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3">
               <Link to={`/painel/usuarios/${s.user_id}`} className="min-w-0 text-sm font-medium hover:text-primary flex items-center gap-1.5">
                 <span className="min-w-0 break-words">{nameOf(s.user_id)}</span> <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
               </Link>
@@ -244,14 +244,14 @@ export function PropertyInvestors({ propertyId, renovationCost, estimatedSaleVal
             <div key={ph} className="flex flex-col sm:flex-row items-center gap-2 sm:flex-1 min-w-0">
               <Button type="button" variant="ghost" onClick={() => setViewPhase(ph)}
                 className={`w-full sm:w-auto sm:flex-1 h-auto min-h-10 flex flex-wrap items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium whitespace-normal transition-colors ${
-                  active === ph ? "border-primary bg-primary/10 text-primary" : "border-border/50 text-muted-foreground hover:bg-secondary/30"
+                  active === ph ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-secondary/30"
                 }`}>
                 <M.icon className="h-4 w-4" />
                 {i + 1}. {M.label}
-                {isCurrent && <span className="text-[9px] uppercase tracking-wider rounded bg-primary text-primary-foreground px-1.5 py-0.5">atual</span>}
+                {isCurrent && <span className="text-[9px] uppercase tracking-normal rounded bg-primary text-primary-foreground px-1.5 py-0.5">atual</span>}
                 {done && <Check className="h-3 w-3" />}
               </Button>
-              {i < phases.length - 1 && <ArrowRight className="h-3.5 w-3.5 rotate-90 sm:rotate-0 text-muted-foreground/50 flex-shrink-0" />}
+              {i < phases.length - 1 && <ArrowRight className="h-3.5 w-3.5 rotate-90 sm:rotate-0 text-muted-foreground flex-shrink-0" />}
             </div>
           );
         })}
@@ -345,21 +345,21 @@ function SalePanel({ initialSale, initialDoc, initialBroker, shares, nameOf, onS
         Salvar dados de venda
       </Button>
 
-      <div className="rounded-lg border border-border/50 bg-secondary/20 p-3 text-xs space-y-1">
+      <div className="rounded-lg border border-border bg-secondary/20 p-3 text-xs space-y-1">
         <div className="flex justify-between"><span>Valor de venda</span><span>${fmt(parseNum(sale))}</span></div>
         <div className="flex justify-between text-muted-foreground"><span>− Documentação</span><span>${fmt(parseNum(doc))}</span></div>
         <div className="flex justify-between text-muted-foreground"><span>− Comissão do corretor</span><span>${fmt(parseNum(broker))}</span></div>
         <div className="flex justify-between text-muted-foreground"><span>− Total investido</span><span>${fmt(r.totalInvested)}</span></div>
-        <div className="border-t border-border/50 pt-1 flex justify-between font-semibold">
+        <div className="border-t border-border pt-1 flex justify-between font-semibold">
           <span>Lucro (Est.)</span><span className={r.profit >= 0 ? "text-primary" : "text-destructive"}>${fmt(r.profit)}</span>
         </div>
       </div>
 
       <div className="space-y-2">
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">Resumo do Investidor</p>
+        <p className="text-[10px] uppercase tracking-normal text-muted-foreground font-medium">Resumo do Investidor</p>
         {r.results.length === 0 && <p className="text-sm text-muted-foreground text-center py-3">Nenhum investidor vinculado</p>}
         {r.results.sort((a, b) => b.total - a.total).map((i) => (
-          <div key={i.userId} className="rounded-lg border border-border/50 bg-card/50 px-4 py-3 text-xs">
+          <div key={i.userId} className="rounded-lg border border-border bg-card px-4 py-3 text-xs">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-medium">{nameOf(i.userId)}</span>
               <span className="font-semibold">{i.pct.toFixed(1)}% do total</span>

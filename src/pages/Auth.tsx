@@ -231,7 +231,7 @@ export default function Auth() {
           <div className="flex justify-center mb-8">
             <img src={discoveryLogo} alt="Discovery" className="h-12" />
           </div>
-          <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <Card className="discovery-auth-form border-border bg-card">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <div className={`h-16 w-16 rounded-full flex items-center justify-center ${isRejected ? "bg-destructive/10" : "bg-primary/10"}`}>
@@ -279,13 +279,13 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
+    <div className="discovery-auth min-h-[100dvh] bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <img src={discoveryLogo} alt="Discovery" className="h-12" />
         </div>
 
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+        <Card className="discovery-auth-form border-border bg-card">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-foreground">
               {isForgotPassword
@@ -408,7 +408,7 @@ export default function Auth() {
                       key={lang.code}
                       type="button"
                       onClick={() => setPreferredLanguage(lang.code)}
-                      className={`flex items-center gap-3 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                      className={`flex items-center gap-3 w-full rounded-lg border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-150 ${
                         preferredLanguage === lang.code
                           ? "border-primary bg-primary/10 text-foreground"
                           : "border-border bg-transparent text-muted-foreground hover:border-primary/50"

@@ -124,15 +124,15 @@ export function PainelLayout() {
   return (
     <TooltipProvider delayDuration={0}>
       <OfflineBanner />
-      <div className="min-h-screen bg-background flex">
+      <div className="discovery-panel min-h-screen bg-background flex">
         {/* ── Desktop Sidebar ── */}
         <aside
           className={cn(
-            "hidden md:flex flex-col flex-shrink-0 border-r border-border/20 bg-card/30 min-h-screen sticky top-0 transition-all duration-300",
-            collapsed ? "w-[68px]" : "w-56"
+            "hidden md:flex flex-col flex-shrink-0 border-r border-border bg-card min-h-screen sticky top-0 transition-all duration-150",
+            collapsed ? "w-[72px]" : "w-60"
           )}
         >
-          <div className={cn("flex items-center h-14 px-3 border-b border-border/20", collapsed ? "justify-center" : "justify-between")}>
+          <div className={cn("flex items-center h-20 px-4 border-b border-border", collapsed ? "justify-center" : "justify-between")}>
             <Link to="/pt" className="flex items-center gap-2 group flex-shrink-0">
               <img src={discoveryLogo} alt="Discovery" className={cn("transition-all", collapsed ? "h-6" : "h-7")} />
             </Link>
@@ -143,7 +143,7 @@ export function PainelLayout() {
             )}
             {collapsed && (
               <div className="absolute -right-3 top-4 z-10">
-                <Button variant="outline" size="sm" className="h-6 w-6 p-0 rounded-full border-border/40 bg-background shadow-sm" onClick={() => setCollapsed(false)}>
+                <Button variant="outline" size="sm" className="h-6 w-6 p-0 rounded-full border-border bg-background shadow-sm" onClick={() => setCollapsed(false)}>
                   <PanelLeft className="h-3 w-3" />
                 </Button>
               </div>
@@ -152,14 +152,14 @@ export function PainelLayout() {
 
           {!collapsed && (
             <div className="px-4 py-2">
-              <span className="text-[10px] font-medium tracking-widest uppercase text-muted-foreground/50 flex items-center gap-1.5">
+              <span className="text-[10px] font-medium tracking-normal uppercase text-muted-foreground flex items-center gap-1.5">
                 {isAdmin && <Shield className="h-3 w-3 text-primary" />}
                 {isAdmin ? "Admin" : p.investor}
               </span>
             </div>
           )}
 
-          <nav className="flex-1 p-2 space-y-1">
+          <nav className="flex-1 p-3 space-y-1">
             {navItems.map((item) => {
               const isActive = item.path === "/painel"
                 ? location.pathname === "/painel"
@@ -177,7 +177,7 @@ export function PainelLayout() {
                   to={item.path}
                   onClick={(event) => handlePanelNavigation(event, item.path)}
                   className={cn(
-                    "relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
+                    "relative flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150",
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
                     isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   )}
@@ -210,18 +210,18 @@ export function PainelLayout() {
             })}
           </nav>
 
-          <div className={cn("border-t border-border/20 p-2 space-y-1", collapsed && "flex flex-col items-center")}>
+          <div className={cn("border-t border-border p-2 space-y-1", collapsed && "flex flex-col items-center")}>
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link to="/pt" className="flex items-center justify-center px-2 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+                  <Link to="/pt" className="flex items-center justify-center px-2 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
                     <Home className="h-4 w-4" />
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="text-xs">{p.goToSite}</TooltipContent>
               </Tooltip>
             ) : (
-              <Link to="/pt" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
+              <Link to="/pt" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
                 <Home className="h-4 w-4 flex-shrink-0" />
                 {p.goToSite}
               </Link>
@@ -231,7 +231,7 @@ export function PainelLayout() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link to={profilePath} className={cn(
-                    "flex items-center justify-center px-2 py-2.5 rounded-xl transition-colors",
+                    "flex items-center justify-center px-2 py-2.5 rounded-lg transition-colors",
                     isProfileActive ? "bg-primary/10" : "hover:bg-secondary/50"
                   )}>
                     <Avatar className="h-7 w-7">
@@ -247,7 +247,7 @@ export function PainelLayout() {
               </Tooltip>
             ) : (
               <Link to={profilePath} onClick={(event) => handlePanelNavigation(event, profilePath)} className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isProfileActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}>
                 <Avatar className="h-6 w-6">
@@ -264,7 +264,7 @@ export function PainelLayout() {
                 <TooltipTrigger asChild>
                   <button
                     onClick={signOut}
-                    className="flex items-center justify-center px-2 py-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                    className="flex items-center justify-center px-2 py-2.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
@@ -274,7 +274,7 @@ export function PainelLayout() {
             ) : (
               <button
                 onClick={signOut}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
               >
                 <LogOut className="h-4 w-4 flex-shrink-0" />
                 {p.logout}
@@ -303,17 +303,17 @@ export function PainelLayout() {
               {/* More panel – full width, above bottom nav */}
               {moreOpen && (
                 <div className="md:hidden fixed inset-0 z-30" onClick={() => setMoreOpen(false)}>
-                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+                  <div className="absolute inset-0 bg-background/80 " />
                 </div>
               )}
               <div
                 className={cn(
-                  "md:hidden fixed inset-x-0 z-35 transition-transform duration-300 ease-out",
+                  "md:hidden fixed inset-x-0 z-35 transition-transform duration-150 ease-out",
                   moreOpen ? "translate-y-0" : "translate-y-full"
                 )}
                 style={{ zIndex: 35, bottom: mobileNavHeight }}
               >
-                <div className="bg-background border-t border-border/30 rounded-t-2xl shadow-2xl px-4 pt-5 pb-4">
+                <div className="bg-background border-t border-border rounded-t-2xl shadow-2xl px-4 pt-5 pb-4">
                   <div className="flex items-center justify-between mb-4 px-1">
                     <span className="text-sm font-semibold text-foreground">Menu</span>
                     <button onClick={() => setMoreOpen(false)} className="text-muted-foreground hover:text-foreground p-1">
@@ -332,7 +332,7 @@ export function PainelLayout() {
                           to={item.path}
                           onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                           className={cn(
-                            "flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all",
+                            "flex items-center gap-4 px-4 py-3.5 rounded-lg text-sm font-medium transition-all",
                             isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                           )}
                         >
@@ -343,10 +343,10 @@ export function PainelLayout() {
                     })}
                   </nav>
 
-                  <div className="border-t border-border/20 mt-3 pt-3">
+                  <div className="border-t border-border mt-3 pt-3">
                     <button
                       onClick={() => { setMoreOpen(false); signOut(); }}
-                      className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
+                      className="flex items-center gap-4 px-4 py-3.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full"
                     >
                       <LogOut className="h-5 w-5 flex-shrink-0" />
                       {p.logout}
@@ -355,7 +355,7 @@ export function PainelLayout() {
                 </div>
               </div>
 
-              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 bg-background">
+              <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background">
                 <nav
                   className="flex items-center justify-evenly px-1 w-full"
                   style={{
@@ -420,7 +420,7 @@ export function PainelLayout() {
           }}
         >
           {isDemoUser && (
-            <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-200 flex items-center gap-2">
+            <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-warning flex items-center gap-2">
               <Shield className="h-4 w-4 flex-shrink-0" />
               <span>Modo demonstração — somente visualização. Ações de escrita estão desabilitadas.</span>
             </div>

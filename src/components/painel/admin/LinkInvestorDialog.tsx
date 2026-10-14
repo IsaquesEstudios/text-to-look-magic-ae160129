@@ -440,7 +440,7 @@ export function LinkInvestorDialog({
 
           {/* Summary */}
           {SHOW_FEES && grossAporte > 0 && selectedUserId && (
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1.5 text-xs">
+            <div className="rounded-lg border border-warning/30 bg-warning/5 p-3 space-y-1.5 text-xs">
               <p className="font-medium text-foreground">Resumo da operação:</p>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Aporte (investimento na compra)</span>
@@ -449,29 +449,29 @@ export function LinkInvestorDialog({
               {feeService > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Taxa de serviço</span>
-                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeService))}</span>
+                  <span className="font-semibold text-warning">${formatUSD(round2(feeService))}</span>
                 </div>
               )}
               {feeRenovation > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Taxa de reforma</span>
-                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeRenovation))}</span>
+                  <span className="font-semibold text-warning">${formatUSD(round2(feeRenovation))}</span>
                 </div>
               )}
               {feeSales > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Taxa de vendas</span>
-                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeSales))}</span>
+                  <span className="font-semibold text-warning">${formatUSD(round2(feeSales))}</span>
                 </div>
               )}
-              <div className="border-t border-border/50 pt-1.5 flex justify-between">
+              <div className="border-t border-border pt-1.5 flex justify-between">
                 <span className="font-medium text-foreground">Total debitado</span>
                 <span className="font-bold text-foreground">${formatUSD(totalDeduction)}</span>
               </div>
               {feeProfitUsd > 0 && (
                 <div className="flex justify-between text-muted-foreground">
                   <span>Taxa de lucro ({feeProfitRate.toFixed(1)}% do lucro)</span>
-                  <span className="font-semibold text-amber-500">${formatUSD(round2(feeProfitUsd))}</span>
+                  <span className="font-semibold text-warning">${formatUSD(round2(feeProfitUsd))}</span>
                 </div>
               )}
               {entryFees > 0 && (
@@ -495,7 +495,7 @@ export function LinkInvestorDialog({
                       Retorno = sua parte do lucro ({(participation * 100).toFixed(1)}%) menos as taxas da Discovery.
                     </span>
                   </div>
-                  <div className="border-t border-border/50 pt-1.5 flex justify-between">
+                  <div className="border-t border-border pt-1.5 flex justify-between">
                     <span className="font-medium text-foreground">Retorno Est. Investidor</span>
                     <span className="font-bold text-emerald-500">
                       ${formatUSD(estimatedReturn)} ({returnPct.toFixed(1)}%)

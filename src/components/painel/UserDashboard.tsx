@@ -179,40 +179,40 @@ export function UserDashboard() {
   return (
     <div className="space-y-4 max-w-full">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">
           {p.greeting.replace("{name}", profile?.full_name?.split(" ")[0] || p.investor)}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">{p.investmentSummary}</p>
       </div>
 
       <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{p.availableCredit}</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.availableCredit}</p>
             <p className="text-sm sm:text-lg font-bold text-foreground truncate">${credits.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{p.totalInvested}</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.totalInvested}</p>
             <p className="text-sm sm:text-lg font-bold text-foreground truncate">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /></div>
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0"><TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-accent" /></div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{p.estimatedReturn}</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.estimatedReturn}</p>
             <p className={`text-sm sm:text-lg font-bold truncate ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
               ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
+        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /></div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground truncate">{p.estimatedROI}</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-normal text-muted-foreground truncate">{p.estimatedROI}</p>
             <p className={`text-sm sm:text-lg font-bold ${portfolioRoi >= 0 ? 'text-primary' : 'text-destructive'}`}>{portfolioRoi.toFixed(1)}%</p>
           </div>
         </div>
@@ -229,7 +229,7 @@ export function UserDashboard() {
           )}
         </div>
         {!effectiveNews?.length ? (
-          <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-12 text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Building2 className="h-8 w-8 mb-2 opacity-20" />
             <p className="text-sm">{p.noLinkedProperties}</p>
             <Link to="/painel/leiloes-user" className="text-xs text-primary hover:underline mt-1">{p.viewAuctions}</Link>
@@ -240,13 +240,13 @@ export function UserDashboard() {
               <Link
                 key={prop.id}
                 to={`/painel/imovel/${prop.id}${prop.unreadMessages > 0 ? "/novidades" : prop.unreadExpenses > 0 ? "/gastos" : "/novidades"}`}
-                className="group relative flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-3 sm:p-4 sm:gap-4 hover:bg-card/70 hover:border-primary/20 transition-all duration-300"
+                className="group relative flex items-center gap-3 rounded-lg border border-border bg-card p-3 sm:p-4 sm:gap-4 hover:bg-card hover:border-primary/20 transition-all duration-150"
               >
-                <div className="h-11 w-11 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
+                <div className="h-11 w-11 rounded-lg overflow-hidden bg-secondary/50 flex-shrink-0">
                   {prop.cover_image_url ? (
                     <img src={prop.cover_image_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground/20" /></div>
+                    <div className="w-full h-full flex items-center justify-center"><Building2 className="h-5 w-5 text-muted-foreground" /></div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -255,10 +255,10 @@ export function UserDashboard() {
                     {prop.unread > 0 ? fmtUnread(prop.unreadMessages, prop.unreadExpenses) : p.noUpdates}
                   </p>
                 </div>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                 {prop.unread > 0 && (
                   <span className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full text-[11px] font-bold flex items-center justify-center ${
-                    prop.unreadExpenses > 0 && prop.unreadMessages === 0 ? "bg-amber-500 text-white" : "bg-destructive text-destructive-foreground"
+                    prop.unreadExpenses > 0 && prop.unreadMessages === 0 ? "bg-warning text-media-foreground" : "bg-destructive text-destructive-foreground"
                   }`}>
                     {prop.unread > 9 ? "+9" : prop.unread}
                   </span>
@@ -308,7 +308,7 @@ export function UserDashboard() {
         });
 
         // Pie chart data
-        const PIE_COLORS = ["hsl(var(--primary))", "hsl(142, 71%, 45%)", "hsl(38, 92%, 50%)", "hsl(280, 67%, 55%)", "hsl(200, 80%, 50%)", "hsl(350, 70%, 55%)"];
+        const PIE_COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(var(--chart-6))"];
         const pieData = Array.from(propMap.entries()).map(([, v]) => ({
           name: v.title.length > 20 ? v.title.slice(0, 18) + "…" : v.title,
           value: Math.round(v.totalPaid * 100) / 100,
@@ -317,7 +317,7 @@ export function UserDashboard() {
         const CustomTooltip = ({ active, payload, label }: any) => {
           if (!active || !payload?.length) return null;
           return (
-            <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+            <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
               <p className="text-xs font-medium text-foreground mb-1">{label}</p>
               {payload.map((entry: any) => (
                 <p key={entry.name} className="text-xs" style={{ color: entry.color }}>
@@ -331,7 +331,7 @@ export function UserDashboard() {
         const PieTooltip = ({ active, payload }: any) => {
           if (!active || !payload?.length) return null;
           return (
-            <div className="rounded-lg border border-border/50 bg-card p-3 shadow-lg">
+            <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
               <p className="text-xs font-medium text-foreground">{payload[0].name}</p>
               <p className="text-xs text-primary">$ {Number(payload[0].value).toLocaleString("en-US")}</p>
             </div>
@@ -340,7 +340,7 @@ export function UserDashboard() {
 
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-card/50 border-border/50">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-semibold">{p.estimatedReturn || "Rendimento Estimado"}</CardTitle>
               </CardHeader>
@@ -369,7 +369,7 @@ export function UserDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-semibold">Distribuição por Imóvel</CardTitle>
               </CardHeader>
@@ -397,8 +397,8 @@ export function UserDashboard() {
         );
       })()}
 
-      <div className="rounded-2xl border border-border/30 bg-card/40 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <History className="h-4 w-4 text-muted-foreground" />
             <h3 className="font-semibold text-foreground text-sm">{p.recentHistory}</h3>
@@ -413,10 +413,10 @@ export function UserDashboard() {
               {effectiveActivity.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors">
                   <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    item.type === "deposit" || item.type === "profit" ? "bg-primary/10" : item.type === "refund" ? "bg-amber-500/10" : "bg-accent/10"
+                    item.type === "deposit" || item.type === "profit" ? "bg-primary/10" : item.type === "refund" ? "bg-warning/10" : "bg-accent/10"
                   }`}>
                     <CreditCard className={`h-4 w-4 ${
-                      item.type === "deposit" || item.type === "profit" ? "text-primary" : item.type === "refund" ? "text-amber-500" : "text-accent"
+                      item.type === "deposit" || item.type === "profit" ? "text-primary" : item.type === "refund" ? "text-warning" : "text-accent"
                     }`} />
                   </div>
                   <div className="flex-1 min-w-0">

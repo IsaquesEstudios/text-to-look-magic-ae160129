@@ -10,17 +10,17 @@ export function DashboardSkeleton() {
       </div>
       <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-[72px] rounded-2xl" />
+          <Skeleton key={i} className="h-[72px] rounded-lg" />
         ))}
       </div>
       <div className="space-y-2">
         <Skeleton className="h-4 w-40 rounded-md" />
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-          <Skeleton className="h-[72px] rounded-2xl" />
-          <Skeleton className="h-[72px] rounded-2xl" />
+          <Skeleton className="h-[72px] rounded-lg" />
+          <Skeleton className="h-[72px] rounded-lg" />
         </div>
       </div>
-      <Skeleton className="h-64 w-full rounded-2xl" />
+      <Skeleton className="h-64 w-full rounded-lg" />
     </div>
   );
 }
@@ -35,12 +35,12 @@ export function AdminDashboardSkeleton() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-[88px] rounded-xl" />
+          <Skeleton key={i} className="h-[88px] rounded-lg" />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Skeleton className="h-64 rounded-xl" />
-        <Skeleton className="h-64 rounded-xl" />
+        <Skeleton className="h-64 rounded-lg" />
+        <Skeleton className="h-64 rounded-lg" />
       </div>
     </div>
   );
@@ -56,7 +56,7 @@ export function AuctionsSkeleton() {
       </div>
       <Skeleton className="h-5 w-44 rounded-md" />
       {Array.from({ length: 2 }).map((_, i) => (
-        <Skeleton key={i} className="h-28 w-full rounded-xl" />
+        <Skeleton key={i} className="h-28 w-full rounded-lg" />
       ))}
     </div>
   );
@@ -70,15 +70,15 @@ export function PropertiesSkeleton() {
         <Skeleton className="h-7 w-44 rounded-lg" />
         <Skeleton className="h-4 w-48 rounded-md" />
       </div>
-      <Skeleton className="h-10 w-56 rounded-xl" />
+      <Skeleton className="h-10 w-56 rounded-lg" />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-[72px] rounded-2xl" />
+          <Skeleton key={i} className="h-[72px] rounded-lg" />
         ))}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Skeleton className="h-72 rounded-2xl" />
-        <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-72 rounded-lg" />
+        <Skeleton className="h-72 rounded-lg" />
       </div>
     </div>
   );
@@ -98,10 +98,10 @@ export function StatementSkeleton() {
           <Skeleton className="h-9 w-28 rounded-lg" />
         </div>
       </div>
-      <Skeleton className="h-14 w-full rounded-2xl" />
+      <Skeleton className="h-14 w-full rounded-lg" />
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 w-full rounded-xl" />
+          <Skeleton key={i} className="h-14 w-full rounded-lg" />
         ))}
       </div>
     </div>
@@ -119,7 +119,7 @@ export function ReceiptsSkeleton() {
       <Skeleton className="h-10 w-full rounded-lg" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-square rounded-xl" />
+          <Skeleton key={i} className="aspect-square rounded-lg" />
         ))}
       </div>
     </div>
@@ -137,7 +137,7 @@ export function ContractsSkeleton() {
         </div>
       </div>
       {Array.from({ length: 3 }).map((_, i) => (
-        <Skeleton key={i} className="h-32 w-full rounded-xl" />
+        <Skeleton key={i} className="h-32 w-full rounded-lg" />
       ))}
     </div>
   );
@@ -149,7 +149,7 @@ export function ProfileSkeleton() {
     <div className="space-y-4">
       <Skeleton className="h-7 w-48 rounded-lg" />
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className="h-36 w-full rounded-xl" />
+        <Skeleton key={i} className="h-36 w-full rounded-lg" />
       ))}
       <Skeleton className="h-10 w-32 rounded-lg" />
     </div>
@@ -163,15 +163,15 @@ export function PropertyDetailSkeleton() {
       <div className="space-y-2">
         <Skeleton className="h-4 w-16 rounded-md" />
         <Skeleton className="h-8 w-64 rounded-lg" />
-        <Skeleton className="h-10 w-80 rounded-xl" />
+        <Skeleton className="h-10 w-80 rounded-lg" />
       </div>
-      <Skeleton className="h-48 w-full rounded-xl" />
+      <Skeleton className="h-48 w-full rounded-lg" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <Skeleton className="h-20 rounded-xl" />
-        <Skeleton className="h-20 rounded-xl" />
-        <Skeleton className="h-20 rounded-xl" />
+        <Skeleton className="h-20 rounded-lg" />
+        <Skeleton className="h-20 rounded-lg" />
+        <Skeleton className="h-20 rounded-lg" />
       </div>
-      <Skeleton className="h-48 w-full rounded-xl" />
+      <Skeleton className="h-48 w-full rounded-lg" />
     </div>
   );
 }
@@ -183,11 +183,11 @@ export function PropertySubPageSkeleton() {
       <div className="space-y-2">
         <Skeleton className="h-4 w-16 rounded-md" />
         <Skeleton className="h-8 w-64 rounded-lg" />
-        <Skeleton className="h-10 w-80 rounded-xl" />
+        <Skeleton className="h-10 w-80 rounded-lg" />
       </div>
       <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-xl" />
+          <Skeleton key={i} className="h-16 w-full rounded-lg" />
         ))}
       </div>
     </div>
@@ -202,10 +202,10 @@ export function AdminListSkeleton() {
         <Skeleton className="h-7 w-44 rounded-lg" />
         <Skeleton className="h-4 w-52 rounded-md" />
       </div>
-      <Skeleton className="h-10 w-full rounded-xl" />
+      <Skeleton className="h-10 w-full rounded-lg" />
       <div className="space-y-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 w-full rounded-xl" />
+          <Skeleton key={i} className="h-14 w-full rounded-lg" />
         ))}
       </div>
     </div>
@@ -218,10 +218,10 @@ export function AuctionDetailSkeleton() {
     <div className="space-y-4">
       <Skeleton className="h-4 w-20 rounded-md" />
       <Skeleton className="h-8 w-56 rounded-lg" />
-      <Skeleton className="h-20 w-full rounded-xl" />
+      <Skeleton className="h-20 w-full rounded-lg" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Skeleton className="h-72 rounded-2xl" />
-        <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-72 rounded-lg" />
+        <Skeleton className="h-72 rounded-lg" />
       </div>
     </div>
   );
@@ -236,11 +236,11 @@ export function GenericPanelSkeleton() {
         <Skeleton className="h-4 w-32 rounded-md" />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-24 rounded-2xl" />
-        <Skeleton className="h-24 rounded-2xl" />
+        <Skeleton className="h-24 rounded-lg" />
+        <Skeleton className="h-24 rounded-lg" />
       </div>
-      <Skeleton className="h-40 w-full rounded-2xl" />
-      <Skeleton className="h-32 w-full rounded-2xl" />
+      <Skeleton className="h-40 w-full rounded-lg" />
+      <Skeleton className="h-32 w-full rounded-lg" />
     </div>
   );
 }

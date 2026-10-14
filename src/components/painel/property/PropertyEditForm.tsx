@@ -203,14 +203,14 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   return (
-    <Card className="bg-card/50 border-border/50">
+    <Card className="bg-card border-border">
       <CardContent className="pt-6 space-y-5">
         {/* Type */}
         <div className="flex gap-3">
           <button
             type="button"
             onClick={() => setForm((f) => ({ ...f, type: "house" }))}
-            className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+            className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
               form.type === "house"
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:border-primary/50"
@@ -221,7 +221,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
           <button
             type="button"
             onClick={() => setForm((f) => ({ ...f, type: "land" }))}
-            className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+            className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
               form.type === "land"
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:border-primary/50"
@@ -328,7 +328,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
         <div className="space-y-2">
           <Label>Foto de Capa</Label>
           {form.coverImage ? (
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted">
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
               <img src={form.coverImage} alt="Capa" className="w-full h-full object-cover" />
               <button
                 type="button"
@@ -339,7 +339,7 @@ export function PropertyEditForm({ property, images, onDone }: PropertyEditFormP
               </button>
             </div>
           ) : (
-            <label className="flex flex-col items-center justify-center w-full aspect-video rounded-xl border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
+            <label className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
               <Upload className="h-8 w-8 text-muted-foreground mb-2" />
               <span className="text-sm text-muted-foreground">Clique para enviar</span>
               <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />

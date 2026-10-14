@@ -236,7 +236,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
     <div className="space-y-4">
       {/* Add expense form - admin only */}
       {isAdmin && (
-        <Card className="bg-card/50 border-border/50">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <form onSubmit={addExpense} className="space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-2 sm:items-end">
               {/* Row 1 mobile: Mês + Valor */}
@@ -350,11 +350,11 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
 
       {/* Expenses table - grouped by category */}
       {groupedExpenses.length > 0 ? (
-        <Card className="bg-card/50 border-border/50 overflow-hidden">
+        <Card className="bg-card border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm table-fixed">
               <thead>
-                <tr className="border-b border-border/50">
+                <tr className="border-b border-border">
                   <th className="text-left p-2 sm:p-3 text-muted-foreground font-medium">Categoria</th>
                   <th className="text-right p-2 sm:p-3 text-muted-foreground font-medium w-20 sm:w-auto">Valor</th>
                   <th className="text-right p-2 sm:p-3 text-muted-foreground font-medium w-16 sm:w-auto">Tarifa</th>
@@ -370,7 +370,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                     <Fragment key={group.category}>
                       <tr
                         className={cn(
-                          "border-b border-border/30 hover:bg-secondary/30",
+                          "border-b border-border hover:bg-secondary/30",
                           hasMultiple && "cursor-pointer"
                         )}
                         onClick={() => hasMultiple && toggleCat(group.category)}
@@ -387,7 +387,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                               <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">({group.items.length})</span>
                             )}
                             {group.newCount > 0 && (
-                              <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold shrink-0">
+                              <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-0.5 rounded-full bg-warning text-media-foreground text-[9px] font-bold shrink-0">
                                 {group.newCount}
                               </span>
                             )}
@@ -408,7 +408,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                       {isExpanded && group.items.map((expense) => {
                         const itemTax = Number(expense.price) * (Number(expense.tax_rate || 0) / 100);
                         return (
-                          <tr key={expense.id} className="border-b border-border/20 bg-secondary/10">
+                          <tr key={expense.id} className="border-b border-border bg-secondary/10">
                             <td className="p-1.5 sm:p-2 pl-7 sm:pl-10 text-muted-foreground text-[11px] sm:text-xs truncate">
                               {formatMonthLabel(expense.month)}
                             </td>
@@ -432,7 +432,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
                 })}
               </tbody>
               <tfoot>
-                <tr className="border-t border-border/50">
+                <tr className="border-t border-border">
                   <td className="p-2 sm:p-3 font-bold text-foreground text-xs sm:text-sm">Total</td>
                   <td className="p-2 sm:p-3 text-right font-bold text-foreground text-xs sm:text-sm">${fmt(totalSpent)}</td>
                   <td className="p-2 sm:p-3 text-right font-bold text-muted-foreground text-xs sm:text-sm">{totalTax > 0 ? `$${fmt(totalTax)}` : "—"}</td>
@@ -444,7 +444,7 @@ export function PropertyExpenses({ propertyId, propertyStateCode }: Props) {
           </div>
         </Card>
       ) : (
-        <Card className="bg-card/50 border-border/50">
+        <Card className="bg-card border-border">
           <CardContent className="py-8 text-center text-muted-foreground">
             Nenhum gasto registrado.
           </CardContent>

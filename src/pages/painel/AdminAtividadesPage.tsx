@@ -44,8 +44,8 @@ const TYPE_LABELS: Record<ActivityType, string> = {
 };
 
 const TYPE_COLORS: Record<ActivityType, string> = {
-  share_purchase: "bg-blue-500/10 text-blue-500",
-  user_registration: "bg-green-500/10 text-green-500",
+  share_purchase: "bg-info/10 text-info",
+  user_registration: "bg-primary/10 text-primary",
   credit_transaction: "bg-yellow-500/10 text-yellow-500",
   auction_deposit: "bg-purple-500/10 text-purple-500",
   property_expense: "bg-orange-500/10 text-orange-500",
@@ -269,11 +269,11 @@ export default function AdminAtividadesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Histórico de Atividades</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">Histórico de Atividades</h1>
         <p className="text-sm text-muted-foreground mt-1">Todas as movimentações realizadas na plataforma</p>
       </div>
 
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">

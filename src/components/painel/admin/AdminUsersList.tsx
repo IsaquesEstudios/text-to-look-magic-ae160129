@@ -32,7 +32,7 @@ export function AdminUsersList() {
 
   if (!profiles?.length) {
     return (
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
           <Users className="h-12 w-12 mb-4 opacity-50" />
           <p>Nenhum usuário cadastrado</p>
@@ -46,7 +46,7 @@ export function AdminUsersList() {
       {profiles.map((profile) => (
         <Card
           key={profile.id}
-          className="bg-card/50 border-border/50 cursor-pointer hover:border-primary/30 transition-colors"
+          className="bg-card border-border cursor-pointer hover:border-primary/30 transition-colors"
           onClick={() => navigate(`/painel/usuarios/${profile.user_id}`)}
         >
           <CardContent className="flex items-center justify-between p-4">

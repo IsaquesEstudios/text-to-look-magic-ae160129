@@ -191,7 +191,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
 
   return (
     <>
-      <Card className="bg-card/50 border-border/50">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
@@ -211,7 +211,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
             const isFullyCovered = remaining <= 0 && totalProject > 0;
 
             return (
-              <div key={item.id} className="border border-border rounded-xl p-4 space-y-3">
+              <div key={item.id} className="border border-border rounded-lg p-4 space-y-3">
                 {/* Property header */}
                 <div className="flex items-center gap-3">
                   {item.image_url ? (
@@ -312,7 +312,7 @@ export default function AuctionInvestorLinking({ auctionId, items }: Props) {
                             <div className="flex flex-col gap-0.5">
                               <span className="font-medium">{profileMap.get(g.userId) || "Usuário"}</span>
                               {g.fees > 0 && (
-                                <span className="text-[10px] text-amber-500">Taxas: ${formatUSD(g.fees)}</span>
+                                <span className="text-[10px] text-warning">Taxas: ${formatUSD(g.fees)}</span>
                               )}
                             </div>
                             <div className="flex items-center gap-3">

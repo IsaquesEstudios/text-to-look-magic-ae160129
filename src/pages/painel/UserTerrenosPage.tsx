@@ -64,23 +64,23 @@ export default function UserTerrenosPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">{p.myLands}</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-normal">{p.myLands}</h1>
         <p className="text-sm text-muted-foreground mt-1">{p.landsYouInvest}</p>
       </div>
 
       {sorted.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
+          <div className="discovery-metric rounded-lg border border-border bg-card p-5">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.totalInvested}</p>
+              <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.totalInvested}</p>
               <p className="text-lg font-bold text-foreground">{formatCurrencySmart(totalInvested).compact}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-border/30 bg-card/40 p-5">
-            <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
+          <div className="discovery-metric rounded-lg border border-border bg-card p-5">
+            <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturn}</p>
+              <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.estimatedReturn}</p>
               <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>{formatCurrencySmart(totalEstimatedReturn).compact}</p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function UserTerrenosPage() {
       )}
 
       {!sorted.length ? (
-        <div className="rounded-2xl border border-dashed border-border/40 flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center py-20 text-muted-foreground">
           <MapPin className="h-9 w-9 mb-3 opacity-25" /><p className="text-sm">{p.noLinkedLands}</p>
         </div>
       ) : (
@@ -105,7 +105,7 @@ export default function UserTerrenosPage() {
             const totalUnread = (counts?.novidades ?? 0) + (counts?.gastos ?? 0);
 
             return (
-              <Link key={prop.id} to={`/painel/imovel/${prop.id}`} className="group relative flex flex-col rounded-2xl border border-border/30 bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
+              <Link key={prop.id} to={`/painel/imovel/${prop.id}`} className="group relative flex flex-col rounded-lg border border-border bg-card overflow-hidden hover:shadow-lg transition-all duration-150">
                 {totalUnread > 0 && (
                   <span className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md">
                     <Bell className="h-3 w-3" />{totalUnread > 9 ? "+9" : totalUnread}
@@ -113,7 +113,7 @@ export default function UserTerrenosPage() {
                 )}
                 <div className="aspect-[16/10] bg-secondary/50 overflow-hidden">
                   {prop.cover_image_url ? <img src={prop.cover_image_url} alt={prop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /> : (
-                    <div className="w-full h-full flex items-center justify-center"><MapPin className="h-8 w-8 text-muted-foreground/20" /></div>
+                    <div className="w-full h-full flex items-center justify-center"><MapPin className="h-8 w-8 text-muted-foreground" /></div>
                   )}
                 </div>
                 <div className="p-4 flex flex-col gap-3 flex-1">
@@ -122,15 +122,15 @@ export default function UserTerrenosPage() {
                       <h3 className="font-semibold text-foreground leading-tight">{prop.title}</h3>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" />{prop.location}</p>
                     </div>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
+                    <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-center mt-auto">
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.invested}</p>
+                      <p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.invested}</p>
                       <p className="font-semibold text-sm text-foreground">{formatCurrencySmart(totalPaid).compact}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.estimatedReturnShort}</p>
+                      <p className="text-[10px] uppercase tracking-normal text-muted-foreground">{p.estimatedReturnShort}</p>
                       <p className="font-semibold text-sm text-primary">{formatCurrencySmart(estimatedValue).compact}</p>
                     </div>
                   </div>

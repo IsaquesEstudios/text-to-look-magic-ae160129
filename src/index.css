@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@font-face { font-family: 'Inter'; src: url('/__l5e/assets-v1/cd604d52-6330-41e1-ad51-81d452229654/inter-0.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/__l5e/assets-v1/e67b1dc6-8631-4d68-9dbd-87644bd5fdc4/inter-1.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/__l5e/assets-v1/305cd330-a03a-41a7-b586-3d3488b8f41f/inter-2.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/__l5e/assets-v1/ad77a3e3-5b45-4d83-9a9b-4c524a7fe7a9/inter-3.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('/__l5e/assets-v1/0f0d0fba-d1a7-478c-8864-8f7c921d4c5c/poppins-0.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('/__l5e/assets-v1/63a730b5-34a8-4bea-9fdd-c9b5dcbb6f44/poppins-1.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('/__l5e/assets-v1/fff4b2f7-c3eb-4c33-b2ad-d49632441cbd/poppins-2.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('/__l5e/assets-v1/edc50fda-6270-4407-8494-0601395d5278/poppins-3.ttf') format('truetype'); font-weight: 700; font-display: swap; }
 
 @tailwind base;
 @tailwind components;
@@ -6,67 +13,82 @@
 
 @layer base {
   :root {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 98%;
+    --background: 60.00 16.67% 97.65%;
+    --foreground: 215.00 27.91% 16.86%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0.00 0.00% 100.00%;
+    --card-foreground: 215.00 27.91% 16.86%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0.00 0.00% 100.00%;
+    --popover-foreground: 215.00 27.91% 16.86%;
 
-    --primary: 113 53% 31%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 144.86 100.00% 27.45%;
+    --primary-foreground: 0.00 0.00% 100.00%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 140.00 35.29% 93.33%;
+    --secondary-foreground: 160.43 60.53% 14.90%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 78%;
+    --muted: 120.00 7.69% 94.90%;
+    --muted-foreground: 220.00 8.94% 46.08%;
 
-    --accent: 113 53% 31%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 140.00 35.29% 93.33%;
+    --accent-foreground: 160.43 60.53% 14.90%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 4.23 76.47% 40.00%;
+    --destructive-foreground: 0.00 0.00% 100.00%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 18%;
-    --ring: 113 53% 31%;
+    --border: 120.00 6.12% 90.39%;
+    --input: 120.00 6.12% 90.39%;
+    --ring: 144.86 100.00% 27.45%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
+
+    --primary-hover: 144.62 100.00% 22.94%;
+    --deep: 160.43 60.53% 14.90%;
+    --warning: 39.73 100.00% 29.02%;
+    --warning-foreground: 0.00 0.00% 100.00%;
+    --warning-soft: 43.64 100.00% 93.53%;
+    --info: 200.87 71.43% 31.57%;
+    --info-soft: 201.43 50.00% 94.51%;
+    --media-scrim: 215.00 27.91% 16.86%;
+    --media-foreground: 0.00 0.00% 100.00%;
+    --chart-2: 160.43 60.53% 14.90%;
+    --chart-3: 40.63 62.56% 39.80%;
+    --chart-4: 275.38 16.05% 47.65%;
+    --chart-5: 195.00 50.98% 40.00%;
+    --chart-6: 351.33 37.82% 53.33%;
 
     /* Custom Discovery tokens */
-    --discovery-black: 0 0% 8%;
-    --discovery-graphite: 0 0% 14%;
-    --discovery-dark: 0 0% 10%;
-    --discovery-green: 113 53% 31%;
-    --discovery-green-light: 113 45% 45%;
-    --discovery-green-glow: 113 60% 25%;
-    --discovery-text: 0 0% 72%;
-    --discovery-text-light: 0 0% 85%;
-    --discovery-cream: 30 20% 95%;
+    --discovery-black: 215.00 27.91% 16.86%;
+    --discovery-graphite: 120.00 7.69% 94.90%;
+    --discovery-dark: 160.43 60.53% 14.90%;
+    --discovery-green: 144.86 100.00% 27.45%;
+    --discovery-green-light: 144.62 100.00% 22.94%;
+    --discovery-green-glow: 144.62 100.00% 22.94%;
+    --discovery-text: 220.00 8.94% 46.08%;
+    --discovery-text-light: 215.00 27.91% 16.86%;
+    --discovery-cream: 60.00 16.67% 97.65%;
     
     /* Light section tokens */
-    --discovery-white: 0 0% 100%;
-    --discovery-light-bg: 0 0% 98%;
-    --discovery-light-card: 0 0% 95%;
+    --discovery-white: 0.00 0.00% 100.00%;
+    --discovery-light-bg: 60.00 16.67% 97.65%;
+    --discovery-light-card: 140.00 35.29% 93.33%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(113 53% 31% / 0.15) 0%, transparent 50%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
-    --gradient-cta: linear-gradient(135deg, hsl(113 53% 31%) 0%, hsl(113 60% 25%) 100%);
+    --gradient-hero: none;
+    --gradient-card: hsl(var(--card));
+    --gradient-cta: hsl(var(--primary));
     --gradient-fade-right: linear-gradient(to right, transparent, hsl(0 0% 10%));
     --gradient-fade-bottom: linear-gradient(to bottom, transparent, hsl(0 0% 10%));
 
-    --shadow-glow: 0 0 60px hsl(113 53% 31% / 0.25);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
-    --shadow-premium: 0 20px 60px hsl(0 0% 0% / 0.5);
-    --shadow-light: 0 4px 20px hsl(0 0% 0% / 0.08);
+    --shadow-glow: 0 2px 8px hsl(var(--foreground) / 0.04);
+    --shadow-card: 0 2px 8px hsl(var(--foreground) / 0.04);
+    --shadow-premium: 0 4px 20px hsl(var(--foreground) / 0.06);
+    --shadow-light: 0 2px 8px hsl(var(--foreground) / 0.04);
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 98%;
+    --background: 60.00 16.67% 97.65%;
+    --foreground: 215.00 27.91% 16.86%;
   }
 }
 
@@ -91,7 +113,7 @@
 
   body {
     @apply bg-background text-foreground antialiased overflow-x-hidden;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: hsl(var(--background));
   }
 
@@ -107,7 +129,8 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', sans-serif;
-    @apply font-semibold tracking-tight;
+    @apply font-semibold;
+    letter-spacing: 0;
   }
 }
 
@@ -147,15 +170,15 @@
   }
 
   .glass-effect {
-    background: hsl(0 0% 100% / 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: hsl(var(--card));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .glass-effect-light {
-    background: hsl(0 0% 100% / 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: hsl(var(--card));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .blur-overlay {
@@ -164,13 +187,13 @@
   }
 
   .premium-card {
-    @apply relative overflow-hidden rounded-2xl;
-    background: linear-gradient(145deg, hsl(0 0% 14%) 0%, hsl(0 0% 10%) 100%);
+    @apply relative overflow-hidden rounded-lg;
+    background: hsl(var(--card));
     box-shadow: var(--shadow-premium);
   }
 
   .premium-card-light {
-    @apply relative overflow-hidden rounded-2xl;
+    @apply relative overflow-hidden rounded-lg;
     background: hsl(var(--discovery-white));
     box-shadow: var(--shadow-light);
   }
@@ -212,4 +235,25 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary) / 0.4) hsl(var(--secondary));
   }
+}
+
+@layer base {
+  body { line-height: 1.6; }
+  ::selection { background: hsl(var(--secondary)); color: hsl(var(--deep)); }
+  button, input, select, textarea { font-family: 'Inter', sans-serif; }
+  h1, h2, h3, h4, h5, h6 { color: hsl(var(--deep)); overflow-wrap: anywhere; }
+  .lucide { stroke-width: 1.5; }
+}
+@layer components {
+  .discovery-auth { background: hsl(var(--background)); }
+  .discovery-auth-form { border-top: 3px solid hsl(var(--primary)); box-shadow: var(--shadow-premium); }
+  .discovery-panel > main { max-width: 1600px; margin-inline: auto; }
+  .discovery-metric { display: flex; flex-direction: column; align-items: stretch; position: relative; gap: 1rem; box-shadow: var(--shadow-card); }
+  .discovery-metric > div:first-child { align-self: flex-end; }
+  .discovery-metric > div:last-child { width: 100%; }
+  .discovery-metric > div:last-child > p:first-child { white-space: normal; min-height: 2.5em; line-height: 1.4; }
+  .discovery-metric > div:last-child > p:last-child { font-family: 'Poppins', sans-serif; font-weight: 600; font-variant-numeric: tabular-nums; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

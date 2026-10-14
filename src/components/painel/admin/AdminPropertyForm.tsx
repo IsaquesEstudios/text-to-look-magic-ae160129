@@ -440,7 +440,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <DialogTitle>{propertyId ? "Editar Imóvel" : "Novo Imóvel"}</DialogTitle>
           {/* Step indicator */}
@@ -489,7 +489,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, type: "house" })}
-                  className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+                  className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
                     form.type === "house"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -500,7 +500,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, type: "land", estimated_renovation_cost: "" })}
-                  className={`flex-1 py-3 rounded-xl border transition-colors text-sm font-medium ${
+                  className={`flex-1 py-3 rounded-lg border transition-colors text-sm font-medium ${
                     form.type === "land"
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -717,7 +717,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
             <div className="space-y-2">
               <Label>Foto de Capa</Label>
               {coverImage ? (
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
                   <img src={coverImage} alt="Capa" className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -728,7 +728,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full aspect-video rounded-xl border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
+                <label className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
                   <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                   <span className="text-sm text-muted-foreground">Clique para enviar</span>
                   <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
@@ -777,7 +777,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
           {/* ===== STEP 3: Investidores (editing existing property) ===== */}
           {step === 3 && propertyId && (
-            <div className="rounded-xl border border-border/50 p-4">
+            <div className="rounded-lg border border-border p-4">
               <PropertyInvestors
                 propertyId={propertyId}
                 totalProject={totalProjeto}

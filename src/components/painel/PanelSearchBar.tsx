@@ -106,7 +106,7 @@ export function PanelSearchBar() {
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative flex items-center">
-        <Search className="absolute left-3 h-4 w-4 text-muted-foreground/50 pointer-events-none" />
+        <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
           ref={inputRef}
           type="text"
@@ -114,17 +114,17 @@ export function PanelSearchBar() {
           onChange={e => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => query && setOpen(true)}
           placeholder="Buscar imóveis, páginas..."
-          className="w-full h-9 pl-9 pr-8 rounded-xl border border-border/30 bg-secondary/30 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all"
+          className="w-full h-9 pl-9 pr-8 rounded-lg border border-border bg-secondary/30 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all"
         />
         {query && (
-          <button onClick={() => { setQuery(""); setOpen(false); }} className="absolute right-2.5 text-muted-foreground/50 hover:text-foreground">
+          <button onClick={() => { setQuery(""); setOpen(false); }} className="absolute right-2.5 text-muted-foreground hover:text-foreground">
             <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border/30 rounded-xl shadow-xl overflow-hidden z-50 max-h-[320px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-lg shadow-xl overflow-hidden z-50 max-h-[320px] overflow-y-auto">
           {results.map((item, i) => (
             <button
               key={`${item.path}-${i}`}
@@ -138,7 +138,7 @@ export function PanelSearchBar() {
                 <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
                 {item.sublabel && <p className="text-[11px] text-muted-foreground truncate">{item.sublabel}</p>}
               </div>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/40 flex-shrink-0">
+              <span className="text-[10px] uppercase tracking-normal text-muted-foreground flex-shrink-0">
                 {item.type === "page" ? "Página" : "Imóvel"}
               </span>
             </button>

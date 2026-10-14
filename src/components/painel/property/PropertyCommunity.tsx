@@ -106,7 +106,7 @@ export function PropertyCommunity({ propertyId }: Props) {
   };
 
   return (
-    <Card className="bg-card/50 border-border/50">
+    <Card className="bg-card border-border">
       <CardContent className="p-4 space-y-4">
         {/* Messages area */}
         <div className="h-96 overflow-y-auto space-y-3 pr-2">
@@ -120,7 +120,7 @@ export function PropertyCommunity({ propertyId }: Props) {
             </p>
           ) : (
             messages.map((msg) => (
-              <div key={msg.id} className="p-3 rounded-xl bg-secondary/50 space-y-2">
+              <div key={msg.id} className="p-3 rounded-lg bg-secondary/50 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-primary">Admin</span>
                   <span className="text-xs text-muted-foreground">

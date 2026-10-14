@@ -136,7 +136,7 @@ export default function UserComprovantesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{p.receiptsTitle}</h1>
+        <h1 className="text-2xl font-bold tracking-normal">{p.receiptsTitle}</h1>
         <p className="text-sm text-muted-foreground mt-1">{p.receiptsDesc}</p>
       </div>
 
@@ -167,17 +167,17 @@ export default function UserComprovantesPage() {
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="relative cursor-pointer rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/40 bg-card/30 hover:bg-card/50 transition-all flex flex-col items-center justify-center py-10 gap-2"
+            className="relative cursor-pointer rounded-lg border-2 border-dashed border-border hover:border-primary/40 bg-card hover:bg-card transition-all flex flex-col items-center justify-center py-10 gap-2"
           >
             {uploadMutation.isPending ? (
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             ) : (
-              <Upload className="h-8 w-8 text-muted-foreground/50" />
+              <Upload className="h-8 w-8 text-muted-foreground" />
             )}
             <p className="text-sm text-muted-foreground font-medium">
               {uploadMutation.isPending ? p.uploading : p.uploadReceipt}
             </p>
-            <p className="text-xs text-muted-foreground/60">{p.uploadReceiptDesc}</p>
+            <p className="text-xs text-muted-foreground">{p.uploadReceiptDesc}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -195,7 +195,7 @@ export default function UserComprovantesPage() {
               {sent.map((item) => (
                 <div
                   key={item.id}
-                  className="group relative rounded-xl overflow-hidden border border-border/40 bg-card"
+                  className="group relative rounded-lg overflow-hidden border border-border bg-card"
                 >
                   {isPdf(item.image_url) ? (
                     <button
@@ -203,7 +203,7 @@ export default function UserComprovantesPage() {
                       onClick={() => setSelectedImage(item.image_url)}
                       className="w-full flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
                     >
-                      <FileText className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                      <FileText className="h-10 w-10 text-muted-foreground mb-2" />
                       <span className="text-xs text-muted-foreground truncate max-w-[90%] px-2">
                         {item.description || "PDF"}
                       </span>
@@ -221,8 +221,8 @@ export default function UserComprovantesPage() {
                       />
                     </button>
                   )}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 flex items-end justify-between">
-                    <span className="text-[11px] text-white/90">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-media-scrim/70 to-transparent p-2 flex items-end justify-between">
+                    <span className="text-[11px] text-media-foreground/90">
                       {format(new Date(item.created_at), "dd/MM/yyyy", {
                         locale: dateLocale,
                       })}
@@ -231,7 +231,7 @@ export default function UserComprovantesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 text-white/70 hover:text-destructive hover:bg-transparent"
+                      className="h-6 w-6 text-media-foreground/70 hover:text-destructive hover:bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteMutation.mutate(item.id);
@@ -257,7 +257,7 @@ export default function UserComprovantesPage() {
               {received.map((item) => (
                 <div
                   key={item.id}
-                  className="group relative rounded-xl overflow-hidden border border-border/40 bg-card"
+                  className="group relative rounded-lg overflow-hidden border border-border bg-card"
                 >
                   {isPdf(item.image_url) ? (
                     <button
@@ -265,7 +265,7 @@ export default function UserComprovantesPage() {
                       onClick={() => setSelectedImage(item.image_url)}
                       className="w-full flex flex-col items-center justify-center aspect-square bg-secondary/30 hover:bg-secondary/50 transition-colors"
                     >
-                      <FileText className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                      <FileText className="h-10 w-10 text-muted-foreground mb-2" />
                       <span className="text-xs text-muted-foreground truncate max-w-[90%] px-2">
                         {item.description || "PDF"}
                       </span>
@@ -283,8 +283,8 @@ export default function UserComprovantesPage() {
                       />
                     </button>
                   )}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                    <span className="text-[11px] text-white/90">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-media-scrim/60 to-transparent p-2">
+                    <span className="text-[11px] text-media-foreground/90">
                       {format(new Date(item.created_at), "dd/MM/yyyy", {
                         locale: dateLocale,
                       })}
@@ -308,7 +308,7 @@ export default function UserComprovantesPage() {
               {recharges.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center gap-4 rounded-xl border border-border/20 bg-card/30 px-4 py-3"
+                  className="flex items-center gap-4 rounded-lg border border-border bg-card px-4 py-3"
                 >
                   <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <ArrowDownLeft className="h-4 w-4 text-primary" />
@@ -343,7 +343,7 @@ export default function UserComprovantesPage() {
               <a href={selectedImage} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">Abrir em nova aba</a>
               <iframe
                 src={`https://docs.google.com/gview?url=${encodeURIComponent(selectedImage)}&embedded=true`}
-                className="w-full flex-1 min-h-[70vh] rounded-lg border border-border/50"
+                className="w-full flex-1 min-h-[70vh] rounded-lg border border-border"
                 title="Recibo"
               />
             </>
@@ -360,7 +360,7 @@ const isPdfUrl = (u: string | null) => !!u && /\.pdf(\?|$)/i.test(u);
 
 const EmptyState = forwardRef<HTMLDivElement, { text: string; icon?: React.ReactNode }>(
   ({ text, icon }, ref) => (
-    <div ref={ref} className="text-center py-16 text-muted-foreground rounded-2xl border border-dashed border-border/40">
+    <div ref={ref} className="text-center py-16 text-muted-foreground rounded-lg border border-dashed border-border">
       {icon || <FileImage className="h-10 w-10 mx-auto mb-3 opacity-40" />}
       <p className="text-sm">{text}</p>
     </div>

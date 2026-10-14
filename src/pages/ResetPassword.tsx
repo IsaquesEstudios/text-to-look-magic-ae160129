@@ -85,7 +85,7 @@ export default function ResetPassword() {
           <img src={discoveryLogo} alt="Discovery" className="h-12" />
         </div>
 
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+        <Card className="border-border bg-card ">
           {success ? (
             <>
               <CardHeader className="text-center">
