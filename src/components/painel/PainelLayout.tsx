@@ -135,6 +135,7 @@ export function PainelLayout() {
           <div className={cn("flex items-center h-20 px-4 border-b border-border", collapsed ? "justify-center" : "justify-between")}>
             <Link to="/pt" className="flex items-center gap-2 group flex-shrink-0">
               <img src={discoveryLogo} alt="Discovery" className={cn("transition-all", collapsed ? "h-6" : "h-7")} />
+              {!collapsed && <span className="font-heading text-sm font-semibold text-deep">Discovery</span>}
             </Link>
             {!collapsed && (
               <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => setCollapsed(true)}>

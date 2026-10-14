@@ -9,6 +9,10 @@ import discoveryLogo from "@/assets/discovery-logo.png";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { routes } from "./routes";
+import { initializeDiscoveryPresentation } from "@/lib/discoveryPresentation";
+import { Button } from "@/components/ui/button";
+
+initializeDiscoveryPresentation();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,12 +37,12 @@ const OfflineScreen = ({ onRetry }: { onRetry: () => void }) => (
     <WifiOff className="h-12 w-12 mb-5 opacity-35 text-muted-foreground" />
     <h1 className="text-lg font-semibold mb-1">Sem conexão</h1>
     <p className="text-sm text-muted-foreground text-center mb-8">Verifique sua internet e tente novamente.</p>
-    <button
+    <Button
       onClick={onRetry}
-      className="bg-primary text-primary-foreground border-none px-10 py-3 rounded-xl text-sm font-semibold"
+      className="px-10"
     >
       Reconectar
-    </button>
+    </Button>
   </div>
 );
 
