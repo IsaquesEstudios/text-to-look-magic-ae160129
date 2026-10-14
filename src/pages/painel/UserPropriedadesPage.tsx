@@ -60,7 +60,7 @@ function KPICards({ aggregated, p }: { aggregated: AggregatedProperty[]; p: any 
   if (aggregated.length === 0) return null;
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-3">
-      <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-foreground text-background border-foreground">
+      <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-deep text-background border-deep">
         <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-background/80">{p.totalInvested}</p>
         <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums">$ {totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
       </div>

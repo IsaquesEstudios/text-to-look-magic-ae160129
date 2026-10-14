@@ -273,7 +273,7 @@ function AdminDashboardContent() {
 
   const money = (v: number) => `$ ${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const Kpi = ({ label, value, dark }: { label: string; value: string; dark?: boolean }) => (
-    <div className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+    <div className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-deep text-background border-deep" : "bg-card border-primary/40 text-foreground"}`}>
       <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${dark ? "text-background/80" : "text-muted-foreground"}`}>{label}</p>
       <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading">{value}</p>
     </div>
