@@ -46,22 +46,18 @@ function TerrenosKPIs() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {cards.map((card) => (
-        <Card key={card.label} className="bg-card border-border">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-normal">
-                {card.label}
-              </span>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="text-2xl font-bold text-foreground">
-              {(() => { const { compact, full } = formatCurrencySmart(card.value); return compact !== full ? <><span className="sm:hidden">{compact}</span><span className="hidden sm:inline">{full}</span></> : full; })()}
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      {cards.map((card, i) => {
+        const dark = i === 0;
+        return (
+          <div key={card.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+            <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${dark ? "text-background/80" : "text-muted-foreground"}`}>{card.label}</p>
+            <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums">
+              $ {card.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

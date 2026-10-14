@@ -59,29 +59,18 @@ function KPICards({ aggregated, p }: { aggregated: AggregatedProperty[]; p: any 
   const roi = totalInvested > 0 ? ((totalEstimatedReturn - totalInvested) / totalInvested) * 100 : 0;
   if (aggregated.length === 0) return null;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div className="discovery-metric rounded-lg border border-border bg-card p-5">
-        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-primary" /></div>
-        <div>
-          <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.totalInvested}</p>
-          <p className="text-lg font-bold text-foreground">${totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-        </div>
+    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-foreground text-background border-foreground">
+        <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-background/80">{p.totalInvested}</p>
+        <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums">$ {totalInvested.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
       </div>
-      <div className="discovery-metric rounded-lg border border-border bg-card p-5">
-        <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-accent" /></div>
-        <div>
-          <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.estimatedReturn}</p>
-          <p className={`text-lg font-bold ${totalEstimatedReturn >= totalInvested ? 'text-primary' : 'text-destructive'}`}>
-            ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
-        </div>
+      <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-card border-primary/40 text-foreground">
+        <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-muted-foreground">{p.estimatedReturn}</p>
+        <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums ${totalEstimatedReturn >= totalInvested ? '' : 'text-destructive'}`}>$ {totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
       </div>
-      <div className="discovery-metric rounded-lg border border-border bg-card p-5">
-        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><Percent className="h-5 w-5 text-primary" /></div>
-        <div>
-          <p className="text-[11px] uppercase tracking-normal text-muted-foreground">{p.estimatedROI}</p>
-          <p className={`text-lg font-bold ${roi >= 0 ? 'text-primary' : 'text-destructive'}`}>{roi.toFixed(1)}%</p>
-        </div>
+      <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-card border-primary/40 text-foreground">
+        <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-muted-foreground">{p.estimatedROI}</p>
+        <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums ${roi >= 0 ? '' : 'text-destructive'}`}>{roi.toFixed(1)}%</p>
       </div>
     </div>
   );

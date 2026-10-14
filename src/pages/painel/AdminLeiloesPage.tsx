@@ -317,28 +317,18 @@ export default function AdminLeiloesPage() {
       </div>
 
       {/* KPIs: Available + Invested */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-discovery-green/10 flex items-center justify-center flex-shrink-0">
-            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-discovery-green" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs uppercase tracking-normal text-muted-foreground truncate">Disponível para Investimento</p>
-            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
-              ${(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-            </p>
-          </div>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-card border-primary/40 text-foreground">
+          <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-muted-foreground">Disponível para Investimento</p>
+          <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums">
+            $ {(investmentKpis?.available ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          </p>
         </div>
-        <div className="discovery-metric rounded-lg border border-border bg-card p-4 sm:p-5 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs uppercase tracking-normal text-muted-foreground truncate">Total Investido em Leilões</p>
-            <p className="text-sm sm:text-xl font-bold text-foreground truncate">
-              ${(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-            </p>
-          </div>
+        <div className="rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 bg-foreground text-background border-foreground">
+          <p className="text-[10px] leading-tight sm:text-sm whitespace-nowrap text-background/80">Total Investido em Leilões</p>
+          <p className="text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums">
+            $ {(investmentKpis?.invested ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          </p>
         </div>
       </div>
 
