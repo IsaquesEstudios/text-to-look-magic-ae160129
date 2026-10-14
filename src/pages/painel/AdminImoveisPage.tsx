@@ -77,7 +77,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
       {cards.map((card) => {
         const dark = card.label === "Total Investido" || (card as any).isPercentage;
         return (
-          <div key={card.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"} ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
+          <div key={card.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${dark ? "bg-deep text-background border-deep" : "bg-card border-primary/40 text-foreground"} ${(card as any).isPercentage && filterType === "house" ? "col-span-2 sm:col-span-1" : ""}`}>
             <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${dark ? "text-background/80" : "text-muted-foreground"}`}>{card.label}</p>
             <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading tabular-nums ${!dark && (card as any).colorClass ? (card as any).colorClass : ""}`}>
               {(card as any).isPercentage

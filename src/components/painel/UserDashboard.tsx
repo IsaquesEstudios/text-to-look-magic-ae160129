@@ -192,7 +192,7 @@ export function UserDashboard() {
           { label: p.estimatedReturn, value: `$ ${totalEstimatedReturn.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, tone: totalEstimatedReturn >= totalInvested ? "" : "text-destructive" },
           { label: p.estimatedROI, value: `${portfolioRoi.toFixed(1)}%`, dark: true },
         ].map((k) => (
-          <div key={k.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${k.dark ? "bg-foreground text-background border-foreground" : "bg-card border-primary/40 text-foreground"}`}>
+          <div key={k.label} className={`rounded-lg border px-2 py-1.5 sm:px-4 sm:py-3 min-w-0 ${k.dark ? "bg-deep text-background border-deep" : "bg-card border-primary/40 text-foreground"}`}>
             <p className={`text-[10px] leading-tight sm:text-sm whitespace-nowrap ${k.dark ? "text-background/80" : "text-muted-foreground"}`}>{k.label}</p>
             <p className={`text-[13px] sm:text-xl font-bold whitespace-nowrap font-heading ${(k as any).tone ?? ""}`}>{k.value}</p>
           </div>
