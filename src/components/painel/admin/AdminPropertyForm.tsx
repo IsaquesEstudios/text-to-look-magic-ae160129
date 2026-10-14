@@ -440,21 +440,21 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden bg-card border-border p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>{propertyId ? "Editar Imóvel" : "Novo Imóvel"}</DialogTitle>
           {/* Step indicator */}
-          <div className="flex items-center gap-2 pt-3">
+          <div className="grid grid-flow-col auto-cols-fr gap-1 pt-3 sm:flex sm:items-center sm:gap-2">
             {stepTitles.map((title, i) => {
               const n = i + 1;
               const active = step === n;
               const done = step > n;
               return (
-                <div key={title} className="flex items-center gap-2">
+                <div key={title} className="min-w-0 flex items-center gap-1 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => setStep(n)}
-                    className="flex items-center gap-1.5 cursor-pointer"
+                    className="min-w-0 flex flex-col sm:flex-row items-center gap-1.5 cursor-pointer"
                   >
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
@@ -471,7 +471,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
                       {title}
                     </span>
                   </button>
-                  {n < stepTitles.length && <span className="w-6 h-px bg-border" />}
+                  {n < stepTitles.length && <span className="hidden sm:block w-6 h-px bg-border shrink-0" />}
                 </div>
               );
             })}

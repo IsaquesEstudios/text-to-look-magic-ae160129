@@ -20,7 +20,8 @@ export function initializeDiscoveryPresentation() {
       ? new URL(asset.url, "https://text-to-look-magic.lovable.app").href
       : asset.url;
     const face = new FontFace(family, `url("${url}")`, { weight, display: "swap" });
-    face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {
+    document.fonts.add(face);
+    face.load().catch(() => {
       // Keep the readable system fallback when font delivery is unavailable.
     });
   }
