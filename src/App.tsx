@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRoutes } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { WifiOff } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
@@ -13,6 +13,10 @@ import { initializeDiscoveryPresentation } from "@/lib/discoveryPresentation";
 import { Button } from "@/components/ui/button";
 
 initializeDiscoveryPresentation();
+
+// The logo animation draws for ~2s; hold the loader 500ms longer after it finishes
+// so screen recordings always capture the full animation.
+const BOOT_HOLD_MS = 2500;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +53,12 @@ const App = () => {
   const { isOnline, checkConnection } = useOnlineStatus();
   const auth = useAuthInternal();
   const routeElement = useRoutes(routes);
+  const [booted, setBooted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setBooted(true), BOOT_HOLD_MS);
+    return () => clearTimeout(t);
+  }, []);
 
   if (!isOnline) {
     return <OfflineScreen onRetry={checkConnection} />;
@@ -60,9 +70,13 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <Suspense fallback={<PageLoader />}>
-            {routeElement}
-          </Suspense>
+          {!booted ? (
+            <PageLoader />
+          ) : (
+            <Suspense fallback={<PageLoader />}>
+              {routeElement}
+            </Suspense>
+          )}
         </TooltipProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
