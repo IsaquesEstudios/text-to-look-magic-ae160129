@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRoutes } from "react-router-dom";
 import { Suspense } from "react";
-import { Loader2, WifiOff } from "lucide-react";
+import { WifiOff } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { AuthContext, useAuthInternal } from "@/hooks/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";

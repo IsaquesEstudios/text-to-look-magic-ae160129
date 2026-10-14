@@ -49,7 +49,6 @@ const PainelLayoutModule = lazy(() =>
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-background">
     <AnimatedLogo size={96} />
-    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
   </div>
 );
 
