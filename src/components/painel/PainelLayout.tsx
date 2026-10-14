@@ -380,7 +380,7 @@ export function PainelLayout() {
                         to={item.path}
                         onClick={(event) => handlePanelNavigation(event, item.path, () => setMoreOpen(false))}
                         className={cn(
-                          "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
+                          "relative flex min-w-0 flex-1 flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors px-1",
                           "text-[10px]",
                           isActive ? "text-primary" : "text-muted-foreground"
                         )}
@@ -399,7 +399,7 @@ export function PainelLayout() {
                   <button
                     onClick={() => setMoreOpen(prev => !prev)}
                     className={cn(
-                      "relative flex flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors flex-shrink-0 px-3",
+                      "relative flex min-w-0 flex-1 flex-col items-center gap-1 py-1.5 rounded-lg font-medium transition-colors px-1",
                       "text-[10px]",
                       moreOpen ? "text-primary" : "text-muted-foreground"
                     )}

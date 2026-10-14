@@ -83,7 +83,7 @@ function KPICards({ filterType }: { filterType: "house" | "land" }) {
               </span>
               <card.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
             </div>
-            <p className={`text-lg sm:text-2xl font-bold ${(card as any).colorClass || "text-foreground"}`}>
+            <p className={`font-heading text-lg sm:text-xl font-semibold break-words tabular-nums ${(card as any).colorClass || "text-foreground"}`}>
               {(card as any).isPercentage
                 ? `${card.value.toFixed(1)}%`
                 : fmt(card.value)

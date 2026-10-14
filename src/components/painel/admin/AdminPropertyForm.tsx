@@ -777,7 +777,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
           {/* ===== STEP 3: Investidores (editing existing property) ===== */}
           {step === 3 && propertyId && (
-            <div className="rounded-lg border border-border p-4">
+            <div className="min-w-0">
               <PropertyInvestors
                 propertyId={propertyId}
                 totalProject={totalProjeto}
@@ -792,7 +792,7 @@ export function AdminPropertyForm({ propertyId, onClose }: Props) {
 
 
           {/* Footer navigation */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             {step > 1 ? (
               <Button type="button" variant="outline" onClick={handleBack} className="flex-1">
                 <ArrowLeft className="h-4 w-4" /> Voltar
